@@ -6,7 +6,7 @@ Authors@R:
 Description: The package reads and write the files that are produced of the statistical spreadsheet jamovi (www.jamovi.org).
     As syntax from jamovi can also be directly used in R, having import / export routines for the data files permits an easy
     transfer of analyses between jamovi and R.
-License: file LICENSE
+License: AGPL-3
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)

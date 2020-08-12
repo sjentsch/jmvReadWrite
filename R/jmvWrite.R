@@ -25,6 +25,10 @@ jmvWrite <- function(dtaFrm = NULL, fleNme = "") {
     
     # create data.bin 
     binHdl <- file(description = "data.bin", open = "wb")
+    
+    # create strings.bin
+    strHdl <- file(description = "strings.bin", open = "wb")
+    strPos <- 0
                                        
     for (i in 1:colNum) {
         # assign fields stored in data frame (if the columns contain attributes)
@@ -50,9 +54,8 @@ jmvWrite <- function(dtaFrm = NULL, fleNme = "") {
             # if the jmv-id marker is set in the original data
             if (! is.null(attr(dtaFrm[[i]], 'jmv-id')) && attr(dtaFrm[[i]], 'jmv-id') == TRUE) {
                 mtaDta$dataSet$fields[[i]][['measureType']] <- 'ID'
-            }
             # if original data are text
-            if (is.character(dtaFrm[[i]])) {
+            } else if (is.character(dtaFrm[[i]])) {
                 mtaDta$dataSet$fields[[i]][['measureType']] <- 'Nominal'
             # if original data are a factor
             } else if (is.factor(dtaFrm[[i]])) {
@@ -89,41 +92,47 @@ jmvWrite <- function(dtaFrm = NULL, fleNme = "") {
         }
 
         colCrr <- dtaFrm[[i]]
-        if (is.character(colCrr)) {
-            colCrr <- factor(colCrr)
-            mtaDta$dataSet$fields[[i]][['dataType']] <- 'Text'
-        }
-        
-        if (is.factor(colCrr)) {
-            facLvl <- attr(colCrr, 'levels')
-            facVal <- attr(colCrr, 'values')
-            if (sum(is.na(suppressWarnings(as.numeric(facLvl)))) > 1) { 
+        if (mtaDta$dataSet$fields[[i]][['measureType']] != "ID") {
+            if (is.character(colCrr)) {
+                colCrr <- factor(colCrr)
                 mtaDta$dataSet$fields[[i]][['dataType']] <- 'Text'
             }
-            if (is.null(facVal)) {
-                colCrr <- as.integer(colCrr)
-                facVal = unique(sort(colCrr))
-            } else {
-                colCrr <-  facVal[as.integer(colCrr)]
-            }
-            if (length(facVal) > 0) {
-                xtdDta[[names(dtaFrm[i])]] <- list(labels = lapply(1:length(facVal), function(i) list(facVal[[i]], facLvl[[i]], facLvl[[i]])))
-            }
-            rm("facLvl", "facVal")
-        } else {
-            mtaDta$dataSet$fields[[i]][["trimLevels"]] <- NULL
-        }
-
-        if (mtaDta$dataSet$fields[[i]]$type == "number") {
-            if (mtaDta$dataSet$fields[[i]]$dataType != "Decimal") {
-                if (all(abs(colCrr - round(colCrr)) < sqrt(.Machine$double.eps), na.rm = TRUE)) {
-                    mtaDta$dataSet$fields[[i]]$type = "integer"
-                    mtaDta$dataSet$fields[[i]]$dataType = "Integer"                    
-                } else {
-                    mtaDta$dataSet$fields[[i]]$type = "number"
-                    mtaDta$dataSet$fields[[i]]$dataType = "Decimal"
+        
+            if (is.factor(colCrr)) {
+                facLvl <- attr(colCrr, 'levels')
+                facVal <- attr(colCrr, 'values')
+                if (sum(is.na(suppressWarnings(as.numeric(facLvl)))) > 1) { 
+                    mtaDta$dataSet$fields[[i]][['dataType']] <- 'Text'
                 }
-            }        
+                if (is.null(facVal)) {
+                    colCrr <- as.integer(colCrr)
+                    facVal = unique(sort(colCrr))
+                } else {
+                    colCrr <-  facVal[as.integer(colCrr)]
+                }
+                if (length(facVal) > 0) {
+                    xtdDta[[names(dtaFrm[i])]] <- list(labels = lapply(1:length(facVal), function(i) list(facVal[[i]], facLvl[[i]], facLvl[[i]])))
+                }
+                rm("facLvl", "facVal")
+            } else {
+                mtaDta$dataSet$fields[[i]][["trimLevels"]] <- NULL
+            }
+
+            if (mtaDta$dataSet$fields[[i]]$type == "number") {
+                if (mtaDta$dataSet$fields[[i]]$dataType != "Decimal") {
+                    if (all(abs(colCrr - round(colCrr)) < sqrt(.Machine$double.eps), na.rm = TRUE)) {
+                        mtaDta$dataSet$fields[[i]]$type = "integer"
+                        mtaDta$dataSet$fields[[i]]$dataType = "Integer"                    
+                    } else {
+                        mtaDta$dataSet$fields[[i]]$type = "number"
+                        mtaDta$dataSet$fields[[i]]$dataType = "Decimal"
+                    }
+                }        
+            }
+        } else {
+            if (is.character(colCrr)) {
+                mtaDta$dataSet$fields[[i]]$type = "string"
+            }
         }
         
         # check that dataType, and measureType are set accordingly to type (attribute and column in the data frame) 
@@ -136,10 +145,17 @@ jmvWrite <- function(dtaFrm = NULL, fleNme = "") {
             colWrt = as.integer(colCrr)
         } else if (mtaDta$dataSet$fields[[i]]$type == 'number') { 
             colWrt = as.double(colCrr)
+        } else if (mtaDta$dataSet$fields[[i]]$type == 'string') {
+            colWrt = rep(0, length(colCrr))
+            for (j in 1:length(colCrr)) {
+                writeBin(colCrr[j], strHdl)
+                colWrt[j] = strPos
+                strPos = strPos + nchar(colCrr[j]) + 1
+            }
+            colWrt = as.integer(colWrt)
         } else {
             stop(paste('Variable type', mtaDta$dataSet$fields[[i]]$type, 'not implemented.'))
         }
-#       str(colWrt)
         writeBin(colWrt, binHdl, endian = "little")
         
         # check that dataType, and measureType are set accordingly
@@ -165,6 +181,13 @@ jmvWrite <- function(dtaFrm = NULL, fleNme = "") {
     close(binHdl)
     zip(fleNme, 'data.bin', flags = "-r9Xq")
     unlink('data.bin')
+    
+    # check whether data were written to strings.bin
+    close(strHdl)
+    if (file.size('strings.bin') > 0) {
+        zip(fleNme, 'strings.bin', flags = "-r9Xq")
+    }
+    unlink('strings.bin') 
 
     # create META-INF/MANIFEST.MF, write it and add it to ZIP file
     mnfTxt <- c("Manifest-Version: 1.0", "Data-Archive-Version: 1.0.2", "jamovi-Archive-Version: 8.0", "Created-By: jmvWrite 0.0.1")

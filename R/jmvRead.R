@@ -20,9 +20,9 @@ jmvRead <- function(fleNme = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = FALSE)
     strBin = grepl('strings.bin', toString(unzip(fleNme, list=TRUE)$Name))
     
     # read and decode
-    mnfTxt <-                 readLines(mnfHdl <- file(mnfFle <- unzip(fleNme, 'META-INF/MANIFEST.MF', junkpaths = T), 'r'), warn=F);  close(mnfHdl); unlink(mnfFle); rm('mnfHdl', 'mnfFle');
-    mtaDta <- rjson::fromJSON(readLines(mtaHdl <- file(mtaFle <- unzip(fleNme, 'metadata.json',        junkpaths = T), 'r'), warn=F)); close(mtaHdl); unlink(mtaFle); rm('mtaHdl', 'mtaFle');
-    xtdDta <- rjson::fromJSON(readLines(xtdHdl <- file(xtdFle <- unzip(fleNme, 'xdata.json',           junkpaths = T), 'r'), warn=F)); close(xtdHdl); unlink(xtdFle); rm('xtdHdl', 'xtdFle');
+    mnfTxt <-                 readLines(mnfHdl <- file(mnfFle <- unzip(fleNme, 'META-INF/MANIFEST.MF', junkpaths = T), 'r'), warn=F);                  close(mnfHdl); unlink(mnfFle); rm('mnfHdl', 'mnfFle');
+    mtaDta <- rjson::fromJSON(readLines(mtaHdl <- file(mtaFle <- unzip(fleNme, 'metadata.json',        junkpaths = T), 'r'), warn=F), simplify=FALSE); close(mtaHdl); unlink(mtaFle); rm('mtaHdl', 'mtaFle');
+    xtdDta <- rjson::fromJSON(readLines(xtdHdl <- file(xtdFle <- unzip(fleNme, 'xdata.json',           junkpaths = T), 'r'), warn=F), simplify=FALSE); close(xtdHdl); unlink(xtdFle); rm('xtdHdl', 'xtdFle');
                                         binHdl <- file(binFle <- unzip(fleNme, 'data.bin',             junkpaths = T), 'rb');
     if (strBin)                       { strHdl <- file(strFle <- unzip(fleNme, 'strings.bin',          junkpaths = T), 'rb'); }
 
@@ -52,7 +52,6 @@ jmvRead <- function(fleNme = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = FALSE)
         } else {
             stop(paste('Variable type', mtaDta$dataSet$fields[[i]]$type, 'not implemented.'))
         }
-        print(str(colRaw))
 
         # name, description
         nmeCrr = mtaDta$dataSet$fields[[i]]$name
@@ -93,8 +92,10 @@ jmvRead <- function(fleNme = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = FALSE)
         }
         
         if (sveAtt) {
-            for (attNme in c('id', 'columnType', 'dataType', 'measureType', 'formula', 'formulaMessage', 'parentId', 'width', 'importName', 'transform', 'edits', 'trimLevels')) {
-                attr(dtaFrm[[nmeCrr]], attNme) = mtaDta$dataSet$fields[[i]][[attNme]]
+            for (attNme in c('id', 'columnType', 'dataType', 'measureType', 'formula', 'formulaMessage', 'parentId', 'width', 'type', 'importName', 'transform', 'edits', 'trimLevels', 'filterNo', 'active')) {
+                if (! is.null(mtaDta$dataSet$fields[[i]][attNme])) {
+                    attr(dtaFrm[[nmeCrr]], attNme) = mtaDta$dataSet$fields[[i]][[attNme]]
+                }
             }
         }
 
@@ -147,6 +148,7 @@ jmvRead <- function(fleNme = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = FALSE)
     
     # removedRows, addedRows, transforms
     if (sveAtt) {
+        print(mtaDta$dataSet)
         for (attNme in c('removedRows', 'addedRows', 'transforms')) {
             attr(dtaFrm, attNme) = mtaDta$dataSet[[attNme]]
         }

@@ -1,18 +1,18 @@
-#' Read files created of jamovi (statistical spreadsheet, www.jamovi.org)
+#' Read files created of the statistical spreadsheet 'jamovi' (www.jamovi.org)
 #'
-#' @param fleNme name of the jamovi file to be read (.omv; default = "")
+#' @param fleNme name of the 'jamovi' file to be read ("FILENAME.omv"; default = "")
 #' @param useFlt apply filters (remove the lines where the filter is set to 0; default: FALSE)
 #' @param rmMsVl remove values defined as missing values (replace them with NA; default - FALSE)
 #' @param sveAtt store attributes that are not required in the data set (if you want to write the same data set using jmvWrite; default – FALSE)
-#' @return data frame (can be directly used with functions included in the R-package "jmv" and syntax from jamovi; also compatible with the format of the  R-package "foreign")
+#' @return data frame (can be directly used with functions included in the R-package 'jmv' and syntax from 'jamovi'; also compatible with the format of the  R-package "foreign")
 #'
 #' @export jmvRead
 
 jmvRead <- function(fleNme = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = FALSE) {
-  
+
     # check whether the file exists and whether it has the correct format
     if (! file.exists(fleNme))                                                    { stop(paste0('File "', fleNme, '" not found.')) }
-    hdrStr = readBin(tmpHdl <- file(fleNme, 'rb'), 'character'); close(tmpHdl); rm('tmpHdl');
+    hdrStr <- readBin(tmpHdl <- file(fleNme, 'rb'), 'character'); close(tmpHdl); rm('tmpHdl');
     if (! hdrStr == "PK\003\004\024")                                             { stop(paste0('File "', fleNme, '" has not the correct file format (is not a ZIP archive).')) }
     if (! grepl('META-INF/MANIFEST.MF', toString(unzip(fleNme, list=TRUE)$Name))) { stop(paste0('File "', fleNme, '" has not the correct file format (is not a jamovi-file).')) }
     
@@ -68,8 +68,8 @@ jmvRead <- function(fleNme = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = FALSE)
             } else if (mtaDta$dataSet$fields[[i]]$columnType ==   'Filter') {
                 colRaw[[1]] = as.logical(colRaw[[1]])
                 fltLst = c(fltLst, i)
-            } else {
-                print(paste(nmeCrr, ' - ', mtaDta$dataSet$fields[[i]]$dataType, ' - ', mtaDta$dataSet$fields[[i]]$columnType))
+#           } else {
+#               print(paste(nmeCrr, ' - ', mtaDta$dataSet$fields[[i]]$dataType, ' - ', mtaDta$dataSet$fields[[i]]$columnType))
             }
         }
         
@@ -148,7 +148,6 @@ jmvRead <- function(fleNme = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = FALSE)
     
     # removedRows, addedRows, transforms
     if (sveAtt) {
-        print(mtaDta$dataSet)
         for (attNme in c('removedRows', 'addedRows', 'transforms')) {
             attr(dtaFrm, attNme) = mtaDta$dataSet[[attNme]]
         }

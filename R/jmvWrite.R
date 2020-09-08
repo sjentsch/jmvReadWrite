@@ -1,7 +1,8 @@
-#' Write files to be used in jamovi (statistical spreadsheet, www.jamovi.org)
+#' Write files to be used with the statistical spreadsheet 'jamovi'
+#' (www.jamovi.org)
 #'
 #' @param dtaFrm Data frame to be exported (default = NULL)
-#' @param fleNme Name / position of the output file to be generated (.omv; default = "")
+#' @param fleNme Name / position of the output file to be generated ("FILENAME.omv"; default = "")
 #' @return NULL
 #'
 #' @export jmvWrite
@@ -158,7 +159,7 @@ jmvWrite <- function(dtaFrm = NULL, fleNme = "") {
         # check that dataType, and measureType are set accordingly to type (attribute and column in the data frame) 
         # dataType: Text, Integer, Decimal
         # 
-        print(paste0(format(i, width = 2), ': ', mtaDta$dataSet$fields[[i]]$type, ' - ', mtaDta$dataSet$fields[[i]]$dataType, ' - ', mtaDta$dataSet$fields[[i]]$measureType))
+        # print(paste0(format(i, width = 2), ': ', mtaDta$dataSet$fields[[i]]$type, ' - ', mtaDta$dataSet$fields[[i]]$dataType, ' - ', mtaDta$dataSet$fields[[i]]$measureType))
         
         # write to data.bin according to type
         if      (mtaDta$dataSet$fields[[i]]$type == 'integer') { 

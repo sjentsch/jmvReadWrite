@@ -2,12 +2,12 @@
 % Please edit documentation in R/jmvRead.R
 \name{jmvRead}
 \alias{jmvRead}
-\title{Read files created of jamovi (statistical spreadsheet, www.jamovi.org)}
+\title{Read files created of the statistical spreadsheet 'jamovi' (www.jamovi.org)}
 \usage{
 jmvRead(fleNme = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = FALSE)
 }
 \arguments{
-\item{fleNme}{name of the jamovi file to be read (.omv; default = "")}
+\item{fleNme}{name of the 'jamovi' file to be read ("FILENAME.omv"; default = "")}
 
 \item{useFlt}{apply filters (remove the lines where the filter is set to 0; default: FALSE)}
 
@@ -16,8 +16,8 @@ jmvRead(fleNme = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = FALSE)
 \item{sveAtt}{store attributes that are not required in the data set (if you want to write the same data set using jmvWrite; default – FALSE)}
 }
 \value{
-data frame (can be directly used with functions included in the R-package "jmv" and syntax from jamovi; also compatible with the format of the  R-package "foreign")
+data frame (can be directly used with functions included in the R-package 'jmv' and syntax from 'jamovi'; also compatible with the format of the  R-package "foreign")
 }
 \description{
-Read files created of jamovi (statistical spreadsheet, www.jamovi.org)
+Read files created of the statistical spreadsheet 'jamovi' (www.jamovi.org)
 }

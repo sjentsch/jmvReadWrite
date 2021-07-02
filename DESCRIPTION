@@ -17,6 +17,8 @@ VignetteBuilder: knitr
 BugReports: https://github.com/sjentsch/jmvReadWrite/issues
 Depends: R (>= 3.5.0)
 Imports: rjson,
+         jmvcore,
+         RProtoBuf,
          stats,
          utils
 Suggests: jmv,

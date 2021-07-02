@@ -20,14 +20,18 @@ jmvRead <- function(fleNme = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = FALSE)
     strBin = grepl('strings.bin', toString(unzip(fleNme, list=TRUE)$Name))
     
     # read and decode
-    mnfTxt <-                 readLines(mnfHdl <- file(mnfFle <- unzip(fleNme, 'META-INF/MANIFEST.MF', junkpaths = T), 'r'), warn=F);                  close(mnfHdl); unlink(mnfFle); rm('mnfHdl', 'mnfFle');
-    mtaDta <- rjson::fromJSON(readLines(mtaHdl <- file(mtaFle <- unzip(fleNme, 'metadata.json',        junkpaths = T), 'r'), warn=F), simplify=FALSE); close(mtaHdl); unlink(mtaFle); rm('mtaHdl', 'mtaFle');
-    xtdDta <- rjson::fromJSON(readLines(xtdHdl <- file(xtdFle <- unzip(fleNme, 'xdata.json',           junkpaths = T), 'r'), warn=F), simplify=FALSE); close(xtdHdl); unlink(xtdFle); rm('xtdHdl', 'xtdFle');
-                                        binHdl <- file(binFle <- unzip(fleNme, 'data.bin',             junkpaths = T), 'rb');
-    if (strBin)                       { strHdl <- file(strFle <- unzip(fleNme, 'strings.bin',          junkpaths = T), 'rb'); }
+    mnfTxt <-                 readLines(mnfHdl <- file(mnfFle <- unzip(fleNme, 'META-INF/MANIFEST.MF', junkpaths = TRUE), 'r'), warn = FALSE);                    close(mnfHdl); unlink(mnfFle); rm('mnfHdl', 'mnfFle');
+    mtaDta <- rjson::fromJSON(readLines(mtaHdl <- file(mtaFle <- unzip(fleNme, 'metadata.json',        junkpaths = TRUE), 'r'), warn = FALSE), simplify = FALSE); close(mtaHdl); unlink(mtaFle); rm('mtaHdl', 'mtaFle');
+    xtdDta <- rjson::fromJSON(readLines(xtdHdl <- file(xtdFle <- unzip(fleNme, 'xdata.json',           junkpaths = TRUE), 'r'), warn = FALSE), simplify = FALSE); close(xtdHdl); unlink(xtdFle); rm('xtdHdl', 'xtdFle');
+                                        binHdl <- file(binFle <- unzip(fleNme, 'data.bin',             junkpaths = TRUE), 'rb');
+    if (strBin)                       { strHdl <- file(strFle <- unzip(fleNme, 'strings.bin',          junkpaths = TRUE), 'rb'); }
 
-    # TO-DO: decode the manifest file
-    # TO-DO: import and decode HTML output - index.html
+    # decode the manifest file and throw an error if an file version occurs that was written using a jamovi-version
+    mnfVer = gsub('Manifest-Version: ',       '', mnfTxt[grepl('Manifest-Version:',       mnfTxt)])
+    datVer = gsub('Data-Archive-Version: ',   '', mnfTxt[grepl('Data-Archive-Version:',   mnfTxt)])
+    jmvVer = gsub('jamovi-Archive-Version: ', '', mnfTxt[grepl('jamovi-Archive-Version:', mnfTxt)])    
+    crtStr = gsub('Created-By: ',             '', mnfTxt[grepl('Created-By:',             mnfTxt)])
+    if (mnfVer != "1.0" || datVer != "1.0.2" || jmvVer != "8.0") { stop(paste0('File "', fleNme, '" was written with an older version of jamovi. It currently can''t be read. Please send the file to sebastian.jentschke@uib.no!')) }
    
     # process meta-data
     if (any(names(mtaDta) != "dataSet")) { stop('Unimplemeted field in the meta data') }
@@ -152,9 +156,71 @@ jmvRead <- function(fleNme = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = FALSE)
             attr(dtaFrm, attNme) = mtaDta$dataSet[[attNme]]
         }
     }
+
+    # import and extract syntax from the analyses
+    anlLst = unzip(fleNme, list = TRUE)$Name
+    anlLst = anlLst[grepl('[0-9][0-9].*/analysis', anlLst)]
+    if (length(anlLst) > 0) {
+        RProtoBuf::readProtoFiles(system.file("jamovi.proto", package="jmvcore"))
+        for (anlNme in anlLst) {
+            anlPBf <- RProtoBuf::read(jamovi.coms.AnalysisResponse, anlHdl <- file(anlFle <- unzip(fleNme, anlNme, junkpaths = TRUE), 'rb'));  close(anlHdl); unlink(anlFle); rm('anlHdl', 'anlFle');
+            # for (anlFld in names(anlPBf)) { print(paste(anlFld, anlPBf[[anlFld]])) } - helper function to show all fields
+            # instanceId     - instance ID (e.g., d70a2417-4438-49f6-839e-7e54daa4458f)
+            # analysisId     - continuous number (same as the folder where the analysis was stored)
+            # name           - name of the analysis (e.g., descriptives, anovaRM)
+            # ns             - name of the module / package
+            # options        - list of [command] options with 3 fields  (can be inherited):
+            #                  each entry in options matches one of the parameters of the respective function
+            #                  in jmv - at the end there are three further display options (.ppi, theme, palette)
+            #   hasNames     - whether the entries of the list have names
+            #   names        - names of the options (e.g., data, effectsize, etc.)
+            #   options      - list with sub-options
+            #     i          - option as integer
+            #     d          - option as decimal
+            #     s          - option as string
+            #     o          - option as boolean (TRUE, FALSE, NONE)
+            #     c          - child (for nested options) - same list as above (hasNames, names, options)          
+            # results        - list of [analysis] results with 15 fields (can be inherited):
+            #   name         - name of the results output (e.g., )
+            #   title        - 
+            #   status       -
+            #   error        -
+            #   stale        -
+            #   table        -
+            #   image        -
+            #   group        -
+            #   array        -
+            #   preformatted -
+            #   syntax       -
+            #   html         -
+            #   state        -
+            #   visible      -
+            #   refs         - reference(s) for that particular output
+            # status         - ? integer (3)
+            # error          - error message (string)
+            # incAsText      - ? boolean (TRUE)
+            # revision       - ? integer (8, 17)
+            # restartEngines - ? boolean (FALSE)
+            # stacktrace     - ? likely in connection with an error
+            # version        - ? integer (16777216)
+            # index          - ? integer (0)
+            # references     - list of references with 8 fields:
+            #   name         - internal code like the BibTex-ref (e.g., of the R-package - afex, emmeans)
+            #   type         - publication type (e.g., software, article, etc.)
+            #   authors      - list - entry "complete" contains the whole list of authors
+            #   year         - year (integer)
+            #   title        - publication title
+            #   publisher    - publisher (or CRAN for R-packages).
+            #   url          - URL of the publication
+            #   volume       - volume (for articles)
+            #   issue        - issue (for articles)
+            #   pages        - page numbers (for articles)
+            #   year2        - year (as string)
+    }
     
-    # TO-DO: import HTML output - index.html
-   
+    # import the HTML output
+    attr(dtaFrm, 'outputHTML') <- readLines(htmHdl <- file(htmFle <- unzip(fleNme, 'index.html', junkpaths = TRUE), 'r'), warn = FALSE); close(htmHdl); unlink(htmFle); rm('htmHdl', 'htmFle');
+    
     # return the resulting data frame
     dtaFrm
 }

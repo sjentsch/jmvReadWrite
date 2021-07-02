@@ -1,0 +1,95 @@
+---
+title: "R package jmvReadWrite"
+author: "Sebastian Jentschke"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{jmvReadWrite}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      comment=NA,message=FALSE,
+                      warning=FALSE,
+                      fig.height=5,
+                      fig.width=7,
+                      fig.align="center")
+```
+
+The R-package  `jmvReadWrite` reads and writes the .omv-files that are used by
+the statistical spreadsheet `jamovi` (www.jamovi.org). It is supposed to ease
+using syntax for statistical analyses created using the GUI in `jamovi` in
+connection with the R-library `jmv`.
+
+
+## Installation
+
+You can install the development version of the `jmvReadWrite` package from
+github.
+
+```{r, eval=FALSE}
+if(!require(devtools)) install.packages("devtools")
+devtools::install_github("sjentsch/jmvReadWrite")
+```
+
+Alternatively, there is a stable version available on CRAN. It can be installed
+using the following commands
+
+```{r, eval=FALSE}
+install.packages("jmvReadWrite")
+```
+
+ 
+## How to use the package?
+
+The following code uses the ToothGrowth-data set that is part of the data sets
+included in R (the current file contains some modifications though for testing
+the reading and writing routines: `jmvRead` and `jmvWrite`). With this data
+set, a syntax to conduct an ANOVA is run.
+
+The results should be similar to those obtained when running the same analysis
+in jamovi (using the GUI). To do so, open the file menu (☰) choose `Open`,
+`Data Library` and `ToothGrowth`. Afterwards, click on the `ANOVA`-button in
+the `Analyses`-tab and choose `ANOVA`. There, you assign the variable `len` to
+`Dependent Variable` and `supp` and `dose` to `Fixed Factors`. Afterwards, you
+choose / tick `Overall Model Test` and `ω²`. Open the drop-down menu
+`Assumption Checks` and tick `Homogeneity test` and `Normality test`.
+The results should be identical apart from that the table output looks nicer in
+`jamovi` (not only text, as below), numbers are rounded and maybe one or two
+other cosmetic differences.
+
+If you want to copy the syntax generated in jamovi, you have to switch on the
+[`Syntax Mode`](https://jamovi.readthedocs.io/en/latest/getting-started/um_2_first-steps.html#syntax-mode).
+Afterwards, the syntax is shown at the top of the analysis and can be copied
+from there.
+
+```{r, echo=TRUE}
+library(jmvReadWrite)
+library(jmv)
+
+data = jmvRead(fleNme = system.file("extdata", "ToothGrowth.omv", package = "jmvReadWrite"))
+jmv::ANOVA(
+    formula = len ~ supp + dose + supp:dose,
+    data = data,
+    effectSize = c("omega"),
+    modelTest = TRUE,
+    homo = TRUE,
+    norm = TRUE)
+```
+
+The `jmvReadWrite`-package also enables you to write `.omv`-files in order to
+use them in `jamovi`. Let's assume that you have a large collection of
+log-files (e.g., from an experiment) that you compile and process (summarize,
+filter, etc.) in R in order to later analyse them in `jamovi`. You will have
+those processed log-files stored in a data frame (called, e.g., `data`) which
+you then write to a file that you can open in jamovi afterwards. Although
+jamovi reads R-data files (.RData, .rda, .rds) `jmvWrite` permits to store
+`jamovi`-specific attributes (such as variable labels) in addition.
+
+```{r, eval=FALSE}
+library(jmvReadWrite)
+
+jmvWrite(dtaFrm = data, fleNme = 'Trial.omv')
+```

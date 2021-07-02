@@ -4,11 +4,7 @@ Version: 0.1.0
 Authors@R: 
     person(given = "Sebastian", family = "Jentschke", role = c("aut", "cre"), email = "sebastian.jentschke@uib.no", comment = c(ORCID = "0000-0003-2576-5432"))
 Description: The free and open a statistical spreadsheet 'jamovi' (www.jamovi.org)
-<<<<<<< HEAD
     aims to make statistical analyses easy and intuitive. 'jamovi' produces
-=======
-    aims to makes statistical analyses easy and intuitive. 'jamovi' produces
->>>>>>> 92f8ecbd43221756663a1963418fae033e9cd09b
     syntax that can directly be used in R (in connection with the R-package 'jmv').
     Having import / export routines for the data files 'jamovi' produces ('.omv')
     permits an easy transfer of analyses between 'jamovi' and R.

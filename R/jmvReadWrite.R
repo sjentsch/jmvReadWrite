@@ -1,8 +1,9 @@
 #' jmvReadWrite: A package to read and write '.omv'-files (produced by the
 #' statistical spreadsheet 'jamovi', www.jamovi.org).
 #'
-#' The jmvReadWrite package provides two functions:
-#' jmvRead and jmvWrite.
+#' The jmvReadWrite package provides the following functions:
+#' read_jmv
+#' write_jmv
 #'
 #' @section jmvReadWrite functions:
 #' The free and open a statistical spreadsheet 'jamovi' (www.jamovi.org) aims

@@ -16,22 +16,28 @@ read_jmv <- function(fleNme = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = FALSE
     if (! hdrStr == "PK\003\004\024")                                             { stop(paste0('File "', fleNme, '" has not the correct file format (is not a ZIP archive).')) }
     if (! grepl('META-INF/MANIFEST.MF', toString(unzip(fleNme, list=TRUE)$Name))) { stop(paste0('File "', fleNme, '" has not the correct file format (is not a jamovi-file).')) }
     
-    # check whether the archive contains a string.bin-file (it only exists if there are columns that contain text variables)
-    strBin = grepl('strings.bin', toString(unzip(fleNme, list=TRUE)$Name))
+    # get list of files contained in the archive
+    fleLst = unzip(fleNme, list=TRUE)$Name;
     
-    # read and decode
-    mnfTxt <-                 readLines(mnfHdl <- file(mnfFle <- unzip(fleNme, 'META-INF/MANIFEST.MF', junkpaths = TRUE), 'r'), warn = FALSE);                    close(mnfHdl); unlink(mnfFle); rm('mnfHdl', 'mnfFle');
-    mtaDta <- rjson::fromJSON(readLines(mtaHdl <- file(mtaFle <- unzip(fleNme, 'metadata.json',        junkpaths = TRUE), 'r'), warn = FALSE), simplify = FALSE); close(mtaHdl); unlink(mtaFle); rm('mtaHdl', 'mtaFle');
-    xtdDta <- rjson::fromJSON(readLines(xtdHdl <- file(xtdFle <- unzip(fleNme, 'xdata.json',           junkpaths = TRUE), 'r'), warn = FALSE), simplify = FALSE); close(xtdHdl); unlink(xtdFle); rm('xtdHdl', 'xtdFle');
-                                        binHdl <- file(binFle <- unzip(fleNme, 'data.bin',             junkpaths = TRUE), 'rb');
-    if (strBin)                       { strHdl <- file(strFle <- unzip(fleNme, 'strings.bin',          junkpaths = TRUE), 'rb'); }
+    # check whether the archive contains a string.bin-file (it only exists if there are columns that contain text variables)
+    strBin = any(grepl('strings.bin', fleLst));
+    
+    # read and decode files: Manifest, metadata (metadata.json), metadata about value labels (xdata.json), binary numeric data (data.bin) and binary string data (strings.bin; if present)
+    mnfNme <- fleLst[grepl("^meta$|^META-INF/MANIFEST.MF$", fleLst, perl=TRUE)][[1]];
+    mnfTxt <-                 readLines(mnfHdl <- file(mnfFle <- unzip(fleNme, mnfNme,          junkpaths = TRUE), 'r'), warn = FALSE);                    close(mnfHdl); unlink(mnfFle); rm('mnfHdl', 'mnfFle');
+    mtaDta <- rjson::fromJSON(readLines(mtaHdl <- file(mtaFle <- unzip(fleNme, 'metadata.json', junkpaths = TRUE), 'r'), warn = FALSE), simplify = FALSE); close(mtaHdl); unlink(mtaFle); rm('mtaHdl', 'mtaFle');
+    xtdDta <- rjson::fromJSON(readLines(xtdHdl <- file(xtdFle <- unzip(fleNme, 'xdata.json',    junkpaths = TRUE), 'r'), warn = FALSE), simplify = FALSE); close(xtdHdl); unlink(xtdFle); rm('xtdHdl', 'xtdFle');
+                                        binHdl <- file(binFle <- unzip(fleNme, 'data.bin',      junkpaths = TRUE), 'rb');
+    if (strBin)                       { strHdl <- file(strFle <- unzip(fleNme, 'strings.bin',   junkpaths = TRUE), 'rb'); }
 
     # decode the manifest file and throw an error if an file version occurs that was written using a jamovi-version
-    mnfVer = gsub('Manifest-Version: ',       '', mnfTxt[grepl('Manifest-Version:',       mnfTxt)])
-    datVer = gsub('Data-Archive-Version: ',   '', mnfTxt[grepl('Data-Archive-Version:',   mnfTxt)])
-    jmvVer = gsub('jamovi-Archive-Version: ', '', mnfTxt[grepl('jamovi-Archive-Version:', mnfTxt)])    
-    crtStr = gsub('Created-By: ',             '', mnfTxt[grepl('Created-By:',             mnfTxt)])
-    if (mnfVer != "1.0" || datVer != "1.0.2" || jmvVer != "8.0") { stop(paste0('File "', fleNme, '" was written with an older version of jamovi. It currently can''t be read. Please send the file to sebastian.jentschke@uib.no!')) }
+    # have a look at https://github.com/jamovi/jamovi/blob/current-dev/server/jamovi/server/formatio/omv.py (jav) for
+    # how to handle the different jamovi-archive-versions
+    mnfVer = unlist(strsplit(gsub('Manifest-Version: ',       '', mnfTxt[grepl('Manifest-Version:',       mnfTxt)]), "\\."));
+    datVer = unlist(strsplit(gsub('Data-Archive-Version: ',   '', mnfTxt[grepl('Data-Archive-Version:',   mnfTxt)]), "\\."));
+    jmvVer = unlist(strsplit(gsub('jamovi-Archive-Version: ', '', mnfTxt[grepl('jamovi-Archive-Version:', mnfTxt)]), "\\."));
+    crtStr =                 gsub('Created-By: ',             '', mnfTxt[grepl('Created-By:',             mnfTxt)]);
+    if (any(mnfVer != c("1", "0")) || any(datVer != c("1", "0", "2") || jmvVer[1] > 11) { stop(paste0('File "', fleNme, '" was written with a version of jamovi that currently is not implemented and therefore can''t be read. Please send the file to sebastian.jentschke@uib.no!')) }
    
     # process meta-data
     if (any(names(mtaDta) != "dataSet")) { stop('Unimplemeted field in the meta data') }
@@ -73,7 +79,7 @@ read_jmv <- function(fleNme = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = FALSE
                 colRaw[[1]] = as.logical(colRaw[[1]])
                 fltLst = c(fltLst, i)
 #           } else {
-#               print(paste(nmeCrr, ' - ', mtaDta$dataSet$fields[[i]]$dataType, ' - ', mtaDta$dataSet$fields[[i]]$columnType))
+                stop(paste('', nmeCrr, ' - ', mtaDta$dataSet$fields[[i]]$dataType, ' - ', mtaDta$dataSet$fields[[i]]$columnType))
             }
         }
         
@@ -164,58 +170,11 @@ read_jmv <- function(fleNme = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = FALSE
         RProtoBuf::readProtoFiles(system.file("jamovi.proto", package="jmvcore"))
         for (anlNme in anlLst) {
             anlPBf <- RProtoBuf::read(jamovi.coms.AnalysisResponse, anlHdl <- file(anlFle <- unzip(fleNme, anlNme, junkpaths = TRUE), 'rb'));  close(anlHdl); unlink(anlFle); rm('anlHdl', 'anlFle');
-            # for (anlFld in names(anlPBf)) { print(paste(anlFld, anlPBf[[anlFld]])) } - helper function to show all fields
-            # instanceId     - instance ID (e.g., d70a2417-4438-49f6-839e-7e54daa4458f)
-            # analysisId     - continuous number (same as the folder where the analysis was stored)
-            # name           - name of the analysis (e.g., descriptives, anovaRM)
-            # ns             - name of the module / package
-            # options        - list of [command] options with 3 fields  (can be inherited):
-            #                  each entry in options matches one of the parameters of the respective function
-            #                  in jmv - at the end there are three further display options (.ppi, theme, palette)
-            #   hasNames     - whether the entries of the list have names
-            #   names        - names of the options (e.g., data, effectsize, etc.)
-            #   options      - list with sub-options
-            #     i          - option as integer
-            #     d          - option as decimal
-            #     s          - option as string
-            #     o          - option as boolean (TRUE, FALSE, NONE)
-            #     c          - child (for nested options) - same list as above (hasNames, names, options)          
-            # results        - list of [analysis] results with 15 fields (can be inherited):
-            #   name         - name of the results output (e.g., )
-            #   title        - 
-            #   status       -
-            #   error        -
-            #   stale        -
-            #   table        -
-            #   image        -
-            #   group        -
-            #   array        -
-            #   preformatted -
-            #   syntax       -
-            #   html         -
-            #   state        -
-            #   visible      -
-            #   refs         - reference(s) for that particular output
-            # status         - ? integer (3)
-            # error          - error message (string)
-            # incAsText      - ? boolean (TRUE)
-            # revision       - ? integer (8, 17)
-            # restartEngines - ? boolean (FALSE)
-            # stacktrace     - ? likely in connection with an error
-            # version        - ? integer (16777216)
-            # index          - ? integer (0)
-            # references     - list of references with 8 fields:
-            #   name         - internal code like the BibTex-ref (e.g., of the R-package - afex, emmeans)
-            #   type         - publication type (e.g., software, article, etc.)
-            #   authors      - list - entry "complete" contains the whole list of authors
-            #   year         - year (integer)
-            #   title        - publication title
-            #   publisher    - publisher (or CRAN for R-packages).
-            #   url          - URL of the publication
-            #   volume       - volume (for articles)
-            #   issue        - issue (for articles)
-            #   pages        - page numbers (for articles)
-            #   year2        - year (as string)
+            # for (anlFld in names(anlPBf)) { print(paste(anlFld, anlPBf[[anlFld]])) }                 # helper function to show all fields
+            # for (anlFld in names(anlPBf$options)) { print(paste(anlFld, anlPBf$options[[anlFld]])) } # helper function to show all fields in options
+            # for (anlFld in names(anlPBf$results)) { print(paste(anlFld, anlPBf$results[[anlFld]])) } # helper function to show all fields in results
+            # ..$bytesize() - size of the protocol buffer (or any field contained in it)
+            # 
     }
     
     # import the HTML output

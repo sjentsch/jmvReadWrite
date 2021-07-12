@@ -10,9 +10,16 @@
 #'
 #' @examples
 #' \dontrun{
-#' add(1, 1)
-#' add(10, 1)
-#' sum("a")
+#' library(jmvReadWrite)
+#' data = read_jmv(fleNme = system.file("extdata", "ToothGrowth.omv", package = "jmvReadWrite"), getSyn = TRUE)
+#' # shows the syntax of the analyses from the .omv-file
+#' attr(data, 'syntax')
+#' # runs the command of the first analysis
+#' eval(parse(text=attr(data, 'syntax')[[1]]))
+#' # runs the command of the second analysis and assigns the output from that analysis to the variable result2
+#' eval(parse(text=paste0('result2 = ', attr(data, 'syntax')[[2]])))
+#' names(result2)
+#' # → "main"      "assump"    "contrasts" "postHoc"   "emm" (the names of the five output tables)
 #' }
 #'
 #' @export read_jmv
@@ -25,6 +32,9 @@ read_jmv <- function(fleNme = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = FALSE
     if (! hdrStr == "PK\003\004\024")                                     { stop(paste0('File "', fleNme, '" has not the correct file format (is not a ZIP archive).')) }
     fleLst = unzip(fleNme, list=TRUE)$Name;   
     if (! any(grepl("^meta$|^META-INF/MANIFEST.MF$", fleLst, perl=TRUE))) { stop(paste0('File "', fleNme, '" has not the correct file format (is missing the jamovi-file-manifest).')) }
+    
+    # get list of files contained in the archive
+    fleLst = unzip(fleNme, list=TRUE)$Name;
     
     # check whether the archive contains a string.bin-file (it only exists if there are columns that contain text variables)
     strBin = any(grepl('strings.bin', fleLst));

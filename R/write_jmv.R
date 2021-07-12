@@ -5,15 +5,15 @@
 #' @param fleNme Name / position of the output file to be generated ("FILENAME.omv"; default = "")
 #' @return NULL
 #'
-#' @export jmvWrite
+#' @export write_jmv
 
-jmvWrite <- function(dtaFrm = NULL, fleNme = "") {
+write_jmv <- function(dtaFrm = NULL, fleNme = "") {
 
     # check whether dtaFrm is a data frame
     if (is.null(dtaFrm) || ! is.data.frame(dtaFrm) || any(dim(dtaFrm) < 1))              { stop("Input data frame is either not a data frame or has not the correct dimensions") }
     # check that the file name isn't empty, that it ends in .omv, and that the destination directory exists
     if (length(fleNme) <= 0 || ! grepl('.omv', fleNme) || ! dir.exists(dirname(fleNme))) { stop("File name doesn't have the correct format or destination directory doesn't exist") }
-    
+
     colNum <- dim(dtaFrm)[2]
 
     # initialize metadata.json
@@ -24,14 +24,14 @@ jmvWrite <- function(dtaFrm = NULL, fleNme = "") {
 
     # initialize xdata.json
     xtdDta <- list()
-    
+
     # create data.bin 
     binHdl <- file(description = "data.bin", open = "wb")
-    
+
     # create strings.bin
     strHdl <- file(description = "strings.bin", open = "wb")
     strPos <- 0
-                                       
+
     for (i in 1:colNum) {
         # assign fields stored in data frame (if the columns contain attributes)
         for (attNme in names(mtaDta$dataSet$fields[[i]])) {
@@ -82,12 +82,12 @@ jmvWrite <- function(dtaFrm = NULL, fleNme = "") {
                     if ((length(unique(dtaFrm[[i]])) < diff(range(dtaFrm[[i]])) / 5) || (sd(dtaFrm[[i]]) < diff(range(dtaFrm[[i]])) / 10)) {
                         mtaDta$dataSet$fields[[i]][['measureType']] <- 'Nominal'
                     } else {
-                        mtaDta$dataSet$fields[[i]][['measureType']] <- 'Continuous'                
+                        mtaDta$dataSet$fields[[i]][['measureType']] <- 'Continuous'
                     }
                 }
             }
         }
-        
+
         # value labels - R-foreign-style
         if (! is.null(attr(dtaFrm, 'label.table')) && ! is.null(attr(dtaFrm, 'label.table')[[names(dtaFrm[i])]])) {
             stop('R-foreign-style value labels need to be implemented.')
@@ -100,7 +100,7 @@ jmvWrite <- function(dtaFrm = NULL, fleNme = "") {
                     colCrr <- factor(colCrr)
                     mtaDta$dataSet$fields[[i]][['dataType']] <- 'Text'
                 }
-        
+
                 if (is.factor(colCrr)) {
                     facLvl <- attr(colCrr, 'levels')
                     facVal <- attr(colCrr, 'values')
@@ -125,12 +125,12 @@ jmvWrite <- function(dtaFrm = NULL, fleNme = "") {
                     if (mtaDta$dataSet$fields[[i]]$dataType != "Decimal") {
                         if (all(abs(colCrr - round(colCrr)) < sqrt(.Machine$double.eps), na.rm = TRUE)) {
                             mtaDta$dataSet$fields[[i]]$type <- "integer"
-                            mtaDta$dataSet$fields[[i]]$dataType <- "Integer"                    
+                            mtaDta$dataSet$fields[[i]]$dataType <- "Integer"
                         } else {
                             mtaDta$dataSet$fields[[i]]$type <- "number"
                             mtaDta$dataSet$fields[[i]]$dataType <- "Decimal"
                         }
-                    }        
+                    }
                 }
             } else {
                 if (is.character(colCrr)) {
@@ -152,15 +152,15 @@ jmvWrite <- function(dtaFrm = NULL, fleNme = "") {
             mtaDta$dataSet$fields[[i]][['dataType']] != "Text") {
             mtaDta$dataSet$fields[[i]][['trimLevels']] <- NULL
         }
-        
+
         # fix problem with transforms
-        
-        
+
+
         # check that dataType, and measureType are set accordingly to type (attribute and column in the data frame) 
         # dataType: Text, Integer, Decimal
         # 
         # print(paste0(format(i, width = 2), ': ', mtaDta$dataSet$fields[[i]]$type, ' - ', mtaDta$dataSet$fields[[i]]$dataType, ' - ', mtaDta$dataSet$fields[[i]]$measureType))
-        
+
         # write to data.bin according to type
         if      (mtaDta$dataSet$fields[[i]]$type == 'integer') { 
             colWrt <- as.integer(colCrr)
@@ -178,7 +178,7 @@ jmvWrite <- function(dtaFrm = NULL, fleNme = "") {
             stop(paste('Variable type', mtaDta$dataSet$fields[[i]]$type, 'not implemented.'))
         }
         writeBin(colWrt, binHdl, endian = "little")
-        
+
         # check that dataType, and measureType are set accordingly
         rm('colCrr', 'colWrt')
     }
@@ -189,7 +189,7 @@ jmvWrite <- function(dtaFrm = NULL, fleNme = "") {
             mtaDta$dataSet[[attNme]] <- attr(dtaFrm, attNme)
         }
     }
-    
+
     # double check whether ID is unique
     id_Lst <- unlist(lapply(1:length(mtaDta$dataSet$fields), function(i) mtaDta$dataSet$fields[[i]]$id))
     if (any(is.na(id_Lst)) || any(duplicated(id_Lst))) {
@@ -202,7 +202,7 @@ jmvWrite <- function(dtaFrm = NULL, fleNme = "") {
     close(binHdl)
     zip(fleNme, 'data.bin', flags = "-r9Xq")
     unlink('data.bin')
-    
+
     # check whether data were written to strings.bin
     close(strHdl)
     if (strPos > 0) {
@@ -215,7 +215,10 @@ jmvWrite <- function(dtaFrm = NULL, fleNme = "") {
     dir.create('META-INF')
     writeLines(mnfTxt, con = 'META-INF/MANIFEST.MF')
     zip(fleNme, 'META-INF/MANIFEST.MF', flags = "-r9Xq")
+    writeLines(mnfTxt, con = 'meta')
     unlink('META-INF', recursive = T)
+    zip(fleNme, 'meta', flags = "-r9Xq")
+    unlink('meta')
     rm("mnfTxt")
 
     # write metadata.json

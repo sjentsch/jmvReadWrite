@@ -46,7 +46,7 @@ install.packages("jmvReadWrite")
 
 The following code uses the ToothGrowth-data set that is part of the data sets
 included in R (the current file contains some modifications though for testing
-the reading and writing routines: `jmvRead` and `jmvWrite`). With this data
+the reading and writing routines: `read_jmv` and `write_jmv`). With this data
 set, a syntax to conduct an ANOVA is run.
 
 The results should be similar to those obtained when running the same analysis
@@ -69,7 +69,7 @@ from there.
 library(jmvReadWrite)
 library(jmv)
 
-data = jmvRead(fleNme = system.file("extdata", "ToothGrowth.omv", package = "jmvReadWrite"))
+data = read_jmv(fleNme = system.file("extdata", "ToothGrowth.omv", package = "jmvReadWrite"))
 jmv::ANOVA(
     formula = len ~ supp + dose + supp:dose,
     data = data,
@@ -85,11 +85,11 @@ log-files (e.g., from an experiment) that you compile and process (summarize,
 filter, etc.) in R in order to later analyse them in `jamovi`. You will have
 those processed log-files stored in a data frame (called, e.g., `data`) which
 you then write to a file that you can open in jamovi afterwards. Although
-jamovi reads R-data files (.RData, .rda, .rds) `jmvWrite` permits to store
+jamovi reads R-data files (.RData, .rda, .rds) `write_jmv` permits to store
 `jamovi`-specific attributes (such as variable labels) in addition.
 
 ```{r, eval=FALSE}
 library(jmvReadWrite)
 
-jmvWrite(dtaFrm = data, fleNme = 'Trial.omv')
+write_jmv(dtaFrm = data, fleNme = 'Trial.omv')
 ```

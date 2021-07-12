@@ -17,7 +17,7 @@ knitr::opts_chunk$set(echo = TRUE,
 library(jmvReadWrite)
 library(jmv)
 
-data = jmvRead(fleNme = system.file("extdata", "ToothGrowth.omv", package = "jmvReadWrite"))
+data = read_jmv(fleNme = system.file("extdata", "ToothGrowth.omv", package = "jmvReadWrite"))
 jmv::ANOVA(
     formula = len ~ supp + dose + supp:dose,
     data = data,
@@ -29,5 +29,5 @@ jmv::ANOVA(
 ## ---- eval=FALSE--------------------------------------------------------------
 #  library(jmvReadWrite)
 #  
-#  jmvWrite(dtaFrm = data, fleNme = 'Trial.omv')
+#  write_jmv(dtaFrm = data, fleNme = 'Trial.omv')
 

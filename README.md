@@ -26,6 +26,7 @@ install.packages("jmvReadWrite")
 ### Documentation
 
 TBA
+
 [Changelog](CHANGELOG.md)
 
 ### Authors

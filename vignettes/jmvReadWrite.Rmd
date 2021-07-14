@@ -79,6 +79,27 @@ jmv::ANOVA(
     norm = TRUE)
 ```
 
+Since version 0.2.0, read_jmv also extracts the syntax from analysis that you
+may have conducted in the jamovi-GUI and that are stored in the .omv-file. To
+extract them, you have to set the parameter `getSyn = TRUE` when calling
+read_jmv (default is `FALSE`). When the parameter is set, the analyses are
+stored in the attribute `syntax`. They can be used as shown in the following
+examples:
+
+```{r, echo=TRUE}
+library(jmvReadWrite)
+
+data = read_jmv(fleNme = system.file("extdata", "ToothGrowth.omv", package = "jmvReadWrite"), getSyn = TRUE)
+# shows the syntax of the analyses from the .omv-file
+attr(data, 'syntax')
+# runs the command of the first analysis
+eval(parse(text=attr(data, 'syntax')[[1]]))
+# runs the command of the second analysis and assigns the output from that analysis to the variable result2
+eval(parse(text=paste0('result2 = ', attr(data, 'syntax')[[2]])))
+names(result2)
+# → "main"      "assump"    "contrasts" "postHoc"   "emm" (the names of the five output tables)
+```
+
 The `jmvReadWrite`-package also enables you to write `.omv`-files in order to
 use them in `jamovi`. Let's assume that you have a large collection of
 log-files (e.g., from an experiment) that you compile and process (summarize,

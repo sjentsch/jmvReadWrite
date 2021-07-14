@@ -9,3 +9,7 @@
 #'   \item{dose}{numeric}{Dose in grams / day}
 #'}
 "ToothGrowth"
+
+"bfi_sample"
+
+"bfi_sample2"

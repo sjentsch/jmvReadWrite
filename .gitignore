@@ -41,3 +41,5 @@ vignettes/*.pdf
 .Rbuildignore
 
 TrialSPV
+/doc/
+/Meta/

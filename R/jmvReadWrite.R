@@ -4,6 +4,7 @@
 #' The jmvReadWrite package provides the following functions:
 #' read_jmv
 #' write_jmv
+#' spv2sps
 #'
 #' @section jmvReadWrite functions:
 #' The free and open a statistical spreadsheet 'jamovi' (www.jamovi.org) aims
@@ -15,7 +16,4 @@
 #' @docType package
 #' @name jmvReadWrite
 #'
-#' @importFrom stats sd
-#' @importFrom utils str unzip zip
-#' @importFrom rjson fromJSON toJSON
 NULL

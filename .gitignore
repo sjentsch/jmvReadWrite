@@ -40,6 +40,6 @@ vignettes/*.pdf
 .Renviron
 .Rbuildignore
 
-TrialSPV
+TrialSPSS
 /doc/
 /Meta/

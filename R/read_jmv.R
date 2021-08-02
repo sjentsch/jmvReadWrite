@@ -1,20 +1,37 @@
 #' Read files created of the statistical spreadsheet 'jamovi' (www.jamovi.org)
 #'
-#' @param fleNme name of the 'jamovi' file to be read ("FILENAME.omv"; default = "")
+#' @param fleNme name (incl. path) of the 'jamovi'-file to be read ("FILENAME.omv"; default = "")
 #' @param useFlt apply filters (remove the lines where the filter is set to 0; default: FALSE)
 #' @param rmMsVl remove values defined as missing values (replace them with NA; default - FALSE)
 #' @param sveAtt store attributes that are not required in the data set (if you want to write the same data set using jmvWrite; default – FALSE)
-#' @return data frame (can be directly used with functions included in the R-package 'jmv' and syntax from 'jamovi'; also compatible with the format of the  R-package "foreign")
+#' @param getSyn extract syntax from the analyses in the 'jamovi'-file and store it in the attribute 'syntax' (default – FALSE)
+#' @param getHTM store index.html in the attribute 'HTML' (default – FALSE)
+#' @return data frame (can be directly used with functions included in the R-package 'jmv' and syntax from 'jamovi'; also compatible with the format of the R-package "foreign")
+#'
+#' @examples
+#' \dontrun{
+#' library(jmvReadWrite)
+#' data = read_jmv(fleNme = system.file("extdata", "ToothGrowth.omv", package = "jmvReadWrite"), getSyn = TRUE)
+#' # shows the syntax of the analyses from the .omv-file
+#' attr(data, 'syntax')
+#' # runs the command of the first analysis
+#' eval(parse(text=attr(data, 'syntax')[[1]]))
+#' # runs the command of the second analysis and assigns the output from that analysis to the variable result2
+#' eval(parse(text=paste0('result2 = ', attr(data, 'syntax')[[2]])))
+#' names(result2)
+#' # → "main"      "assump"    "contrasts" "postHoc"   "emm" (the names of the five output tables)
+#' }
 #'
 #' @export read_jmv
+#'
+read_jmv <- function(fleNme = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = FALSE, getSyn = FALSE, getHTM = FALSE) {
 
-read_jmv <- function(fleNme = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = FALSE) {
-
-    # check whether the file exists and whether it has the correct format
-    if (! file.exists(fleNme))                                                    { stop(paste0('File "', fleNme, '" not found.')) }
+    # check whether the file / archive exists, get list of files contained in the archive and check whether it has the correct format
+    if (! file.exists(fleNme))                                            { stop(paste0('File "', fleNme, '" not found.')) }
     hdrStr <- readBin(tmpHdl <- file(fleNme, 'rb'), 'character'); close(tmpHdl); rm('tmpHdl');
-    if (! hdrStr == "PK\003\004\024")                                             { stop(paste0('File "', fleNme, '" has not the correct file format (is not a ZIP archive).')) }
-    if (! grepl('META-INF/MANIFEST.MF', toString(unzip(fleNme, list=TRUE)$Name))) { stop(paste0('File "', fleNme, '" has not the correct file format (is not a jamovi-file).')) }
+    if (! hdrStr == "PK\003\004\024")                                     { stop(paste0('File "', fleNme, '" has not the correct file format (is not a ZIP archive).')) }
+    fleLst = unzip(fleNme, list=TRUE)$Name;   
+    if (! any(grepl("^meta$|^META-INF/MANIFEST.MF$", fleLst, perl=TRUE))) { stop(paste0('File "', fleNme, '" has not the correct file format (is missing the jamovi-file-manifest).')) }
     
     # get list of files contained in the archive
     fleLst = unzip(fleNme, list=TRUE)$Name;
@@ -37,7 +54,7 @@ read_jmv <- function(fleNme = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = FALSE
     datVer = unlist(strsplit(gsub('Data-Archive-Version: ',   '', mnfTxt[grepl('Data-Archive-Version:',   mnfTxt)]), "\\."));
     jmvVer = unlist(strsplit(gsub('jamovi-Archive-Version: ', '', mnfTxt[grepl('jamovi-Archive-Version:', mnfTxt)]), "\\."));
     crtStr =                 gsub('Created-By: ',             '', mnfTxt[grepl('Created-By:',             mnfTxt)]);
-    if (any(mnfVer != c("1", "0")) || any(datVer != c("1", "0", "2") || jmvVer[1] > 11) { stop(paste0('File "', fleNme, '" was written with a version of jamovi that currently is not implemented and therefore can''t be read. Please send the file to sebastian.jentschke@uib.no!')) }
+    if (any(mnfVer != c("1", "0")) || any(datVer != c("1", "0", "2")) || as.integer(jmvVer[1]) > 11) { stop(paste0('File "', fleNme, '" was written with a version of jamovi that currently is not implemented and therefore can\'t be read. Please send the file to sebastian.jentschke@uib.no!')) }
    
     # process meta-data
     if (any(names(mtaDta) != "dataSet")) { stop('Unimplemeted field in the meta data') }
@@ -75,11 +92,11 @@ read_jmv <- function(fleNme = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = FALSE
                 if (mtaDta$dataSet$fields[[i]]$dataType == 'Integer') { 
                     attr(colRaw[[1]], 'values') = unlist(sapply(xtdDta[[nmeCrr]]$labels, function(m) as.integer(m[1])))
                 }
-            } else if (mtaDta$dataSet$fields[[i]]$columnType ==   'Filter') {
+            } else if (mtaDta$dataSet$fields[[i]]$columnType == 'Filter') {
                 colRaw[[1]] = as.logical(colRaw[[1]])
                 fltLst = c(fltLst, i)
-#           } else {
-                stop(paste('', nmeCrr, ' - ', mtaDta$dataSet$fields[[i]]$dataType, ' - ', mtaDta$dataSet$fields[[i]]$columnType))
+            } else {
+                stop(paste('Error when reading value label - likely the column type is not implemented (yet): ', nmeCrr, ' - ', mtaDta$dataSet$fields[[i]]$dataType, ' - ', mtaDta$dataSet$fields[[i]]$columnType))
             }
         }
         
@@ -164,22 +181,45 @@ read_jmv <- function(fleNme = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = FALSE
     }
 
     # import and extract syntax from the analyses
-    anlLst = unzip(fleNme, list = TRUE)$Name
-    anlLst = anlLst[grepl('[0-9][0-9].*/analysis', anlLst)]
-    if (length(anlLst) > 0) {
-        RProtoBuf::readProtoFiles(system.file("jamovi.proto", package="jmvcore"))
-        for (anlNme in anlLst) {
-            anlPBf <- RProtoBuf::read(jamovi.coms.AnalysisResponse, anlHdl <- file(anlFle <- unzip(fleNme, anlNme, junkpaths = TRUE), 'rb'));  close(anlHdl); unlink(anlFle); rm('anlHdl', 'anlFle');
-            # for (anlFld in names(anlPBf)) { print(paste(anlFld, anlPBf[[anlFld]])) }                 # helper function to show all fields
-            # for (anlFld in names(anlPBf$options)) { print(paste(anlFld, anlPBf$options[[anlFld]])) } # helper function to show all fields in options
-            # for (anlFld in names(anlPBf$results)) { print(paste(anlFld, anlPBf$results[[anlFld]])) } # helper function to show all fields in results
-            # ..$bytesize() - size of the protocol buffer (or any field contained in it)
-            # 
+    if (getSyn) {
+        anlLst = fleLst[grepl('[0-9][0-9].*/analysis', fleLst)];
+        savSyn = list();
+        savPBf = list();    
+        if (length(anlLst) > 0) {
+            RProtoBuf::readProtoFiles(system.file("jamovi.proto", package="jmvcore"))
+            for (anlNme in anlLst) {
+                anlPBf <- RProtoBuf::read(jamovi.coms.AnalysisResponse, anlHdl <- file(anlFle <- unzip(fleNme, anlNme, junkpaths = TRUE), 'rb'));  close(anlHdl); unlink(anlFle); rm('anlHdl', 'anlFle');
+                # for (anlFld in names(anlPBf)) { print(paste(anlFld, anlPBf[[anlFld]])) }                 # helper function to show all fields
+                # for (anlFld in names(anlPBf$options)) { print(paste(anlFld, anlPBf$options[[anlFld]])) } # helper function to show all fields in options
+                # for (anlFld in names(anlPBf$results)) { print(paste(anlFld, anlPBf$results[[anlFld]])) } # helper function to show all fields in results
+                # ..$bytesize() - size of the protocol buffer (or any field contained in it)
+                savSyn = c(savSyn, gsub('\\( ', '\\(', gsub('\\n\\s+', ' ', find_syntax(anlPBf$results))));
+                anlPBf$results = NULL;
+                savPBf = c(savPBf, anlPBf);
+            }
+        }
+        attr(dtaFrm, 'syntax') <- savSyn;
+        attr(dtaFrm, 'protobuf') <- savPBf;
     }
     
     # import the HTML output
-    attr(dtaFrm, 'outputHTML') <- readLines(htmHdl <- file(htmFle <- unzip(fleNme, 'index.html', junkpaths = TRUE), 'r'), warn = FALSE); close(htmHdl); unlink(htmFle); rm('htmHdl', 'htmFle');
+    if (getHTM) {
+        attr(dtaFrm, 'HTML') <- readLines(htmHdl <- file(htmFle <- unzip(fleNme, 'index.html', junkpaths = TRUE), 'r'), warn = FALSE); close(htmHdl); unlink(htmFle); rm('htmHdl', 'htmFle');
+    }
     
     # return the resulting data frame
     dtaFrm
+}
+
+find_syntax <- function(resElm) {
+    if (hasName(resElm, 'name') && hasName(resElm, 'preformatted') && resElm[['name']] == 'syntax' && resElm[['preformatted']] != '') {
+        resElm[['preformatted']]
+    } else if (hasName(resElm, 'group') && length(resElm[['group']]) > 0) {
+        for (obj in resElm[['group']][['elements']]) {
+            ret <- Recall(obj)
+            if (!is.null(ret)) return(ret)
+        }
+    } else {
+        NULL
+    }
 }

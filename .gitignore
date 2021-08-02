@@ -39,3 +39,7 @@ vignettes/*.pdf
 # R Environment Variables
 .Renviron
 .Rbuildignore
+
+TrialSPV
+/doc/
+/Meta/

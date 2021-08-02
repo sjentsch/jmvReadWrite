@@ -26,7 +26,7 @@ sps2jmv <- function(lstSPS = list(), fleSPS = "", fleSAV = "") {
     }
     if (fleSAV > "") {
         if (! file.exists(fleSAV) && file.exists(file.path(getwd(), basename(fleSAV)))) { fleSAV = file.path(getwd(), basename(fleSAV)); }
-        dtaFrm = suppressWarnings(foreign::read.spss(file = fleSAV, as.data.frame=TRUE));
+        data = suppressWarnings(foreign::read.spss(file = fleSAV, to.data.frame=TRUE));
     } else {
         stop('sps2jmv requires an SPSS-data-file. This can be either provided by lstSPS containing an attribute \"datafile\" or via the parameter fleSAV. This should be a character vector containing the position of the SPSS-data-file (.sav; incl. path).');
     }
@@ -35,114 +35,105 @@ sps2jmv <- function(lstSPS = list(), fleSPS = "", fleSAV = "") {
     }
 
     lstJMV = list();
-    for (inpCmd in lstSPS) {
+    for (crrSPS in lstSPS) {
        
         # General: Split, handle generic attributes (e.g., VAR1 TO VARx) ======
-        inpCmd = unist(strsplit(inpCmd, ' /'));
+        crrSPS = unlist(strsplit(gsub('\\.$', '', crrSPS), ' /'));
 
         # Modifications to the data set =======================================
 
         # ADD VALUE LABELS ----------------------------------------------------
         # https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=reference-add-value-labels
         # (adds new value labels but keeps existing ones, see also VALUE LABELS)
-        if      (grepl('^ADD VALUE LABELS', inpCmd[1])) {
-            print('ADD VALUE LABELS');
+        if      (grepl('^ADD VALUE LABELS', crrSPS[1])) {
+            warning('ADD VALUE LABELS – not implemented yet');
         }
         
         # ALTER TYPE ----------------------------------------------------------
         # https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=reference-alter-type
-        else if (grepl('^ALTER TYPE', inpCmd[1])) {
-            print('ALTER TYPE');
+        else if (grepl('^ALTER TYPE', crrSPS[1])) {
+            warning('ALTER TYPE – not implemented yet');
         }
         
         # COMPUTE -------------------------------------------------------------
         # https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=reference-compute
-        else if (grepl('^COMPUTE', inpCmd[1])) {
-            print('COMPUTE');
+        else if (grepl('^COMPUTE', crrSPS[1])) {
+            warning('COMPUTE – not implemented yet');
         }
 
         # FILTER --------------------------------------------------------------
         # https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=reference-filter
-        else if (grepl('^FILTER', inpCmd[1])) {
-            print('FILTER');
-        }
-
-        # FORMATS? ------------------------------------------------------------
-        # https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=reference-formats
-        else if (grepl('^FORMATS', inpCmd[1])) {
-            print('FORMATS');
+        else if (grepl('^FILTER', crrSPS[1])) {
+            warning('FILTER – not implemented yet');
         }
 
         # NUMERIC -------------------------------------------------------------
         # https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=reference-numeric
-        else if (grepl('^NUMERIC', inpCmd[1])) {
-            print('NUMERIC');
+        else if (grepl('^NUMERIC', crrSPS[1])) {
+            warning('NUMERIC – not implemented yet');
         }
 
         # RANK ----------------------------------------------------------------
         # https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=reference-rank
-        else if (grepl('^RANK', inpCmd[1])) {
-            print('RANK');
+        else if (grepl('^RANK', crrSPS[1])) {
+            warning('RANK – not implemented yet');
         }
 
         # RECODE --------------------------------------------------------------
         # https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=reference-recode
-        else if (grepl('^RECODE', inpCmd[1])) {
-            print('RECODE');
+        else if (grepl('^RECODE', crrSPS[1])) {
+            warning('RECODE – not implemented yet');
+            # COMPUTED → RANK(VARNAME)
         }
 
         # RENAME VARIABLES ----------------------------------------------------
         # https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=reference-rename-variables
-        else if (grepl('^RENAME VARIABLES', inpCmd[1])) {
-            print('RENAME VARIABLES');
+        else if (grepl('^RENAME VARIABLES', crrSPS[1])) {
+            warning('RENAME VARIABLES – not implemented yet');
         }
 
         # SAMPLE --------------------------------------------------------------
         # https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=reference-sample
-        else if (grepl('^SAMPLE', inpCmd[1])) {
-            print('SAMPLE');
+        else if (grepl('^SAMPLE', crrSPS[1])) {
+            warning('SAMPLE – not implemented yet');
+            # COMPUTED → SAMPLE(1, N FROM M / DECIMAL VALUE, 0) + FILTER
+            # double-check whether the sample changes, otherwise use a fixed assignment based on R-sample()
         }
 
         # SORT CASES ----------------------------------------------------------
         # https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=reference-sort-cases
-        else if (grepl('^SORT CASES', inpCmd[1])) {
-            print('SORT CASES');
+        else if (grepl('^SORT CASES', crrSPS[1])) {
+            warning('SORT CASES – not implemented yet');
         }
 
         # SORT VARIABLES ------------------------------------------------------
         # https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=reference-sort-variables
-        else if (grepl('^SORT VARIABLES', inpCmd[1])) {
-            print('SORT VARIABLES');
+        else if (grepl('^SORT VARIABLES', crrSPS[1])) {
+            warning('SORT VARIABLES – not implemented yet');
         }
 
         # STRING --------------------------------------------------------------
         # https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=reference-string
-        else if (grepl('^STRING', inpCmd[1])) {
-            print('STRING');
+        else if (grepl('^STRING', crrSPS[1])) {
+            warning('STRING – not implemented yet');
         }
 
         # VALUE LABELS --------------------------------------------------------
         # https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=reference-value-labels
-        else if (grepl('^VALUE LABELS', inpCmd[1])) {
-            print('VALUE LABELS');
+        else if (grepl('^VALUE LABELS', crrSPS[1])) {
+            warning('VALUE LABELS – not implemented yet');
         }
    
-        # VARIABLE ATTRIBUTE --------------------------------------------------
-        # https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=reference-variable-attribute
-        else if (grepl('^VARIABLE ATTRIBUTE', inpCmd[1])) {
-            print('VARIABLE ATTRIBUTE');
-        }
-
         # VARIABLE LABELS -----------------------------------------------------
         # https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=reference-variable-labels
-        else if (grepl('^VARIABLE LABELS', inpCmd[1])) {
-            print('VARIABLE LABELS');
+        else if (grepl('^VARIABLE LABELS', crrSPS[1])) {
+            warning('VARIABLE LABELS – not implemented yet');
         }
 
         # VARIABLE LEVEL ------------------------------------------------------
         # https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=reference-variable-level
-        else if (grepl('^VARIABLE LEVEL', inpCmd[1])) {
-            print('VARIABLE LEVEL');
+        else if (grepl('^VARIABLE LEVEL', crrSPS[1])) {
+            warning('VARIABLE LEVEL – not implemented yet');
         }
 
 
@@ -150,152 +141,162 @@ sps2jmv <- function(lstSPS = list(), fleSPS = "", fleSAV = "") {
 
         # COMMENT -------------------------------------------------------------
         # https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=reference-comment
-        else if (grepl('^COMMENT', inpCmd[1])) {
-            print('COMMENT');
+        else if (grepl('^COMMENT', crrSPS[1])) {
+            warning('COMMENT – not implemented yet');
         }
 
 
         # Exploration – Descriptives ==========================================
         # https://www.jamovi.org/jmv/descriptives.html
 
-        # CTABLES -------------------------------------------------------------
-        # https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=reference-ctables
-        else if (grepl('^CTABLES', inpCmd[1])) {
-            print('CTABLES');
-            outCmd = 'jmv::descriptives(data=data, '
-        }
-
         # DESCRIPTIVES --------------------------------------------------------
         # https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=reference-descriptives
-        else if (grepl('^DESCRIPTIVES', inpCmd[1])) {
+        else if (grepl('^DESCRIPTIVES', crrSPS[1])) {
             print('DESCRIPTIVES');
-            outCmd = 'jmv::descriptives(data=data, '
+            crrSPS = rmvCmd(crrSPS, 'DESCRIPTIVES');
+            crrFnc = 'jmv::descriptives';
+            crrArg = eval(parse(text = paste0('formals(', crrFnc, ')')));
+            # extract variables and assign them as argument "formula"
+            varLst = substr(crrSPS[1], (gregexpr(pattern = 'VARIABLES\\s?=', crrSPS[1])[[1]] + 10), nchar(crrSPS[1]));
+            chkVar(varLst, data);
+            crrArg = asgArg(crrArg, pairlist(formula = as.symbol(gsub(' ', ' + ', varLst))));
+            # STATISTICS subcommand
+            crrArg = asgArg(crrArg, pairlist(mean     = any(grepl('^STATISTICS', crrSPS) & (grepl('MEAN',     crrSPS) | grepl('DEFAULT', crrSPS) | grepl('ALL', crrSPS))),
+                                             sd       = any(grepl('^STATISTICS', crrSPS) & (grepl('STDDEV',   crrSPS) | grepl('DEFAULT', crrSPS) | grepl('ALL', crrSPS))),
+                                             min      = any(grepl('^STATISTICS', crrSPS) & (grepl('MIN',      crrSPS) | grepl('DEFAULT', crrSPS) | grepl('ALL', crrSPS))),
+                                             max      = any(grepl('^STATISTICS', crrSPS) & (grepl('MAX',      crrSPS) | grepl('DEFAULT', crrSPS) | grepl('ALL', crrSPS))),
+                                             se       = any(grepl('^STATISTICS', crrSPS) & (grepl('SEMEAN',   crrSPS)                            | grepl('ALL', crrSPS))),
+                                             variance = any(grepl('^STATISTICS', crrSPS) & (grepl('VARIANCE', crrSPS)                            | grepl('ALL', crrSPS))),
+                                             skew     = any(grepl('^STATISTICS', crrSPS) & (grepl('SKEWNESS', crrSPS)                            | grepl('ALL', crrSPS))),
+                                             kurt     = any(grepl('^STATISTICS', crrSPS) & (grepl('KURTOSIS', crrSPS)                            | grepl('ALL', crrSPS))),
+                                             sum      = any(grepl('^STATISTICS', crrSPS) & (grepl('SUM',      crrSPS)                            | grepl('ALL', crrSPS))),
+                                             range    = any(grepl('^STATISTICS', crrSPS) & (grepl('RANGE',    crrSPS)                            | grepl('ALL', crrSPS))),
+                                             median = FALSE, mode = FALSE, sum = FALSE, ci = FALSE, iqr = FALSE, sw = FALSE, pc = FALSE));           
+            # not implemented in jmv: MISSING, SAVE, SORT
+            # SAVE could be implemented manually later - generate computed variable Z()
         }
-
 
         # EXAMINE -------------------------------------------------------------
         # https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=reference-examine
-        else if (grepl('^EXAMINE', inpCmd[1])) {
+        else if (grepl('^EXAMINE', crrSPS[1])) {
             print('EXAMINE');
-            outCmd = 'jmv::descriptives(data=data, '
-
-#EXAMINE VARIABLES=attdrug phyheal menheal psydrug BY emplmnt religion /PLOT BOXPLOT NPPLOT /COMPARE GROUPS /STATISTICS DESCRIPTIVES /CINTERVAL 95 /MISSING LISTWISE /NOTOTAL.
-#EXAMINE VARIABLES=varlist [[BY varlist] [varname BY varname]]
-# 
-# [/COMPARE={GROUPS** }] 
-#           {VARIABLES}
-# 
-# [/{TOTAL**}]
-#   {NOTOTAL}
-
-# [/ID={case number**}] 
-#      {varname      }
-# 
-# [/PERCENTILES [{NONE                   }]]
-#                {({5,10,25,50,75,90,95})}=[{HAVERAGE  }]  
-#                  {value list         }    {WAVERAGE  }
-#                                           {ROUND     }
-#                                           {AEMPIRICAL}
-#                                           {EMPIRICAL }
-# 
-# [/PLOT=[STEMLEAF**] [BOXPLOT**] [NPPLOT] [SPREADLEVEL(n)] [HISTOGRAM]]
-# 
-#        [{ALL   }]
-#         {NONE}
-# 
-# [/STATISTICS=[DESCRIPTIVES**] [EXTREME({5})]] 
-#                                        {n}
-#              [{ALL }]
-#               {NONE}
-# 
-# [/CINTERVAL {95**}]
-#             {n   }
-# 
-# [/MESTIMATOR=[{NONE**}]] 
-#               {ALL   } 
-# 
-#              [HUBER({1.339})] [ANDREW({1.34}] 
-#                     {c    }           {c    }
-# 
-#              [HAMPEL({1.7,3.4,8.5})] 
-#                      {a  ,b  ,c  }
-# 
-#              [TUKEY({4.685})] 
-#                     {c    }
-#  
-#[/MISSING=[{LISTWISE**}] [{EXCLUDE**}] [{NOREPORT**}]] 
-#           {PAIRWISE  }   {INCLUDE  }   {REPORT    }
-
-#data	the data as a data frame
-#vars	a vector of strings naming the variables of interest in data
-#splitBy	a vector of strings naming the variables used to split vars
-#freq	TRUE or FALSE (default), provide frequency tables (nominal, ordinal variables only)
-#hist	TRUE or FALSE (default), provide histograms (continuous variables only)
-#dens	TRUE or FALSE (default), provide density plots (continuous variables only)
-#bar	TRUE or FALSE (default), provide bar plots (nominal, ordinal variables only)
-#barCounts	TRUE or FALSE (default), add counts to the bar plots
-#box	TRUE or FALSE (default), provide box plots (continuous variables only)
-#violin	TRUE or FALSE (default), provide violin plots (continuous variables only)
-#dot	TRUE or FALSE (default), provide dot plots (continuous variables only)
-#dotType	
-#boxMean	TRUE or FALSE (default), add mean to box plot
-#qq	TRUE or FALSE (default), provide Q-Q plots (continuous variables only)
-#n	TRUE (default) or FALSE, provide the sample size
-#missing	TRUE (default) or FALSE, provide the number of missing values
-#mean	TRUE (default) or FALSE, provide the mean
-#median	TRUE (default) or FALSE, provide the median
-#mode	TRUE or FALSE (default), provide the mode
-#sum	TRUE or FALSE (default), provide the sum
-#sd	TRUE (default) or FALSE, provide the standard deviation
-#variance	TRUE or FALSE (default), provide the variance
-#range	TRUE or FALSE (default), provide the range
-#min	TRUE or FALSE (default), provide the minimum
-#max	TRUE or FALSE (default), provide the maximum
-#se	TRUE or FALSE (default), provide the standard error
-#iqr	TRUE or FALSE (default), provide the interquartile range
-#skew	TRUE or FALSE (default), provide the skewness
-#kurt	TRUE or FALSE (default), provide the kurtosis
-#sw	TRUE or FALSE (default), provide Shapiro-Wilk p-value
-#pcEqGr	TRUE or FALSE (default), provide quantiles
-#pcNEqGr	an integer (default: 4) specifying the number of equal groups
-#pc	TRUE or FALSE (default), provide percentiles
-#pcValues	a comma-sepated list (default: 25,50,75) specifying the percentiles 
-            
+            crrSPS = rmvCmd(crrSPS, 'EXAMINE');
+            crrFnc = 'jmv::descriptives';
+            crrArg = eval(parse(text = paste0('formals(', crrFnc, ')')));
+            # extract variables and assign them as argument "formula"
+            varLst = substr(crrSPS[1], (gregexpr(pattern = 'VARIABLES\\s?=', crrSPS[1])[[1]] + 10), nchar(crrSPS[1]));
+            chkVar(gsub(' BY ', ' ', varLst), data);
+            crrArg = asgArg(crrArg, pairlist(formula = as.symbol(gsub(' \\+ BY \\+ ', ' ~ ', gsub(' ', ' + ', varLst)))));
+            # PLOT subcommand: STEMLEAF (not implemented), SPREADLEVEL(not implemented)
+            crrArg = asgArg(crrArg, pairlist(box  = any(grepl('^PLOT', crrSPS) & (grepl('BOXPLOT',   crrSPS) | grepl('ALL', crrSPS))),
+                                             hist = any(grepl('^PLOT', crrSPS) & (grepl('HISTOGRAM', crrSPS) | grepl('ALL', crrSPS))),
+                                             qq   = any(grepl('^PLOT', crrSPS) & (grepl('NPPLOT',    crrSPS) | grepl('ALL', crrSPS))),
+                                             sw   = any(grepl('^PLOT', crrSPS) & (grepl('NPPLOT',    crrSPS) | grepl('ALL', crrSPS))),
+                                             dens = FALSE, bar = FALSE, violin = FALSE, dot = FALSE, boxMean = FALSE));
+            # STATISTICS subcommand: EXTREMES (not implemented)
+            if (any(grepl('^STATISTICS[=,\\s]DESCRIPTIVES', crrSPS, perl = TRUE) | grepl('^STATISTICS[=,\\s]ALL', crrSPS, perl = TRUE))) {
+                crrArg = asgArg(crrArg, pairlist(mean = TRUE, median = TRUE, se = TRUE, variance = TRUE, sd = TRUE, min = TRUE, max = TRUE, range = TRUE, iqr = TRUE, skew = TRUE, kurt = TRUE, 
+                                                 mode = FALSE, sum = FALSE)); }
+            # CINTERVAL subcommand
+            if (any(grepl('^CINTERVAL', crrSPS))) {
+                crrArg = asgArg(crrArg, pairlist(ci = TRUE, ciWidth = as.double(trimws(sub("CINTERVAL", "", crrSPS[grepl('^CINTERVAL', crrSPS)]))))); }
+            # PERCENTILES subcommand
+            if (any(grepl('^PERCENTILES\\(', crrSPS))) {
+                crrArg = asgArg(crrArg, pairlist(pc = TRUE, pcValues = sub("\\).*", "", sub(".*\\(", "", crrSPS[grepl('^PERCENTILES\\(', crrSPS)])))); }
+            # not implemented in jmv: COMPARE (not necessary), TOTAL, ID, MESTIMATOR, MISSING
         }
 
         # FREQUENCIES ---------------------------------------------------------
         # https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=reference-frequencies
-        else if (grepl('^FREQUENCIES', inpCmd[1])) {
+        else if (grepl('^FREQUENCIES', crrSPS[1])) {
             print('FREQUENCIES');
-            outCmd = 'jmv::descriptives(data=data, '
+            crrSPS = rmvCmd(crrSPS, 'FREQUENCIES');
+            crrFnc = 'jmv::descriptives';
+            crrArg = eval(parse(text = paste0('formals(', crrFnc, ')')));
+            # extract variables and assign them as argument "formula"
+            varLst = substr(crrSPS[1], (gregexpr(pattern = 'VARIABLES\\s?=', crrSPS[1])[[1]] + 10), nchar(crrSPS[1]));
+            chkVar(varLst, data);
+            crrArg = asgArg(crrArg, pairlist(formula = as.symbol(gsub(' ', ' + ', varLst))));
+            # BARCHART subcommand: MINIMUM, MAXIMUM, FREQ, PERCENT not implemented
+            if (any(grepl('^BARCHART', crrSPS))) { crrArg = asgArg(crrArg, pairlist(bar = TRUE, barCounts = TRUE)); }
+            # HISTOGRAM subcommand: MINIMUM, MAXIMUM, FREQ, NORMAL (replaced by density)
+            if (any(grepl('HISTOGRAM', crrSPS))) { crrArg = asgArg(crrArg, pairlist(hist = TRUE, dens = TRUE)); }
+            # NTILES subcommand
+            if (any(grepl('^NTILES', crrSPS))) {
+                crrArg = asgArg(crrArg, pairlist(pc = TRUE, pcNEqGr  = sub("NTILES\\s?=", "",      crrSPS[grepl('^NTILES',      crrSPS)]))); }
+            # PERCENTILES subcommand
+            if (any(grepl('^PERCENTILES', crrSPS))) {
+                crrArg = asgArg(crrArg, pairlist(pc = TRUE, pcValues = sub("PERCENTILES\\s?=", "", crrSPS[grepl('^PERCENTILES', crrSPS)]))); }
+            # STATISTICS subcommand
+            crrArg = asgArg(crrArg, pairlist(mean     = any(grepl('^STATISTICS', crrSPS) & (grepl('MEAN',     crrSPS) | grepl('DEFAULT', crrSPS) | grepl('ALL', crrSPS))),
+                                             sd       = any(grepl('^STATISTICS', crrSPS) & (grepl('STDDEV',   crrSPS) | grepl('DEFAULT', crrSPS) | grepl('ALL', crrSPS))),
+                                             min      = any(grepl('^STATISTICS', crrSPS) & (grepl('MIN',      crrSPS) | grepl('DEFAULT', crrSPS) | grepl('ALL', crrSPS))),
+                                             max      = any(grepl('^STATISTICS', crrSPS) & (grepl('MAX',      crrSPS) | grepl('DEFAULT', crrSPS) | grepl('ALL', crrSPS))),
+                                             median   = any(grepl('^STATISTICS', crrSPS) & (grepl('MEDIAN',   crrSPS)                            | grepl('ALL', crrSPS))),
+                                             se       = any(grepl('^STATISTICS', crrSPS) & (grepl('SEMEAN',   crrSPS)                            | grepl('ALL', crrSPS))),
+                                             variance = any(grepl('^STATISTICS', crrSPS) & (grepl('VARIANCE', crrSPS)                            | grepl('ALL', crrSPS))),
+                                             skew     = any(grepl('^STATISTICS', crrSPS) & (grepl('SKEWNESS', crrSPS)                            | grepl('ALL', crrSPS))),
+                                             kurt     = any(grepl('^STATISTICS', crrSPS) & (grepl('KURTOSIS', crrSPS)                            | grepl('ALL', crrSPS))),
+                                             sum      = any(grepl('^STATISTICS', crrSPS) & (grepl('SUM',      crrSPS)                            | grepl('ALL', crrSPS))),
+                                             range    = any(grepl('^STATISTICS', crrSPS) & (grepl('RANGE',    crrSPS)                            | grepl('ALL', crrSPS))),
+                                             mode     = any(grepl('^STATISTICS', crrSPS) & (grepl('MODE',     crrSPS)                            | grepl('ALL', crrSPS))),
+                                             sum      = any(grepl('^STATISTICS', crrSPS) & (grepl('SUM',      crrSPS)                            | grepl('ALL', crrSPS))),
+                                             ci = FALSE, iqr = FALSE, sw = FALSE));
+            # not implemented in jmv: FORMAT, MISSING, PIECHART, GROUPED, ORDER
         }
 
         # MEANS ---------------------------------------------------------------
         # https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=reference-means
-        else if (grepl('^MEANS', inpCmd[1])) {
+        else if (grepl('^MEANS', crrSPS[1])) {
             print('MEANS');
-            outCmd = 'jmv::descriptives(data=data, '
-        }
-
-        # NPAR TESTS - K-S ----------------------------------------------------
-        # https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=reference-npar-tests
-        else if (grepl('^NPAR TESTS K-S', inpCmd[1]) & any(grepl('K-S', inpCmd))) {
-            print('NPAR TESTS - K-S');
-            outCmd = 'jmv::descriptives(data=data, '
-        }
-
-        # NPTESTS - ONESAMPLE - KOLMOGOROV_SMIRNOV ----------------------------
-        # https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=reference-nptests
-        else if (grepl('^NPTESTS', inpCmd[1]) & any(grepl('ONESAMPLE', inpCmd)) & any(grepl('KOLMOGOROV_SMIRNOV', inpCmd))) {
-            print('NPTESTS - ONESAMPLE - KOLMOGOROV_SMIRNOV');
-            outCmd = 'jmv::descriptives(data=data, '
+            crrSPS = rmvCmd(crrSPS, 'MEANS');
+            crrFnc = 'jmv::descriptives';
+            crrArg = eval(parse(text = paste0('formals(', crrFnc, ')')));
+            # extract variables and assign them as argument "formula", NB: Only the first variable list is considered
+            varLst = gsub('MEANS ', '', gsub('TABLES=', '', crrSPS[1]));
+            if (trimws(varLst) == 'ALL') { varLst = names(data); } else { chkVar(gsub(' BY ', ' ', varLst), data); }
+            crrArg = asgArg(crrArg, pairlist(formula = as.symbol(gsub(' \\+ BY \\+ ', ' ~ ', gsub(' ', ' + ', varLst)))));
+            # CELLS subcommand - not implemented: GMEDIAN, SEKURT, SESKEW, FIRST, LAST, NPCT, SPCT, HARMONIC, GEOMETRIC
+            crrArg = asgArg(crrArg, pairlist(mean     = any(grepl('^CELLS', crrSPS) & (grepl('MEAN',     crrSPS) | grepl('DEFAULT', crrSPS) | grepl('ALL', crrSPS))),
+                                             sd       = any(grepl('^CELLS', crrSPS) & (grepl('STDDEV',   crrSPS) | grepl('DEFAULT', crrSPS) | grepl('ALL', crrSPS))),
+                                             median   = any(grepl('^CELLS', crrSPS) & (grepl('MEDIAN',   crrSPS)                            | grepl('ALL', crrSPS))),
+                                             se       = any(grepl('^CELLS', crrSPS) & (grepl('SEMEAN',   crrSPS)                            | grepl('ALL', crrSPS))),
+                                             sum      = any(grepl('^CELLS', crrSPS) & (grepl('SUM',      crrSPS)                            | grepl('ALL', crrSPS))),
+                                             min      = any(grepl('^CELLS', crrSPS) & (grepl('MIN',      crrSPS)                            | grepl('ALL', crrSPS))),
+                                             max      = any(grepl('^CELLS', crrSPS) & (grepl('MAX',      crrSPS)                            | grepl('ALL', crrSPS))),
+                                             range    = any(grepl('^CELLS', crrSPS) & (grepl('RANGE',    crrSPS)                            | grepl('ALL', crrSPS))),
+                                             variance = any(grepl('^CELLS', crrSPS) & (grepl('VARIANCE', crrSPS)                            | grepl('ALL', crrSPS))),
+                                             kurt     = any(grepl('^CELLS', crrSPS) & (grepl('KURT',     crrSPS)                            | grepl('ALL', crrSPS))),
+                                             skew     = any(grepl('^CELLS', crrSPS) & (grepl('SKEW',     crrSPS)                            | grepl('ALL', crrSPS))),
+                                             mode = FALSE, missing = FALSE, ci = FALSE, iqr = FALSE, sw = FALSE));
+            # not implemented in jmv: MISSING, STATISTICS
         }
 
         # SUMMARIZE -----------------------------------------------------------
         # https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=reference-summarize
-        else if (grepl('^SUMMARIZE', inpCmd[1])) {
+        else if (grepl('^SUMMARIZE', crrSPS[1])) {
             print('SUMMARIZE');
-            outCmd = 'jmv::descriptives(data=data, '
+            crrSPS = rmvCmd(crrSPS, 'SUMMARIZE');
+            crrFnc = 'jmv::descriptives';
+            crrArg = eval(parse(text = paste0('formals(', crrFnc, ')')));
+            # extract variables and assign them as argument "formula", NB: Only the first variable list is considered
+            varLst = gsub('SUMMARIZE ', '', gsub('TABLES=', '', crrSPS[1]));
+            if (trimws(varLst) == 'ALL') { varLst = names(data); } else { chkVar(gsub(' BY ', ' ', varLst), data); }
+            crrArg = asgArg(crrArg, pairlist(formula = as.symbol(gsub(' \\+ BY \\+ ', ' ~ ', gsub(' ', ' + ', varLst)))));
+            # CELLS subcommand - not implemented: GMEDIAN, SEKURT, SESKEW, FIRST, LAST, NPCT, SPCT, HARMONIC, GEOMETRIC
+            crrArg = asgArg(crrArg, pairlist(mean     = any(grepl('^CELLS', crrSPS) & (grepl('MEAN',     crrSPS) | grepl('DEFAULT', crrSPS) | grepl('ALL', crrSPS))),
+                                             sd       = any(grepl('^CELLS', crrSPS) & (grepl('STDDEV',   crrSPS) | grepl('DEFAULT', crrSPS) | grepl('ALL', crrSPS))),
+                                             median   = any(grepl('^CELLS', crrSPS) & (grepl('MEDIAN',   crrSPS)                            | grepl('ALL', crrSPS))),
+                                             se       = any(grepl('^CELLS', crrSPS) & (grepl('SEMEAN',   crrSPS)                            | grepl('ALL', crrSPS))),
+                                             sum      = any(grepl('^CELLS', crrSPS) & (grepl('SUM',      crrSPS)                            | grepl('ALL', crrSPS))),
+                                             min      = any(grepl('^CELLS', crrSPS) & (grepl('MIN',      crrSPS)                            | grepl('ALL', crrSPS))),
+                                             max      = any(grepl('^CELLS', crrSPS) & (grepl('MAX',      crrSPS)                            | grepl('ALL', crrSPS))),
+                                             range    = any(grepl('^CELLS', crrSPS) & (grepl('RANGE',    crrSPS)                            | grepl('ALL', crrSPS))),
+                                             variance = any(grepl('^CELLS', crrSPS) & (grepl('VARIANCE', crrSPS)                            | grepl('ALL', crrSPS))),
+                                             kurt     = any(grepl('^CELLS', crrSPS) & (grepl('KURT',     crrSPS)                            | grepl('ALL', crrSPS))),
+                                             skew     = any(grepl('^CELLS', crrSPS) & (grepl('SKEW',     crrSPS)                            | grepl('ALL', crrSPS))),
+                                             mode = FALSE, missing = FALSE, ci = FALSE, iqr = FALSE, sw = FALSE));
+            # not implemented in jmv: TITLE, FOOTNOTE, MISSING, FORMAT, STATISTICS
         }
 
 
@@ -304,23 +305,35 @@ sps2jmv <- function(lstSPS = list(), fleSPS = "", fleSAV = "") {
 
         # NPAR TESTS - M-W ----------------------------------------------------
         # https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=reference-npar-tests
-        else if (grepl('^NPAR TESTS', inpCmd[1]) & any(grepl('M-W', inpCmd))) {
-            print('NPAR TESTS - M-W');
-            outCmd = 'jmv::ttestIS(data=data, students=FALSE, welchs=FALSE, mann=TRUE,  '
+        else if (grepl('^NPAR TESTS', crrSPS[1]) & any(grepl('M-W', crrSPS))) {
+            warning('NPAR TESTS - M-W – not implemented yet');
+            crrSPS = rmvCmd(crrSPS, 'NPAR TESTS');
+            crrFnc = 'jmv::ttestIS';
+            crrArg = eval(parse(text = paste0('formals(', crrFnc, ')')));
+            crrArg$students = FALSE; crrArg$welchs = FALSE; crrArg$mann = TRUE;
+            
         }
 
         # NPTESTS - INDEPENDENT - MANN_WHITNEY --------------------------------
         # https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=reference-nptests
-        else if (grepl('^NPTESTS', inpCmd[1]) & any(grepl('INDEPENDENT', inpCmd)) & any(grepl('MANN_WHITNEY', inpCmd))) {
-            print('NPTESTS - INDEPENDENT - MANN_WHITNEY');
-            outCmd = 'jmv::ttestIS(data=data, students=FALSE, welchs=FALSE, mann=TRUE,  '
+        else if (grepl('^NPTESTS', crrSPS[1]) & any(grepl('INDEPENDENT', crrSPS)) & any(grepl('MANN_WHITNEY', crrSPS))) {
+            warning('NPTESTS - INDEPENDENT - MANN_WHITNEY – not implemented yet');
+            crrSPS = rmvCmd(crrSPS, 'NPTESTS');            
+            crrFnc = 'jmv::ttestIS';
+            crrArg = eval(parse(text = paste0('formals(', crrFnc, ')')));
+            crrArg$students = FALSE; crrArg$welchs = FALSE; crrArg$mann = TRUE;
+            
         }
 
-        # T-TEST (without PAIRS and TESTVAL) ----------------------------------
+        # T-TEST (with GROUPS) ------------------------------------------------
         # https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=reference-t-test
-        else if (grepl('^T-TEST', inpCmd[1]) & ! any(grepl('PAIRS', inpCmd)) & ! any(grepl('TESTVAL', inpCmd))) {
-            print('T-TEST - INDEPENDENT');
-            outCmd = 'jmv::ttestIS(data=data, students=TRUE,  welchs=TRUE,  mann=FALSE, '
+        else if (grepl('^T-TEST', crrSPS[1]) & ! any(grepl('PAIRS', crrSPS)) & ! any(grepl('TESTVAL', crrSPS))) {
+            warning('T-TEST - INDEPENDENT – not implemented yet');
+            crrSPS = rmvCmd(crrSPS, 'T-TEST');
+            crrFnc = 'jmv::ttestIS';
+            crrArg = eval(parse(text = paste0('formals(', crrFnc, ')')));
+            crrArg$students = TRUE; crrArg$welchs = TRUE; crrArg$mann = FALSE;
+            
         }
 
 
@@ -329,23 +342,35 @@ sps2jmv <- function(lstSPS = list(), fleSPS = "", fleSAV = "") {
 
         # NPAR TESTS - WILCOXON - PAIRED --------------------------------------
         # https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=reference-npar-tests
-        else if (grepl('^NPAR TESTS', inpCmd[1]) & any(grepl('WILCOXON', inpCmd)) & any(grepl('PAIRED', inpCmd))) {
-            print('NPAR TESTS - WILCOXON - PAIRED');
-            outCmd = 'jmv::ttestIS(data=data, students=FALSE, wilcoxon=TRUE,  ' 
+        else if (grepl('^NPAR TESTS', crrSPS[1]) & any(grepl('WILCOXON', crrSPS)) & any(grepl('PAIRED', crrSPS))) {
+            warning('NPAR TESTS - WILCOXON - PAIRED – not implemented yet');
+            crrSPS = rmvCmd(crrSPS, 'NPAR TESTS');
+            crrFnc = 'jmv::ttestPS';
+            crrArg = eval(parse(text = paste0('formals(', crrFnc, ')')));
+            crrArg$students = FALSE; crrArg$wilcoxon = TRUE;
+            
         }
 
         # NPTESTS - RELATED - WILCOXON -----------------------------------------
         # https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=reference-nptests
-        else if (grepl('^NPTESTS', inpCmd[1]) & any(grepl('RELATED', inpCmd)) & any(grepl('WILCOXON', inpCmd))) {
-            print('NPTESTS - RELATED - WILCOXON');
-            outCmd = 'jmv::ttestIS(data=data, students=FALSE, wilcoxon=TRUE,  ' 
+        else if (grepl('^NPTESTS', crrSPS[1]) & any(grepl('RELATED', crrSPS)) & any(grepl('WILCOXON', crrSPS))) {
+            warning('NPTESTS - RELATED - WILCOXON – not implemented yet');
+            crrSPS = rmvCmd(crrSPS, 'NPTESTS');            
+            crrFnc = 'jmv::ttestPS';
+            crrArg = eval(parse(text = paste0('formals(', crrFnc, ')')));
+            crrArg$students = FALSE; crrArg$wilcoxon = TRUE;
+            
         }
 
         # T-TEST (with PAIRS) -------------------------------------------------
         # https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=reference-t-test
-        else if (grepl('^T-TEST', inpCmd[1]) & any(grepl('PAIRS', inpCmd))) {
-            print('T-TEST - Paired');
-            outCmd = 'jmv::ttestIS(data=data, students=TRUE,  wilcoxon=FALSE, ' 
+        else if (grepl('^T-TEST', crrSPS[1]) & any(grepl('PAIRS', crrSPS))) {
+            warning('T-TEST - Paired – not implemented yet');
+            crrSPS = rmvCmd(crrSPS, 'T-TEST');
+            crrFnc = 'jmv::ttestPS';
+            crrArg = eval(parse(text = paste0('formals(', crrFnc, ')')));
+            crrArg$students = TRUE; crrArg$wilcoxon = FALSE;
+            
         }
 
 
@@ -354,23 +379,35 @@ sps2jmv <- function(lstSPS = list(), fleSPS = "", fleSAV = "") {
 
         # NPAR TESTS - WILCOXON - not PAIRED ----------------------------------
         # https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=reference-npar-tests
-        else if (grepl('^NPAR TESTS', inpCmd[1]) & any(grepl('WILCOXON', inpCmd)) & ! any(grepl('PAIRED', inpCmd))) {
-            print('NPAR TESTS WILCOXON - not PAIRED (one sample)');
-            outCmd = 'jmv::ttestOneS(data=data, students=FALSE, wilcoxon=TRUE,  '
+        else if (grepl('^NPAR TESTS', crrSPS[1]) & any(grepl('WILCOXON', crrSPS)) & ! any(grepl('PAIRED', crrSPS))) {
+            warning('NPAR TESTS WILCOXON - not PAIRED (one sample) – not implemented yet');
+            crrSPS = rmvCmd(crrSPS, 'NPAR TESTS');
+            crrFnc = 'jmv::ttestOneS';
+            crrArg = eval(parse(text = paste0('formals(', crrFnc, ')')));
+            crrArg$students = FALSE; crrArg$wilcoxon = TRUE;
+            
         }
 
         # NPTESTS - ONESAMPLE - WILCOXON ---------------------------------------
         # https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=reference-nptests
-        else if (grepl('^NPTESTS', inpCmd[1]) & any(grepl('ONESAMPLE', inpCmd)) & any(grepl('WILCOXON', inpCmd))) {
-            print('NPTESTS - ONESAMPLE - WILCOXON');
-            outCmd = 'jmv::ttestOneS(data=data, students=FALSE, wilcoxon=TRUE,  '
+        else if (grepl('^NPTESTS', crrSPS[1]) & any(grepl('ONESAMPLE', crrSPS)) & any(grepl('WILCOXON', crrSPS))) {
+            warning('NPTESTS - ONESAMPLE - WILCOXON – not implemented yet');
+            crrSPS = rmvCmd(crrSPS, 'NPTESTS');            
+            crrFnc = 'jmv::ttestOneS';
+            crrArg = eval(parse(text = paste0('formals(', crrFnc, ')')));
+            crrArg$students = FALSE; crrArg$wilcoxon = TRUE;
+            
         }
 
         # T-TEST (with TESTVAL) -----------------------------------------------
         # https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=reference-t-test
-        else if (grepl('^T-TEST', inpCmd[1]) & any(grepl('TESTVAL', inpCmd))) {
-            print('T-TEST - One sample');
-            outCmd = 'jmv::ttestOneS(data=data, students=TRUE,  wilcoxon=FALSE, '
+        else if (grepl('^T-TEST', crrSPS[1]) & any(grepl('TESTVAL', crrSPS))) {
+            warning('T-TEST - One sample – not implemented yet');
+            crrSPS = rmvCmd(crrSPS, 'T-TEST');
+            crrFnc = 'jmv::ttestOneS';
+            crrArg = eval(parse(text = paste0('formals(', crrFnc, ')')));
+            crrArg$students = TRUE; crrArg$wilcoxon = FALSE;
+            
         }
 
 
@@ -379,16 +416,22 @@ sps2jmv <- function(lstSPS = list(), fleSPS = "", fleSAV = "") {
         
         # ONEWAY --------------------------------------------------------------
         # https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=reference-oneway
-        else if (grepl('^ONEWAY', inpCmd[1])) {
-            print('ONEWAY');
-            outCmd = 'jmv::anovaOneW(data=data, '
+        else if (grepl('^ONEWAY', crrSPS[1])) {
+            warning('ONEWAY – not implemented yet');
+            crrSPS = rmvCmd(crrSPS, 'ONEWAY');
+            crrFnc = 'jmv::anovaOneW';
+            crrArg = eval(parse(text = paste0('formals(', crrFnc, ')')));
+            
         }
 
         # UNIANOVA ------------------------------------------------------------
         # https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=reference-unianova
-        else if (grepl('^UNIANOVA', inpCmd[1])) {
-            print('UNIANOVA');
-            outCmd = 'jmv::anovaOneW(data=data, '
+        else if (grepl('^UNIANOVA', crrSPS[1])) {
+            warning('UNIANOVA – not implemented yet');
+            crrSPS = rmvCmd(crrSPS, 'UNIANOVA');
+            crrFnc = 'jmv::anovaOneW';
+            crrArg = eval(parse(text = paste0('formals(', crrFnc, ')')));
+            
         }
 
 
@@ -397,23 +440,32 @@ sps2jmv <- function(lstSPS = list(), fleSPS = "", fleSAV = "") {
 
         # ANOVA ---------------------------------------------------------------
         # https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=reference-anova
-        else if (grepl('^ANOVA', inpCmd[1])) {
-            print('ANOVA');
-            outCmd = 'jmv::ANOVA(data=data, '
+        else if (grepl('^ANOVA', crrSPS[1])) {
+            warning('ANOVA – not implemented yet');
+            crrSPS = rmvCmd(crrSPS, 'ANOVA');
+            crrFnc = 'jmv::ANOVA';
+            crrArg = eval(parse(text = paste0('formals(', crrFnc, ')')));
+            
         }
 
         # GLM: Univariate -----------------------------------------------------
         # https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=reference-glm-univariate
-        else if (grepl('^GLM', inpCmd[1])) {
-            print('GLM');
-            outCmd = 'jmv::ANOVA(data=data, '
+        else if (grepl('^GLM', crrSPS[1])) {
+            warning('GLM – not implemented yet');
+            crrSPS = rmvCmd(crrSPS, 'GLM');            
+            crrFnc = 'jmv::ANOVA';
+            crrArg = eval(parse(text = paste0('formals(', crrFnc, ')')));
+            
         }
 
         # MANOVA: Univariate --------------------------------------------------
         # https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=reference-manova-univariate
-        else if (grepl('^MANOVA', inpCmd[1])) {
-            print('MANOVA');
-            outCmd = 'jmv::ANOVA(data=data, '
+        else if (grepl('^MANOVA', crrSPS[1])) {
+            warning('MANOVA – not implemented yet');
+            crrSPS = rmvCmd(crrSPS, 'MANOVA');
+            crrFnc = 'jmv::ANOVA';
+            crrArg = eval(parse(text = paste0('formals(', crrFnc, ')')));
+            
         }
 
 
@@ -422,16 +474,22 @@ sps2jmv <- function(lstSPS = list(), fleSPS = "", fleSAV = "") {
 
         # GLM: Repeated Measures ----------------------------------------------
         # https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=reference-glm-repeated-measures
-        else if (grepl('^GLM', inpCmd[1])) {
-            print('GLM');
-            outCmd = 'jmv::anovaRM(data=data, '
+        else if (grepl('^GLM', crrSPS[1])) {
+            warning('GLM – not implemented yet');
+            crrSPS = rmvCmd(crrSPS, 'GLM');            
+            crrFnc = 'jmv::anovaRM';
+            crrArg = eval(parse(text = paste0('formals(', crrFnc, ')')));
+            
         }
 
         # MANOVA: Repeated Measures -------------------------------------------
         # https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=reference-manova-repeated-measures
-        else if (grepl('^MANOVA', inpCmd[1])) {
-            print('MANOVA');
-            outCmd = 'jmv::anovaRM(data=data, '
+        else if (grepl('^MANOVA', crrSPS[1])) {
+            warning('MANOVA – not implemented yet');
+            crrSPS = rmvCmd(crrSPS, 'MANOVA');
+            crrFnc = 'jmv::anovaRM';
+            crrArg = eval(parse(text = paste0('formals(', crrFnc, ')')));
+            
         }
 
 
@@ -440,16 +498,22 @@ sps2jmv <- function(lstSPS = list(), fleSPS = "", fleSAV = "") {
 
         # GLM: Univariate -----------------------------------------------------
         # https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=reference-glm-univariate
-        else if (grepl('^GLM', inpCmd[1])) {
-            print('GLM');
-            outCmd = 'jmv::ancova(data=data, '
+        else if (grepl('^GLM', crrSPS[1])) {
+            warning('GLM – not implemented yet');
+            crrSPS = rmvCmd(crrSPS, 'GLM');            
+            crrFnc = 'jmv::ancova';
+            crrArg = eval(parse(text = paste0('formals(', crrFnc, ')')));
+            
         }
 
         # MANOVA: Univariate --------------------------------------------------
         # https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=reference-manova-univariate
-        else if (grepl('^MANOVA', inpCmd[1])) {
-            print('MANOVA');
-            outCmd = 'jmv::ancova(data=data, '
+        else if (grepl('^MANOVA', crrSPS[1])) {
+            warning('MANOVA – not implemented yet');
+            crrSPS = rmvCmd(crrSPS, 'MANOVA');
+            crrFnc = 'jmv::ancova';
+            crrArg = eval(parse(text = paste0('formals(', crrFnc, ')')));
+            
         }
 
 
@@ -458,16 +522,22 @@ sps2jmv <- function(lstSPS = list(), fleSPS = "", fleSAV = "") {
 
         # GLM: Multivariate ---------------------------------------------------
         # https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=reference-glm-multivariate
-        else if (grepl('^GLM', inpCmd[1])) {
-            print('GLM');
-            outCmd = 'jmv::mancova(data=data, '
+        else if (grepl('^GLM', crrSPS[1])) {
+            warning('GLM – not implemented yet');
+            crrSPS = rmvCmd(crrSPS, 'GLM');            
+            crrFnc = 'jmv::mancova';
+            crrArg = eval(parse(text = paste0('formals(', crrFnc, ')')));
+            
         }
 
         # MANOVA: Multivariate ------------------------------------------------
         # https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=reference-manova-multivariate
-        else if (grepl('^MANOVA', inpCmd[1])) {
-            print('MANOVA');
-            outCmd = 'jmv::mancova(data=data, '
+        else if (grepl('^MANOVA', crrSPS[1])) {
+            warning('MANOVA – not implemented yet');
+            crrSPS = rmvCmd(crrSPS, 'MANOVA');
+            crrFnc = 'jmv::mancova';
+            crrArg = eval(parse(text = paste0('formals(', crrFnc, ')')));
+            
         }
 
 
@@ -476,16 +546,22 @@ sps2jmv <- function(lstSPS = list(), fleSPS = "", fleSAV = "") {
 
         # NPAR TESTS K-W ------------------------------------------------------
         # https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=reference-npar-tests
-        else if (grepl('^NPAR TESTS', inpCmd[1]) & any(grepl('K-W', inpCmd))) {
-            print('NPAR TESTS - Kruskal-Wallis');
-            outCmd = 'jmv::anovaNP(data=data, '
+        else if (grepl('^NPAR TESTS', crrSPS[1]) & any(grepl('K-W', crrSPS))) {
+            warning('NPAR TESTS - Kruskal-Wallis – not implemented yet');
+            crrSPS = rmvCmd(crrSPS, 'NPAR TESTS');
+            crrFnc = 'jmv::anovaNP';
+            crrArg = eval(parse(text = paste0('formals(', crrFnc, ')')));
+            
         }
 
         # NPTESTS /INDEPENDENT - KRUSKAL_WALLIS -------------------------------
         # https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=reference-nptests
-        else if (grepl('^NPTESTS', inpCmd[1]) & any(grepl('INDEPENDENT', inpCmd)) & any(grepl('KRUSKAL_WALLIS', inpCmd))) {
-            print('NPTESTS - Kruskal-Wallis');
-            outCmd = 'jmv::anovaNP(data=data, '
+        else if (grepl('^NPTESTS', crrSPS[1]) & any(grepl('INDEPENDENT', crrSPS)) & any(grepl('KRUSKAL_WALLIS', crrSPS))) {
+            warning('NPTESTS - Kruskal-Wallis – not implemented yet');
+            crrSPS = rmvCmd(crrSPS, 'NPTESTS');            
+            crrFnc = 'jmv::anovaNP';
+            crrArg = eval(parse(text = paste0('formals(', crrFnc, ')')));
+            
         }
 
 
@@ -494,16 +570,22 @@ sps2jmv <- function(lstSPS = list(), fleSPS = "", fleSAV = "") {
 
         # NPAR TESTS FRIEDMAN -------------------------------------------------
         # https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=reference-npar-tests
-        else if (grepl('^NPAR TESTS', inpCmd[1]) & any(grepl('FRIEDMAN', inpCmd))) {
-            print('NPAR TESTS - Kruskal-Wallis');
-            outCmd = 'jmv::anovaRMNP(data=data, '
+        else if (grepl('^NPAR TESTS', crrSPS[1]) & any(grepl('FRIEDMAN', crrSPS))) {
+            warning('NPAR TESTS - FRIEDMAN – not implemented yet');
+            crrSPS = rmvCmd(crrSPS, 'NPAR TESTS');
+            crrFnc = 'jmv::anovaRMNP';
+            crrArg = eval(parse(text = paste0('formals(', crrFnc, ')')));
+            
         }
 
         # NPTESTS /RELATED - FRIEDMAN -----------------------------------------
         # https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=reference-nptests
-        else if (grepl('^NPTESTS', inpCmd[1]) & any(grepl('RELATED', inpCmd)) & any(grepl('FRIEDMAN', inpCmd))) {
-            print('NPTESTS - Friedman');
-            outCmd = 'jmv::anovaRMNP(data=data, '
+        else if (grepl('^NPTESTS', crrSPS[1]) & any(grepl('RELATED', crrSPS)) & any(grepl('FRIEDMAN', crrSPS))) {
+            warning('NPTESTS - Friedman – not implemented yet');
+            crrSPS = rmvCmd(crrSPS, 'NPTESTS');            
+            crrFnc = 'jmv::anovaRMNP';
+            crrArg = eval(parse(text = paste0('formals(', crrFnc, ')')));
+            
         }
 
 
@@ -512,16 +594,24 @@ sps2jmv <- function(lstSPS = list(), fleSPS = "", fleSAV = "") {
 
         # CORRELATIONS --------------------------------------------------------
         # https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=reference-correlations
-        else if (grepl('^CORRELATIONS', inpCmd[1])) {
-            print('CORRELATIONS');
-            outCmd = 'jmv::corrMatrix(data=data, pearson = TRUE,  spearman = FALSE, kendall = FALSE, '
+        else if (grepl('^CORRELATIONS', crrSPS[1])) {
+            warning('CORRELATIONS – not implemented yet');
+            crrSPS = rmvCmd(crrSPS, 'CORRELATIONS');
+            crrFnc = 'jmv::corrMatrix';
+            crrArg = eval(parse(text = paste0('formals(', crrFnc, ')')));
+            crrArg$pearson = TRUE; crrArg$spearman = FALSE; crrArg$kendall = FALSE;
+            
         }
 
         # NONPAR CORR ---------------------------------------------------------
         # https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=reference-nonpar-corr
-        else if (grepl('^NONPAR CORR', inpCmd[1])) {
-            print('NONPAR CORR');
-            outCmd = 'jmv::corrMatrix(data=data, pearson = FALSE, spearman = TRUE,  kendall = TRUE,  '
+        else if (grepl('^NONPAR CORR', crrSPS[1])) {
+            warning('NONPAR CORR – not implemented yet');
+            crrSPS = rmvCmd(crrSPS, 'NONPAR CORR');
+            crrFnc = 'jmv::corrMatrix';
+            crrArg = eval(parse(text = paste0('formals(', crrFnc, ')')));
+            crrArg$pearson = FALSE; crrArg$spearman = TRUE; crrArg$kendall = TRUE;
+            
         }
 
 
@@ -530,9 +620,12 @@ sps2jmv <- function(lstSPS = list(), fleSPS = "", fleSAV = "") {
 
         # PARTIAL CORR --------------------------------------------------------
         # https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=reference-partial-corr
-        else if (grepl('^PARTIAL CORR', inpCmd[1])) {
-            print('PARTIAL CORR');
-            outCmd = 'jmv::corrPart(data=data, '
+        else if (grepl('^PARTIAL CORR', crrSPS[1])) {
+            warning('PARTIAL CORR – not implemented yet');
+            crrSPS = rmvCmd(crrSPS, 'PARTIAL CORR');
+            crrFnc = 'jmv::corrPart';
+            crrArg = eval(parse(text = paste0('formals(', crrFnc, ')')));
+            
         }
 
 
@@ -541,16 +634,22 @@ sps2jmv <- function(lstSPS = list(), fleSPS = "", fleSAV = "") {
 
         # LINEAR --------------------------------------------------------------
         # https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=reference-linear
-        else if (grepl('^LINEAR', inpCmd[1])) {
-            print('LINEAR');
-            outCmd = 'jmv::linReg(data=data, '
+        else if (grepl('^LINEAR', crrSPS[1])) {
+            warning('LINEAR – not implemented yet');
+            crrSPS = rmvCmd(crrSPS, 'LINEAR');
+            crrFnc = 'jmv::linReg';
+            crrArg = eval(parse(text = paste0('formals(', crrFnc, ')')));
+            
         }
 
         # REGRESSION ----------------------------------------------------------
         # https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=reference-regression
-        else if (grepl('^REGRESSION', inpCmd[1])) {
-            print('REGRESSION');
-            outCmd = 'jmv::linReg(data=data, '
+        else if (grepl('^REGRESSION', crrSPS[1])) {
+            warning('REGRESSION – not implemented yet');
+            crrSPS = rmvCmd(crrSPS, 'REGRESSION');
+            crrFnc = 'jmv::linReg';
+            crrArg = eval(parse(text = paste0('formals(', crrFnc, ')')));
+            
         }
 
         # Correlation and regression – Binomial Logistic Regression ===========
@@ -558,9 +657,12 @@ sps2jmv <- function(lstSPS = list(), fleSPS = "", fleSAV = "") {
 
         # LOGISTIC REGRESSION (outcome variable has two steps) ----------------
         # https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=reference-logistic-regression
-        else if (grepl('^LOGISTIC REGRESSION', inpCmd[1])) {
-            print('LOGISTIC REGRESSION - Binomial');
-            outCmd = 'jmv::logRegBin(data=data, '
+        else if (grepl('^LOGISTIC REGRESSION', crrSPS[1])) {
+            warning('LOGISTIC REGRESSION - Binomial – not implemented yet');
+            crrSPS = rmvCmd(crrSPS, 'LOGISTIC REGRESSION');
+            crrFnc = 'jmv::logRegBin';
+            crrArg = eval(parse(text = paste0('formals(', crrFnc, ')')));
+            
         }
 
 
@@ -569,9 +671,12 @@ sps2jmv <- function(lstSPS = list(), fleSPS = "", fleSAV = "") {
 
         # LOGISTIC REGRESSION (outcome variable has more than two steps) ------
         # https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=reference-logistic-regression
-        else if (grepl('^LOGISTIC REGRESSION', inpCmd[1])) {
-            print('LOGISTIC REGRESSION - Multinomial');
-            outCmd = 'jmv::logRegMulti(data=data, '
+        else if (grepl('^LOGISTIC REGRESSION', crrSPS[1])) {
+            warning('LOGISTIC REGRESSION - Multinomial – not implemented yet');
+            crrSPS = rmvCmd(crrSPS, 'LOGISTIC REGRESSION');
+            crrFnc = 'jmv::logRegMulti';
+            crrArg = eval(parse(text = paste0('formals(', crrFnc, ')')));
+            
         }
 
 
@@ -580,9 +685,12 @@ sps2jmv <- function(lstSPS = list(), fleSPS = "", fleSAV = "") {
 
         # LOGISTIC REGRESSION (outcome variable has more than two steps and is ordered)
         # https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=reference-logistic-regression
-        else if (grepl('^LOGISTIC REGRESSION', inpCmd[1])) {
-            print('LOGISTIC REGRESSION - Ordinal');
-            outCmd = 'jmv::logRegOrd(data=data, '
+        else if (grepl('^LOGISTIC REGRESSION', crrSPS[1])) {
+            warning('LOGISTIC REGRESSION - Ordinal – not implemented yet');
+            crrSPS = rmvCmd(crrSPS, 'LOGISTIC REGRESSION');
+            crrFnc = 'jmv::logRegOrd';
+            crrArg = eval(parse(text = paste0('formals(', crrFnc, ')')));
+            
         }
 
 
@@ -591,16 +699,22 @@ sps2jmv <- function(lstSPS = list(), fleSPS = "", fleSAV = "") {
 
         # NPAR TESTS BINOMIAL -------------------------------------------------
         # https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=reference-npar-tests
-        else if (grepl('^NPAR TESTS', inpCmd[1]) & any(grepl('BINOMIAL', inpCmd))) {
-            print('NPAR TESTS - Binomial');
-            outCmd = 'jmv::propTest2(data=data, '
+        else if (grepl('^NPAR TESTS', crrSPS[1]) & any(grepl('BINOMIAL', crrSPS))) {
+            warning('NPAR TESTS - Binomial – not implemented yet');
+            crrSPS = rmvCmd(crrSPS, 'NPAR TESTS');
+            crrFnc = 'jmv::propTest2';
+            crrArg = eval(parse(text = paste0('formals(', crrFnc, ')')));
+            
         }
 
         # NPTESTS /ONESAMPLE BINOMIAL -------------------------------------------------
         # https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=reference-nptests
-        else if (grepl('^NPTESTS', inpCmd[1]) & any(grepl('ONESAMPLE', inpCmd)) & any(grepl('BINOMIAL', inpCmd))) {
-            print('NPTESTS - Binomial');
-            outCmd = 'jmv::propTest2(data=data, '
+        else if (grepl('^NPTESTS', crrSPS[1]) & any(grepl('ONESAMPLE', crrSPS)) & any(grepl('BINOMIAL', crrSPS))) {
+            warning('NPTESTS - Binomial – not implemented yet');
+            crrSPS = rmvCmd(crrSPS, 'NPTESTS');            
+            crrFnc = 'jmv::propTest2';
+            crrArg = eval(parse(text = paste0('formals(', crrFnc, ')')));
+            
         }
 
 
@@ -609,16 +723,22 @@ sps2jmv <- function(lstSPS = list(), fleSPS = "", fleSAV = "") {
 
         # NPAR TESTS CHISQUARE ------------------------------------------------
         # https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=reference-npar-tests
-        else if (grepl('^NPAR TESTS', inpCmd[1]) & any(grepl('CHISQUARE', inpCmd))) {
-            print('NPAR TESTS - Chi-squared');
-            outCmd = 'jmv::propTestN(data=data, '
+        else if (grepl('^NPAR TESTS', crrSPS[1]) & any(grepl('CHISQUARE', crrSPS))) {
+            warning('NPAR TESTS - Chi-squared – not implemented yet');
+            crrSPS = rmvCmd(crrSPS, 'NPAR TESTS');
+            crrFnc = 'jmv::propTestN';
+            crrArg = eval(parse(text = paste0('formals(', crrFnc, ')')));
+            
         }
 
         # NPTESTS /ONESAMPLE CHISQUARE ----------------------------------------
         # https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=reference-nptests
-        else if (grepl('^NPTESTS', inpCmd[1]) & any(grepl('ONESAMPLE', inpCmd)) & any(grepl('CHISQUARE', inpCmd))) {
-            print('NPTESTS - Binomial');
-            outCmd = 'jmv::propTestN(data=data, '
+        else if (grepl('^NPTESTS', crrSPS[1]) & any(grepl('ONESAMPLE', crrSPS)) & any(grepl('CHISQUARE', crrSPS))) {
+            warning('NPTESTS - Binomial – not implemented yet');
+            crrSPS = rmvCmd(crrSPS, 'NPTESTS');            
+            crrFnc = 'jmv::propTest2';
+            crrArg = eval(parse(text = paste0('formals(', crrFnc, ')')));
+            
         }
 
 
@@ -626,9 +746,12 @@ sps2jmv <- function(lstSPS = list(), fleSPS = "", fleSAV = "") {
         # https://www.jamovi.org/jmv/conttables.html
 
         # CROSSTABS -----------------------------------------------------------
-        else if (grepl('^CROSSTABS', inpCmd[1])) {
-            print('CROSSTABS');
-            outCmd = 'jmv::contTables(data=data, '
+        else if (grepl('^CROSSTABS', crrSPS[1])) {
+            warning('CROSSTABS – not implemented yet');
+            crrSPS = rmvCmd(crrSPS, 'CROSSTABS');
+            crrFnc = 'jmv::contTables';
+            crrArg = eval(parse(text = paste0('formals(', crrFnc, ')')));
+            
         }
 
 
@@ -637,16 +760,22 @@ sps2jmv <- function(lstSPS = list(), fleSPS = "", fleSAV = "") {
 
         # NPAR TESTS MCNEMAR --------------------------------------------------
         # https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=reference-npar-tests
-        else if (grepl('^NPAR TESTS', inpCmd[1]) & any(grepl('MCNEMAR', inpCmd))) {
-            print('NPAR TESTS MCNEMAR');
-            outCmd = 'jmv::contTablesPaired(data=data, '
+        else if (grepl('^NPAR TESTS', crrSPS[1]) & any(grepl('MCNEMAR', crrSPS))) {
+            warning('NPAR TESTS MCNEMAR – not implemented yet');
+            crrSPS = rmvCmd(crrSPS, 'NPAR TESTS');
+            crrFnc = 'jmv::contTablesPaired';
+            crrArg = eval(parse(text = paste0('formals(', crrFnc, ')')));
+            
         }
 
         # NPTESTS /RELATED MCNEMAR ----------------------------------------
         # https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=reference-nptests
-        else if (grepl('^NPTESTS', inpCmd[1]) & any(grepl('RELATED', inpCmd)) & any(grepl('MCNEMAR', inpCmd))) {
-            print('NPTESTS - Binomial');
-            outCmd = 'jmv::contTablesPaired(data=data, '
+        else if (grepl('^NPTESTS', crrSPS[1]) & any(grepl('RELATED', crrSPS)) & any(grepl('MCNEMAR', crrSPS))) {
+            warning('NPTESTS - Binomial – not implemented yet');
+            crrSPS = rmvCmd(crrSPS, 'NPTESTS');            
+            crrFnc = 'jmv::contTablesPaired';
+            crrArg = eval(parse(text = paste0('formals(', crrFnc, ')')));
+            
         }
 
 
@@ -655,9 +784,11 @@ sps2jmv <- function(lstSPS = list(), fleSPS = "", fleSAV = "") {
 
         # LOGLINEAR -----------------------------------------------------------
         # https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=reference-loglinear
-        else if (grepl('^LOGLINEAR', inpCmd[1])) {
-            print('LOGLINEAR');
-            outCmd = 'jmv::logLinear(data=data, '
+        else if (grepl('^LOGLINEAR', crrSPS[1])) {
+            warning('LOGLINEAR – not implemented yet');
+            crrFnc = 'jmv::logLinear';
+            crrArg = eval(parse(text = paste0('formals(', crrFnc, ')')));
+            
         }
 
 
@@ -666,9 +797,12 @@ sps2jmv <- function(lstSPS = list(), fleSPS = "", fleSAV = "") {
 
         # RELIABILITY ---------------------------------------------------------
         # https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=reference-reliability
-        else if (grepl('^RELIABILITY', inpCmd[1])) {
-            print('RELIABILITY');
-            outCmd = 'jmv::reliability(data=data, '
+        else if (grepl('^RELIABILITY', crrSPS[1])) {
+            warning('RELIABILITY – not implemented yet');
+            crrSPS = rmvCmd(crrSPS, 'RELIABILITY');            
+            crrFnc = 'jmv::reliability';
+            crrArg = eval(parse(text = paste0('formals(', crrFnc, ')')));
+            
         }
 
 
@@ -677,9 +811,12 @@ sps2jmv <- function(lstSPS = list(), fleSPS = "", fleSAV = "") {
 
         # FACTOR - /EXTRACTION = PC, PA1, DEFAULT -----------------------------
         # https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=reference-factor
-        else if (grepl('^', inpCmd[1])) {
-            print('');
-            outCmd = 'jmv::pca(data=data, '
+        else if (grepl('^', crrSPS[1])) {
+            warning('FACTOR - PCA – not implemented yet');
+            crrSPS = rmvCmd(crrSPS, 'FACTOR');            
+            crrFnc = 'jmv::pca';
+            crrArg = eval(parse(text = paste0('formals(', crrFnc, ')')));
+            
         }
 
 
@@ -691,9 +828,12 @@ sps2jmv <- function(lstSPS = list(), fleSPS = "", fleSAV = "") {
         # PAF, PA2 → Principal axis 
         # ML → maximum likelihood 
         # CHECK: unclear whether "minimum residuals" = GLS / ULS
-        else if (grepl('^', inpCmd[1])) {
-            print('');
-            outCmd = 'jmv::efa(data=data, '
+        else if (grepl('^', crrSPS[1])) {
+            warning('FACTOR - EFA – not implemented yet');
+            crrSPS = rmvCmd(crrSPS, 'FACTOR');            
+            crrFnc = 'jmv::efa';
+            crrArg = eval(parse(text = paste0('formals(', crrFnc, ')')));
+            
         }
 
         # Factor analysis – Confirmatory Factor Analysis ======================
@@ -705,17 +845,42 @@ sps2jmv <- function(lstSPS = list(), fleSPS = "", fleSAV = "") {
         
         # other not (yet) implemented SPSS-commands ---------------------------
         else {
-            print(paste('SPSS-command', inpCmd[1], 'not (yet) implemented.'));
-            outCmd = "";
+            print(paste('SPSS-command', crrSPS[1], 'not (yet) implemented.'));
+            crrFnc = '';
+            crrArg = pairlist();
         }
 
         # add converted command / function the the syntax list ================ 
-        if (inpCmd > "") { lstJMV = c(lstJMV, outCmd); }
+        if (crrFnc > '') {
+            lstJMV = c(lstJMV, gsub('list\\( ', paste0(crrFnc, '('), gsub('data=,', 'data=data,', gsub('\\n\\s+', ' ', jmvcore::sourcify(crrArg)))));
+        }
     }
 
-    attr(dtaFrm, 'syntax') = lstJMV;
+    attr(data, 'syntax') = lstJMV;
+    data
 }
 
-chkVar <- function(varLst = list(), dtaFrm = data.frame()) {
+chkVar <- function(lstVar = list(), data = data.frame()) {
+    if (is.character(lstVar)) { lstVar = strsplit(lstVar, ' ')[[1]]; }
+    allVar = names(data);
+    for (crrVar in lstVar) {
+        if (! crrVar %in% allVar) { stop(paste('Variable', crrVar, 'is contained in the SPSS-syntax but not in the current data set.')); }  
+    }
+}
 
+asgArg <- function(lstArg = list(), addArg = list()) {
+    nmeArg = names(lstArg)
+    for (i in 1:length(addArg)) {
+        # check whether the argument exists in lstArg
+        if (! names(addArg[i]) %in% nmeArg) { stop(paste('Argument', names(addArg[i]), 'is not a valid argumenent / parameter name.')); }
+        # check whether the variable type of the argument to add and the argument in the parameter list is the same
+        if (typeof(addArg[[i]]) != typeof(lstArg[[names(addArg[i])]])) { warning(paste('Variable type is not the same for the argument', names(addArg[[i]]), '–', typeof(addArg[[i]]), 'vs.',  typeof(lstArg[[names(addArg[i])]]))); };
+        lstArg[[names(addArg[i])]] <- addArg[[i]];
+    }
+    lstArg
+}
+
+rmvCmd <- function(crrSPS = list(), crrCmd = "") {
+    crrSPS[1] = trimws(gsub(crrCmd, '', crrSPS[1]));
+    crrSPS[crrSPS != ""]
 }

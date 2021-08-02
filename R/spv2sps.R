@@ -53,7 +53,7 @@ spv2sps <- function(fleSPV = "") {
         } else if (file.exists(file.path(dirname(fleSPV), basename(fleSAV)))) {
             attr(txtSPS, 'datafile') <- file.path(dirname(fleSPV), basename(fleSAV));
         } else {
-            stop('SPSS data file not found: It is expected to be found either at the position that is stored in the .spv-file, the current working directory, or the directory where the .spv-file was located. Please correct it (copy the data file to one of these places) and run the function again.');
+            stop(paste0('SPSS data file \"', basename(fleSAV), '\" not found: It is expected to be found either at the position that is stored in the .spv-file, the current working directory, or the directory where the .spv-file was located. Please correct it (copy the data file to one of these places) and run the function again.'));
         }
     } else {
         warning('File name of the data file insufficient: Either there was more than one data file used in the analyses that are stored in the .spv-file or the file was not stored (e.g., because you worked with a dataset with values that were typed in but not stored before conducting the analyses).');

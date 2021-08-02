@@ -2,16 +2,16 @@
 % Please edit documentation in R/spv2sps.R
 \name{spv2sps}
 \alias{spv2sps}
-\title{Reads SPSS output files (.spv) and extracts the syntax from them}
+\title{Reads SPSS output files (.spv) and extracts the syntax and the data file used in the analyses from them}
 \usage{
-spv2sps(fleNme = "")
+spv2sps(fleSPV = "")
 }
 \arguments{
-\item{fleNme}{name (incl. path) of the SPSS-output-file to be read ("FILENAME.spv"; default = "")}
+\item{fleSPV}{name (incl. path) of the SPSS-output-file to be read ("FILENAME.spv"; default = "")}
 }
 \value{
-list with SPSS commands (like what you store in SPSS syntax files - .sps)
+list with SPSS commands (like what is typically stored in SPSS syntax files - .sps); the list contains one command per entry (the command being a character vector) and the position of the SPSS-data-file \link{incl. path} that was used in the analyses is stored as a character vector in the attribute 'datafile' (the attribute will be empty if either the SPSS-datafile used in the analyses was not stored or if there was more than one data file used in the analyses stored in the original .spv-file
 }
 \description{
-Reads SPSS output files (.spv) and extracts the syntax from them
+Reads SPSS output files (.spv) and extracts the syntax and the data file used in the analyses from them
 }

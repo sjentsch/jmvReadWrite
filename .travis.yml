@@ -1,13 +1,27 @@
 language: r
+
+sudo: required
+
+env:
+  - _R_CHECK_CRAN_INCOMING_=FALSE
+  - CODECOV_TOKEN='2f521d97-d1e2-4baf-b05b-0b569a7c6f0f'
+
 cache: packages
+
 r_packages:
   - covr
+  - devtools
+    
 r:
   - oldrel
   - release
+
+r_github_packages:
+  - sjentsch/jmvReadWrite
+
 os:
   - windows
   - osx
+
 after_success:
   - Rscript -e 'library(covr); codecov()'
-

@@ -25,6 +25,8 @@ os:
   
 jobs:
   include:
+    - os: linux
+      dist: focal
     - os: osx
       osx_image: xcode12.5  
 

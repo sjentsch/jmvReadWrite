@@ -5,8 +5,8 @@
 
 ## Test environments
 * ``devtools::check()`` - local: Ubuntu 20.04, R 4.1.0 (x86_64-pc-linux-gnu)
-* rhub::check_for_cran()
-* rhbPlt = rhub::platforms()$name; rhub::check(platform = rhbPlt[grepl('windows-.*-devel', rhbPlt)]); rhub::check(rhbPlt[grepl('macos-.*-release-cran', rhbPlt)])
+* ``rhub::check_for_cran()``
+* ``rhbPlt = rhub::platforms()$name; rhub::check(platform = rhbPlt[grepl('windows-.*-devel', rhbPlt)]); rhub::check(rhbPlt[grepl('macos-.*-release-cran', rhbPlt)])``
 
 ## R CMD check results
 0 errors | 0 warnings | 1 / 2 notes

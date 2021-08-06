@@ -58,6 +58,7 @@ spv2sps <- function(fleSPV = "") {
             crrSPS = gsub('\\h+', ' ', paste0(substr(crrSPS, 1, rmvPos - 1), '\n', substr(crrSPS, rmvPos + attr(rmvPos, 'match.length') - 2, nchar(crrSPS))), perl = TRUE);
         } }
         if (grepl('>Specific symptom number: ', crrSPS)) { repeat {
+            stop(
             rmvPos = gregexpr("\\.\n+>Specific symptom number: \\d+", paste0('\n', crrSPS))[[1]];
             if (rmvPos[1] == -1) { rm('rmvPos'); break; }
             crrSPS = gsub('\\h+', ' ', paste0(substr(crrSPS, 1, rmvPos - 1), '\n', substr(crrSPS, rmvPos + attr(rmvPos, 'match.length') - 2, nchar(crrSPS))), perl = TRUE);
@@ -68,29 +69,32 @@ spv2sps <- function(fleSPV = "") {
             if (rmvPos[1] == -1) { rm('rmvPos'); break; }
             crrSPS = gsub('\\h+', ' ', paste0(substr(crrSPS, 1, rmvPos - 1), '\n', substr(crrSPS, rmvPos + attr(rmvPos, 'match.length') - 2, nchar(crrSPS))), perl = TRUE);
         } }
-        if (grepl('\n\\*', crrSPS) | grepl('\n/\\*', crrSPS)) { repeat {
-            rmvPos = min(c(gregexpr('\n\\*', crrSPS)[[1]], gregexpr('\n/\\*', crrSPS)[[1]]));
+        if (grepl('\n+[\\*,/\\*]', paste0('\n', crrSPS, '\n'))) { repeat {
+            rmvPos = gregexpr('\n[\\*,/\\*]', paste0('\n', crrSPS, '\n'))[[1]];
             if (rmvPos[1] == -1) { rm('rmvPos'); break; }
-            crrSPS = gsub('\\h+', ' ', paste0(substr(crrSPS, 1, rmvPos[1]), substr(crrSPS, rmvPos[1] + min(gregexpr('\\n', substr(crrSPS, rmvPos[1] + 2, nchar(crrSPS)))[[1]]) + 2, nchar(crrSPS))), perl = TRUE);
+            crrSPS = trimws(paste0(substr(crrSPS, 1, rmvPos[1] - 1), substr(crrSPS, rmvPos[1] + min(gregexpr('\\n+[\\*,A-Z]+', substr(crrSPS, rmvPos[1] + 2, nchar(crrSPS)))[[1]]) + 2, nchar(crrSPS))));
         } }
-        if (grepl('\\n>', crrSPS)) {
-            stop(paste0('Warning / error: ', fleSPV, ' - ', fleLog, ' - ', crrSPS));
-        }        
-        txtSPS <- c(txtSPS, gsub('\\s+', ' ', unlist(strsplit(trimws(gsub('\\.\n', '\\.\\.\\\n', gsub('\\.\\n+', '.\\\n', crrSPS))), '\\.\n'))));
+        # Any changes ... lost. 
+        # The time now is 10:52:14.
+        # 15 variables and 28 cases written.
+        # Chart Builder.
+        txtSPS <- c(txtSPS, gsub('\\s+', ' ', trimws(unlist(strsplit(gsub('\\.\n', '\\.\\.\\\n', gsub('\\.\\n+', '.\\\n', crrSPS)), '\\.\n')))));
         rm('txtLog', 'crrSPS');
     }
-    txtSPS[  grep('^[/\\*,\\*].*[\\*,\\*\\.,\\*/,\\*/\\.]$', txtSPS)   ] <- NULL;
-    txtSPS[c(grep('TITLE ',        txtSPS), grep('TITLE ', txtSPS) + 1)] <- NULL;
-    txtSPS[c(grep('CACHE.',        txtSPS), grep('CACHE.', txtSPS) + 1)] <- NULL;
-    txtSPS[  grep('DATASET ',      txtSPS)                             ] <- NULL;
-    txtSPS[  grep('NEW FILE.',     txtSPS)                             ] <- NULL;
-    txtSPS[  grep('GET FILE=',     txtSPS)                             ] <- NULL;
-    txtSPS[  grep('GET DATA ',     txtSPS)                             ] <- NULL;
-    txtSPS[  grep('SAVE OUTFILE=', txtSPS)                             ] <- NULL;
-    txtSPS[  grep('PRESERVE.',     txtSPS)                             ] <- NULL;
-    txtSPS[  grep('SET DECIMAL ',  txtSPS)                             ] <- NULL;
-    txtSPS[  grep('RESTORE.',      txtSPS)                             ] <- NULL;
-    txtSPS[  grep('SET TLook=',    txtSPS)                             ] <- NULL;
+    if (length(txtSPS) == 0) { warning(paste0('The current SPV-file ', fleSPV, ' doesn\'t contain any Log-entries with SPSS-syntax.')); return(); }
+#   txtSPS[  grep('^[/\\*,\\*].*[\\*,\\*\\.,\\*/,\\*/\\.]$', txtSPS)    ] <- NULL;
+    txtSPS[c(grep('CACHE.',         txtSPS), grep('CACHE.', txtSPS) + 1)] <- NULL;
+    txtSPS[  grep('TITLE ',         txtSPS)                             ] <- NULL;
+    txtSPS[  grep('DATASET ',       txtSPS)                             ] <- NULL;
+    txtSPS[  grep('NEW FILE.',      txtSPS)                             ] <- NULL;
+    txtSPS[  grep('GET FILE=',      txtSPS)                             ] <- NULL;
+    txtSPS[  grep('GET DATA ',      txtSPS)                             ] <- NULL;
+    txtSPS[  grep('SAVE OUTFILE=',  txtSPS)                             ] <- NULL;
+    txtSPS[  grep('SAVE TRANSLATE', txtSPS)                             ] <- NULL;    
+    txtSPS[  grep('PRESERVE.',      txtSPS)                             ] <- NULL;
+    txtSPS[  grep('SET DECIMAL ',   txtSPS)                             ] <- NULL;
+    txtSPS[  grep('RESTORE.',       txtSPS)                             ] <- NULL;
+    txtSPS[  grep('SET TLook=',     txtSPS)                             ] <- NULL;
     
     # the data file (.sav) that was used for a particular analysis is stored in
     # files whose file names begin with numbers and end with lightNotesData.xml

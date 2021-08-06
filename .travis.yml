@@ -1,8 +1,13 @@
 language: r
 cache: packages
+r_packages:
+  - covr
 r:
   - oldrel
   - release
 os:
   - windows
   - osx
+after_success:
+  - Rscript -e 'library(covr); codecov()'
+

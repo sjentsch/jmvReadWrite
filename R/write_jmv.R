@@ -62,7 +62,7 @@ write_jmv <- function(dtaFrm = NULL, fleNme = "") {
             # if original data are a factor
             } else if (is.factor(dtaFrm[[i]])) {
                 numLvl <- suppressWarnings(as.integer(dtaFrm[[i]]))
-                if (any(is.na(numLvl)) || (sd(diff(numLvl)) > diff(range(numLvl)) / 10)) {
+                if (any(is.na(numLvl)) || (stats::sd(diff(numLvl)) > diff(range(numLvl)) / 10)) {
                     mtaDta$dataSet$fields[[i]][['measureType']] <- 'Nominal'
                 } else {
                     mtaDta$dataSet$fields[[i]][['measureType']] <- 'Ordinal'
@@ -79,7 +79,7 @@ write_jmv <- function(dtaFrm = NULL, fleNme = "") {
                         stop('Needs to be implemented: All values NA and column type neither integer nor number / double')
                     }
                 } else {
-                    if ((length(unique(dtaFrm[[i]])) < diff(range(dtaFrm[[i]])) / 5) || (sd(dtaFrm[[i]]) < diff(range(dtaFrm[[i]])) / 10)) {
+                    if ((length(unique(dtaFrm[[i]])) < diff(range(dtaFrm[[i]])) / 5) || (stats::sd(dtaFrm[[i]]) < diff(range(dtaFrm[[i]])) / 10)) {
                         mtaDta$dataSet$fields[[i]][['measureType']] <- 'Nominal'
                     } else {
                         mtaDta$dataSet$fields[[i]][['measureType']] <- 'Continuous'
@@ -200,13 +200,13 @@ write_jmv <- function(dtaFrm = NULL, fleNme = "") {
 
     # compress data.bin and discard the temporary file
     close(binHdl)
-    zip(fleNme, 'data.bin', flags = "-r9Xq")
+    utils::zip(fleNme, 'data.bin', flags = "-r9Xq")
     unlink('data.bin')
 
     # check whether data were written to strings.bin
     close(strHdl)
     if (strPos > 0) {
-        zip(fleNme, 'strings.bin', flags = "-r9Xq")
+        utils::zip(fleNme, 'strings.bin', flags = "-r9Xq")
     }
     unlink('strings.bin') 
 
@@ -214,21 +214,21 @@ write_jmv <- function(dtaFrm = NULL, fleNme = "") {
     mnfTxt <- c("Manifest-Version: 1.0", "Data-Archive-Version: 1.0.2", "jamovi-Archive-Version: 8.0", "Created-By: jmvWrite 0.0.1")
     dir.create('META-INF')
     writeLines(mnfTxt, con = 'META-INF/MANIFEST.MF')
-    zip(fleNme, 'META-INF/MANIFEST.MF', flags = "-r9Xq")
+    utils::zip(fleNme, 'META-INF/MANIFEST.MF', flags = "-r9Xq")
     writeLines(mnfTxt, con = 'meta')
     unlink('META-INF', recursive = T)
-    zip(fleNme, 'meta', flags = "-r9Xq")
+    utils::zip(fleNme, 'meta', flags = "-r9Xq")
     unlink('meta')
     rm("mnfTxt")
 
     # write metadata.json
     writeLines(gsub(':', ': ', gsub(',', ', ', rjson::toJSON(mtaDta))), 'metadata.json')
-    zip(fleNme, 'metadata.json', flags = "-r9Xq")
+    utils::zip(fleNme, 'metadata.json', flags = "-r9Xq")
     unlink('metadata.json')
 
     # write xdata.json
     writeLines(gsub(':', ': ', gsub(',', ', ', rjson::toJSON(xtdDta))), 'xdata.json')
-    zip(fleNme, 'xdata.json', flags = "-r9Xq")
+    utils::zip(fleNme, 'xdata.json', flags = "-r9Xq")
     unlink('xdata.json')
 
     # export empty HTML results output - index.html
@@ -251,7 +251,7 @@ write_jmv <- function(dtaFrm = NULL, fleNme = "") {
                 '</html>')
     # write HTML and add it to ZIP file
     writeLines(resHTM, con = 'index.html')
-    zip(fleNme, 'index.html', flags = "-r9Xq")   
+    utils::zip(fleNme, 'index.html', flags = "-r9Xq")   
     unlink('index.html')
 
     list(mtaDta = mtaDta, xtdDta = xtdDta, dtaFrm = dtaFrm)

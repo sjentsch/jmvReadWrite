@@ -8,7 +8,7 @@ Description: The free and open a statistical spreadsheet 'jamovi' (www.jamovi.or
     syntax that can directly be used in R (in connection with the R-package 'jmv').
     Having import / export routines for the data files 'jamovi' produces ('.omv')
     permits an easy transfer of analyses between 'jamovi' and R.
-License: AGPL-3
+License: AGPL-3 + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
@@ -18,9 +18,7 @@ BugReports: https://github.com/sjentsch/jmvReadWrite/issues
 Depends: R (>= 3.5.0)
 Imports: rjson,
          jmvcore,
-         RProtoBuf,
-         stats,
-         utils
+         RProtoBuf
 Suggests: jmv,
           knitr,
           rmarkdown

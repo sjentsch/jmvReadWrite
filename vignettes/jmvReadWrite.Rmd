@@ -65,7 +65,7 @@ If you want to copy the syntax generated in jamovi, you have to switch on the
 Afterwards, the syntax is shown at the top of the analysis and can be copied
 from there.
 
-```{r, echo=TRUE}
+```{r, eval=FALSE}
 library(jmvReadWrite)
 library(jmv)
 
@@ -86,7 +86,7 @@ read_jmv (default is `FALSE`). When the parameter is set, the analyses are
 stored in the attribute `syntax`. They can be used as shown in the following
 examples:
 
-```{r, echo=TRUE}
+```{r, eval=FALSE}
 library(jmvReadWrite)
 
 data = read_jmv(fleNme = system.file("extdata", "ToothGrowth.omv", package = "jmvReadWrite"), getSyn = TRUE)

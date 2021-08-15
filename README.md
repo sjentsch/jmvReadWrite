@@ -35,7 +35,7 @@ devtools::install_github("sjentsch/jmvReadWrite")
 
 [Vignette](https://raw.githubusercontent.com/sjentsch/jmvReadWrite/master/doc/jmvReadWrite.html)
 
-[Vignette_RMD](https://raw.githubusercontent.com/sjentsch/jmvReadWrite/master/vignettes/jmvReadWrite.Rmd)
+[Vignette_RMD](DOCUMENTATION.md)
 
 [Changelog](CHANGELOG.md)
 

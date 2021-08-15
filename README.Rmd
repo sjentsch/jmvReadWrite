@@ -33,7 +33,7 @@ knitr::opts_chunk$set(
 ```{r, child=c('vignettes/jmvReadWrite.Rmd')}
 ```
 
-__
+===
 
 [Changelog](CHANGELOG.md)
 

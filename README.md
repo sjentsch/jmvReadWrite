@@ -4,6 +4,7 @@
 # jmvReadWrite
 
 <!-- badges: start -->
+
 [![CRAN](http://www.r-pkg.org/badges/version/jmvReadWrite)](https://cran.r-project.org/package=jmvReadWrite)
 [![License](https://img.shields.io/badge/License-AGPL%20v3-green.svg)](https://www.gnu.org/licenses/agpl-3.0.html)
 [![Downloads](https://cranlogs.r-pkg.org/badges/jmvReadWrite?color=brightgreen)](https://cran.r-project.org/package=jmvReadWrite)
@@ -18,8 +19,8 @@ Commit](https://img.shields.io/github/last-commit/sjentsch/jmvReadWrite)](https:
 [//]: [![JSS](https://img.shields.io/badge/JSS-10.18637%2Fjss.v071.i02-brightgreen)](https://dx.doi.org/10.18637/jss.v071.i02)
 --->
 
-jmvReadWrite provides routines to read and write OMV-files from within
-R. OMV-files are created by the statistical spreadsheet
+jmvReadWrite provides routines to read and write .omv-files from within
+R. .omv-files are created by the statistical spreadsheet
 [CRAN](https://CRAN.R-project.org).
 
 The R-package `jmvReadWrite` reads and writes the .omv-files that are
@@ -115,7 +116,7 @@ jmv::ANOVA(
 #>  ─────────────────────────────
 ```
 
-Since version 0.2.0, read\_jmv also extracts the syntax from analysis
+Since version 0.2.0, read\_jmv also extracts the syntax from analyses
 that you may have conducted in the jamovi-GUI and that are stored in the
 .omv-file. To extract them, you have to set the parameter `getSyn =
 TRUE` when calling read\_jmv (default is `FALSE`). When the parameter is

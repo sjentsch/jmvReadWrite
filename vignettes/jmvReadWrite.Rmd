@@ -85,7 +85,7 @@ jmv::ANOVA(
     norm = TRUE)
 ```
 
-Since version 0.2.0, read_jmv also extracts the syntax from analysis that you
+Since version 0.2.0, read_jmv also extracts the syntax from analyses that you
 may have conducted in the jamovi-GUI and that are stored in the .omv-file. To
 extract them, you have to set the parameter `getSyn = TRUE` when calling
 read_jmv (default is `FALSE`). When the parameter is set, the analyses are

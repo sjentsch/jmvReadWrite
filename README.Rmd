@@ -29,7 +29,7 @@ knitr::opts_chunk$set(
 [//]: [![JSS](https://img.shields.io/badge/JSS-10.18637%2Fjss.v071.i02-brightgreen)](https://dx.doi.org/10.18637/jss.v071.i02)
 --->
 
-jmvReadWrite provides routines to read and write OMV-files from within R. OMV-files are created by the statistical spreadsheet [CRAN](https://CRAN.R-project.org).
+jmvReadWrite provides routines to read and write .omv-files from within R. .omv-files are created by the statistical spreadsheet [CRAN](https://CRAN.R-project.org).
 
 ```{r, child=c('vignettes/jmvReadWrite.Rmd')}
 ```

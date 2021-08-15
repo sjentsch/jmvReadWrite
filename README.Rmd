@@ -33,9 +33,7 @@ knitr::opts_chunk$set(
 ```{r, child=c('vignettes/jmvReadWrite.Rmd')}
 ```
 
-<hr style="border:2px solid gray"></hr>
-
---
+<hr style="border:1px solid gray"></hr>
 
 ---
 

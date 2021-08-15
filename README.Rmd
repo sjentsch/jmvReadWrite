@@ -22,6 +22,7 @@ knitr::opts_chunk$set(
 [![Dependencies](https://tinyverse.netlify.com/badge/RProtoBuf)](https://cran.r-project.org/package=jmvReadWrite)
 [![Last Commit](https://img.shields.io/github/last-commit/sjentsch/jmvReadWrite)](https://github.com/sjentsch/jmvReadWrite)
 <!-- badges: end -->
+
 <!---
 [//]: [![Build Status](https://travis-ci.org/eddelbuettel/rprotobuf.svg)](https://travis-ci.org/eddelbuettel/rprotobuf)
 [//]: [![CI](https://github.com/eddelbuettel/rprotobuf/workflows/ci/badge.svg)](https://github.com/eddelbuettel/rprotobuf/actions?query=workflow%3Aci)
@@ -29,24 +30,6 @@ knitr::opts_chunk$set(
 --->
 
 jmvReadWrite provides routines to read and write OMV-files from within R. OMV-files are created by the statistical spreadsheet [CRAN](https://CRAN.R-project.org).
-
-## Installation
-
-You can either install [the CRAN package](https://cran.r-project.org/package=jmvReadWrite)
-the usual way from [R](https://www.r-project.org) using
-
-``` r
-install.packages("jmvReadWrite")
-```
-
-or install from source via this repo using (you can replace ```devtools``` with ```remotes``` if you wish):
-
-```r
-devtools::install_github("sjentsch/jmvReadWrite")
-```
-
-
-## Documentation
 
 ```{r, child=c('vignettes/jmvReadWrite.Rmd')}
 ```
@@ -59,6 +42,7 @@ library(jmvReadWrite)
 ```
 
 [Changelog](CHANGELOG.md)
+
 
 ## Authors
 

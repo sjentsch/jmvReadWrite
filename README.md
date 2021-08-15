@@ -11,7 +11,9 @@
 [![Dependencies](https://tinyverse.netlify.com/badge/RProtoBuf)](https://cran.r-project.org/package=jmvReadWrite)
 [![Last
 Commit](https://img.shields.io/github/last-commit/sjentsch/jmvReadWrite)](https://github.com/sjentsch/jmvReadWrite)
-<!-- badges: end --> <!---
+<!-- badges: end -->
+
+<!---
 [//]: [![Build Status](https://travis-ci.org/eddelbuettel/rprotobuf.svg)](https://travis-ci.org/eddelbuettel/rprotobuf)
 [//]: [![CI](https://github.com/eddelbuettel/rprotobuf/workflows/ci/badge.svg)](https://github.com/eddelbuettel/rprotobuf/actions?query=workflow%3Aci)
 [//]: [![JSS](https://img.shields.io/badge/JSS-10.18637%2Fjss.v071.i02-brightgreen)](https://dx.doi.org/10.18637/jss.v071.i02)
@@ -21,25 +23,6 @@ jmvReadWrite provides routines to read and write OMV-files from within
 R. OMV-files are created by the statistical spreadsheet
 [CRAN](https://CRAN.R-project.org).
 
-## Installation
-
-You can either install [the CRAN
-package](https://cran.r-project.org/package=jmvReadWrite) the usual way
-from [R](https://www.r-project.org) using
-
-``` r
-install.packages("jmvReadWrite")
-```
-
-or install from source via this repo using (you can replace `devtools`
-with `remotes` if you wish):
-
-``` r
-devtools::install_github("sjentsch/jmvReadWrite")
-```
-
-## Documentation
-
 The R-package `jmvReadWrite` reads and writes the .omv-files that are
 used by the statistical spreadsheet `jamovi` (www.jamovi.org). It is
 supposed to ease using syntax for statistical analyses created using the
@@ -47,19 +30,20 @@ GUI in `jamovi` in connection with the R-library `jmv`.
 
 ## Installation
 
-You can install the development version of the `jmvReadWrite` package
-from github.
+You can either install a stable version of `jmvReadWrite` which is
+available on [CRAN](https://cran.r-project.org/package=jmvReadWrite)
+using the following command:
+
+``` r
+install.packages("jmvReadWrite")
+```
+
+or you can install the development version of the `jmvReadWrite` package
+from [GitHub](https://github.com/sjentsch/jmvReadWrite):
 
 ``` r
 if(!require(devtools)) install.packages("devtools")
 devtools::install_github("sjentsch/jmvReadWrite")
-```
-
-Alternatively, there is a stable version available on CRAN. It can be
-installed using the following commands
-
-``` r
-install.packages("jmvReadWrite")
 ```
 
 ## How to use the package?

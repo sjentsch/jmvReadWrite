@@ -23,7 +23,8 @@ knitr::opts_chunk$set(echo = TRUE,
                       out.width = "100%")
 ```
 
-The R-package  `jmvReadWrite` reads and writes the .omv-files that are used by
+
+The R-package `jmvReadWrite` reads and writes the .omv-files that are used by
 the statistical spreadsheet `jamovi` (www.jamovi.org). It is supposed to ease
 using syntax for statistical analyses created using the GUI in `jamovi` in
 connection with the R-library `jmv`.
@@ -31,19 +32,19 @@ connection with the R-library `jmv`.
 
 ## Installation
 
-You can install the development version of the `jmvReadWrite` package from
-github.
+You can either install a stable version of `jmvReadWrite` which is available on
+[CRAN](https://cran.r-project.org/package=jmvReadWrite) using the following command:
+
+```{r, eval=FALSE}
+install.packages("jmvReadWrite")
+```
+
+or you can install the development version of the `jmvReadWrite` package from
+[GitHub](https://github.com/sjentsch/jmvReadWrite):
 
 ```{r, eval=FALSE}
 if(!require(devtools)) install.packages("devtools")
 devtools::install_github("sjentsch/jmvReadWrite")
-```
-
-Alternatively, there is a stable version available on CRAN. It can be installed
-using the following commands
-
-```{r, eval=FALSE}
-install.packages("jmvReadWrite")
 ```
 
  

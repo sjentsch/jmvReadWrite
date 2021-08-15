@@ -31,9 +31,11 @@ devtools::install_github("sjentsch/jmvReadWrite")
 ### Documentation
 
 #include "doc/jmvReadWrite.html"
-[![Vignette](doc/jmvReadWrite.html)](doc/jmvReadWrite.html)
+[![Vignette](https://github.com/sjentsch/jmvReadWrite/blob/master/doc/jmvReadWrite.html)](https://github.com/sjentsch/jmvReadWrite/blob/master/doc/jmvReadWrite.html)
 
-[Vignette](doc/jmvReadWrite.html)
+[Vignette](https://github.com/sjentsch/jmvReadWrite/blob/master/doc/jmvReadWrite.html)
+
+[Vignette_RMD](vignettes/jmvReadWrite.Rmd)
 
 [Changelog](CHANGELOG.md)
 

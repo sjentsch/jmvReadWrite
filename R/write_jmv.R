@@ -211,12 +211,8 @@ write_jmv <- function(dtaFrm = NULL, fleNme = "") {
     unlink('strings.bin') 
 
     # create META-INF/MANIFEST.MF, write it and add it to ZIP file
-    mnfTxt <- c("Manifest-Version: 1.0", "Data-Archive-Version: 1.0.2", "jamovi-Archive-Version: 8.0", "Created-By: jmvWrite 0.0.1")
-    dir.create('META-INF')
-    writeLines(mnfTxt, con = 'META-INF/MANIFEST.MF')
-    utils::zip(fleNme, 'META-INF/MANIFEST.MF', flags = "-r9Xq")
+    mnfTxt <- c("Manifest-Version: 1.0", "Data-Archive-Version: 1.0.2", "jamovi-Archive-Version: 9.0", paste("Created-By: jmvReadWrite", packageVersion("jmvReadWrite")))
     writeLines(mnfTxt, con = 'meta')
-    unlink('META-INF', recursive = T)
     utils::zip(fleNme, 'meta', flags = "-r9Xq")
     unlink('meta')
     rm("mnfTxt")

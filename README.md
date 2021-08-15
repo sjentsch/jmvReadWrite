@@ -30,7 +30,7 @@ devtools::install_github("sjentsch/jmvReadWrite")
 
 ### Documentation
 
-?[](doc/jmvReadWrite.html)
+![](doc/jmvReadWrite.html)
 
 [Changelog](CHANGELOG.md)
 

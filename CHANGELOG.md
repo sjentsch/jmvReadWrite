@@ -2,8 +2,11 @@
 
 ## v0.2.1 (15/08/2021)
 
+#### Bug fixes and enhancements:
 - bug in write_jmv fixed (thanks to MAgojam); jamovi 2.0 did not open files that had jamovi-Archive-version 8.0 in the manifest
 - updated the Created-by in the manifest string to use the jmvReadWrite version
+- improved the README (switched it to be generated from Rmd so that the vignette could be included
+
 
 ## v0.2.0 (12/07/2021)
 

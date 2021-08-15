@@ -11,12 +11,14 @@
 #' @examples
 #' \dontrun{
 #' library(jmvReadWrite)
-#' data = read_jmv(fleNme = system.file("extdata", "ToothGrowth.omv", package = "jmvReadWrite"), getSyn = TRUE)
+#' fleOMV = system.file("extdata", "ToothGrowth.omv", package = "jmvReadWrite")
+#' data = read_jmv(fleNme = fleOMV, getSyn = TRUE)
 #' # shows the syntax of the analyses from the .omv-file
 #' attr(data, 'syntax')
 #' # runs the command of the first analysis
 #' eval(parse(text=attr(data, 'syntax')[[1]]))
-#' # runs the command of the second analysis and assigns the output from that analysis to the variable result2
+#' # runs the command of the second analysis and assigns the output from that analysis
+#' # to the variable result2
 #' eval(parse(text=paste0('result2 = ', attr(data, 'syntax')[[2]])))
 #' names(result2)
 #' # → "main"      "assump"    "contrasts" "postHoc"   "emm" (the names of the five output tables)
@@ -30,22 +32,22 @@ read_jmv <- function(fleNme = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = FALSE
     if (! file.exists(fleNme))                                            { stop(paste0('File "', fleNme, '" not found.')) }
     hdrStr <- readBin(tmpHdl <- file(fleNme, 'rb'), 'character'); close(tmpHdl); rm('tmpHdl');
     if (! hdrStr == "PK\003\004\024")                                     { stop(paste0('File "', fleNme, '" has not the correct file format (is not a ZIP archive).')) }
-    fleLst = unzip(fleNme, list=TRUE)$Name;   
+    fleLst = utils::unzip(fleNme, list=TRUE)$Name;   
     if (! any(grepl("^meta$|^META-INF/MANIFEST.MF$", fleLst, perl=TRUE))) { stop(paste0('File "', fleNme, '" has not the correct file format (is missing the jamovi-file-manifest).')) }
     
     # get list of files contained in the archive
-    fleLst = unzip(fleNme, list=TRUE)$Name;
+    fleLst = utils::unzip(fleNme, list=TRUE)$Name;
     
     # check whether the archive contains a string.bin-file (it only exists if there are columns that contain text variables)
     strBin = any(grepl('strings.bin', fleLst));
     
     # read and decode files: Manifest, metadata (metadata.json), metadata about value labels (xdata.json), binary numeric data (data.bin) and binary string data (strings.bin; if present)
     mnfNme <- fleLst[grepl("^meta$|^META-INF/MANIFEST.MF$", fleLst, perl=TRUE)][[1]];
-    mnfTxt <-                 readLines(mnfHdl <- file(mnfFle <- unzip(fleNme, mnfNme,          junkpaths = TRUE), 'r'), warn = FALSE);                    close(mnfHdl); unlink(mnfFle); rm('mnfHdl', 'mnfFle');
-    mtaDta <- rjson::fromJSON(readLines(mtaHdl <- file(mtaFle <- unzip(fleNme, 'metadata.json', junkpaths = TRUE), 'r'), warn = FALSE), simplify = FALSE); close(mtaHdl); unlink(mtaFle); rm('mtaHdl', 'mtaFle');
-    xtdDta <- rjson::fromJSON(readLines(xtdHdl <- file(xtdFle <- unzip(fleNme, 'xdata.json',    junkpaths = TRUE), 'r'), warn = FALSE), simplify = FALSE); close(xtdHdl); unlink(xtdFle); rm('xtdHdl', 'xtdFle');
-                                        binHdl <- file(binFle <- unzip(fleNme, 'data.bin',      junkpaths = TRUE), 'rb');
-    if (strBin)                       { strHdl <- file(strFle <- unzip(fleNme, 'strings.bin',   junkpaths = TRUE), 'rb'); }
+    mnfTxt <-                 readLines(mnfHdl <- file(mnfFle <- utils::unzip(fleNme, mnfNme,          junkpaths = TRUE), 'r'), warn = FALSE);                    close(mnfHdl); unlink(mnfFle); rm('mnfHdl', 'mnfFle');
+    mtaDta <- rjson::fromJSON(readLines(mtaHdl <- file(mtaFle <- utils::unzip(fleNme, 'metadata.json', junkpaths = TRUE), 'r'), warn = FALSE), simplify = FALSE); close(mtaHdl); unlink(mtaFle); rm('mtaHdl', 'mtaFle');
+    xtdDta <- rjson::fromJSON(readLines(xtdHdl <- file(xtdFle <- utils::unzip(fleNme, 'xdata.json',    junkpaths = TRUE), 'r'), warn = FALSE), simplify = FALSE); close(xtdHdl); unlink(xtdFle); rm('xtdHdl', 'xtdFle');
+                                        binHdl <- file(binFle <- utils::unzip(fleNme, 'data.bin',      junkpaths = TRUE), 'rb');
+    if (strBin)                       { strHdl <- file(strFle <- utils::unzip(fleNme, 'strings.bin',   junkpaths = TRUE), 'rb'); }
 
     # decode the manifest file and throw an error if an file version occurs that was written using a jamovi-version
     # have a look at https://github.com/jamovi/jamovi/blob/current-dev/server/jamovi/server/formatio/omv.py (jav) for
@@ -157,11 +159,11 @@ read_jmv <- function(fleNme = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = FALSE
     if (useFlt) {
         fltInc = rep(TRUE, dim(dtaFrm)[1])
         for (i in fltLst) fltInc = fltInc & dtaFrm[[i]]
-        str(dtaFrm)
+        utils::str(dtaFrm)
         dtaFrm = dtaFrm[fltInc, ]
-        str(dtaFrm)
+        utils::str(dtaFrm)
         dtaFrm[fltLst] = NULL
-        str(dtaFrm)
+        utils::str(dtaFrm)
     } else if(length(fltLst) > 0) {
         attr(dtaFrm, 'fltLst') = names(dtaFrm)[fltLst]
     }
@@ -188,7 +190,7 @@ read_jmv <- function(fleNme = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = FALSE
         if (length(anlLst) > 0) {
             RProtoBuf::readProtoFiles(system.file("jamovi.proto", package="jmvcore"))
             for (anlNme in anlLst) {
-                anlPBf <- RProtoBuf::read(jamovi.coms.AnalysisResponse, anlHdl <- file(anlFle <- unzip(fleNme, anlNme, junkpaths = TRUE), 'rb'));  close(anlHdl); unlink(anlFle); rm('anlHdl', 'anlFle');
+                anlPBf <- RProtoBuf::read(jamovi.coms.AnalysisResponse, anlHdl <- file(anlFle <- utils::unzip(fleNme, anlNme, junkpaths = TRUE), 'rb'));  close(anlHdl); unlink(anlFle); rm('anlHdl', 'anlFle');
                 # for (anlFld in names(anlPBf)) { print(paste(anlFld, anlPBf[[anlFld]])) }                 # helper function to show all fields
                 # for (anlFld in names(anlPBf$options)) { print(paste(anlFld, anlPBf$options[[anlFld]])) } # helper function to show all fields in options
                 # for (anlFld in names(anlPBf$results)) { print(paste(anlFld, anlPBf$results[[anlFld]])) } # helper function to show all fields in results
@@ -204,7 +206,7 @@ read_jmv <- function(fleNme = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = FALSE
     
     # import the HTML output
     if (getHTM) {
-        attr(dtaFrm, 'HTML') <- readLines(htmHdl <- file(htmFle <- unzip(fleNme, 'index.html', junkpaths = TRUE), 'r'), warn = FALSE); close(htmHdl); unlink(htmFle); rm('htmHdl', 'htmFle');
+        attr(dtaFrm, 'HTML') <- readLines(htmHdl <- file(htmFle <- utils::unzip(fleNme, 'index.html', junkpaths = TRUE), 'r'), warn = FALSE); close(htmHdl); unlink(htmFle); rm('htmHdl', 'htmFle');
     }
     
     # return the resulting data frame
@@ -212,9 +214,9 @@ read_jmv <- function(fleNme = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = FALSE
 }
 
 find_syntax <- function(resElm) {
-    if (hasName(resElm, 'name') && hasName(resElm, 'preformatted') && resElm[['name']] == 'syntax' && resElm[['preformatted']] != '') {
+    if (utils::hasName(resElm, 'name') && utils::hasName(resElm, 'preformatted') && resElm[['name']] == 'syntax' && resElm[['preformatted']] != '') {
         resElm[['preformatted']]
-    } else if (hasName(resElm, 'group') && length(resElm[['group']]) > 0) {
+    } else if (utils::hasName(resElm, 'group') && length(resElm[['group']]) > 0) {
         for (obj in resElm[['group']][['elements']]) {
             ret <- Recall(obj)
             if (!is.null(ret)) return(ret)

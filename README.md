@@ -31,7 +31,7 @@ devtools::install_github("sjentsch/jmvReadWrite")
 ### Documentation
 
 #include "doc/jmvReadWrite.html"
-[![Vignette](doc/jmvReadWrite.html)]
+[![Vignette](doc/jmvReadWrite.html)](doc/jmvReadWrite.html)
 
 [Vignette](doc/jmvReadWrite.html)
 

@@ -41,5 +41,6 @@ vignettes/*.pdf
 .Rbuildignore
 
 TrialSPSS
+TrialOMV
 /doc/
 /Meta/

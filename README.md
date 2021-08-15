@@ -173,8 +173,6 @@ library(jmvReadWrite)
 write_jmv(dtaFrm = data, fleNme = 'Trial.omv')
 ```
 
-<hr />
-
 -----
 
 [Changelog](CHANGELOG.md)

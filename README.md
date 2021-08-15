@@ -179,11 +179,13 @@ write_jmv(dtaFrm = data, fleNme = 'Trial.omv')
 
 -----
 
+. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
 [Changelog](CHANGELOG.md)
 
 ## Authors
 
-Sebastian Jentschke
+[Sebastian Jentschke](https://www.uib.no/en/persons/Sebastian.Jentschke)
 
 ## License
 

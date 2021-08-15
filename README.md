@@ -19,10 +19,6 @@ Commit](https://img.shields.io/github/last-commit/sjentsch/jmvReadWrite)](https:
 [//]: [![JSS](https://img.shields.io/badge/JSS-10.18637%2Fjss.v071.i02-brightgreen)](https://dx.doi.org/10.18637/jss.v071.i02)
 --->
 
-jmvReadWrite provides routines to read and write .omv-files from within
-R. .omv-files are created by the statistical spreadsheet
-[CRAN](https://CRAN.R-project.org).
-
 The R-package `jmvReadWrite` reads and writes the .omv-files that are
 used by the statistical spreadsheet `jamovi` (www.jamovi.org). It is
 supposed to ease using syntax for statistical analyses created using the
@@ -177,12 +173,7 @@ library(jmvReadWrite)
 write_jmv(dtaFrm = data, fleNme = 'Trial.omv')
 ```
 
-This is a basic example which shows you how to solve a common problem:
-
-``` r
-library(jmvReadWrite)
-## basic example code
-```
+-----
 
 [Changelog](CHANGELOG.md)
 

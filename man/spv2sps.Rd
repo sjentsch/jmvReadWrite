@@ -4,7 +4,7 @@
 \alias{spv2sps}
 \title{Reads SPSS output files (.spv) and extracts the syntax and the data file used in the analyses from them}
 \usage{
-spv2sps(fleSPV = "")
+spv2sps(fleSPV = "", rmvInv = FALSE)
 }
 \arguments{
 \item{fleSPV}{name (incl. path) of the SPSS-output-file to be read ("FILENAME.spv"; default = "")}

@@ -15,17 +15,22 @@ Routines to read and write (jamovi) OMV-files from R
 
 ### Installation
 
-You can either install from source via this repo, or install
-[the CRAN package](https://cran.r-project.org/package=jmvReadWrite)
-the usual way from [R](https://www.r-project.org) via
+You can either install [the CRAN package](https://cran.r-project.org/package=jmvReadWrite)
+the usual way from [R](https://www.r-project.org) using
 
 ```r
 install.packages("jmvReadWrite")
 ```
 
+or install from source via this repo using (you can use ```remotes``` instead of ```devtools````if you wish):
+
+```r
+devtools::install_github("sjentsch/jmvReadWrite")
+```
+
 ### Documentation
 
-TBA
+?[](doc/jmvReadWrite.html)
 
 [Changelog](CHANGELOG.md)
 

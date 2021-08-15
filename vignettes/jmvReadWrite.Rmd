@@ -1,21 +1,26 @@
 ---
-title: "R package jmvReadWrite"
+title: "R package `jmvReadWrite`"
 author: "Sebastian Jentschke"
 date: "`r Sys.Date()`"
-output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{jmvReadWrite}
+  %\VignetteIndexEntry{R package `jmvReadWrite`}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+output:
+  rmarkdown::html_vignette:
+    keep_md: TRUE  
 ---
 
-```{r setup, include = FALSE}
+```{r, include = FALSE}
 knitr::opts_chunk$set(echo = TRUE,
-                      comment=NA,message=FALSE,
-                      warning=FALSE,
-                      fig.height=5,
-                      fig.width=7,
-                      fig.align="center")
+                      comment = "#>",
+                      collapse = TRUE,
+                      message = FALSE,                      
+                      warning = FALSE,
+                      fig.height = 5,
+                      fig.width = 7,
+                      fig.align = "center",
+                      out.width = "100%")
 ```
 
 The R-package  `jmvReadWrite` reads and writes the .omv-files that are used by

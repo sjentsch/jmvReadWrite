@@ -20,7 +20,7 @@ read_jmv(
 
 \item{rmMsVl}{remove values defined as missing values (replace them with NA; default - FALSE)}
 
-\item{sveAtt}{store attributes that are not required in the data set (if you want to write the same data set using jmvWrite; default – FALSE)}
+\item{sveAtt}{store attributes that are not required in the data set (if you want to write the same data set using write_jmv; default – FALSE)}
 
 \item{getSyn}{extract syntax from the analyses in the 'jamovi'-file and store it in the attribute 'syntax' (default – FALSE)}
 

@@ -232,7 +232,7 @@ write_jmv <- function(dtaFrm = NULL, fleNme = "") {
     unlink('xdata.json')
 
     # export empty HTML results output - index.html
-    # TO-DO: implement properly writing HTML if this is implemented in jmvRead
+    # TO-DO: implement properly writing HTML if this is implemented in read_jmv
     resHTM <- c('<!DOCTYPE html>',
                 '<html>',
                 '    <head>',

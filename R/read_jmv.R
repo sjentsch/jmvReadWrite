@@ -3,7 +3,7 @@
 #' @param fleNme name (incl. path) of the 'jamovi'-file to be read ("FILENAME.omv"; default = "")
 #' @param useFlt apply filters (remove the lines where the filter is set to 0; default: FALSE)
 #' @param rmMsVl remove values defined as missing values (replace them with NA; default - FALSE)
-#' @param sveAtt store attributes that are not required in the data set (if you want to write the same data set using jmvWrite; default – FALSE)
+#' @param sveAtt store attributes that are not required in the data set (if you want to write the same data set using write_jmv; default – FALSE)
 #' @param getSyn extract syntax from the analyses in the 'jamovi'-file and store it in the attribute 'syntax' (default – FALSE)
 #' @param getHTM store index.html in the attribute 'HTML' (default – FALSE)
 #' @return data frame (can be directly used with functions included in the R-package 'jmv' and syntax from 'jamovi'; also compatible with the format of the R-package "foreign")

@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.2.1 (15/08/2021)
+
+- bug in write_jmv fixed (thanks to MAgojam); jamovi 2.0 did not open files that had jamovi-Archive-version 8.0 in the manifest
+- updated the Created-by in the manifest string to use the jmvReadWrite version
+
 ## v0.2.0 (12/07/2021)
 
 #### Enhancements:

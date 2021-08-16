@@ -12,7 +12,7 @@
 
 #### Enhancements:
 
-- renamed `jmvRead` to `read_jmv`, and `jmvWrite` into `write_jmv`
+- renamed `jmvRead` to `read_omv`, and `jmvWrite` into `write_omv`
 - extracts syntax from analyses contained in the `.omv`-file (set the parameter `getSyn = TRUE`; default is `FALSE`)
 - imports the output from the `.omv`-file (set the parameter `getHTM = TRUE`; default is `FALSE`)
 

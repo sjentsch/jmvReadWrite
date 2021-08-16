@@ -12,7 +12,7 @@ the respondent should answer by indicating how accurately the statement describe
 attitude. Responses were collected using a 6-point scale: 1 - Very inaccurate, 2 - Moderately inaccurate,
 3 - Slightly inaccurate, 4 - Slightly accurate, 5 - Moderately accurate, 6 - Very accurate.
 The data set includes the jamovi-attributes. It is supposed to result in an identical file compared to the
-bfi_sample2.omv-file contained in the extdata-directory of the package when written with write_jmv.}
+bfi_sample2.omv-file contained in the extdata-directory of the package when written with write_omv.}
 \format{
 A data.frame with 250 rows and 29 variables
 \describe{
@@ -60,6 +60,6 @@ the respondent should answer by indicating how accurately the statement describe
 attitude. Responses were collected using a 6-point scale: 1 - Very inaccurate, 2 - Moderately inaccurate,
 3 - Slightly inaccurate, 4 - Slightly accurate, 5 - Moderately accurate, 6 - Very accurate.
 The data set includes the jamovi-attributes. It is supposed to result in an identical file compared to the
-bfi_sample2.omv-file contained in the extdata-directory of the package when written with write_jmv.
+bfi_sample2.omv-file contained in the extdata-directory of the package when written with write_omv.
 }
 \keyword{datasets}

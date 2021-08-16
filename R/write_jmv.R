@@ -211,7 +211,7 @@ write_jmv <- function(dtaFrm = NULL, fleNme = "") {
     unlink('strings.bin') 
 
     # create meta, write it and add it to ZIP file
-    mnfTxt <- c("Manifest-Version: 1.0", "Data-Archive-Version: 1.0.2", "jamovi-Archive-Version: 9.0", paste("Created-By: jmvReadWrite", packageVersion("jmvReadWrite")))
+    mnfTxt <- c("Manifest-Version: 1.0", "Data-Archive-Version: 1.0.2", "jamovi-Archive-Version: 9.0", paste("Created-By: jmvReadWrite", utils::packageVersion("jmvReadWrite")))
     writeLines(mnfTxt, con = 'meta')
     utils::zip(fleNme, 'meta', flags = "-r9Xq")
     unlink('meta')

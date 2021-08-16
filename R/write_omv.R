@@ -5,9 +5,9 @@
 #' @param fleNme Name / position of the output file to be generated ("FILENAME.omv"; default = "")
 #' @return NULL
 #'
-#' @export write_jmv
+#' @export write_omv
 
-write_jmv <- function(dtaFrm = NULL, fleNme = "") {
+write_omv <- function(dtaFrm = NULL, fleNme = "") {
 
     # check whether dtaFrm is a data frame
     if (is.null(dtaFrm) || ! is.data.frame(dtaFrm) || any(dim(dtaFrm) < 1))              { stop("Input data frame is either not a data frame or has not the correct dimensions") }
@@ -232,7 +232,7 @@ write_jmv <- function(dtaFrm = NULL, fleNme = "") {
     unlink('xdata.json')
 
     # export empty HTML results output - index.html
-    # TO-DO: implement properly writing HTML if this is implemented in read_jmv
+    # TO-DO: implement properly writing HTML if this is implemented in read_omv
     resHTM <- c('<!DOCTYPE html>',
                 '<html>',
                 '    <head>',

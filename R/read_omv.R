@@ -3,7 +3,7 @@
 #' @param fleNme name (incl. path) of the 'jamovi'-file to be read ("FILENAME.omv"; default = "")
 #' @param useFlt apply filters (remove the lines where the filter is set to 0; default: FALSE)
 #' @param rmMsVl remove values defined as missing values (replace them with NA; default - FALSE)
-#' @param sveAtt store attributes that are not required in the data set (if you want to write the same data set using write_jmv; default – FALSE)
+#' @param sveAtt store attributes that are not required in the data set (if you want to write the same data set using write_omv; default – FALSE)
 #' @param getSyn extract syntax from the analyses in the 'jamovi'-file and store it in the attribute 'syntax' (default – FALSE)
 #' @param getHTM store index.html in the attribute 'HTML' (default – FALSE)
 #' @return data frame (can be directly used with functions included in the R-package 'jmv' and syntax from 'jamovi'; also compatible with the format of the R-package "foreign")
@@ -12,7 +12,7 @@
 #' \dontrun{
 #' library(jmvReadWrite)
 #' fleOMV = system.file("extdata", "ToothGrowth.omv", package = "jmvReadWrite")
-#' data = read_jmv(fleNme = fleOMV, getSyn = TRUE)
+#' data = read_omv(fleNme = fleOMV, getSyn = TRUE)
 #' # shows the syntax of the analyses from the .omv-file
 #' attr(data, 'syntax')
 #' # runs the command of the first analysis
@@ -24,9 +24,9 @@
 #' # → "main"      "assump"    "contrasts" "postHoc"   "emm" (the names of the five output tables)
 #' }
 #'
-#' @export read_jmv
+#' @export read_omv
 #'
-read_jmv <- function(fleNme = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = FALSE, getSyn = FALSE, getHTM = FALSE) {
+read_omv <- function(fleNme = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = FALSE, getSyn = FALSE, getHTM = FALSE) {
 
     # check whether the file / archive exists, get list of files contained in the archive and check whether it has the correct format
     if (! file.exists(fleNme))                                            { stop(paste0('File "', fleNme, '" not found.')) }

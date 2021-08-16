@@ -46,8 +46,8 @@ devtools::install_github("sjentsch/jmvReadWrite")
 
 The following code uses the ToothGrowth-data set that is part of the
 data sets included in R (the current file contains some modifications
-though for testing the reading and writing routines: `read_jmv` and
-`write_jmv`). With this data set, a syntax to conduct an ANOVA is run.
+though for testing the reading and writing routines: `read_omv` and
+`write_omv`). With this data set, a syntax to conduct an ANOVA is run.
 
 The results should be similar to those obtained when running the same
 analysis in jamovi (using the GUI). To do so, open the file menu (☰)
@@ -63,7 +63,7 @@ differences.
 
 If you want to copy the syntax generated in jamovi, you have to switch
 on the [`Syntax
-Mode`](https://jamovi.readthedocs.io/en/latest/getting-started/um_2_first-steps.html#syntax-mode).
+Mode`](https://jamovi.readthedocs.io/en/latest/_pages/um_6_syntax_mode.html).
 Afterwards, the syntax is shown at the top of the analysis and can be
 copied from there.
 
@@ -71,7 +71,7 @@ copied from there.
 library(jmvReadWrite)
 library(jmv)
 
-data = read_jmv(fleNme = system.file("extdata", "ToothGrowth.omv", package = "jmvReadWrite"))
+data = read_omv(fleNme = system.file("extdata", "ToothGrowth.omv", package = "jmvReadWrite"))
 jmv::ANOVA(
     formula = len ~ supp + dose + supp:dose,
     data = data,
@@ -112,17 +112,17 @@ jmv::ANOVA(
 #>  ─────────────────────────────
 ```
 
-Since version 0.2.0, read\_jmv also extracts the syntax from analyses
+Since version 0.2.0, read\_omv also extracts the syntax from analyses
 that you may have conducted in the jamovi-GUI and that are stored in the
 .omv-file. To extract them, you have to set the parameter `getSyn =
-TRUE` when calling read\_jmv (default is `FALSE`). When the parameter is
+TRUE` when calling read\_omv (default is `FALSE`). When the parameter is
 set, the analyses are stored in the attribute `syntax`. They can be used
 as shown in the following examples:
 
 ``` r
 library(jmvReadWrite)
 
-data = read_jmv(fleNme = system.file("extdata", "ToothGrowth.omv", package = "jmvReadWrite"), getSyn = TRUE)
+data = read_omv(fleNme = system.file("extdata", "ToothGrowth.omv", package = "jmvReadWrite"), getSyn = TRUE)
 # shows the syntax of the analyses from the .omv-file
 attr(data, 'syntax')
 #> [[1]]
@@ -164,13 +164,13 @@ process (summarize, filter, etc.) in R in order to later analyse them in
 `jamovi`. You will have those processed log-files stored in a data frame
 (called, e.g., `data`) which you then write to a file that you can open
 in jamovi afterwards. Although jamovi reads R-data files (.RData, .rda,
-.rds) `write_jmv` permits to store `jamovi`-specific attributes (such as
+.rds) `write_omv` permits to store `jamovi`-specific attributes (such as
 variable labels) in addition.
 
 ``` r
 library(jmvReadWrite)
 
-write_jmv(dtaFrm = data, fleNme = 'Trial.omv')
+write_omv(dtaFrm = data, fleNme = 'Trial.omv')
 ```
 
 -----

@@ -3,7 +3,7 @@
 ## v0.2.1 (15/08/2021)
 
 #### Bug fixes and enhancements:
-- bug in write_jmv fixed (thanks to MAgojam); jamovi 2.0 did not open files that had jamovi-Archive-version 8.0 in the manifest
+- bug in write_omv fixed (thanks to MAgojam); jamovi 2.0 did not open files that had jamovi-Archive-version 8.0 in the manifest
 - updated the Created-by in the manifest string to use the jmvReadWrite version
 - improved the README (switched it to be generated from Rmd so that the vignette could be included
 
@@ -12,14 +12,14 @@
 
 #### Enhancements:
 
-- renamed `jmvRead` to `read_jmv`, and `jmvWrite` into `write_jmv`
+- renamed `jmvRead` to `read_omv`, and `jmvWrite` into `write_omv`
 - extracts syntax from analyses contained in the `.omv`-file (set the parameter `getSyn = TRUE`; default is `FALSE`)
 - imports the output from the `.omv`-file (set the parameter `getHTM = TRUE`; default is `FALSE`)
 
 ```R
 library(jmvReadWrite)
 
-data = read_jmv(fleNme = system.file("extdata", "ToothGrowth.omv", package = "jmvReadWrite"), getSyn = TRUE)
+data = read_omv(fleNme = system.file("extdata", "ToothGrowth.omv", package = "jmvReadWrite"), getSyn = TRUE)
 # shows the syntax of the analyses from the .omv-file
 attr(data, 'syntax')
 # runs the command of the first analysis

@@ -175,7 +175,7 @@ write_omv(dtaFrm = data, fleNme = 'Trial.omv')
 
 -----
 
-[Changelog](CHANGELOG.md)
+[Changelog](https://github.com/sjentsch/jmvReadWrite/blob/main/CHANGELOG.md)
 
 ## Authors
 
@@ -183,4 +183,4 @@ write_omv(dtaFrm = data, fleNme = 'Trial.omv')
 
 ## License
 
-[AGPL 3](LICENSE)
+[AGPL 3](https://github.com/sjentsch/jmvReadWrite/blob/main/LICENSE)

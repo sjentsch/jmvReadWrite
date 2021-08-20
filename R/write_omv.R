@@ -211,14 +211,10 @@ write_omv <- function(dtaFrm = NULL, fleNme = "") {
     unlink('strings.bin') 
 
     # create meta, write it and add it to ZIP file
-    mnfTxt <- c("Manifest-Version: 1.0", "Data-Archive-Version: 1.0.2", "jamovi-Archive-Version: 9.0", paste("Created-By: jmvReadWrite", utils::packageVersion("jmvReadWrite")))
-    writeLines(mnfTxt, con = 'meta')
+    mnfTxt <- c("Manifest-Version: 1.0", "Data-Archive-Version: 1.0.2", "jamovi-Archive-Version: 8.0", paste("Created-By: jmvReadWrite", utils::packageVersion("jmvReadWrite")))
+    writeLines(mnfTxt, con = 'meta', sep='\n');
     utils::zip(fleNme, 'meta', flags = "-r9Xq")
     unlink('meta')
-    dir.create('META-INF')
-    writeLines(mnfTxt, con = 'META-INF/MANIFEST.MF')
-    utils::zip(fleNme, 'META-INF/MANIFEST.MF', flags = "-r9Xq")
-    unlink('META-INF', recursive = T)
     rm("mnfTxt")
 
     # write metadata.json

@@ -89,7 +89,7 @@ spv2sps <- function(fleSPV = "", rmvInv = FALSE) {
     # output are stored (those files start with 'outputViewer' followed by
     # numbers and the .xml-file-extension); the text with the syntax is just
     # HTML-code (the formatting nd the HTML-tags are removed)
-    lstSPS = list();
+    vecSPS = c();
     lstLog = lstZIP[grepl('outputViewer[[:digit:]]+\\.xml', lstZIP)];
     for (fleLog in lstLog) {
         # [1] extracting the commands from the log-file ===============================================================================================================================================
@@ -243,10 +243,10 @@ spv2sps <- function(fleSPV = "", rmvInv = FALSE) {
         while (any(txtSPS[-1] == txtSPS[-length(txtSPS)])) { txtSPS = txtSPS[c(TRUE, txtSPS[-1] != txtSPS[-length(txtSPS)])]; }
         if (length(txtSPS) >= 1 && txtSPS[1] == 'EXECUTE.') { txtSPS = txtSPS[-1]; }
         # check that all lines end with a '.' - possibly check for the command being in capitals too
-        if (all(grepl(grcSPS, txtSPS) & grepl('\\.$', txtSPS))) { lstSPS <- c(lstSPS, txtSPS) } else { stop(sprintf('\n\nThe syntax contains commands that could not be parsed:\nfleSPV = \'%s\'\nfleLog = \'%s\'\n\n%s\n\n', fleSPV, fleLog, paste0(txtSPS, collapse='\n'))); }
+        if (all(grepl(grcSPS, txtSPS) & grepl('\\.$', txtSPS))) { vecSPS <- c(vecSPS, txtSPS) } else { stop(sprintf('\n\nThe syntax contains commands that could not be parsed:\nfleSPV = \'%s\'\nfleLog = \'%s\'\n\n%s\n\n', fleSPV, fleLog, paste0(txtSPS, collapse='\n'))); }
         rm('txtLog', 'txtSPS');
     }
-    if (length(lstSPS) == 0) { stop(sprintf('The current SPV-file "%s" doesn\'t contain any Log-entries with SPSS-syntax.', fleSPV)); }
+    if (length(vecSPS) == 0) { stop(sprintf('The current SPV-file "%s" doesn\'t contain any Log-entries with SPSS-syntax.', fleSPV)); }
 
     # the data file (.sav) that was used for a particular analysis is stored in
     # files whose file names begin with numbers and end with lightNotesData.xml
@@ -262,17 +262,17 @@ spv2sps <- function(fleSPV = "", rmvInv = FALSE) {
         if (any(savPos)) fleSAV = c(fleSAV, gsub('\\\\', '/', rawToChar(binNte[seq(max(which(binNte[seq(1, min(which(savPos)))] == '00')) + 1, min(which(savPos)) + 3)])));
     }
     # check whether exactly one data file was used for all analyses in the
-    # .spv-file; if so, return the file name as atrribute 'datafile' of lstSPS;
+    # .spv-file; if so, return the file name as atrribute 'datafile' of vecSPS;
     # if not throw a warning
     fleSAV = unique(fleSAV);
     if (length(fleSAV) == 1) {
         # check for existence of the SPSS-data-file
         if (file.exists(fleSAV)) { 
-            attr(lstSPS, 'datafile') <- fleSAV;
+            attr(vecSPS, 'datafile') <- fleSAV;
         } else if (file.exists(file.path(getwd(), basename(fleSAV)))) {
-            attr(lstSPS, 'datafile') <- file.path(getwd(), basename(fleSAV));
+            attr(vecSPS, 'datafile') <- file.path(getwd(), basename(fleSAV));
         } else if (file.exists(file.path(dirname(fleSPV), basename(fleSAV)))) {
-            attr(lstSPS, 'datafile') <- file.path(dirname(fleSPV), basename(fleSAV));
+            attr(vecSPS, 'datafile') <- file.path(dirname(fleSPV), basename(fleSAV));
         } else {
             stop(sprintf('\n\nSPSS data file \'%s\' not found:\nIt is expected to be found either at the position that is stored in the .spv-file (\'%s\'),\nthe current working directory (%s), or\nthe directory where the .spv-file was located (\'%s\').\nPlease correct it (copy the data file to one of these places) and run the function again.\n\n', basename(fleSAV), dirname(fleSAV), getwd(), dirname(fleSPV)));
         }
@@ -283,7 +283,7 @@ spv2sps <- function(fleSPV = "", rmvInv = FALSE) {
     }
 
     # return the syntax
-    lstSPS
+    vecSPS
 }
 
 crrCmd <- function(inpLne = '', cmdSPS = c()) {

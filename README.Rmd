@@ -35,7 +35,7 @@ knitr::opts_chunk$set(
 
 ---
 
-[Changelog](CHANGELOG.md)
+[Changelog](https://github.com/sjentsch/jmvReadWrite/blob/main/CHANGELOG.md)
 
 
 ## Authors
@@ -45,4 +45,4 @@ knitr::opts_chunk$set(
 
 ## License
 
-[AGPL 3](LICENSE)
+[AGPL 3](https://github.com/sjentsch/jmvReadWrite/blob/main/LICENSE)

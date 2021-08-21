@@ -21,15 +21,7 @@ sps2jmv <- function(vecSPS = c(), fleSPS = "", fleSAV = "", fltCnd = "") {
         if (fleSAV == "" && ! is.null(attr(vecSPS, "datafile"))) { fleSAV = attr(vecSPS, "datafile"); }
     } else if (fleSPS > "") {
         # check whether fleSPS exists, load it and do some plausibility checks
-        if (! file.exists(fleSPS) && ! file.exists(file.path(getwd(), basename(fleSPS)))) { stop(sprintf("\"%s\" does not exist.", fleSPS)); }
-        vecSPS = readLines(hdlSPS <- file(fleSPS, "r"), warn = FALSE); close(hdlSPS); rm("hdlSPS");
-        ## =================================================================================================================================================================================================================
-        ## TO-DO: run the commands through a parser (re-use the one from spv2sps) ==========================================================================================================================================
-        ## =================================================================================================================================================================================================================
-        lneCtd = which(! (grepl("\\.$", vecSPS) | grepl("^$", vecSPS)));
-        if (max(lneCtd) >= length(vecSPS)) { stop("The last entry / command in the syntax file isn\'t terminated properly with a full stop (.)") }
-        for (Z in lneCtd) { vecSPS[Z + 1] = gsub("\\s+", " ", paste(vecSPS[Z], vecSPS[Z + 1])); vecSPS[Z] = ""; }
-        vecSPS = vecSPS[vecSPS != ""];
+        vecSPS = getSPS(fleSPS)
     }
     if (fleSAV > "") {
         if (! file.exists(fleSAV) && file.exists(file.path(getwd(), basename(fleSAV)))) { fleSAV = file.path(getwd(), basename(fleSAV)); }
@@ -1065,6 +1057,18 @@ sourcify <- function(object, indent="") {
 #======================================================================================================================================================================================================
 # SUB-FUNCTIONS
 #======================================================================================================================================================================================================
+
+getSPS <- function(fleSPS = '') {
+    if (! file.exists(fleSPS) && ! file.exists(file.path(getwd(), basename(fleSPS)))) { stop(sprintf("\"%s\" does not exist.", fleSPS)); }
+    vecSPS = gsub('\\s+', ' ', trimws(readLines(hdlSPS <- file(fleSPS, "r"), warn = FALSE))); close(hdlSPS); rm("hdlSPS");
+    vecSPS = clnSPS(vecSPS);
+    vecSPS = vecSPS[! grepl("^$|^.$", vecSPS)];
+    # check that all lines end with a '.' - possibly check for the command being in capitals too
+    if (! all(grepl(grcSPS, vecSPS) & grepl('\\.$', vecSPS))) { stop(sprintf('\n\nThe syntax contains commands that could not be parsed or that don\'t end with a \".\":\n\n%s\n\n',
+                                                                paste0(vecSPS[! (grepl(grcSPS, vecSPS) & grepl('\\.$', vecSPS))], collapse='\n'))); }
+    vecSPS
+}
+
 getVar <- function(crrSPS = c(), begKey = c()) {
     # if no begKey is given, the most common case (VARIABLES) is assumed
     if (length(begKey) == 0) {

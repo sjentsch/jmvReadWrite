@@ -3,7 +3,7 @@
 #'
 #' @param dtaFrm Data frame to be exported (default = NULL)
 #' @param fleNme Name / position of the output file to be generated ("FILENAME.omv"; default = "")
-#' @return NULL
+#' @return a list containing the meta data (mtaDta, written to metadata.json in the OMV-file), the extended data (xtdDta, written to xdata.json in the OMV-file) and the orginal data frame (dtaFrm)
 #'
 #' @export write_omv
 

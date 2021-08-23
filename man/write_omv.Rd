@@ -3,16 +3,19 @@
 \name{write_omv}
 \alias{write_omv}
 \title{Write files to be used with the statistical spreadsheet 'jamovi'
-(www.jamovi.org);}
+(www.jamovi.org)}
 \usage{
 write_omv(dtaFrm = NULL, fleNme = "")
 }
 \arguments{
-\item{dtaFrm}{Data frame to be exported (default = NULL);}
+\item{dtaFrm}{Data frame to be exported (default = NULL)}
 
-\item{fleNme}{Name / position of the output file to be generated ("FILENAME.omv"; default = "");}
+\item{fleNme}{Name / position of the output file to be generated ("FILENAME.omv"; default = "")}
+}
+\value{
+a list containing the meta data (mtaDta, written to metadata.json in the OMV-file), the extended data (xtdDta, written to xdata.json in the OMV-file) and the orginal data frame (dtaFrm)
 }
 \description{
 Write files to be used with the statistical spreadsheet 'jamovi'
-(www.jamovi.org);
+(www.jamovi.org)
 }

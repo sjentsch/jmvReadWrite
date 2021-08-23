@@ -20,4 +20,4 @@
 
 ## v0.1.0 (20/09/2020)
 
-- first implementation, reads and writes files similar to jamovi 1.2
+- first implementation, reads (`jmvRead`) and writes (`jmvWrite`) files similar to jamovi 1.2

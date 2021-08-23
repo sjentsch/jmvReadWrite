@@ -195,7 +195,7 @@ read_omv <- function(fleNme = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = FALSE
                 # for (anlFld in names(anlPBf$options)) { print(paste(anlFld, anlPBf$options[[anlFld]])) } # helper function to show all fields in options
                 # for (anlFld in names(anlPBf$results)) { print(paste(anlFld, anlPBf$results[[anlFld]])) } # helper function to show all fields in results
                 # ..$bytesize() - size of the protocol buffer (or any field contained in it)
-                savSyn = c(savSyn, gsub('\\( ', '\\(', gsub('\\n\\s+', ' ', find_syntax(anlPBf$results))));
+                savSyn = c(savSyn, gsub('\\( ', '\\(', gsub('\\n\\s+', ' ', fndSyn(anlPBf$results))));
                 anlPBf$results = NULL;
                 savPBf = c(savPBf, anlPBf);
             }
@@ -213,7 +213,7 @@ read_omv <- function(fleNme = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = FALSE
     dtaFrm
 }
 
-find_syntax <- function(resElm) {
+fndSyn <- function(resElm) {
     if (utils::hasName(resElm, 'name') && utils::hasName(resElm, 'preformatted') && resElm[['name']] == 'syntax' && resElm[['preformatted']] != '') {
         resElm[['preformatted']]
     } else if (utils::hasName(resElm, 'group') && length(resElm[['group']]) > 0) {

@@ -1,9 +1,9 @@
 #' Write files to be used with the statistical spreadsheet 'jamovi'
-#' (www.jamovi.org);
+#' (www.jamovi.org)
 #'
-#' @param dtaFrm Data frame to be exported (default = NULL);
-#' @param fleNme Name / position of the output file to be generated ("FILENAME.omv"; default = "");
-#' @return NULL
+#' @param dtaFrm Data frame to be exported (default = NULL)
+#' @param fleNme Name / position of the output file to be generated ("FILENAME.omv"; default = "")
+#' @return a list containing the meta data (mtaDta, written to metadata.json in the OMV-file), the extended data (xtdDta, written to xdata.json in the OMV-file) and the orginal data frame (dtaFrm)
 #'
 #' @export write_omv
 
@@ -51,7 +51,7 @@ write_omv <- function(dtaFrm = NULL, fleNme = "") {
             mtaDta$dataSet$fields[[i]][["description"]] <- attr(dtaFrm, "variable.labels")[[names(dtaFrm[i])]];
         }
 
-        # assess measurementType (if not stored as attribute);
+        # assess measurementType (if not stored as attribute)
         if (is.null(attr(dtaFrm[[i]], "measureType"))) {
             # if the jmv-id marker is set in the original data
             if (! is.null(attr(dtaFrm[[i]], "jmv-id")) && attr(dtaFrm[[i]], "jmv-id") == TRUE) {

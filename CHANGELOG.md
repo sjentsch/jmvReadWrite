@@ -1,6 +1,6 @@
 # Changelog
 
-## v0.2.1 (15/08/2021)
+## v0.2.1 (23/08/2021)
 
 #### Bug fixes and enhancements:
 - bug in write_omv fixed (thanks to MAgojam); jamovi could not read the manifest (meta) when the file was created with `write_omv` on Windows (LF + CR, but only CR expected / decoded)

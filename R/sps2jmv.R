@@ -39,9 +39,14 @@ sps2jmv <- function(vecSPS = c(), fleSPS = "", fleSAV = "", fltCnd = "") {
     for (crrSPS in vecSPS) {
        
         # General: Split, handle generic attributes (e.g., VAR1 TO VARx) ==============================================================================================================================
+        print(crrSPS);
         crrSPS = unlist(strsplit(gsub("\\.$", "", crrSPS), " /"));
         crrCmm = vector(mode = "character", length = length(crrSPS));
         crrVar = getVar(crrSPS);
+        print(crrVar);
+        cat('\n\n');
+   }     
+}
         if (crrVar == "") { stop("Variable list empty."); }
         crrFnc = "";
 
@@ -1108,29 +1113,33 @@ getSPS <- function(fleSPS = '') {
 }
 
 getVar <- function(crrSPS = c()) {
-    # handle the most common case (the keyword VARIABLES) first
-    if (any(grepl("VARIABLES\\s?", crrSPS))) {
+    if (grepl("^DATASET|^GET FILE|^SAVE OUTFILE=|^NEW FILE|^USE ALL$|^FILTER|^EXECUTE$|^TITLE|^COMPUTE|^DELETE VARIABLES|^SORT CASES|^SPLIT FILE|^CTABLES|^GRAPH", crrSPS[1])) { return(""); }
+
+    vecVar = "";
+    # handle the most common cases (the keywords VARIABLES and TABLES) first
+    if (any(grepl("VARIABLES", crrSPS))) {
         # TO DO: possibly remove parentheses around the variable list
-        vecVar = unlist(strsplit(gsub("=", "", strsplit(crrSPS[grepl("VARIABLES\\s?", crrSPS)], "VARIABLES\\s?")[[1]][2]), "\\s+"));
-        if (grepl("^T-TEST\\s+GROUPS=", crrSPS)) { vecVar = c(vecVar, "BY", getLst(crrSPS, c("^T-TEST\\s+GROUPS=", "\\(.*?\\)"))); }
+        vecVar = unlist(strsplit(gsub("=", "", strsplit(trimws(crrSPS[grepl("VARIABLES", crrSPS)]), "VARIABLES\\s?")[[1]][2]), "\\s+"));
+        if (grepl("^T-TEST\\s+GROUPS=", crrSPS[1])) { vecVar = c(vecVar, "BY", getLst(crrSPS[1], c("^T-TEST\\s+GROUPS=", "\\(.*?\\)"))); }
+    } else if (any(grepl("TABLES\\s*=", crrSPS))) {
+        vecVar = unlist(strsplit(gsub("=", "", strsplit(trimws(crrSPS[grepl("TABLES",    crrSPS)]),     "TABLES\\s?")[[1]][2]), "\\s+"));
     # afterwards, go through a list with keywords to match and remove 
     } else {
-        for (crrKey in list(c("^GLM\\s+"), c("^MEANS", "TABLES="), c("^ONESAMPLE", "TEST\\s+\\(", "\\)"), c("^SUMMARIZE", "TABLES="), c("^T-TEST\\s+PAIRS=", "\\(PAIRED\\)"), c("^UNIANOVA\\s+"))) {
-            vecVar = getLst(crrSPS, begKey);
+        for (begKey in list(c("^GLM\\s+"), c("^UNIANOVA\\s+"), c("METHOD=", "ENTER"), c("^MEANS", "TABLES="), c("^SUMMARIZE", "TABLES="), c("^ONESAMPLE", "TEST\\s+\\(", "\\)"),
+                            c("^T-TEST\\s+PAIRS=", "\\(PAIRED\\)"))) {
+            if (any(grepl(begKey[1], crrSPS))) { vecVar = getLst(crrSPS, begKey); break }
         }
     }
     if (any(grepl("^ALL$|^TO$", vecVar))) { stop("Encountered TO - not implemented yet."); vecVar = ifelse(any(grepl("^ALL$", vecVar)), allVar, ""); }
 
-# check for commands where there are no variables; if (! ...
-    if (! grepl('^EXCLUDED', crrSPS[1])) {
-        allVar = names(get("data", envir=parent.frame()));
-        for (crrVar in vecVar[! grepl("^BY$|^WITH$", vecVar)]) {
-            if (! any(grepl(paste0("^", crrVar, "$"), allVar))) { stop(sprintf("Variable %s is contained in the SPSS-syntax but not in the current data set.", crrVar)); }
-        }
-        vecVar
-    } else {
-        ""
+    allVar = names(get("data", envir=parent.frame()));
+    for (crrVar in vecVar[! grepl("^BY$|^WITH$", vecVar)]) {
+        if (! any(grepl(paste0("^", crrVar, "$"), allVar, ignore.case = TRUE))) { stop(sprintf("Variable %s is contained in the SPSS-syntax but not in the current data set.", crrVar)); }
+        # replace the variable name with the variable name from the column header if it is not a perfect match (i.e., if lower- / uppercase don't match up)
+        if (! any(grepl(paste0("^", crrVar, "$"), allVar)))                     { vecVar[grepl(paste0("^", crrVar, "$"), vecVar)] = allVar[grepl(paste0("^", crrVar, "$"), allVar, ignore.case = TRUE)]; }
     }
+
+    vecVar
 }
 
 getDpV <- function(crrVar) {

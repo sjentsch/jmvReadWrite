@@ -4,16 +4,16 @@
 \alias{sps2jmv}
 \title{Converts SPPS-syntax (either from a SPSS-syntax file .sps or read from a SPSS-output-file .spv \link{using spv2sps}) into jamovi / jmv-syntax}
 \usage{
-sps2jmv(lstSPS = list(), fleSPS = "", fleSAV = "")
+sps2jmv(vecSPS = c(), fleSPS = "", fleSAV = "", fltCnd = "")
 }
 \arguments{
-\item{list}{with SPSS-commands, the format is supposed to be the same as what is output from spv2sps (a list containing one command per entry, the command being a character vector, and the attribute 'datafile' with a character vector containing the position of the SPSS-data-file \link{incl. path}; if not found at the path, the file is searched in the current directory)}
+\item{character}{vector with SPSS-commands, the format is supposed to be the same as what is output from spv2sps: a character vector containing one command per element, and the attribute "datafile" that contains a string pointing to the location of the SPSS-data-file \link{incl. path} (if not found at the path or if no path is given, the file is searched in the current directory)}
 
-\item{position}{of a SPSS-data-file \link{.sav; incl. path}}
+\item{string}{a filter condition to be applied to the dataset (default = "" → no filter; e.g., "data$\link{VARNAME} == 1")}
 }
 \value{
-list with jamovi / jmv-analysis-function-calls and the data set stored in the attribute 'dataset'
+list with jamovi / jmv-analysis-function-calls and the data set stored in the attribute "dataset"
 }
 \description{
-The function expects that either the parameter lstSPS \link{with the output from spv2sps; otherwise the list has to have identical format – see below} is used or that both fleSPS and fleSAV are given.
+The function expects that either the parameter vecSPS is used \link{with the output from spv2sps} or that both fleSPS and fleSAV are given.
 }

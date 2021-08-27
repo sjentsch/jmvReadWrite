@@ -1,8 +1,11 @@
 #' Reads SPSS output files (.spv) and extracts the syntax and the data file used in the analyses from them
 #'
-#' @param fleSPV name (incl. path) of the SPSS-output-file to be read ("FILENAME.spv"; default = "")
+#' @param fleSPV name (incl. path) of the SPSS-output-file to be read ("FILENAME.spv"; default: "")
+#' @param rmvInv remove lines that are deemed to be invalid (TRUE / FALSE; default: FALSE)
 #'
-#' @return list with SPSS commands (like what is typically stored in SPSS syntax files - .sps); the list contains one command per entry (the command being a character vector) and the position of the SPSS-data-file [incl. path] that was used in the analyses is stored as a character vector in the attribute "datafile" (the attribute will be empty if either the SPSS-datafile used in the analyses was not stored or if there was more than one data file used in the analyses stored in the original .spv-file 
+#' @return character vector with SPSS commands (like what is typically stored in SPSS syntax files - .sps); the vector contains one command per entry and the position of the SPSS-data-file (incl. path)
+#'         that was used in the analyses is stored as a character vector in the attribute "datafile" (the attribute will be empty if either the SPSS-datafile used in the analyses was not stored or if
+#'         there was more than one data file used in the analyses stored in the original .spv-file
 #'
 #' @export spv2sps
 #'
@@ -57,9 +60,9 @@ spv2sps <- function(fleSPV = "", rmvInv = FALSE) {
         }
         # extract the actual command(s) - "[CDATA[" to "]]" - remove the header if it exists, and clean up HTML tags
         txtLog <- strsplit(strsplit(txtLog, "<!\\[CDATA\\[")[[1]][2], "\\]\\]>")[[1]][1];
-        txtLog <- trimws(gsub("<.*?>", " ", gsub("&quot;", "\"", gsub("&amp;", "&", gsub("&gt;", ">", gsub("&nbsp;", " ",
+        txtLog <- trimws(gsub("</[A-z].*?>", " ", gsub("<[A-z].*?>", " ", gsub("&quot;", "\"", gsub("&amp;", "&", gsub("&gt;", ">", gsub("&nbsp;", " ",
                          gsub("&#160;", " ", gsub("\ua0", " ", gsub("<br>", "\\\n ", gsub("<BR>", "\\\n ", gsub("\\r\\n", "\\\n",
-                         gsub("<head.*</head>", "", iconv(txtLog, from="UTF-8", to="latin1", sub=" ")))))))))))));
+                         gsub("<head.*</head>", "", iconv(txtLog, from="UTF-8", to="latin1", sub=" "))))))))))))));
         # parse line-wise: assemble SPSS commands, remove error, warning, specific symptom messages, etc.
         txtSPS <- gsub("\\s+", " ", trimws(unlist(strsplit(txtLog, "\n"))));
 
@@ -141,14 +144,14 @@ spv2sps <- function(fleSPV = "", rmvInv = FALSE) {
             rm("lneErr")
         }
         if (length(txtSPS) == 0) { next }
-       
+        
         # remove empty lines, duplicated lines, and "EXECUTE." as first command
         txtSPS = txtSPS[txtSPS != ""];
         while (any(txtSPS[-1] == txtSPS[-length(txtSPS)])) { txtSPS = txtSPS[c(TRUE, txtSPS[-1] != txtSPS[-length(txtSPS)])]; }
         if (length(txtSPS) >= 1 && txtSPS[1] == "EXECUTE.") { txtSPS = txtSPS[-1]; }
         # check that all lines end with a "." - possibly check for the command being in capitals too
         if (! all(grepl(grcSPS, txtSPS) & grepl("\\.$", txtSPS))) { stop(sprintf("\n\nThe syntax contains commands that could not be parsed:\nfleSPV = \"%s\"\nfleLog = \"%s\"\n\n%s\n\n",
-                                                                                 fleSPV, fleLog, paste0(txtSPS, collapse="\n"))); }
+                                                                                 fleSPV, fleLog, paste0(txtSPS[! (grepl(grcSPS, txtSPS) & grepl("\\.$", txtSPS))], collapse="\n") )); }
         vecSPS <- c(vecSPS, txtSPS);
         rm("txtLog", "txtSPS");
     }
@@ -230,8 +233,8 @@ crrCmd <- function(inpLne = "") {
 }
 
 clnSPS <- function(txtSPS = c()) {
-    txtSPS = gsub('(\\S+)/', '\\1 /', gsub('\\s+', ' ', trimws(txtSPS)));
-
+    txtSPS = gsub('\\s+', ' ', trimws(txtSPS));
+    
     while (any(grepl("^\\*", txtSPS)) | any(grepl("/\\*", txtSPS))) {
         cmmRng = which(grepl("^\\*", txtSPS) | grepl("/\\*", txtSPS));
         if (grepl("/\\*", txtSPS[cmmRng[1]])) {
@@ -252,11 +255,11 @@ clnSPS <- function(txtSPS = c()) {
     if (length(txtSPS) == 0) { return("") }
 
     while (! all(grepl("\\.$", txtSPS))) {
-        # it may happen that a line starts with a SPSS command that actually isn"t one (e.g., can DISPLAY be both command and parameter)
+        # it may happen that a line starts with a SPSS command that actually isn't one (e.g., can DISPLAY be both command and parameter)
         # thus, commands have to be followed either by a space or the end of the string; graSPS is designed to pick up the spaces, the
         # end of the string is caught with the gsub replacement
         lneCmd = which(grepl(graSPS, txtSPS, ignore.case = TRUE) | grepl(gsub("\\\\s\\+", "$", graSPS), txtSPS, ignore.case = TRUE));
-        # set the begin of the range to collapse the first command that doesn"t end on the same line, the range is then extended to the
+        # set the begin of the range to collapse the first command that doesn't end on the same line, the range is then extended to the
         # next occurrence of either the command terminator (.), the next empty line, the next error or the end of txtSPS
         rngCmd = lneCmd[! grepl("\\.$", txtSPS[lneCmd])];
         if (length(rngCmd) > 0) {
@@ -264,6 +267,7 @@ clnSPS <- function(txtSPS = c()) {
                                      which(grepl("^$",   txtSPS[rngCmd[1] + 1:length(txtSPS)])) + rngCmd[1] - 1,
                                      which(grepl("^>",   txtSPS[rngCmd[1] + 1:length(txtSPS)])) + rngCmd[1] - 1,
                                      length(txtSPS)));
+
             txtSPS[rngCmd[1]] = paste(txtSPS[rngCmd], collapse=" ");
             txtSPS = txtSPS[-rngCmd[-1]];
         } else {
@@ -271,7 +275,29 @@ clnSPS <- function(txtSPS = c()) {
             break
         }
     }
-    txtSPS = gsub("\\s+\\.$", ".", gsub("\'\\+ \'", "", gsub("\"\\+ \"", "", txtSPS)));
+    # it may vice versa happen that several SPSS commands end up on one line; the following commands splits those and afterwards goes through them individually
+    # assigning a placeholder to txtSPS is required since unlist (a couple of lines below) squashes empty lines
+    txtSPS[txtSPS == ""] = "[EMPTY_LINE]";
+    splSPS = strsplit(txtSPS, "\\.\\s+");
+    for (i in which(lapply(splSPS, length) > 1)) {
+        # if all splits are SPSS commands, then just add a "." at the end (replace what was taken away by strsplit)
+        if (all(grepl(graSPS, splSPS[[i]], ignore.case = TRUE)) & all(unlist(lapply(gregexpr("\'|\"", splSPS[[i]]), length)) %% 2 == 0)) {
+            splSPS[[i]][-length(splSPS[[i]])] = paste0(splSPS[[i]][-length(splSPS[[i]])], '.');
+        # if the original string wasn't an SPSS command (then, it is either error, warning, message or empty line) just replace it with the original
+        } else if (! grepl(graSPS, txtSPS[[i]], ignore.case = TRUE)) {
+            splSPS[[i]] = txtSPS[i];
+        } else {
+            begCmd = 1;
+            for (j in 2:length(splSPS[[i]])) {
+                if (length(gregexpr("\"|\'", splSPS[[i]][begCmd])[[1]]) %% 2 == 0 && grepl(grcSPS, splSPS[[i]][j], ignore.case = TRUE)) { splSPS[[i]][begCmd] = paste0(splSPS[[i]][begCmd], '.'); begCmd = j; }
+                splSPS[[i]][begCmd] = paste0(splSPS[[i]][begCmd], ifelse(j > begCmd, paste0(". ", splSPS[[i]][j]), ""));
+                splSPS[[i]][j] = ifelse(j > begCmd, "", splSPS[[i]][j]);
+            }
+            splSPS[[i]] = splSPS[[i]][splSPS[[i]] != ""];
+        }
+    }
+    txtSPS = gsub("\\s+\\.$", ".", gsub("\'\\+ \'", "", gsub("\"\\+ \"", "", gsub("\\[EMPTY_LINE\\]", "", unlist(splSPS)))));
+
     if (! all(grepl(grcSPS, txtSPS))) {
         # select all SPSS commands and remove those that are properly formatted (grcSPS)
         lneCmd = which(grepl(graSPS, txtSPS, ignore.case = TRUE) | grepl(gsub("\\\\s\\+", "$", graSPS), txtSPS, ignore.case = TRUE));
@@ -281,8 +307,9 @@ clnSPS <- function(txtSPS = c()) {
             rplCmd = crrCmd(inpLne = txtSPS[lneCmd[1]]);
             if (length(rplCmd) == 2) {
                 txtSPS[lneCmd] = gsub(rplCmd[1], rplCmd[2], txtSPS[lneCmd]);
+                if (! any(grepl(grcSPS, txtSPS[lneCmd]))) { stop("Command match did not work: %s - %s\n\n%s", rplCmd[1], rplCmd[2], paste0(txtSPS[lneCmd], collapse = "\n")); }
                 lneCmd = lneCmd[! grepl(grcSPS, txtSPS[lneCmd])];
-            # if that fails (rplCmd doesn"t return 2 elements → else), remove the line since then there is no SPSS command to replace what
+            # if that fails (rplCmd doesn't return 2 elements → else), remove the line since then there is no SPSS command to replace what
             # is written in that line (e.g., because the command is misspelled); such commands are likely to be later removed below by the
             # code removing of the errors 
             } else {
@@ -293,6 +320,17 @@ clnSPS <- function(txtSPS = c()) {
         }
         rm("lneCmd");
     }
+
+    # split commands depending on whether they contain text in quoation marks, apply a correction for misplaced / outside the quotation marks
+    splSPS = strsplit(txtSPS, "\"|\'");
+    for (i in which(unlist(lapply(splSPS, length)) > 1   )) {
+        if (length(splSPS[[i]]) %% 2 == 1) {
+            for (j in seq(1, length(splSPS[[i]]), 2)) { splSPS[[i]][j] = gsub('(\\S+)/', '\\1 /', splSPS[[i]][j]); }
+        } else if (! grepl("\"$|\'$", txtSPS[i]) && ! grepl("\"\'\"|\'\"\'", txtSPS[i])) {
+            stop(sprintf("Malformatted command: opens quoation mark but doesn\'t close it: %s\n\n", txtSPS[i]));
+        }
+    }
+    txtSPS = trimws(gsub('\\s+', ' ', gsub("\'\'\'", "\'\"\'", unlist(lapply(splSPS, paste, collapse = "\'")))));
 
     # return txtSPS    
     txtSPS

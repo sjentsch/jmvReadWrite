@@ -8,9 +8,13 @@ spv2sps(fleSPV = "", rmvInv = FALSE)
 }
 \arguments{
 \item{fleSPV}{name (incl. path) of the SPSS-output-file to be read ("FILENAME.spv"; default = "")}
+
+\item{rmvInv}{}
 }
 \value{
-list with SPSS commands (like what is typically stored in SPSS syntax files - .sps); the list contains one command per entry (the command being a character vector) and the position of the SPSS-data-file \link{incl. path} that was used in the analyses is stored as a character vector in the attribute 'datafile' (the attribute will be empty if either the SPSS-datafile used in the analyses was not stored or if there was more than one data file used in the analyses stored in the original .spv-file
+character vector with SPSS commands (like what is typically stored in SPSS syntax files - .sps); the vector contains one command per entry and the position of the SPSS-data-file \link{incl. path}
+that was used in the analyses is stored as a character vector in the attribute "datafile" (the attribute will be empty if either the SPSS-datafile used in the analyses was not stored or if
+there was more than one data file used in the analyses stored in the original .spv-file
 }
 \description{
 Reads SPSS output files (.spv) and extracts the syntax and the data file used in the analyses from them

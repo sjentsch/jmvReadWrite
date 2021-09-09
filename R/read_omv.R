@@ -121,7 +121,8 @@ read_omv <- function(fleNme = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = FALSE
         }
         
         if (sveAtt) {
-            for (attNme in c('id', 'columnType', 'dataType', 'measureType', 'formula', 'formulaMessage', 'parentId', 'width', 'type', 'importName', 'transform', 'edits', 'trimLevels', 'filterNo', 'active')) {
+            for (attNme in c('id', 'columnType', 'dataType', 'measureType', 'formula', 'formulaMessage', 'parentId', 'width', 'type', 'importName',
+                             'transform', 'edits', 'trimLevels', 'filterNo', 'active')) {
                 if (! is.null(mtaDta$dataSet$fields[[i]][attNme])) {
                     attr(dtaFrm[[nmeCrr]], attNme) = mtaDta$dataSet$fields[[i]][[attNme]]
                 }

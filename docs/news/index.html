@@ -117,6 +117,72 @@
       <small>Source: <a href='https://github.com/sjentsch/jmvReadWrite/blob/main/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
+    <div id="styler-1519000-development-version" class="section level1">
+<h1 class="page-header" data-toc-text="1.5.1.9000">
+<a href="#styler-1519000-development-version" class="anchor"></a>styler 1.5.1.9000 (Development version)<small> Unreleased </small>
+</h1>
+<ul>
+<li><p>Files with <code>.Rmarkdown</code> extension are now recognized as an R markdown files in <code>style_file()</code> and friends (<a href='https://github.com/sjentsch/jmvReadWrite/issues/824'>#824</a>).</p></li>
+<li><p>Don’t break line before comments in pipes (<a href='https://github.com/sjentsch/jmvReadWrite/issues/822'>#822</a>).</p></li>
+<li><p>Ordinary comments (starting with <code>#</code>) that break a roxygen code example block (starting with <code>#'</code>) are now recognized and preserved (<a href='https://github.com/sjentsch/jmvReadWrite/issues/830'>#830</a>).</p></li>
+<li><p><code>@examplesIf</code> conditions longer than one line after styling throw an error for compatibility with {roxygen2} (<a href='https://github.com/sjentsch/jmvReadWrite/issues/833'>#833</a>).</p></li>
+<li><p>R Markdown chunk headers are no longer required to be parsable R code (<a href='https://github.com/sjentsch/jmvReadWrite/issues/832'>#832</a>).</p></li>
+<li><p>Break the line between <code>%&gt;%</code> and <code>{</code> inside and outside function calls (<a href='https://github.com/sjentsch/jmvReadWrite/issues/825'>#825</a>).</p></li>
+</ul>
+</div>
+    <div id="styler-151" class="section level1">
+<h1 class="page-header" data-toc-text="1.5.1">
+<a href="#styler-151" class="anchor"></a>styler 1.5.1<small> Unreleased </small>
+</h1>
+<div id="alignment-detection" class="section level2">
+<h2 class="hasAnchor">
+<a href="#alignment-detection" class="anchor"></a>Alignment detection</h2>
+<ul>
+<li>
+<p>Code with left alignment after <code><a href="https://rdrr.io/r/base/assignOps.html">=</a></code> in function calls is now recognized as aligned and won’t be reformatted (<a href='https://github.com/sjentsch/jmvReadWrite/issues/774'>#774</a>, <a href='https://github.com/sjentsch/jmvReadWrite/issues/777'>#777</a>).</p>
+<pre><code><a href="https://rdrr.io/r/base/call.html"># already detected previously
+call(
+  x  = 12345,
+  y2 =    17
+)
+
+# newly detected
+call(
+  x  = 12345,
+  y2 = 17
+)</a></code></pre>
+</li>
+<li>
+<p>Similarly, left aligned after comma is now detected (<a href='https://github.com/sjentsch/jmvReadWrite/issues/785'>#785</a>, <a href='https://github.com/sjentsch/jmvReadWrite/issues/786'>#786</a>).</p>
+<pre><code><a href="https://rdrr.io/r/base/call.html"># previously detected
+call(
+  x  = 12345, "It's old",
+  y2 = 17,      "before"
+)
+
+tribble(
+  ~x,             ~y,
+  "another",     1:3,
+  "b",       1211234
+)
+
+# newly detected
+call(
+  x = 2,           p = "another",
+  y = "hhjkjkbew", x = 3
+)
+
+
+tribble(
+  ~x,        ~y,
+  "another", 1:3,
+  "b",       1211234
+)</a></code></pre>
+<p>Also see <code>vignette("detect-alignment")</code>.</p>
+</li>
+</ul>
+</div>
+</div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

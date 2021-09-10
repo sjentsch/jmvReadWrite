@@ -23,7 +23,7 @@ devtools::check()
 
 devtools::release                    
 
-
+# for later:
 devtools::has_tests()
 devtools::test()
 
@@ -31,7 +31,7 @@ devtools::test()
 
 devtools::dev_packages          
 devtools::test_file                  
-devtools::show_news                  devtools::unload                     devtools::install_svn                devtools::install_dev_deps           devtools::test_active_file
+                  devtools::unload                     devtools::install_svn                devtools::install_dev_deps           devtools::test_active_file
 devtools::package_info               devtools::release_checks             devtools::install_git                devtools::build_manual
 devtools::github_pull                devtools::github_pat                 devtools::uninstall
 devtools::test_coverage_active_file  devtools::dev_mode

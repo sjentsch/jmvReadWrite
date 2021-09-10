@@ -1,7 +1,12 @@
 AGPL
 Changelog
+CR
+LF
+MAgojam
+MinGW
 OMV
 RData
+Rmd
 SAPA
 ToothGrowth
 VC
@@ -19,6 +24,7 @@ mtaDta
 omv
 org
 ori
+pkgdown
 rda
 rds
 sapa

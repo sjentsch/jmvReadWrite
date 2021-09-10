@@ -22,7 +22,6 @@
 * extracts syntax from analyses contained in the `.omv`-file (set the parameter `getSyn = TRUE`; default is `FALSE`)
 * imports the output from the `.omv`-file (set the parameter `getHTM = TRUE`; default is `FALSE`)
 
----
 
 # jmvReadWrite 0.1.0
 

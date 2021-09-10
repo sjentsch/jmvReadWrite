@@ -1,3 +1,69 @@
+# styler 1.5.1.9000 (Development version)
+
+* Files with `.Rmarkdown` extension are now recognized as an R markdown files in
+  `style_file()` and friends (#824).
+
+* Don't break line before comments in pipes (#822).
+
+* Ordinary comments (starting with `#`) that break a roxygen code example block 
+  (starting with `#'`) are now recognized and preserved (#830).
+
+* `@examplesIf` conditions longer than one line after styling throw an error for
+  compatibility with {roxygen2} (#833).
+  
+* R Markdown chunk headers are no longer required to be parsable R code (#832).
+
+* Break the line between `%>%` and `{` inside and outside function calls (#825).
+
+# styler 1.5.1
+
+## Alignment detection
+
+* Code with left alignment after `=` in function calls is now recognized as 
+  aligned and won't be reformatted (#774, #777).
+  ```
+  # already detected previously
+  call(
+    x  = 12345,
+    y2 =    17
+  )
+  
+  # newly detected
+  call(
+    x  = 12345,
+    y2 = 17
+  )
+  ```
+
+* Similarly, left aligned after comma is now detected (#785, #786).
+  ```
+  # previously detected
+  call(
+    x  = 12345, "It's old",
+    y2 = 17,      "before"
+  )
+  
+  tribble(
+    ~x,             ~y,
+    "another",     1:3,
+    "b",       1211234
+  )
+  
+  # newly detected
+  call(
+    x = 2,           p = "another",
+    y = "hhjkjkbew", x = 3
+  )
+
+  
+  tribble(
+    ~x,        ~y,
+    "another", 1:3,
+    "b",       1211234
+  )
+  ```
+  Also see `vignette("detect-alignment")`.
+
 # v0.2.2 (10/09/2021)
 
 ## Bug fixes and enhancements:

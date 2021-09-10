@@ -1,0 +1,6 @@
+repo:
+  url:
+    home: https://github.com/sjentsch/jmvReadWrite/
+    source: https://github.com/sjentsch/jmvReadWrite/blob/main/
+    issue: https://github.com/sjentsch/jmvReadWrite/issues/
+  branch: main

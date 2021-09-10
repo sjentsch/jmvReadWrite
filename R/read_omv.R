@@ -188,9 +188,12 @@ read_omv <- function(fleNme = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = FALSE
         savSyn = list();
         savPBf = list();    
         if (length(anlLst) > 0) {
-            RProtoBuf::readProtoFiles(system.file("jamovi.proto", package="jmvcore"))
-            for (anlNme in anlLst) {
-                anlPBf <- RProtoBuf::read(jamovi.coms.AnalysisResponse, anlHdl <- file(anlFle <- utils::unzip(fleNme, anlNme, junkpaths = TRUE), 'rb'));  close(anlHdl); unlink(anlFle); rm('anlHdl', 'anlFle');
+            flePtB = system.file("jamovi.proto", package="jmvcore");
+            if (length(setdiff(c("RProtoBuf", "jmvcore", "rlang"), installed.packages())) == 0 && file.exists(flePtB)) {
+                RProtoBuf::readProtoFiles(flePtB)
+                for (anlNme in anlLst) {
+                    anlPBf <- RProtoBuf::read(jamovi.coms.AnalysisResponse, anlHdl <- file(anlFle <- utils::unzip(fleNme, anlNme, junkpaths = TRUE), 'rb'));
+                    close(anlHdl); unlink(anlFle); rm('anlHdl', 'anlFle');
                 # for (anlFld in names(anlPBf)) { print(paste(anlFld, anlPBf[[anlFld]])) }                 # helper function to show all fields
                 # for (anlFld in names(anlPBf$options)) { print(paste(anlFld, anlPBf$options[[anlFld]])) } # helper function to show all fields in options
                 # for (anlFld in names(anlPBf$results)) { print(paste(anlFld, anlPBf$results[[anlFld]])) } # helper function to show all fields in results

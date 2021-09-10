@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.2.2 (10/09/2021)
+
+#### Bug fixes and enhancements:
+- bug fix in read_omv (some libraries required for syntax extraction are not available on certain platforms (Solaris, Windows with MinGW)
+
 ## v0.2.1 (23/08/2021)
 
 #### Bug fixes and enhancements:

@@ -137,7 +137,7 @@
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>fleNme</th>
-      <td><p>name (including the path, if required) of the 'jamovi'-file to be read ("FILENAME.omv"; default = "")</p></td>
+      <td><p>name (including the path, if required) of the 'jamovi'-file to be read ("FILENAME.omv"; default: "")</p></td>
     </tr>
     <tr>
       <th>useFlt</th>
@@ -153,11 +153,11 @@
     </tr>
     <tr>
       <th>getSyn</th>
-      <td><p>extract syntax from the analyses in the 'jamovi'-file and store it in the attribute 'syntax' (default – FALSE)</p></td>
+      <td><p>extract syntax from the analyses in the 'jamovi'-file and store it in the attribute "syntax" (default – FALSE)</p></td>
     </tr>
     <tr>
       <th>getHTM</th>
-      <td><p>store index.html in the attribute 'HTML' (default – FALSE)</p></td>
+      <td><p>store index.html in the attribute "HTML" (default – FALSE)</p></td>
     </tr>
     </table>
 
@@ -166,20 +166,37 @@
     <p>data frame (can be directly used with functions included in the R-package 'jmv' and syntax from 'jamovi'; also compatible with the format of the R-package "foreign")</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'>if</span> <span class='op'>(</span><span class='cn'>FALSE</span><span class='op'>)</span> <span class='op'>{</span>
-<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'>jmvReadWrite</span><span class='op'>)</span>
-<span class='va'>fleOMV</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span><span class='op'>(</span><span class='st'>"extdata"</span>, <span class='st'>"ToothGrowth.omv"</span>, package <span class='op'>=</span> <span class='st'>"jmvReadWrite"</span><span class='op'>)</span>
-<span class='va'>data</span> <span class='op'>=</span> <span class='fu'>read_omv</span><span class='op'>(</span>fleNme <span class='op'>=</span> <span class='va'>fleOMV</span>, getSyn <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
+    <pre class="examples"><div class='input'><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'>jmvReadWrite</span><span class='op'>)</span>
+<span class='va'>fleOMV</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span><span class='op'>(</span><span class='st'>"extdata"</span>, <span class='st'>"ToothGrowth.omv"</span>, package <span class='op'>=</span> <span class='st'>"jmvReadWrite"</span><span class='op'>)</span>
+<span class='va'>data</span> <span class='op'>&lt;-</span> <span class='fu'>read_omv</span><span class='op'>(</span>fleNme <span class='op'>=</span> <span class='va'>fleOMV</span>, getSyn <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
 <span class='co'># shows the syntax of the analyses from the .omv-file</span>
-<span class='fu'><a href='https://rdrr.io/r/base/attr.html'>attr</a></span><span class='op'>(</span><span class='va'>data</span>, <span class='st'>'syntax'</span><span class='op'>)</span>
-<span class='co'># runs the command of the first analysis</span>
-<span class='fu'><a href='https://rdrr.io/r/base/eval.html'>eval</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/parse.html'>parse</a></span><span class='op'>(</span>text<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/attr.html'>attr</a></span><span class='op'>(</span><span class='va'>data</span>, <span class='st'>'syntax'</span><span class='op'>)</span><span class='op'>[[</span><span class='fl'>1</span><span class='op'>]</span><span class='op'>]</span><span class='op'>)</span><span class='op'>)</span>
-<span class='co'># runs the command of the second analysis and assigns the output from that analysis</span>
+<span class='fu'><a href='https://rdrr.io/r/base/attr.html'>attr</a></span><span class='op'>(</span><span class='va'>data</span>, <span class='st'>"syntax"</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; [[1]]
+#&gt; [1] "jmv::ANOVA(formula = len ~ supp + dose2 + supp:dose2, data = data, effectSize = \"partEta\", modelTest = TRUE, qq = TRUE, emMeans = ~ dose2:supp)"
+#&gt; 
+#&gt; [[2]]
+#&gt; [1] "jmv::ancova(formula = len ~ supp + dose, data = data, effectSize = \"partEta\", modelTest = TRUE)"
+#&gt; </div><div class='input'><span class='co'># runs the command of the first analysis</span>
+<span class='fu'><a href='https://rdrr.io/r/base/eval.html'>eval</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/parse.html'>parse</a></span><span class='op'>(</span>text <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/attr.html'>attr</a></span><span class='op'>(</span><span class='va'>data</span>, <span class='st'>"syntax"</span><span class='op'>)</span><span class='op'>[[</span><span class='fl'>1</span><span class='op'>]</span><span class='op'>]</span><span class='op'>)</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; 
+#&gt;  ANOVA
+#&gt; 
+#&gt;  ANOVA - len                                                                                      
+#&gt;  ──────────────────────────────────────────────────────────────────────────────────────────────── 
+#&gt;                     Sum of Squares    df    Mean Square    F            p             η²p         
+#&gt;  ──────────────────────────────────────────────────────────────────────────────────────────────── 
+#&gt;    Overall model         2740.1033     5      548.02067    41.557178    &lt; .0000001                
+#&gt;    supp                   205.3500     1      205.35000    15.571979     0.0002312    0.2238254   
+#&gt;    dose2                 2426.4343     2     1213.21717    91.999965    &lt; .0000001    0.7731092   
+#&gt;    supp:dose2             108.3190     2       54.15950     4.106991     0.0218603    0.1320279   
+#&gt;    Residuals              712.1060    54       13.18715                                           
+#&gt;  ──────────────────────────────────────────────────────────────────────────────────────────────── 
+#&gt; </div><div class='img'><img src='read_omv-1.png' alt='' width='700' height='433' /></div><div class='img'><img src='read_omv-2.png' alt='' width='700' height='433' /></div><div class='input'><span class='co'># runs the command of the second analysis and assigns the output from that analysis</span>
 <span class='co'># to the variable result2</span>
-<span class='fu'><a href='https://rdrr.io/r/base/eval.html'>eval</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/parse.html'>parse</a></span><span class='op'>(</span>text<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span><span class='op'>(</span><span class='st'>'result2 = '</span>, <span class='fu'><a href='https://rdrr.io/r/base/attr.html'>attr</a></span><span class='op'>(</span><span class='va'>data</span>, <span class='st'>'syntax'</span><span class='op'>)</span><span class='op'>[[</span><span class='fl'>2</span><span class='op'>]</span><span class='op'>]</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/base/eval.html'>eval</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/parse.html'>parse</a></span><span class='op'>(</span>text <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span><span class='op'>(</span><span class='st'>"result2 &lt;- "</span>, <span class='fu'><a href='https://rdrr.io/r/base/attr.html'>attr</a></span><span class='op'>(</span><span class='va'>data</span>, <span class='st'>"syntax"</span><span class='op'>)</span><span class='op'>[[</span><span class='fl'>2</span><span class='op'>]</span><span class='op'>]</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/base/names.html'>names</a></span><span class='op'>(</span><span class='va'>result2</span><span class='op'>)</span>
-<span class='co'># → "main"      "assump"    "contrasts" "postHoc"   "emm" (the names of the five output tables)</span>
-<span class='op'>}</span>
+</div><div class='output co'>#&gt; [1] "main"      "assump"    "contrasts" "postHoc"   "emm"       "residsOV" </div><div class='input'><span class='co'># → "main"      "assump"    "contrasts" "postHoc"   "emm"       "residsOV"</span>
+<span class='co'># (the names of the six output tables)</span>
 
 </div></pre>
   </div>

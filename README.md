@@ -160,7 +160,7 @@ write_omv(dtaFrm = data, fleNme = 'Trial.omv')
 
 -----
 
-[Changelog](https://github.com/sjentsch/jmvReadWrite/blob/main/CHANGELOG.md)
+[Changelog](https://github.com/sjentsch/jmvReadWrite/blob/main/NEWS.md)
 
 ## Authors
 

@@ -16,7 +16,7 @@ bfi_sample2.omv-file contained in the extdata-directory of the package when writ
 \format{
 A data.frame with 250 rows and 29 variables
 \describe{
-\item{ID}{character}{Repondent ID}
+\item{ID}{character}{Respondent ID}
 \item{A1}{integer}{Am indifferent to the feelings of others. (reversed)}
 \item{A2}{integer}{Inquire about others' well-being.}
 \item{A3}{integer}{Know how to comfort others.}

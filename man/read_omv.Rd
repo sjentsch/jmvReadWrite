@@ -14,7 +14,7 @@ read_omv(
 )
 }
 \arguments{
-\item{fleNme}{name (incl. path) of the 'jamovi'-file to be read ("FILENAME.omv"; default = "")}
+\item{fleNme}{name (including the path, if required) of the 'jamovi'-file to be read ("FILENAME.omv"; default = "")}
 
 \item{useFlt}{apply filters (remove the lines where the filter is set to 0; default: FALSE)}
 

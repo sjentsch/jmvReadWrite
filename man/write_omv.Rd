@@ -13,7 +13,7 @@ write_omv(dtaFrm = NULL, fleNme = "")
 \item{fleNme}{Name / position of the output file to be generated ("FILENAME.omv"; default = "")}
 }
 \value{
-a list containing the meta data (mtaDta, written to metadata.json in the OMV-file), the extended data (xtdDta, written to xdata.json in the OMV-file) and the orginal data frame (dtaFrm)
+a list containing the meta data (mtaDta, written to metadata.json in the OMV-file), the extended data (xtdDta, written to xdata.json in the OMV-file) and the original data frame (dtaFrm)
 }
 \description{
 Write files to be used with the statistical spreadsheet 'jamovi'

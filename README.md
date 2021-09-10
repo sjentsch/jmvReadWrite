@@ -1,3 +1,4 @@
+
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 # jmvReadWrite
@@ -120,40 +121,25 @@ as shown in the following examples:
 
 ``` r
 library(jmvReadWrite)
-
 data = read_omv(fleNme = system.file("extdata", "ToothGrowth.omv", package = "jmvReadWrite"), getSyn = TRUE)
 # shows the syntax of the analyses from the .omv-file
+# please note that syntax extraction may not work on all systems
 attr(data, 'syntax')
 #> [[1]]
 #> [1] "jmv::ANOVA(formula = len ~ supp + dose2 + supp:dose2, data = data, effectSize = \"partEta\", modelTest = TRUE, qq = TRUE, emMeans = ~ dose2:supp)"
 #> 
 #> [[2]]
 #> [1] "jmv::ancova(formula = len ~ supp + dose, data = data, effectSize = \"partEta\", modelTest = TRUE)"
-# runs the command of the first analysis
-eval(parse(text=attr(data, 'syntax')[[1]]))
-#> 
-#>  ANOVA
-#> 
-#>  ANOVA - len                                                                                      
-#>  ──────────────────────────────────────────────────────────────────────────────────────────────── 
-#>                     Sum of Squares    df    Mean Square    F            p             η²p         
-#>  ──────────────────────────────────────────────────────────────────────────────────────────────── 
-#>    Overall model         2740.1033     5      548.02067    41.557178    < .0000001                
-#>    supp                   205.3500     1      205.35000    15.571979     0.0002312    0.2238254   
-#>    dose2                 2426.4343     2     1213.21717    91.999965    < .0000001    0.7731092   
-#>    supp:dose2             108.3190     2       54.15950     4.106991     0.0218603    0.1320279   
-#>    Residuals              712.1060    54       13.18715                                           
-#>  ────────────────────────────────────────────────────────────────────────────────────────────────
-```
-
-<img src="man/figures/README-unnamed-chunk-7-1.png" width="100%" style="display: block; margin: auto;" /><img src="man/figures/README-unnamed-chunk-7-2.png" width="100%" style="display: block; margin: auto;" />
-
-``` r
-# runs the command of the second analysis and assigns the output from that analysis to the variable result2
-eval(parse(text=paste0('result2 = ', attr(data, 'syntax')[[2]])))
-names(result2)
+# runs the command of the first and the second analysis
+# the output from the second analysis is assigned to the variable result2
+# (if the syntax couldn't be extracted, an empty list - length = 0 - is returned) 
+if (length(attr(data, 'syntax')) >= 2) {
+    eval(parse(text=attr(data, 'syntax')[[1]]))
+    eval(parse(text=paste0('result2 = ', attr(data, 'syntax')[[2]])))
+    names(result2)
+    # → "main"      "assump"    "contrasts" "postHoc"   "emm" (the names of the five output tables)
+}
 #> [1] "main"      "assump"    "contrasts" "postHoc"   "emm"       "residsOV"
-# → "main"      "assump"    "contrasts" "postHoc"   "emm" (the names of the five output tables)
 ```
 
 The `jmvReadWrite`-package also enables you to write `.omv`-files in

@@ -3,6 +3,7 @@
 ## Bug fixes and enhancements:
 * bug fix in read_omv (some libraries required for syntax extraction are not available on certain platforms (Solaris, Windows with MinGW)
 * added documentation (pkgdown) in docs/
+* set up examples and lintr
 
 
 # jmvReadWrite 0.2.1

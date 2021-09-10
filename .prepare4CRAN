@@ -1,6 +1,7 @@
 # REMEMBER: error messages from R are not always pointing to the place where the error occurs - especially when using commands like build_readme()
 
 # checks the requirements (all dependencies up-to-date, etc.)
+# use devtools::update_packages("devtools") and devtools::install_dev_deps() if required
 devtools::dev_sitrep()
 
 # update man-pages and NAMESPACE
@@ -23,20 +24,35 @@ devtools::check()
 devtools::release                    
 
 
+devtools::has_tests()
+devtools::test()
 
-devtools::dev_packages               
+
+
+devtools::dev_packages          
 devtools::test_file                  
 devtools::show_news                  devtools::unload                     devtools::install_svn                devtools::install_dev_deps           devtools::test_active_file
-devtools::check_win_devel            devtools::package_info               devtools::release_checks             devtools::install_git                devtools::build_manual
-devtools::check_win_oldrelease       devtools::check                      devtools::github_pull                devtools::github_pat                 devtools::uninstall
-devtools::has_tests                  devtools::test                       devtools::check_win_release          devtools::test_coverage_active_file  devtools::dev_mode
-devtools::uses_testthat              devtools::install_bitbucket          devtools::check_man                  devtools::install_version            devtools::submit_cran
-devtools::document                   devtools::lint                       devtools::dev_package_deps           devtools::run_examples               devtools::check_rhub
-devtools::test_coverage_file         devtools::as.package                 devtools::wd                         devtools::check_built                devtools::session_info
-devtools::loaded_packages            devtools::build_readme               devtools::load_all                   devtools::reload                     devtools::revdep_maintainers
-devtools::update_packages            devtools::test_coverage              devtools::has_devel                  devtools::build                      
+devtools::package_info               devtools::release_checks             devtools::install_git                devtools::build_manual
+devtools::github_pull                devtools::github_pat                 devtools::uninstall
+devtools::test_coverage_active_file  devtools::dev_mode
+devtools::uses_testthat              devtools::install_bitbucket
+devtools::install_version            devtools::submit_cran
+devtools::lint                       devtools::dev_package_deps           devtools::run_examples
+devtools::test_coverage_file         devtools::as.package                 devtools::wd                         
+
+devtools::check_win_devel            
+devtools::check_win_release
+devtools::check_win_oldrelease
+devtools::check                      
+devtools::check_man                  
+devtools::check_rhub
+devtools::check_built
+
+devtools::session_info
+devtools::loaded_packages            devtools::load_all                   devtools::reload                     devtools::revdep_maintainers
+devtools::update_packages            devtools::test_coverage              devtools::has_devel                      
 devtools::source_gist                devtools::install_cran               devtools::github_release             devtools::install                    
-devtools::create                     devtools::build_vignettes            devtools::install_gitlab             devtools::is.package
+devtools::create                     devtools::install_gitlab             devtools::is.package
 
 
 # other helpful commands:

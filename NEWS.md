@@ -1,4 +1,4 @@
-# jmvReadWrite 0.2.2
+# v0.2.2 (10/09/2021)
 
 ## Bug fixes and enhancements:
 * bug fix in read_omv (some libraries required for syntax extraction are not available on certain platforms (Solaris, Windows with MinGW)

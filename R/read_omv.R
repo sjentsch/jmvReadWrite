@@ -20,7 +20,8 @@
 #' # to the variable result2
 #' eval(parse(text = paste0("result2 <- ", attr(data, "syntax")[[2]])))
 #' names(result2)
-#' # → "main"      "assump"    "contrasts" "postHoc"   "emm"       "residsOV" (the names of the six output tables)
+#' # → "main"      "assump"    "contrasts" "postHoc"   "emm"       "residsOV"
+#' # (the names of the six output tables)
 #'
 #' @export read_omv
 #'

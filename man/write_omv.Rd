@@ -21,16 +21,17 @@ Write files to be used with the statistical spreadsheet 'jamovi'
 }
 \examples{
 library(jmvReadWrite)
-fleRDa <- system.file("data", "ToothGrowth.rda", package = "jmvReadWrite")
 
-# the data set is loaded as "ToothGrowth" which is then written using write_omv()
-load(fleRDa);
+# use the data set "ToothGrowth" and write it as jamovi-file using write_omv()
+data("ToothGrowth");
 wrtDta = write_omv(ToothGrowth, "Trial.omv");
 
 names(wrtDta);
 # → "mtaDta" "xtdDta" "dtaFrm"
 # returns a list with the metadata (mtaDta, e.g., column and data type),
 # the extended data (xtdDta, e.g., variable lables), and the data frame (dtaFrm)
+# the purpose of these variables is merely for checking (understanding the file format)
+# and debugging
 
 # check whether the file was written to the disk, get the file information (size, etc.)
 # and delete the file afterwards

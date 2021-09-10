@@ -1,5 +1,4 @@
 # jmvReadWrite 0.2.2
-(10/09/2021)
 
 ## Bug fixes and enhancements:
 * bug fix in read_omv (some libraries required for syntax extraction are not available on certain platforms (Solaris, Windows with MinGW)
@@ -7,16 +6,14 @@
 
 
 # jmvReadWrite 0.2.1
-(23/08/2021)
 
 ## Bug fixes and enhancements:
-* bug in write_omv fixed (thanks @MAgojam, #2); jamovi could not read the manifest (meta) when the file was created with `write_omv` on Windows (LF + CR, but only CR expected / decoded)
+* bug in write_omv fixed (@MAgojam, #2); jamovi could not read the manifest (meta) when the file was created with `write_omv` on Windows (LF + CR, but only CR expected / decoded)
 * updated the Created-by in the manifest string to use the jmvReadWrite version
 * improved the README (switched it to be generated from Rmd so that the vignette could be included
 
 
 # jmvReadWrite 0.2.0
-(12/07/2021)
 
 ## Enhancements:
 
@@ -27,6 +24,5 @@
 ---
 
 # jmvReadWrite 0.1.0
-(20/09/2020)
 
 * first implementation, reads (`jmvRead`) and writes (`jmvWrite`) files using a file format similar to jamovi 1.2 (can be read with more recent versions)

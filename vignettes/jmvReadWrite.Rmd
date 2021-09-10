@@ -92,11 +92,11 @@ read_omv (default is `FALSE`). When the parameter is set, the analyses are
 stored in the attribute `syntax`. They can be used as shown in the following
 examples:
 
-```{r, echo=TRUE}
+```{r eval=TRUE)}
 library(jmvReadWrite)
-
 data = read_omv(fleNme = system.file("extdata", "ToothGrowth.omv", package = "jmvReadWrite"), getSyn = TRUE)
 # shows the syntax of the analyses from the .omv-file
+# please note that syntax extraction may not work on all systems
 attr(data, 'syntax')
 # runs the command of the first analysis
 eval(parse(text=attr(data, 'syntax')[[1]]))

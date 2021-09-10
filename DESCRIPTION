@@ -1,7 +1,7 @@
 Package: jmvReadWrite
 Title: Read and Write 'jamovi' Files ('.omv')
-Version: 0.2.1
-Authors@R: 
+Version: 0.2.2
+Authors@R:
     person(given = "Sebastian", family = "Jentschke", role = c("aut", "cre"), email = "sebastian.jentschke@uib.no", comment = c(ORCID = "0000-0003-2576-5432"))
 Description: The free and open a statistical spreadsheet 'jamovi' (www.jamovi.org)
     aims to make statistical analyses easy and intuitive. 'jamovi' produces
@@ -16,10 +16,9 @@ RoxygenNote: 7.1.1
 VignetteBuilder: knitr
 BugReports: https://github.com/sjentsch/jmvReadWrite/issues
 Depends: R (>= 3.5.0)
-Imports: rjson,
-         jmvcore,
-         RProtoBuf,
-         foreign
+Imports: rjson
 Suggests: jmv,
+          jmvcore,
           knitr,
-          rmarkdown
+          rmarkdown,
+          RProtoBuf

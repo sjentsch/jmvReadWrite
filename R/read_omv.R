@@ -1,6 +1,6 @@
 #' Read files created of the statistical spreadsheet 'jamovi' (www.jamovi.org)
 #'
-#' @param fleNme name (incl. path) of the 'jamovi'-file to be read ("FILENAME.omv"; default = "")
+#' @param fleNme name (including the path, if required) of the 'jamovi'-file to be read ("FILENAME.omv"; default = "")
 #' @param useFlt apply filters (remove the lines where the filter is set to 0; default: FALSE)
 #' @param rmMsVl remove values defined as missing values (replace them with NA; default - FALSE)
 #' @param sveAtt store attributes that are not required in the data set (if you want to write the same data set using write_omv; default – FALSE)
@@ -189,7 +189,7 @@ read_omv <- function(fleNme = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = FALSE
         savPBf = list();    
         if (length(anlLst) > 0) {
             flePtB = system.file("jamovi.proto", package="jmvcore");
-            if (length(setdiff(c("RProtoBuf", "jmvcore", "rlang"), installed.packages())) == 0 && file.exists(flePtB)) {
+            if (length(setdiff(c("RProtoBuf", "jmvcore", "rlang"), utils::installed.packages())) == 0 && file.exists(flePtB)) {
                 RProtoBuf::readProtoFiles(flePtB)
                 for (anlNme in anlLst) {
                     anlPBf <- RProtoBuf::read(jamovi.coms.AnalysisResponse, anlHdl <- file(anlFle <- utils::unzip(fleNme, anlNme, junkpaths = TRUE), 'rb'));

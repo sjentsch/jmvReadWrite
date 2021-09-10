@@ -1,20 +1,31 @@
 # REMEMBER: error messages from R are not always pointing to the place where the error occurs - especially when using commands like build_readme()
 
+# checks the requirements (all dependencies up-to-date, etc.)
+devtools::dev_sitrep()
+
 # update man-pages and NAMESPACE
+devtools::spell_check()
 devtools::document()
 
 # building / updating README, PDF manual, HTML documentation and the package itself (tar.gz)
 devtools::build_readme()
 devtools::build_manual(path="doc")
 devtools::build_site()
-# also builds vignettes
+
+# build() also builds vignettes
+# ping-pong between build() and check() until all errors, warnings, notes are resolved 
 devtools::build()
+devtools::check()
+
+# the next stage of ping-pong
 
 
-devtools::build_site
-devtools::install_github             devtools::install_bioc               devtools::install_local              devtools::source_url                 devtools::check_dep_version
-devtools::spell_check                devtools::install_deps               devtools::package_file               devtools::release                    devtools::dev_sitrep
-devtools::dev_packages               devtools::build_rmd                  devtools::test_file                  devtools::install_dev                devtools::bash
+devtools::release                    
+
+
+
+devtools::dev_packages               
+devtools::test_file                  
 devtools::show_news                  devtools::unload                     devtools::install_svn                devtools::install_dev_deps           devtools::test_active_file
 devtools::check_win_devel            devtools::package_info               devtools::release_checks             devtools::install_git                devtools::build_manual
 devtools::check_win_oldrelease       devtools::check                      devtools::github_pull                devtools::github_pat                 devtools::uninstall
@@ -32,7 +43,8 @@ devtools::create                     devtools::build_vignettes            devtoo
 devtools::revdep()                    # shows reverse imports of the package 
 usethis::use_vignette('jmvReadWrite') # assigns a vignette
                                       # run this when getting "Setting active project to '<no active project>'" from build() or build_vignettes()
-
+devtools::install_local()             # install locally from current working directory
+ 
 
 # unclear what those commands do:
 devtools::parse_deps

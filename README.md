@@ -155,21 +155,25 @@ library(jmvReadWrite)
 
 # use the data set "ToothGrowth" and, if it exists, write it as jamovi-file using write_omv()
 data("ToothGrowth");
-if (exists("ToothGrowth")) {
-    wrtDta = write_omv(ToothGrowth, "Trial.omv");
-    names(wrtDta);
-    # → "mtaDta" "xtdDta" "dtaFrm"
-    # returns a list with the metadata (mtaDta, e.g., column and data type),
-    # the extended data (xtdDta, e.g., variable lables), and the data frame (dtaFrm)
-    # the purpose of these variables is merely for checking (understanding the file format)
-    # and debugging
+wrtDta = write_omv(ToothGrowth, "Trial.omv");
+names(wrtDta);
+#> [1] "mtaDta" "xtdDta" "dtaFrm"
+# → "mtaDta" "xtdDta" "dtaFrm"
+# returns a list with the metadata (mtaDta, e.g., column and data type),
+# the extended data (xtdDta, e.g., variable lables), and the data frame (dtaFrm)
+# the purpose of these variables is merely for checking (understanding the file format)
+# and debugging
 
-    # check whether the file was written to the disk, get the file information (size, etc.)
-    # and delete the file afterwards
-    list.files(".", "Trial.omv");
-    file.info("Trial.omv");
-    unlink("Trial.omv");
-}
+# check whether the file was written to the disk, get the file information (size, etc.)
+# and delete the file afterwards
+list.files(".", "Trial.omv");
+#> [1] "Trial.omv"
+file.info("Trial.omv");
+#>           size isdir mode               mtime               ctime
+#> Trial.omv 2111 FALSE  664 2021-09-11 12:45:47 2021-09-11 12:45:47
+#>                         atime  uid  gid    uname   grname
+#> Trial.omv 2021-09-11 12:45:47 1000 1000 sjentsch sjentsch
+unlink("Trial.omv");
 ```
 
 -----

@@ -173,21 +173,25 @@
 
 <span class="co"># use the data set "ToothGrowth" and, if it exists, write it as jamovi-file using write_omv()</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="st">"ToothGrowth"</span><span class="op">)</span>;
-<span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/exists.html">exists</a></span><span class="op">(</span><span class="st">"ToothGrowth"</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span>
-    <span class="va">wrtDta</span> <span class="op">=</span> <span class="fu"><a href="reference/write_omv.html">write_omv</a></span><span class="op">(</span><span class="va">ToothGrowth</span>, <span class="st">"Trial.omv"</span><span class="op">)</span>;
-    <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">wrtDta</span><span class="op">)</span>;
-    <span class="co"># → "mtaDta" "xtdDta" "dtaFrm"</span>
-    <span class="co"># returns a list with the metadata (mtaDta, e.g., column and data type),</span>
-    <span class="co"># the extended data (xtdDta, e.g., variable lables), and the data frame (dtaFrm)</span>
-    <span class="co"># the purpose of these variables is merely for checking (understanding the file format)</span>
-    <span class="co"># and debugging</span>
+<span class="va">wrtDta</span> <span class="op">=</span> <span class="fu"><a href="reference/write_omv.html">write_omv</a></span><span class="op">(</span><span class="va">ToothGrowth</span>, <span class="st">"Trial.omv"</span><span class="op">)</span>;
+<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">wrtDta</span><span class="op">)</span>;
+<span class="co">#&gt; [1] "mtaDta" "xtdDta" "dtaFrm"</span>
+<span class="co"># → "mtaDta" "xtdDta" "dtaFrm"</span>
+<span class="co"># returns a list with the metadata (mtaDta, e.g., column and data type),</span>
+<span class="co"># the extended data (xtdDta, e.g., variable lables), and the data frame (dtaFrm)</span>
+<span class="co"># the purpose of these variables is merely for checking (understanding the file format)</span>
+<span class="co"># and debugging</span>
 
-    <span class="co"># check whether the file was written to the disk, get the file information (size, etc.)</span>
-    <span class="co"># and delete the file afterwards</span>
-    <span class="fu"><a href="https://rdrr.io/r/base/list.files.html">list.files</a></span><span class="op">(</span><span class="st">"."</span>, <span class="st">"Trial.omv"</span><span class="op">)</span>;
-    <span class="fu"><a href="https://rdrr.io/r/base/file.info.html">file.info</a></span><span class="op">(</span><span class="st">"Trial.omv"</span><span class="op">)</span>;
-    <span class="fu"><a href="https://rdrr.io/r/base/unlink.html">unlink</a></span><span class="op">(</span><span class="st">"Trial.omv"</span><span class="op">)</span>;
-<span class="op">}</span></code></pre></div>
+<span class="co"># check whether the file was written to the disk, get the file information (size, etc.)</span>
+<span class="co"># and delete the file afterwards</span>
+<span class="fu"><a href="https://rdrr.io/r/base/list.files.html">list.files</a></span><span class="op">(</span><span class="st">"."</span>, <span class="st">"Trial.omv"</span><span class="op">)</span>;
+<span class="co">#&gt; [1] "Trial.omv"</span>
+<span class="fu"><a href="https://rdrr.io/r/base/file.info.html">file.info</a></span><span class="op">(</span><span class="st">"Trial.omv"</span><span class="op">)</span>;
+<span class="co">#&gt;           size isdir mode               mtime               ctime</span>
+<span class="co">#&gt; Trial.omv 2111 FALSE  664 2021-09-11 12:45:47 2021-09-11 12:45:47</span>
+<span class="co">#&gt;                         atime  uid  gid    uname   grname</span>
+<span class="co">#&gt; Trial.omv 2021-09-11 12:45:47 1000 1000 sjentsch sjentsch</span>
+<span class="fu"><a href="https://rdrr.io/r/base/unlink.html">unlink</a></span><span class="op">(</span><span class="st">"Trial.omv"</span><span class="op">)</span>;</code></pre></div>
 <hr>
 <p><a href="https://github.com/sjentsch/jmvReadWrite/blob/main/NEWS.md">Changelog</a></p>
 </div>

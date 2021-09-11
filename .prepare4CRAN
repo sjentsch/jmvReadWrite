@@ -43,6 +43,9 @@ devtools::check_win_devel()
 # now, we are ready to release the package onto CRAN
 devtools::release()
 
+# on the shell (after the submission got accepted):
+git tag -a "v$(grep "^Version:" DESCRIPTION | cut -d: -f2 | sed -e 's/ //')" $(tail -n 1 CRAN-RELEASE | cut -d\( -f2 | cut -d\) -f1 | sed 's/commit //') -m "CRAN submission: $(head -n1 CRAN-RELEASE | cut -c39-48)" && rm CRAN-RELEASE
+
 
 # for later - implement tests:
 devtools::has_tests()

@@ -30,7 +30,8 @@ devtools::check()
 
 # the next stage of ping-pong - builds it the package on rhub using all
 # major platforms R is supported on
-devtools::check_rhub(pkg=".", platforms=rhub::platforms()$name)
+devtools::check_rhub()
+devtools::check_rhub(pkg = ".", platforms = rhub::platforms()$name)
 
 devtools::release()
 devtools::submit_cran()

@@ -30,8 +30,15 @@ devtools::check()
 
 # the next stage of ping-pong - builds it the package on rhub using all
 # major platforms R is supported on
-devtools::check_rhub()
 devtools::check_rhub(pkg = ".", platforms = rhub::platforms()$name)
+# or, if there are known errors (e.g., on rhub), certain platforms can
+# explicitly be excluded
+crrPlt = rhub::platforms()
+crrPlt = crrPlt[-c(x, ...)]
+devtools::check_rhub(pkg = ".", platforms = crrPlt$name)
+
+# check on win-builder
+devtools::check_win_devel()
 
 devtools::release()
 devtools::submit_cran()
@@ -44,15 +51,6 @@ devtools::test_active_file()
 devtools::test_coverage_active_file()
 devtools::test_coverage_file()
 devtools::test_coverage()
-
-devtools::check_win_devel            
-devtools::check_win_release
-devtools::check_win_oldrelease
-devtools::check_rhub
-
-
-devtools::has_devel
-devtools::is.package
 
 
 # other helpful commands:
@@ -67,4 +65,3 @@ devtools::dev_packages()              # returns a vector with packages loaded by
 devtools::loaded_packages()           # shows currently loaded packages
 devtools::load_all()                  # works approx. like using library()
 devtools::update_packages()           # updates packages - unclear to what degree it is equivalent to update.packages()
-

@@ -126,19 +126,17 @@ library(jmvReadWrite)
 
 # use the data set "ToothGrowth" and, if it exists, write it as jamovi-file using write_omv()
 data("ToothGrowth");
-if (exists("ToothGrowth")) {
-    wrtDta = write_omv(ToothGrowth, "Trial.omv");
-    names(wrtDta);
-    # → "mtaDta" "xtdDta" "dtaFrm"
-    # returns a list with the metadata (mtaDta, e.g., column and data type),
-    # the extended data (xtdDta, e.g., variable lables), and the data frame (dtaFrm)
-    # the purpose of these variables is merely for checking (understanding the file format)
-    # and debugging
+wrtDta = write_omv(ToothGrowth, "Trial.omv");
+names(wrtDta);
+# → "mtaDta" "xtdDta" "dtaFrm"
+# returns a list with the metadata (mtaDta, e.g., column and data type),
+# the extended data (xtdDta, e.g., variable lables), and the data frame (dtaFrm)
+# the purpose of these variables is merely for checking (understanding the file format)
+# and debugging
 
-    # check whether the file was written to the disk, get the file information (size, etc.)
-    # and delete the file afterwards
-    list.files(".", "Trial.omv");
-    file.info("Trial.omv");
-    unlink("Trial.omv");
-}
+# check whether the file was written to the disk, get the file information (size, etc.)
+# and delete the file afterwards
+list.files(".", "Trial.omv");
+file.info("Trial.omv");
+unlink("Trial.omv");
 ```

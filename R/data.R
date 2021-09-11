@@ -11,8 +11,8 @@
 "ToothGrowth"
 
 #' The data set contains responses from 250 participants filling in twenty-five personality self-report items
-#' taken from the International Personality Item Pool (http://ipip.ori.org) as part of the Synthetic Aperture
-#' Personality Assessment (SAPA) web-based personality assessment (http://sapa-project.org) project.
+#' taken from the International Personality Item Pool (https://ipip.ori.org) as part of the Synthetic Aperture
+#' Personality Assessment (SAPA) web-based personality assessment (https://sapa-project.org) project.
 #' The 25 items are organized by five putative factors: Agreeableness (A1 to A5), Conscientiousness (C1 to C5),
 #' Extraversion (E1 to E5), Neuroticism (N1 to N5), and Openness (N1 to N5). The items were short phrases that
 #' the respondent should answer by indicating how accurately the statement describes their typical behaviour or
@@ -21,7 +21,7 @@
 #'
 #'@format A data.frame with 254 rows (250 original respondents, 4 manually generated (for testing)) and 33 variables
 #'\describe{
-#'   \item{ID}{character}{Repondent ID}
+#'   \item{ID}{character}{Respondent ID}
 #'   \item{A1}{integer}{Am indifferent to the feelings of others. (reversed)}
 #'   \item{A2}{integer}{Inquire about others' well-being.}
 #'   \item{A3}{integer}{Know how to comfort others.}
@@ -66,11 +66,11 @@
 #' attitude. Responses were collected using a 6-point scale: 1 - Very inaccurate, 2 - Moderately inaccurate,
 #' 3 - Slightly inaccurate, 4 - Slightly accurate, 5 - Moderately accurate, 6 - Very accurate.
 #' The data set includes the jamovi-attributes. It is supposed to result in an identical file compared to the
-#' bfi_sample2.omv-file contained in the extdata-directory of the package when written with write_omv. 
+#' bfi_sample2.omv-file contained in the extdata-directory of the package when written with write_omv.
 #'
 #'@format A data.frame with 250 rows and 29 variables
 #'\describe{
-#'   \item{ID}{character}{Repondent ID}
+#'   \item{ID}{character}{Respondent ID}
 #'   \item{A1}{integer}{Am indifferent to the feelings of others. (reversed)}
 #'   \item{A2}{integer}{Inquire about others' well-being.}
 #'   \item{A3}{integer}{Know how to comfort others.}

@@ -35,7 +35,7 @@ knitr::opts_chunk$set(
 
 ---
 
-[Changelog](https://github.com/sjentsch/jmvReadWrite/blob/main/CHANGELOG.md)
+[Changelog](https://github.com/sjentsch/jmvReadWrite/blob/main/NEWS.md)
 
 
 ## Authors

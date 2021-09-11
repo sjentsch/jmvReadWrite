@@ -1,18 +1,42 @@
 #' Write files to be used with the statistical spreadsheet 'jamovi'
 #' (www.jamovi.org)
 #'
-#' @param dtaFrm Data frame to be exported (default = NULL)
-#' @param fleNme Name / position of the output file to be generated ("FILENAME.omv"; default = "")
-#' @return a list containing the meta data (mtaDta, written to metadata.json in the OMV-file), the extended data (xtdDta, written to xdata.json in the OMV-file) and the orginal data frame (dtaFrm)
+#' @param dtaFrm Data frame to be exported (default: NULL)
+#' @param fleNme Name / position of the output file to be generated ("FILENAME.omv"; default: "")
+#' @return a list containing the meta data (mtaDta, written to metadata.json in the OMV-file), the extended data (xtdDta, written to xdata.json in the OMV-file) and the original data frame (dtaFrm)
+#'
+#' @examples
+#' library(jmvReadWrite)
+#'
+#' # use the data set "ToothGrowth" and write it as jamovi-file using write_omv()
+#' data("ToothGrowth");
+#' wrtDta = write_omv(ToothGrowth, "Trial.omv");
+#'
+#' names(wrtDta);
+#' # → "mtaDta" "xtdDta" "dtaFrm"
+#' # returns a list with the metadata (mtaDta, e.g., column and data type),
+#' # the extended data (xtdDta, e.g., variable lables), and the data frame (dtaFrm)
+#' # the purpose of these variables is merely for checking (understanding the file format)
+#' # and debugging
+#'
+#' # check whether the file was written to the disk, get the file information (size, etc.)
+#' # and delete the file afterwards
+#' list.files(".", "Trial.omv");
+#' file.info("Trial.omv");
+#' unlink("Trial.omv");
 #'
 #' @export write_omv
 
 write_omv <- function(dtaFrm = NULL, fleNme = "") {
 
     # check whether dtaFrm is a data frame
-    if (is.null(dtaFrm) || ! is.data.frame(dtaFrm) || any(dim(dtaFrm) < 1))              { stop("Input data frame is either not a data frame or has not the correct dimensions (at least one dimension has a size of < 1)."); }
+    if (is.null(dtaFrm) || ! is.data.frame(dtaFrm) || any(dim(dtaFrm) < 1)) {
+        stop("Input data frame is either not a data frame or has not the correct dimensions (at least one dimension has a size of < 1).");
+    }
     # check that the file name isn't empty, that it ends in .omv, and that the destination directory exists
-    if (length(fleNme) <= 0 || ! grepl(".omv", fleNme) || ! dir.exists(dirname(fleNme))) { stop(sprintf("Output file name (%s) doesn't have the correct format (e.g., wrong extension) or destination directory doesn't exist.", fleNme)); }
+    if (length(fleNme) <= 0 || ! grepl(".omv", fleNme) || ! dir.exists(dirname(fleNme))) {
+        stop(sprintf("Output file name (%s) doesn't have the correct format (e.g., wrong extension) or destination directory doesn't exist.", fleNme));
+    }
 
     colNum <- dim(dtaFrm)[2]
 
@@ -25,14 +49,14 @@ write_omv <- function(dtaFrm = NULL, fleNme = "") {
     # initialize xdata.json
     xtdDta <- list();
 
-    # create data.bin 
+    # create data.bin
     binHdl <- file(description = "data.bin", open = "wb");
 
     # create strings.bin
     strHdl <- file(description = "strings.bin", open = "wb");
     strPos <- 0
 
-    for (i in 1:colNum) {
+    for (i in seq_len(colNum)) {
         # assign fields stored in data frame (if the columns contain attributes);
         for (attNme in names(mtaDta$dataSet$fields[[i]])) {
             if (! is.null(attr(dtaFrm[[i]], attNme))) {
@@ -104,7 +128,7 @@ write_omv <- function(dtaFrm = NULL, fleNme = "") {
                 if (is.factor(colCrr)) {
                     facLvl <- attr(colCrr, "levels");
                     facVal <- attr(colCrr, "values");
-                    if (sum(is.na(suppressWarnings(as.numeric(facLvl)))) > 1) { 
+                    if (sum(is.na(suppressWarnings(as.numeric(facLvl)))) > 1) {
                         mtaDta$dataSet$fields[[i]][["dataType"]] <- "Text";
                     }
                     if (is.null(facVal)) {
@@ -114,7 +138,7 @@ write_omv <- function(dtaFrm = NULL, fleNme = "") {
                         colCrr <-  facVal[as.integer(colCrr)]
                     }
                     if (length(facVal) > 0) {
-                        xtdDta[[names(dtaFrm[i])]] <- list(labels = lapply(1:length(facVal), function(i) list(facVal[[i]], facLvl[[i]], facLvl[[i]])));
+                        xtdDta[[names(dtaFrm[i])]] <- list(labels = lapply(seq_along(facVal), function(i) list(facVal[[i]], facLvl[[i]], facLvl[[i]])));
                     }
                     rm("facLvl", "facVal");
                 } else {
@@ -148,27 +172,26 @@ write_omv <- function(dtaFrm = NULL, fleNme = "") {
             mtaDta$dataSet$fields[[i]][["filterNo"]]   <- NULL;
             mtaDta$dataSet$fields[[i]][["active"]]     <- NULL;
         }
-        if (is.null(attr(dtaFrm[[i]], "trimLevels")) &&
-            mtaDta$dataSet$fields[[i]][["dataType"]]   != "Text") {
+        if (is.null(attr(dtaFrm[[i]], "trimLevels")) && mtaDta$dataSet$fields[[i]][["dataType"]] != "Text") {
             mtaDta$dataSet$fields[[i]][["trimLevels"]] <- NULL;
         }
 
         # fix problem with transforms
 
 
-        # check that dataType, and measureType are set accordingly to type (attribute and column in the data frame) 
+        # check that dataType, and measureType are set accordingly to type (attribute and column in the data frame)
         # dataType: Text, Integer, Decimal
-        # 
-        # print(paste0(format(i, width = 2), ": ", mtaDta$dataSet$fields[[i]][["type"]], " - ", mtaDta$dataSet$fields[[i]][["dataType"]], " - ", mtaDta$dataSet$fields[[i]][["measureType"]]));
+        #
+        # print(sprintf("%02d: %s - %s - %s\n", i, mtaDta$dataSet$fields[[i]][["type"]], mtaDta$dataSet$fields[[i]][["dataType"]], mtaDta$dataSet$fields[[i]][["measureType"]]));
 
         # write to data.bin according to type
-        if      (mtaDta$dataSet$fields[[i]][["type"]] == "integer") { 
+        if      (mtaDta$dataSet$fields[[i]][["type"]] == "integer") {
             colWrt <- as.integer(colCrr);
-        } else if (mtaDta$dataSet$fields[[i]][["type"]] == "number") { 
+        } else if (mtaDta$dataSet$fields[[i]][["type"]] == "number") {
             colWrt <- as.double(colCrr);
         } else if (mtaDta$dataSet$fields[[i]][["type"]] == "string") {
             colWrt <- rep(0, length(colCrr));
-            for (j in 1:length(colCrr)) {
+            for (j in seq_along(colCrr)) {
                 writeBin(colCrr[j], strHdl);
                 colWrt[j] <- strPos;
                 strPos <- strPos + nchar(colCrr[j]) + 1;
@@ -191,9 +214,9 @@ write_omv <- function(dtaFrm = NULL, fleNme = "") {
     }
 
     # double check whether ID is unique
-    id_Lst <- unlist(lapply(1:length(mtaDta$dataSet$fields), function(i) mtaDta$dataSet$fields[[i]][["id"]]));
+    id_Lst <- unlist(lapply(seq_along(mtaDta$dataSet$fields), function(i) mtaDta$dataSet$fields[[i]][["id"]]));
     if (any(is.na(id_Lst)) || any(duplicated(id_Lst))) {
-        for (i in 1:length(mtaDta$dataSet$fields)) {
+        for (i in seq_along(mtaDta$dataSet$fields)) {
             mtaDta$dataSet$fields[[i]][["id"]] <- i;
         }
     }
@@ -205,18 +228,18 @@ write_omv <- function(dtaFrm = NULL, fleNme = "") {
 
     # check whether data were written to strings.bin
     close(strHdl);
-    if (strPos > 0) { utils::zip(fleNme, "strings.bin", flags = "-r9Xq"); }
+    if (strPos > 0) utils::zip(fleNme, "strings.bin", flags = "-r9Xq");
     unlink("strings.bin");
 
     # create meta, write it and add it to ZIP file
     # this needs a bit of special handling because of \r\n on Windows vs. \n on Mac / Linux
     # thanks to MAgojam for figuring out a solution
-    mnfTxt <- enc2utf8(c("Manifest-Version: 1.0", 
+    mnfTxt <- enc2utf8(c("Manifest-Version: 1.0",
                          "Data-Archive-Version: 1.0.2",
-                         "jamovi-Archive-Version: 8.0", 
+                         "jamovi-Archive-Version: 8.0",
                          paste("Created-By: jmvReadWrite", utils::packageVersion("jmvReadWrite"))));
-    
-    writeLines(mnfTxt, mnfHdl <- file("meta", open="wb"), sep="\n"); close(mnfHdl);
+
+    writeLines(mnfTxt, mnfHdl <- file("meta", open = "wb"), sep = "\n"); close(mnfHdl);
     utils::zip(fleNme, "meta", flags = "-r9Xq");
     unlink("meta");
     rm("mnfTxt", "mnfHdl");

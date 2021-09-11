@@ -1,5 +1,8 @@
-# binds the variable jamovi.coms.AnalysisResponse locally to the function, otherwise devtools::check() - required for submitting to CRAN - throws an error
-if(getRversion() >= "2.15.1")  utils::globalVariables(c("jamovi.coms.AnalysisResponse"));
+# binds the variable jamovi.coms.AnalysisResponse locally to the function,
+# otherwise devtools::check() - required before submitting to CRAN - throws an error
+if (getRversion() >= "2.15.1") {
+    utils::globalVariables(c("jamovi.coms.AnalysisResponse"));
+}
 
 # Definitions: SPSS commands (copied from the left panel in https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=reference-introduction-guide-command-syntax, replace "-" with "\n",
 # restore "T-TEST" manually, find commands with a ":" and delete them, sort the commands, and replace "\n" with "", "", manually added "ELSE", "ELSE IF" and "END IF"as well as the

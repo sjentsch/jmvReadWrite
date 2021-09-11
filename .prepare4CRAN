@@ -16,11 +16,11 @@ devtools::build_readme()
 devtools::build_manual(path="doc")
 pkgdown::clean_site()
 pkgdown::build_site()
-pkgdown::build_reference()
+pkgdown::build_reference(run_dont_run = TRUE, preview = FALSE)
 pkgdown::build_reference_index()
 
 # check whether the examples run through and do some linting
-devtools::run_examples()
+devtools::run_examples(run_dontrun = TRUE)
 devtools::lint()
 
 # the package itself (tar.gz) - build() also builds vignettes
@@ -28,11 +28,11 @@ devtools::lint()
 devtools::build()
 devtools::check()
 
-# the next stage of ping-pong - builds it the package on rhub using all
-# major platforms R is supported on
+# the next stage of ping-pong, either build on the standard platforms
+devtools::check_rhub()
+# or builds it the package on rhub using all major platforms R is supported on
 devtools::check_rhub(pkg = ".", platforms = rhub::platforms()$name)
-# or, if there are known errors (e.g., on rhub), certain platforms can
-# explicitly be excluded
+# or, if there are known errors (e.g., on rhub), exclude certain platforms explicitly
 crrPlt = rhub::platforms()
 crrPlt = crrPlt[-c(x, ...)]
 devtools::check_rhub(pkg = ".", platforms = crrPlt$name)
@@ -40,8 +40,8 @@ devtools::check_rhub(pkg = ".", platforms = crrPlt$name)
 # check on win-builder
 devtools::check_win_devel()
 
+# now, we are ready to release the package onto CRAN
 devtools::release()
-devtools::submit_cran()
 
 
 # for later - implement tests:

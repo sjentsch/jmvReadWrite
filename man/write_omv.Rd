@@ -20,6 +20,7 @@ Write files to be used with the statistical spreadsheet 'jamovi'
 (www.jamovi.org)
 }
 \examples{
+\dontrun{
 library(jmvReadWrite);
 
 # use the data set "ToothGrowth" and, if it exists, write it as jamovi-file using write_omv()
@@ -40,5 +41,6 @@ print(list.files(".", "Trial.omv"));
 print(file.info("Trial.omv")$size);
 # → 2111 (size may differ on different OSes)
 unlink("Trial.omv");
+}
 
 }

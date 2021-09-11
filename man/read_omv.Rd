@@ -33,6 +33,7 @@ data frame (can be directly used with functions included in the R-package 'jmv' 
 Read files created of the statistical spreadsheet 'jamovi' (www.jamovi.org)
 }
 \examples{
+\dontrun{
 library(jmvReadWrite);
 fleOMV <- system.file("extdata", "ToothGrowth.omv", package = "jmvReadWrite");
 data <- read_omv(fleNme = fleOMV, getSyn = TRUE);
@@ -46,8 +47,10 @@ if (length(attr(data, 'syntax')) >= 1) {
     # without assigning the output to a variable, the command would be:
     # eval(parse(text=attr(data, 'syntax')[[1]]))
     print(names(result));
+    print(result$main);
     # → "main"      "assump"    "contrasts" "postHoc"   "emm"       "residsOV"
     # (the names of the six output tables)
+}
 }
 
 }

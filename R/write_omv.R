@@ -6,6 +6,7 @@
 #' @return a list containing the meta data (mtaDta, written to metadata.json in the OMV-file), the extended data (xtdDta, written to xdata.json in the OMV-file) and the original data frame (dtaFrm)
 #'
 #' @examples
+#' \dontrun{
 #' library(jmvReadWrite);
 #'
 #' # use the data set "ToothGrowth" and, if it exists, write it as jamovi-file using write_omv()
@@ -26,6 +27,7 @@
 #' print(file.info("Trial.omv")$size);
 #' # → 2111 (size may differ on different OSes)
 #' unlink("Trial.omv");
+#' }
 #'
 #' @export write_omv
 

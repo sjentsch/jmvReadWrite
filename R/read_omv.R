@@ -9,19 +9,21 @@
 #' @return data frame (can be directly used with functions included in the R-package 'jmv' and syntax from 'jamovi'; also compatible with the format of the R-package "foreign")
 #'
 #' @examples
-#' library(jmvReadWrite)
-#' fleOMV <- system.file("extdata", "ToothGrowth.omv", package = "jmvReadWrite")
-#' data <- read_omv(fleNme = fleOMV, getSyn = TRUE)
-#' # shows the syntax of the analyses from the .omv-file
-#' attr(data, "syntax")
-#' # runs the command of the first analysis
-#' eval(parse(text = attr(data, "syntax")[[1]]))
-#' # runs the command of the second analysis and assigns the output from that analysis
-#' # to the variable result2
-#' eval(parse(text = paste0("result2 <- ", attr(data, "syntax")[[2]])))
-#' names(result2)
-#' # → "main"      "assump"    "contrasts" "postHoc"   "emm"       "residsOV"
-#' # (the names of the six output tables)
+#' library(jmvReadWrite);
+#' fleOMV <- system.file("extdata", "ToothGrowth.omv", package = "jmvReadWrite");
+#' data <- read_omv(fleNme = fleOMV, getSyn = TRUE);
+#' # if the syntax couldn't be extracted, an empty list - length = 0 - is returned,
+#' # otherwise, the commands are shown and the first and the second analysis are run,
+#' # with the output from the second analysis being assigned to the variable result2
+#' if (length(attr(data, 'syntax')) >= 2) {
+#'     print(attr(data, "syntax"));
+#'     # the print-function is only used to force devtools::run_examples() to show output
+#'     eval(parse(text=attr(data, 'syntax')[[1]]));
+#'     eval(parse(text=paste0('result2 = ', attr(data, 'syntax')[[2]])));
+#'     print(names(result2));
+#'     # → "main"      "assump"    "contrasts" "postHoc"   "emm"       "residsOV"
+#'     # (the names of the six output tables)
+#' }
 #'
 #' @export read_omv
 #'
@@ -231,8 +233,6 @@ fndSyn <- function(resElm = NULL) {
             ret <- Recall(obj);
             if (!is.null(ret)) return(ret);
         }
-    } else {
-        NULL
     }
 }
 

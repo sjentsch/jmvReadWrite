@@ -1,4 +1,4 @@
-# v0.2.2 (10/09/2021)
+# jmvReadWrite 0.2.2
 
 ## Bug fixes and enhancements:
 * bug fix in read_omv (some libraries required for syntax extraction are not available on certain platforms (Solaris, Windows with MinGW)
@@ -22,6 +22,7 @@
 * extracts syntax from analyses contained in the `.omv`-file (set the parameter `getSyn = TRUE`; default is `FALSE`)
 * imports the output from the `.omv`-file (set the parameter `getHTM = TRUE`; default is `FALSE`)
 
+---
 
 # jmvReadWrite 0.1.0
 

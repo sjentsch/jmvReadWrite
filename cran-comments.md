@@ -1,4 +1,4 @@
-## CRAN Notes - jmvReadWrite
+# CRAN Notes - jmvReadWrite
 
 ## Current version
 0.2.2

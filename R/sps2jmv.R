@@ -45,12 +45,22 @@ sps2jmv <- function(vecSPS = c(), fleSPS = "", fleSAV = "", fltCnd = "") {
             crrFnc = "";
             crrVar = getVar(crrSPS);
             # some commands don't require a variable list (they are parsed using other approaches)
-            if (length(crrVar) == 0 && ! grepl("^COMPUTE", crrSPS[1])) { stop(sprintf("Variable list empty. - Current command: %s\n\n", crrSPS[1])); }
+            if (length(crrVar) == 0 && !grepl("^COMPUTE", crrSPS[1])) { 
+                if (any(grepl("ZRE_\\d+", crrSPS))) {
+                     vecJMV = c(vecJMV, "", sprintf("# %s", vecSPS[i]),
+                                        "# Saving std. residuals is often done to evaluate whether they are normally distributed, etc. jamovi often offers this within analyses.", "");
+                     next
+                } else {
+                    stop(sprintf("Variable list empty. - Current command: %s\n\n", crrSPS[1]));
+                }
+            }
         } else if (grepl("^DATASET\\s+|SAVE\\s+OUTFILE\\s*=|GET\\s+FILE\\s*=", vecSPS[i])) {
-            vecJMV = c(vecJMV, sprintf("# %s – This SPSS-command is used to handle datasets and data files in SPSS and therefore not implemented.", vecSPS[i]));
+            vecJMV = c(vecJMV, "", sprintf("# %s", vecSPS[i]),
+                               "# This SPSS-command is used to handle datasets and data files in SPSS and therefore not implemented.", "");
             next
         } else if (grepl("^EXECUTE\\.$", vecSPS[i])) {
-            vecJMV = c(vecJMV, sprintf("# %s – This SPSS-command is used to execute previous COMPUTE, FILTER, etc.-commands and therefore not implemented.", vecSPS[i]));
+            vecJMV = c(vecJMV, "", sprintf("# %s", vecSPS[i]),
+                               "# This SPSS-command is used to execute previous COMPUTE, FILTER, etc.-commands and therefore not implemented.", "");
             next
         } else {
             warning(sprintf("SPSS-command in l. %d - \"%s\" not (yet) implemented.", i, vecSPS[i]));
@@ -1055,6 +1065,10 @@ sps2jmv <- function(vecSPS = c(), fleSPS = "", fleSAV = "", fltCnd = "") {
         rm(list = ls(pattern="crr*"));
     }
 
+    # clean up the output vector: remove first and last line if those are empty, and adjacent duplicate lines
+    if (vecJMV[1] == "") vecJMV = vecJMV[-1];
+    if (vecJMV[length(vecJMV)] == "") vecJMV = vecJMV[-length(vecJMV)];
+    vecJMV = vecJMV[c(TRUE, vecJMV[1:(length(vecJMV) - 1)] != vecJMV[2:length(vecJMV)])];
     attr(data, "syntax") = vecJMV;
     data
 }

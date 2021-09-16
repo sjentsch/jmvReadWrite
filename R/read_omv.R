@@ -201,6 +201,7 @@ read_omv <- function(fleNme = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = FALSE
         savPBf <- list();
         if (length(anlLst) > 0) {
             flePtB <- system.file("jamovi.proto", package = "jmvcore");
+            # check whether all required packages and files are present
             if (length(setdiff(c("RProtoBuf", "jmvcore", "rlang"), utils::installed.packages())) == 0 && file.exists(flePtB)) {
                 # try reading the protobuffer-file (if it can be read / parsed, tryCatch returns TRUE and the syntax can be extracted)
                 blnPtb <- tryCatch(expr  = {

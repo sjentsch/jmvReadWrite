@@ -26,7 +26,7 @@ devtools::lint()
 # the package itself (tar.gz) - build() also builds vignettes
 # ping-pong between build() and check() until all errors, warnings, notes are resolved 
 devtools::build()
-devtools::check()
+devtools::check(force_suggests = TRUE, incoming = TRUE, remote = TRUE, env_vars = c(NOT_CRAN = "FALSE"))
 
 # the next stage of ping-pong, either build on the standard platforms
 devtools::check_rhub()

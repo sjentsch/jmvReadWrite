@@ -201,18 +201,30 @@ read_omv <- function(fleNme = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = FALSE
         savPBf <- list();
         if (length(anlLst) > 0) {
             flePtB <- system.file("jamovi.proto", package = "jmvcore");
+            # check whether all required packages and files are present
             if (length(setdiff(c("RProtoBuf", "jmvcore", "rlang"), utils::installed.packages())) == 0 && file.exists(flePtB)) {
-                RProtoBuf::readProtoFiles(flePtB);
-                for (anlNme in anlLst) {
-                    anlPBf <- RProtoBuf::read(jamovi.coms.AnalysisResponse, anlHdl <- file(anlFle <- utils::unzip(fleNme, anlNme, junkpaths = TRUE), "rb"));
-                    close(anlHdl); unlink(anlFle); rm("anlHdl", "anlFle");
-                    # for (anlFld in names(anlPBf)) { print(paste(anlFld, anlPBf[[anlFld]])) }                 # helper function to show all fields
-                    # for (anlFld in names(anlPBf$options)) { print(paste(anlFld, anlPBf$options[[anlFld]])) } # helper function to show all fields in options
-                    # for (anlFld in names(anlPBf$results)) { print(paste(anlFld, anlPBf$results[[anlFld]])) } # helper function to show all fields in results
-                    # ..$bytesize() - size of the protocol buffer (or any field contained in it)
-                    savSyn <- c(savSyn, gsub("\\( ", "\\(", gsub("\\n\\s+", " ", fndSyn(anlPBf$results))));
-                    anlPBf$results <- NULL;
-                    savPBf <- c(savPBf, anlPBf);
+                # try reading the protobuffer-file (if it can be read / parsed, tryCatch returns TRUE and the syntax can be extracted)
+                blnPtb <- tryCatch(expr  = {
+                                             RProtoBuf::readProtoFiles(flePtB);
+                                             TRUE
+                                           },
+                                   error = function(e) {
+                                                         message("Error when loading protocol definition, syntax can\'t be extracted:\n", e);
+                                                         FALSE
+                                                       }
+                                 );
+                if (blnPtb) {
+                    for (anlNme in anlLst) {
+                        anlPBf <- RProtoBuf::read(jamovi.coms.AnalysisResponse, anlHdl <- file(anlFle <- utils::unzip(fleNme, anlNme, junkpaths = TRUE), "rb"));
+                        close(anlHdl); unlink(anlFle); rm("anlHdl", "anlFle");
+                        # for (anlFld in names(anlPBf)) { print(paste(anlFld, anlPBf[[anlFld]])) }                 # helper function to show all fields
+                        # for (anlFld in names(anlPBf$options)) { print(paste(anlFld, anlPBf$options[[anlFld]])) } # helper function to show all fields in options
+                        # for (anlFld in names(anlPBf$results)) { print(paste(anlFld, anlPBf$results[[anlFld]])) } # helper function to show all fields in results
+                        # ..$bytesize() - size of the protocol buffer (or any field contained in it)
+                        savSyn <- c(savSyn, gsub("\\( ", "\\(", gsub("\\n\\s+", " ", fndSyn(anlPBf$results))));
+                        anlPBf$results <- NULL;
+                        savPBf <- c(savPBf, anlPBf);
+                    }
                 }
             }
         }

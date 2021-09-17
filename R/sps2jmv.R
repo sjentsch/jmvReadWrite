@@ -26,6 +26,9 @@ sps2jmv <- function(vecSPS = c(), fleSPS = "", fleSAV = "", fltCnd = "") {
     if (fleSAV > "") {
         if (! file.exists(fleSAV) && file.exists(file.path(getwd(), basename(fleSAV)))) { fleSAV = file.path(getwd(), basename(fleSAV)); }
         data = suppressMessages(suppressWarnings(foreign::read.spss(file = fleSAV, to.data.frame=TRUE)));
+        # store the original data type, later used for being compared with
+        clsVar = unlist(lapply(names(data), function(x) { class(data[[x]]) }));
+        names(clsVar) = names(data);
     } else {
         stop(paste("sps2jmv requires an SPSS-data-file. This can be either provided by vecSPS containing an attribute \"datafile\" or via the parameter fleSAV.",
                    "This should be a character vector containing the position of the SPSS-data-file (.sav; incl. path)."));
@@ -37,13 +40,14 @@ sps2jmv <- function(vecSPS = c(), fleSPS = "", fleSAV = "", fltCnd = "") {
 
     vecJMV = c();
 
-    for (i in 1:length(vecSPS)) {
+    for (i in seq_along(vecSPS)) {
        
         # General: Split, handle generic attributes (e.g., VAR1 TO VARx) ==============================================================================================================================
         if (grepl(grpCnv, vecSPS[i])) {
             crrSPS = strSpl(gsub("\\.$", "", vecSPS[i]), " /");
             crrFnc = "";
             crrVar = getVar(crrSPS);
+            if (all(cntVar(crrVar) != unlist(lapply(splVar(crrVar), length)))) { stop(sprintf("Something went wrong with splVar or cntVar (l. %d):\n%s\n\n", i, vecSPS[i])); }
             # some commands don't require a variable list (they are parsed using other approaches)
             if (length(crrVar) == 0 && !grepl("^COMPUTE", crrSPS[1])) { 
                 if (any(grepl("ZRE_\\d+", crrSPS))) {
@@ -61,6 +65,19 @@ sps2jmv <- function(vecSPS = c(), fleSPS = "", fleSAV = "", fltCnd = "") {
         } else if (grepl("^EXECUTE\\.$", vecSPS[i])) {
             vecJMV = c(vecJMV, "", sprintf("# %s", vecSPS[i]),
                                "# This SPSS-command is used to execute previous COMPUTE, FILTER, etc.-commands and therefore not implemented.", "");
+            next
+        } else if (grepl("^TITLE\\s+", vecSPS[i])) {
+            vecJMV = c(vecJMV, "", sprintf("# %s", vecSPS[i]), "");
+            next
+        } else if (grepl("^SPLIT\\s+FILE\\s+.*?BY", vecSPS[i])) {
+            vecJMV = c(vecJMV, "", paste("#", strrep("=", 100)), sprintf("# %s", vecSPS[i]),
+                               "# The SPLIT-command produces two (or more) separate analyses for each step of this variable, the following analyses DON\'T honour that split.",
+                               "# Results will be different from those in SPSS.", paste("#", strrep("=", 100)), "");
+            next
+        } else if (grepl("^SPLIT\\s+FILE\\s+OFF.", vecSPS[i])) {
+            vecJMV = c(vecJMV, "", paste("#", strrep("=", 100)), sprintf("# %s", vecSPS[i]),
+                               "# The SPLIT-command produces two (or more) separate analyses for each step of this variable, the analyses above (up to the other SPLIT-comment) DON\'T honour that split.",
+                               paste("#", strrep("=", 100)), "");
             next
         } else {
             warning(sprintf("SPSS-command in l. %d - \"%s\" not (yet) implemented.", i, vecSPS[i]));
@@ -141,7 +158,7 @@ sps2jmv <- function(vecSPS = c(), fleSPS = "", fleSAV = "", fltCnd = "") {
         # SORT CASES ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
         # https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=reference-sort-cases
         else if (grepl("^SORT CASES", crrSPS[1])) {
-            stop(sprintf("SORT CASES – not implemented yet: l. %d - %s", i, vecSPS[i]));
+            data = data[order(data[[trimws(gsub("\\(A\\)|\\(D\\)", "", gsub("SORT\\s+CASES\\s+BY", "", crrSPS[1])))]], decreasing = grepl("\\(D\\)", crrSPS[1])), ];
         }
 
         # SORT VARIABLES ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -181,7 +198,13 @@ sps2jmv <- function(vecSPS = c(), fleSPS = "", fleSAV = "", fltCnd = "") {
         # FILTER --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
         # https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=reference-filter
         else if (grepl("^FILTER", crrSPS[1])) {
-            if (!grepl("filter_\\S", crrSPS[1])) { fltCnd = gsub("FILTER\\s+BY\\s+", "", crrSPS[1]); }
+            if (!grepl("filter_\\S", crrSPS[1])) { 
+                fltCnd = gsub("FILTER\\s+BY\\s+", "", crrSPS[1]);
+            } else if (fltCnd == "" && hasName(data, "filter_.")) {
+                fltCnd = "filter_.";
+            } else {
+                
+            }
             fltCnd = chkFlt(fltCnd, data);
         }
 
@@ -270,7 +293,7 @@ sps2jmv <- function(vecSPS = c(), fleSPS = "", fleSAV = "", fltCnd = "") {
                                                      dot          = FALSE,
                                                      boxMean      = FALSE));
             # CINTERVAL and PERCENTILES subcommand
-            if (any(grepl("^CINTERVAL", crrSPS)))      { crrArg = updArg(crrArg, argCI(crrSPS)); }
+#           if (any(grepl("^CINTERVAL", crrSPS)))      { crrArg = updArg(crrArg, argCI(crrSPS)); }
             if (any(grepl("^PERCENTILES\\(", crrSPS))) { crrArg = updArg(crrArg, argTls(crrSPS)); }
             # not implemented in jmv: COMPARE (not necessary), TOTAL, ID, MESTIMATOR, MISSING, STATISTICS subcommand: EXTREMES
         }
@@ -435,7 +458,7 @@ sps2jmv <- function(vecSPS = c(), fleSPS = "", fleSAV = "", fltCnd = "") {
                                                      meanDiff     = TRUE,
                                                      effectSize   = any(grepl("^ES ", crrSPS))));
             # CRITERIA=CI and MISSING subcommand
-            if (any(grepl("^CRITERIA=CI", crrSPS))) { crrArg = updArg(crrArg,  argCI(crrSPS)); }
+            if (any(grepl("^CRITERIA=CI", crrSPS))) { crrArg = updArg(crrArg,  argCI(crrSPS, ci4ES = FALSE)); }
             if (any(grepl("^MISSING",     crrSPS))) { crrArg = updArg(crrArg, argMsV(crrSPS)); }
             # not implemented in jmv: subcommand ES: STANDARDIZER (defaults to SD, i.e., Cohen's d - which is what jmv gives)
         }
@@ -475,7 +498,7 @@ sps2jmv <- function(vecSPS = c(), fleSPS = "", fleSAV = "", fltCnd = "") {
                                                      meanDiff     = TRUE,
                                                      effectSize   = any(grepl("^ES ", crrSPS))));
             # CRITERIA=CI and MISSING subcommand
-            if (any(grepl("^CRITERIA=CI", crrSPS))) { crrArg = updArg(crrArg,  argCI(crrSPS)); }
+            if (any(grepl("^CRITERIA=CI", crrSPS))) { crrArg = updArg(crrArg,  argCI(crrSPS, ci4ES = FALSE)); }
             if (any(grepl("^MISSING",     crrSPS))) { crrArg = updArg(crrArg, argMsV(crrSPS)); }
             # not implemented in jmv: subcommand ES: STANDARDIZER (defaults to SD, i.e., Cohen's d - which is what jmv gives)
         }
@@ -533,6 +556,8 @@ sps2jmv <- function(vecSPS = c(), fleSPS = "", fleSAV = "", fltCnd = "") {
         else if (grepl("^UNIANOVA", crrSPS[1]) && all(cntVar(crrVar) == c(1, 1, 0))) {
             print("UNIANOVA");
             crrFnc = "jmv::anovaOneW";
+            crrRnd = getLst(crrSPS, "^RANDOM\\s*=");
+            crrVar = rmvRnd(crrVar, crrRnd);
             crrArg = updArg(getArg(crrFnc), pairlist(formula      = fmtFrm(crrVar, "formula"),
                                                      welchs       = any(grepl('^PRINT|^STATISTICS',    crrSPS) & grepl('WELCH', crrSPS)),
                                                      fishers      = TRUE,
@@ -545,7 +570,7 @@ sps2jmv <- function(vecSPS = c(), fleSPS = "", fleSAV = "", fltCnd = "") {
             if (any(grepl("^POSTHOC", crrSPS))) { crrArg = updArg(crrArg, argPHT(crrSPS, crrFnc)); } 
             if (any(grepl("^MISSING", crrSPS))) { crrArg = updArg(crrArg, argMsV(crrSPS)); }
 
-            # not implemented in jmv: RANDOM, REGWGT, METHOD (SS type), INTERCEPT, CRITERIA, TEST, LMATRIX, KMATRIX, CONTRAST, EMMEANS, ROBUST, SAVE, OUTFILE, MBPDESIGN, BPDESIGN, FDESIGN,
+            # not implemented in jmv: REGWGT, METHOD (SS type), INTERCEPT, CRITERIA, TEST, LMATRIX, KMATRIX, CONTRAST, EMMEANS, ROBUST, SAVE, OUTFILE, MBPDESIGN, BPDESIGN, FDESIGN,
             #                         DESIGN (typically not required, as there can only be main effects), subcommand PRINT / STATISTICS (only DESCRIPTIVE, HOMOGENEITY, and WELCH),
             #                         subcommand PLOT (no further plot customization)
             #                         SAVE could be implemented manually later (at least for some outputs, e.g., PRED, RESID, ZRESID, possibly COOK)
@@ -593,15 +618,17 @@ sps2jmv <- function(vecSPS = c(), fleSPS = "", fleSAV = "", fltCnd = "") {
         else if (grepl("^UNIANOVA", crrSPS[1]) && cntVar(crrVar)[1] == 1 && cntVar(crrVar)[2] > 1 && cntVar(crrVar)[3] == 0) {
             print("UNIANOVA → ANOVA");
             crrFnc = "jmv::ANOVA";
+            crrRnd = getLst(crrSPS, "^RANDOM\\s*=");
+            crrVar = rmvRnd(crrVar, crrRnd);            
             crrArg = updArg(getArg(crrFnc), pairlist(formula      = fmtFrm(crrVar, "formula"),
                                                      modelTest    = TRUE,
-                                                     modelTerms   = fmtFrm(getLst(crrSPS, "^DESIGN\\s*="), "terms"),
+                                                     modelTerms   = fmtFrm(rmvRnd(getLst(crrSPS, "^DESIGN\\s*="), crrRnd), "terms"),
                                                      ss           = argSS(crrSPS, crrFnc),
                                                      homo         = any(grepl('^PRINT|^STATISTICS',    crrSPS) & grepl('HOMOGENEITY', crrSPS)),
                                                      norm         = any(grepl('^SAVE\\s*=\\s*ZRESID$', crrSPS)),
                                                      qq           = any(grepl('^SAVE\\s*=\\s*ZRESID$', crrSPS))));
             # effect size, CONTRAST, POSTHOC, PLOT-PROFILE and MISSING subcommands
-            if (any(grepl('^PRINT|^STATISTICS', crrSPS) & grepl('ETASQ', crrSPS))) { crrArg = updArg(pairlist(effectSize = 'partEta')); }
+            if (any(grepl('^PRINT|^STATISTICS', crrSPS) & grepl('ETASQ', crrSPS))) { crrArg = updArg(crrArg, pairlist(effectSize = 'partEta')); }
             if (any(grepl("^CONTRAST",          crrSPS)))                          { crrArg = updArg(crrArg, argCon(crrSPS)); }
             if (any(grepl("^POSTHOC",           crrSPS)))                          { crrArg = updArg(crrArg, argPHT(crrSPS, crrFnc)); }
             if (any(grepl("^PLOT.*?PROFILE",    crrSPS)))                          { crrArg = updArg(crrArg, argEmm(crrSPS)); }
@@ -621,20 +648,20 @@ sps2jmv <- function(vecSPS = c(), fleSPS = "", fleSAV = "", fltCnd = "") {
         else if (grepl("^GLM", crrSPS[1]) && any(grepl("^WSFACTOR", crrSPS))) {
             print("GLM – Repeated Measures");
             crrFnc = "jmv::anovaRM";
-            crrVar = splVar(crrVar);
-            crrRpM = getRpM(crrSPS, crrVar[[1]]);
+            crrSpV = splVar(crrVar);
+            crrRpM = getRpM(crrSPS, crrSpV[[1]]);
             # return number of levels
             # TO-DO: check regularly on "contrasts" (announced as "under development")
             crrArg = updArg(getArg(crrFnc), pairlist(rm           = str2lang(jmvcore::sourcify(crrRpM[[1]])),
                                                      rmCells      = str2lang(jmvcore::sourcify(crrRpM[[2]])),
+                                                     bs           = fmtVar(crrSpV[[2]], asLng = TRUE),
+                                                     cov          = fmtVar(crrSpV[[3]], asLng = TRUE),
                                                      ss           = argSS(crrSPS, crrFnc),
                                                      contrasts    = list(NULL), # currently stored in crrRpM[[3]]
                                                      groupSumm    = TRUE));
             # within and between subjects design (WSDESIGN, DESIGN), type of square sum (METHOD), effect size (PRINT), and estimated marginal means (PLOT - PROFILE)
-            if (any(grepl("^WSDESIGN\\s*=",     crrSPS))) { crrArg = updArg(crrArg, pairlist(rmTerms      = fmtFrm(getLst(crrSPS, "^WSDESIGN\\s*="), "terms"))); }
-            if (any(grepl("^DESIGN\\s*=",       crrSPS))) { crrArg = updArg(crrArg, pairlist(bsTerms      = fmtFrm(getLst(crrSPS,   "^DESIGN\\s*="), "terms"))); }
-            if (length(crrVar[[2]]) > 0)                  { crrArg = updArg(crrArg, pairlist(bs           = fmtVar(crrVar[[2]], asLng = TRUE))); }
-            if (length(crrVar[[3]]) > 0)                  { crrArg = updArg(crrArg, pairlist(cov          = fmtVar(crrVar[[3]], asLng = TRUE))); }
+            if (any(grepl("^WSDESIGN\\s*=",     crrSPS))) { crrArg = updArg(crrArg, pairlist(rmTerms      = fmtFrm(       getLst(crrSPS, "^WSDESIGN\\s*="),                   "terms"))); }
+            if (any(grepl("^DESIGN\\s*=",       crrSPS))) { crrArg = updArg(crrArg, pairlist(bsTerms      = fmtFrm(chkVar(getLst(crrSPS,   "^DESIGN\\s*="), "", names(data)), "terms"))); }
             if (any(crrRpM[[4]] > 2))                     { crrArg = updArg(crrArg, pairlist(spherTests   = TRUE,
                                                                                              spherCorr    = str2lang("list(\"none\", \"GG\", \"HF\")"))); }
             if (any(grepl("PRINT\\s*=.*?ETASQ", crrSPS))) { crrArg = updArg(crrArg, pairlist(effectSize   = "partEta")); }
@@ -687,21 +714,26 @@ sps2jmv <- function(vecSPS = c(), fleSPS = "", fleSAV = "", fltCnd = "") {
         # https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=reference-unianova
         # TO ADD: 1 dependent and 1 independent variable (factor, no covariate)
         else if (grepl("^UNIANOVA", crrSPS[1]) && cntVar(crrVar)[1] == 1 && all(cntVar(crrVar)[2:3] >= 1)) {
-            stop(sprintf("UNIANOVA → ancova not implemented yet: l. %d - %s", i, vecSPS[i]));
+            print("UNIANOVA → ancova");
             crrFnc = "jmv::ancova";
+            crrRnd = getLst(crrSPS, "^RANDOM\\s*=");
+            crrVar = rmvRnd(crrVar, crrRnd);
             crrArg = updArg(getArg(crrFnc), pairlist(formula      = fmtFrm(crrVar, "formula"),
                                                      modelTest    = TRUE,
+                                                     modelTerms   = fmtFrm(rmvRnd(getLst(crrSPS, "^DESIGN\\s*="), crrRnd), "terms"),
                                                      ss           = argSS(crrSPS, crrFnc),
                                                      homo         = any(grepl('^PRINT|^STATISTICS',    crrSPS) & grepl('HOMOGENEITY', crrSPS)),
                                                      norm         = any(grepl('^SAVE\\s*=\\s*ZRESID$', crrSPS)),
                                                      qq           = any(grepl('^SAVE\\s*=\\s*ZRESID$', crrSPS))));
-            # effect size, POSTHOC and MISSING subcommands
-            if (any(grepl('^PRINT|^STATISTICS', crrSPS) & grepl('ETASQ', crrSPS))) { crrArg = updArg(pairlist(effectSize = 'partEta')); }
-            if (any(grepl("^POSTHOC", crrSPS)))                                    { crrArg = updArg(crrArg, argPHT(crrSPS, crrFnc)); }
-            if (any(grepl("^PLOT.*?PROFILE", crrSPS)))                             { crrArg = updArg(crrArg, argEmm(crrSPS)); }            
+            # effect size, CONTRAST, POSTHOC, PLOT-PROFILE and MISSING subcommands
+            if (any(grepl('^PRINT|^STATISTICS', crrSPS) & grepl('ETASQ', crrSPS))) { crrArg = updArg(crrArg, pairlist(effectSize = 'partEta')); }
+            if (any(grepl("^CONTRAST",          crrSPS)))                          { crrArg = updArg(crrArg, argCon(crrSPS)); }
+            if (any(grepl("^POSTHOC",           crrSPS)))                          { crrArg = updArg(crrArg, argPHT(crrSPS, crrFnc)); }
+            if (any(grepl("^PLOT.*?PROFILE",    crrSPS)))                          { crrArg = updArg(crrArg, argEmm(crrSPS)); }
+            if (any(grepl("^MISSING",           crrSPS)))                          { crrArg = updArg(crrArg, argMsV(crrSPS)); }
 
             # not implemented in jmv: RANDOM, REGWGT, INTERCEPT, CRITERIA, TEST, LMATRIX, KMATRIX, CONTRAST, EMMEANS, ROBUST, SAVE, OUTFILE, MBPDESIGN, BPDESIGN, FDESIGN,
-            #                         DESIGN, subcommand PRINT / STATISTICS (only HOMOGENEITY)
+            #                         subcommand PRINT / STATISTICS (only HOMOGENEITY)
             #                         SAVE could be implemented manually later (at least for some outputs, e.g., PRED, RESID, ZRESID, possibly COOK)
         }
 
@@ -838,9 +870,28 @@ sps2jmv <- function(vecSPS = c(), fleSPS = "", fleSAV = "", fltCnd = "") {
         else if (grepl("^LINEAR", crrSPS[1])) {
             stop(sprintf("LINEAR – not implemented yet: l. %d - %s", i, vecSPS[i]));
             crrFnc = "jmv::linReg";
-#           crrArg = updArg(getArg(crrFnc), pairlist());
+            crrSpV = splVar(crrVar);
+            crrArg = updArg(getArg(crrFnc), pairlist(dep          = crrSpV[[1]],
+                                                     factors      = fmtVar(crrSpV[[2]], asLng = TRUE),
+                                                     covs         = fmtVar(crrSpV[[3]], asLng = TRUE),
+                                                     blocks       = getBlk(crrSPS),
+                                                     r            = any( grepl('^STATISTICS',   crrSPS) & grepl('R\\s+|DEFAULTS|ALL|^STATISTICS$', crrSPS)),
+                                                     r2           = any( grepl('^STATISTICS',   crrSPS) & grepl('R\\s+|DEFAULTS|ALL|^STATISTICS$', crrSPS)),
+                                                     r2Adj        = any( grepl('^STATISTICS',   crrSPS) & grepl('R\\s+|DEFAULTS|ALL|^STATISTICS$', crrSPS)),
+                                                     modelTest    = any( grepl('^STATISTICS',   crrSPS) & grepl('ANOVA|DEFAULTS|ALL|^STATISTICS$', crrSPS)),
+                                                     stdEst       = any( grepl('^STATISTICS',   crrSPS) & grepl('COEFF|DEFAULTS|ALL|^STATISTICS$', crrSPS)),
+                                                     anova        = any( grepl('^STATISTICS',   crrSPS) & grepl('F\\s+|ALL',                       crrSPS)),
+                                                     collin       = any( grepl('^STATISTICS',   crrSPS) & grepl('COLLIN|ALL',                      crrSPS)),
+                                                     norm         = any((grepl('^RESIDUALS',    crrSPS) & grepl('NORMPROB|DEFAULTS',               crrSPS)) | grepl('^SAVE', crrSPS)),
+                                                     qqPlot       = any((grepl('^RESIDUALS',    crrSPS) & grepl('NORMPROB|DEFAULTS',               crrSPS)) | grepl('^SAVE', crrSPS)),
+                                                     durbin       = any((grepl('^RESIDUALS',    crrSPS) & grepl('DURBIN|DEFAULTS',                 crrSPS)) | grepl('^SAVE', crrSPS)),
+                                                     resPlots	  = any( grepl('^SCATTERPLOT',  crrSPS) | grepl('^PARTIALPLOT',                    crrSPS)  | grepl('^SAVE', crrSPS)),
+                                                     cooks	      = any( grepl('^SAVE.*?COOKS', crrSPS)),
+                                                     groupSumm    = any( grepl('^DESCRIPTIVES', crrSPS))));
+            if (any(grepl("^STATISTICS.*?CI", crrSPS))) { crrArg = updArg(crrArg, argCI(crrSPS, ci4Std = crrArg$stdEst, ci4EMM = FALSE)); }
 
-            # not implemented in jmv:
+            # not implemented in jmv: CASEWISE, CRITERIA (jamovi doesn't support step-wise), DESCRIPTIVES (some measures), MATRIX, METHOD, MISSING,
+            #                         ORIGIN, OUTFILE, REGWGT, RESIDUALS (some measures), SELECT, STATISTICS (some measures), SAVE, TEMPLATE
         }
 
         # REGRESSION ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -945,14 +996,52 @@ sps2jmv <- function(vecSPS = c(), fleSPS = "", fleSAV = "", fltCnd = "") {
 
         # Frequency analyses – Contingency Tables =====================================================================================================================================================
         # https://www.jamovi.org/jmv/conttables.html
-
+        
         # CROSSTABS -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        # https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=reference-crosstabs
         else if (grepl("^CROSSTABS", crrSPS[1])) {
-            stop(sprintf("CROSSTABS – not implemented yet: l. %d - %s", i, vecSPS[i]));
+            print("CROSSTABS");
+            if (grepl("VARIABLES\\s*=", crrSPS[1])) stop(sprintf("CROSSTABS – VARIABLES not implemented yet: l. %d - %s", i, vecSPS[i]));
             crrFnc = "jmv::contTables";
-#           crrArg = updArg(getArg(crrFnc), pairlist());
+            chiSqr = any(grepl("^STATISTIC\\s*=", crrSPS) & grepl("CHISQ|ALL", crrSPS)) | all(!grepl("^STATISTIC\\s*=", crrSPS));
+            crrArg = updArg(getArg(crrFnc), pairlist(formula      = fmtFrm(crrVar, "ctForm"),
+                                                     chiSq        = chiSqr,
+                                                     likeRat      = chiSqr,
+                                                     mh           = chiSqr,
+                                                     fisher       = chiSqr,
+                                                     chiSqCorr	  = chiSqr,
+                                                     phiCra       = any(grepl("^STATISTIC\\s*=", crrSPS) & grepl("ALL|PHI",   crrSPS)),
+                                                     contCoef     = any(grepl("^STATISTIC\\s*=", crrSPS) & grepl("ALL|CC",    crrSPS)),
+                                                     taub         = any(grepl("^STATISTIC\\s*=", crrSPS) & grepl("ALL|BTAU",  crrSPS)),
+                                                     gamma        = any(grepl("^STATISTIC\\s*=", crrSPS) & grepl("ALL|GAMMA", crrSPS)),
+                                                     relRisk      = any(grepl("^STATISTIC\\s*=", crrSPS) & grepl("ALL|RISK",  crrSPS)),
+                                                     obs	      = any(grepl("^CELLS\\s*=.*?COUNT",    crrSPS)),
+                                                     exp	      = any(grepl("^CELLS\\s*=.*?EXPECTED", crrSPS)),
+                                                     pcRow	      = any(grepl("^CELLS\\s*=.*?ROW",      crrSPS)),
+                                                     pcCol        = any(grepl("^CELLS\\s*=.*?COLUMN",   crrSPS)),
+                                                     pcTot        = any(grepl("^CELLS\\s*=.*?TOTAL",    crrSPS)),
+                                                     diffProp     = any(grepl("^CELLS\\s*=.*?PROP",     crrSPS)),                                                     
+                                                     barplot	  = any(grepl("^BARCHART",              crrSPS))));
+            if (any(grepl("^METHOD.*?CIN", crrSPS))) { crrArg = updArg(crrArg, argCI(crrSPS)); }
 
-            # not implemented in jmv:
+            # not implemented in jmv: VARIABLES, CELLS (RESID, SRESID, ASRESID, BPROP, ALL), STATISTIC (LAMBDA, UC, CTAU, D, ETA, CORR, KAPPA, MCNEMAR, CMH),
+            #                         METHOD (all except CIN), MISSING, FORMAT, COUNT, WRITE, HIDESMALLCOUNTS, SHOWDIM
+        }
+
+        # CTABLES -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        # https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=reference-ctables
+        else if (grepl("^CTABLES", crrSPS[1])) {
+            print("CTABLES - only simple counts, no advanced statistics, are converted");
+            crrFnc = "jmv::contTables";
+            crrArg = updArg(getArg(crrFnc), pairlist(formula      = fmtFrm(paste(crrVar, collapse = " BY "), "ctForm"),
+                                                     chiSq        = any(grepl("^SIGTEST\\s*=.*?CHISQUARE",  crrSPS)),
+                                                     obs	      = any(grepl("^TABLE.*?COUNT",             crrSPS)),
+                                                     pcRow	      = any(grepl("^TABLE.*?ROWPCT.COUNT",      crrSPS)),
+                                                     pcCol        = any(grepl("^TABLE.*?COLPCT.COUNT",      crrSPS)),
+                                                     pcTot        = any(grepl("^TABLE.*?TABLEPCT.COUNT",    crrSPS))));
+            if (any(grepl("^CRITERIA.*?CILEVEL", crrSPS))) { crrArg = updArg(crrArg, argCI(crrSPS)); }
+
+            # not implemented in jmv: FORMAT, MRSETS, SMISSING, PCOMPUTE, PPROPERTIES, WEIGHT, HIDESMALLCOUNTS, SLABELS, CLABELS, CATEGORIES, TITLES, TABLES (most statistics), COMPARETEST
         }
 
 
@@ -1056,8 +1145,10 @@ sps2jmv <- function(vecSPS = c(), fleSPS = "", fleSAV = "", fltCnd = "") {
             # not implemented in jmv:      
         }
 
-        # add converted command / function the the syntax list ======================================================================================================================================== 
+        # check that the variables are of the correct type and add converted command / function the the syntax list ===================================================================================
         if (crrFnc > "") {
+            # ensure that the variable class matches what is required of the analyses
+            data = xfmVar(data, crrFnc, splVar(crrVar), clsVar, i, vecSPS[i]);
 #           vecJMV = c(vecJMV, gsub("^list\\(", paste0(crrFnc, "("), gsub("\\( ", "\\(", gsub("\\n\\s+", " ", jmvcore::sourcify(clnArg(crrArg, crrFnc))))));
             vecJMV = c(vecJMV, gsub("^list\\(", paste0(crrFnc, "("), gsub("\\( ", "\\(", gsub("\\n\\s+", " ",          sourcify(clnArg(crrArg, crrFnc))))));
 #           for testing commands: eval(parse(text = gsub("^list\\(", paste0(crrFnc, "("), gsub("\\( ", "\\(", gsub("\\n\\s+", " ", sourcify(clnArg(crrArg, crrFnc)))))))
@@ -1068,7 +1159,7 @@ sps2jmv <- function(vecSPS = c(), fleSPS = "", fleSAV = "", fltCnd = "") {
     # clean up the output vector: remove first and last line if those are empty, and adjacent duplicate lines
     if (vecJMV[1] == "") vecJMV = vecJMV[-1];
     if (vecJMV[length(vecJMV)] == "") vecJMV = vecJMV[-length(vecJMV)];
-    vecJMV = vecJMV[c(TRUE, vecJMV[1:(length(vecJMV) - 1)] != vecJMV[2:length(vecJMV)])];
+    vecJMV = vecJMV[c(TRUE, vecJMV[-length(vecJMV)] != vecJMV[-1])];
     attr(data, "syntax") = vecJMV;
     data
 }
@@ -1198,21 +1289,22 @@ getSPS <- function(fleSPS = '') {
 }
 
 getVar <- function(crrSPS = c()) {
-    if (grepl(paste0("^ADD FILES|^BEGIN GPL|^CACHE|^CASESTOVARS|^COMPUTE|^CTABLES|^DATASET|^DELETE VARIABLES|^DO IF|^ELSE|^END GPL|^END IF|^EXECUTE$|^FILTER|^FORMATS|^GET\\s+|^GRAPH|^GGRAPH|^IF\\s+|",
+    if (grepl(paste0("^ADD FILES|^BEGIN GPL|^CACHE|^CASESTOVARS|^COMPUTE|^DATASET|^DELETE VARIABLES|^DO IF|^ELSE|^END GPL|^END IF|^EXECUTE$|^FILTER|^FORMATS|^GET\\s+|^GRAPH|^GGRAPH|^IF\\s+|",
                      "^LEAVE|^MATCH FILES|^NEW FILE|^PRESERVE|^RENAME VARIABLES|^RESTORE|^SAVE\\s+|^SET\\s+|^SORT CASES|^SPLIT FILE|^STAR JOIN|^TITLE|^USE ALL$|^VALUE LABELS|^VARIABLE LABELS|",
                      "^VARIABLE LEVEL"), crrSPS[1])) { return(""); }
 
     vecVar = "";
-    # handle the most common cases (the keywords VARIABLES and TABLES) first
-    if (any(grepl("VARIABLES", crrSPS))) {
+    # handle REGRESSION first (may contain VARIABLES), and afterwards the most common cases (the keywords VARIABLES and TABLES)
+    if (grepl("^REGRESSION", crrSPS[1])) {
+        vecVar = c(getLst(crrSPS, "^DEPENDENT\\s*="), "WITH", getLst(crrSPS, c("METHOD=", "STEPWISE", "FORWARD", "BACKWARD", "ENTER", "REMOVE", "TEST")));
+    } else if (any(grepl("VARIABLES", crrSPS))) {
         # TO DO: possibly remove parentheses around the variable list
-        vecVar = strSpl(gsub("\\(.*?\\)", "", gsub("\\s*=\\s*", "", gsub("MISSING\\s*=\\s*[A-z]+\\s*", "", gsub("REPORTMISSING\\s*=\\s*NO\\s*", "", strSpl(crrSPS[grepl("VARIABLES", crrSPS)], "VARIABLES\\s?")[2])))), "\\s+");
+        vecVar = strSpl(gsub("\\(.*?\\)", "", gsub("\\s*=\\s*", "", gsub("DISPLAY\\s*=\\s*[A-z]+\\s*", "", gsub("MISSING\\s*=\\s*[A-z]+\\s*", "", gsub("REPORTMISSING\\s*=\\s*NO\\s*", "",
+                        strSpl(crrSPS[grepl("VARIABLES", crrSPS)], "VARIABLES\\s?")[2]))))), "\\s+");
         if (grepl("^T-TEST\\s+GROUPS=", crrSPS[1])) { vecVar = c(vecVar, "BY", getLst(crrSPS[1], c("^T-TEST\\s+GROUPS=", "\\(.*?\\)"))); }
     } else if (any(grepl("TABLES\\s*=", crrSPS))) {
         vecVar = strSpl(gsub("=", "", strSpl(crrSPS[grepl("TABLES", crrSPS)], "TABLES\\s?")[2]), "\\s+");
-    # afterwards, go through a list with keywords to match and remove
-    } else if (grepl("^REGRESSION", crrSPS[1])) {
-        vecVar = c(getLst(crrSPS, "^DEPENDENT"), "BY", getLst(crrSPS, c("METHOD=", "STEPWISE", "FORWARD", "BACKWARD", "ENTER", "REMOVE", "TEST")));
+    # afterwards, go through a list with less common keywords to match and remove
     } else {
         for (begKey in list(c("COUNT", "^.*?=\\s*", "\\(.*?\\)$"), c("^GLM\\s+"), c("K-S\\(NORMAL\\)="), c("^MEANS", "TABLES="), c("M-W=", "\\(.*?\\)"),
                             c("^ONESAMPLE", "TEST\\s+\\(", "\\)"), c("ONEWAY"), c("RECODE", "\\(.*?\\)", "INTO.*?$"), c("^SUMMARIZE", "TABLES="),
@@ -1221,33 +1313,16 @@ getVar <- function(crrSPS = c()) {
         }
     }
     if (any(grepl("^ALL$|^TO$", vecVar))) { stop("Encountered TO - not implemented yet."); vecVar = ifelse(any(grepl("^ALL$", vecVar)), allVar, ""); }
-    vecVar = gsub("^WITH$", "WITH", gsub("^BY$", "BY", vecVar, ignore.case = TRUE), ignore.case = TRUE);
+    vecVar = unique(gsub("^WITH$", "WITH", gsub("^BY$", "BY", vecVar, ignore.case = TRUE), ignore.case = TRUE));
 
     # check and return the checked variables
     chkVar(vecVar, crrSPS, names(get("data", envir=parent.frame())))
 }
 
-cntVar <- function(crrVar = c()) {
-    if (! any(grepl("^BY$|^WITH$", crrVar))) {
-        c(length(crrVar), 0, 0)
-    } else {
-        numVar = diff(c(0, grep("^BY$|^WITH$", crrVar), length(crrVar) + 1)) - 1;
-        if (any(grepl("^BY$", crrVar)) && ! any(grepl("^WITH$", crrVar))) {
-            c(numVar[1], numVar[2], 0)
-        } else if (any(grepl("^WITH$", crrVar)) && ! any(grepl("^BY$", crrVar))) {
-            c(numVar[1], 0, numVar[2])
-        } else if (grep("^BY$", crrVar) < grep("^WITH$", crrVar)) {
-            c(numVar[1], numVar[2], numVar[3])
-        } else if (grep("^BY$", crrVar) > grep("^WITH$", crrVar)) {
-           c(numVar[1], numVar[3], numVar[2])
-        }
-    }
-}
-
 getLst <- function(crrSPS = c(), begKey = c(), splLst = TRUE) {
     vecLst = crrSPS[grepl(begKey[1], crrSPS)];
-    for (j in 1:length(begKey)) { vecLst = trimws(gsub(begKey[j], "", vecLst)); }
-    if (splLst) { strSpl(vecLst, "\\s+") } else { vecLst }
+    for (j in seq_along(begKey)) { vecLst = trimws(gsub(begKey[j], "", vecLst)); }
+    if (splLst) { strSpl(vecLst, "\\s+|,") } else { vecLst }
 }
 
 getArg <- function(crrFnc = "", addDta = TRUE) {
@@ -1266,15 +1341,15 @@ getRpM <- function(crrSPS = c(), inpVar = c()) {
     numLvl = as.integer(crrWSF[posLvl]);    
     # TO-DO: extract contrasts
     outRpM = list(vector(mode = "list", length = length(posLvl)), vector(mode = "list", length = prod(numLvl)), vector(mode = "list", length = length(posLvl)), numLvl);
-    for (j in 1:length(posLvl)) { 
-        outRpM[[1]][[j]] = list(label = crrWSF[posLvl[j] - 1], levels = sprintf(paste0(crrWSF[posLvl[j] - 1], "%d"), 1:numLvl[j]));
+    for (j in seq_along(posLvl)) { 
+        outRpM[[1]][[j]] = list(label = crrWSF[posLvl[j] - 1], levels = sprintf(paste0(crrWSF[posLvl[j] - 1], "%d"), seq_len(numLvl[j])));
         if (j == 1) { cmbLvl = outRpM[[1]][[j]]$levels; } else { cmbLvl = sprintf("%s, %s", rep(cmbLvl, each=numLvl[j]), rep(outRpM[[1]][[j]]$levels, length(cmbLvl))); }
         if (grepl("^DEVIATION|^SIMPLE|^DIFFERENCE|^HELMERT|^REPEATED|^POLYNOMIAL", toupper(crrWSF[posLvl[j] + 1]))) { outRpM[[3]][[j]] = toupper(crrWSF[posLvl[j] + 1]); }
     }
     if (! all(duplicated(c(length(inpVar), length(cmbLvl), prod(numLvl)))[-1])) {
         stop("Mismatch between the number of possible combinations of factor levels and the number of within-subject variables.");
     }
-    for (j in 1:prod(numLvl)) {
+    for (j in seq_len(prod(numLvl))) {
         outRpM[[2]][[j]] = list(measure = inpVar[j], cell = strSpl(cmbLvl[j], ","))
     }
     
@@ -1287,16 +1362,35 @@ splVar <- function(inpVar = c()) {
     posBnW = grep(paste(grpKey, collapse="|"), inpVar);
     if (length(posBnW) > 0) {
         for (j in posBnW) {
-            for (k in 1:length(grpKey)) {
+            for (k in seq_along(grpKey)) {
                 if (grepl(grpKey[k], inpVar[j])) { outVar[[k + 1]] = inpVar[(j + 1):min(c(posBnW[posBnW > j] - 1, length(inpVar)))]; }
             }
         }
-        outVar[[1]] = inpVar[1:(min(posBnW) - 1)];
+        outVar[[1]] = inpVar[seq_len(min(posBnW) - 1)];
     } else {
         outVar[[1]] = inpVar;
     }
     outVar
 }
+
+cntVar <- function(inpVar = c()) {
+    if (! any(grepl("^BY$|^WITH$", inpVar))) {
+        c(length(inpVar), 0, 0)
+    } else {
+        numVar = diff(c(0, grep("^BY$|^WITH$", inpVar), length(inpVar) + 1)) - 1;
+        if (any(grepl("^BY$", inpVar)) && ! any(grepl("^WITH$", inpVar))) {
+            c(numVar[1], numVar[2], 0)
+        } else if (any(grepl("^WITH$", inpVar)) && ! any(grepl("^BY$", inpVar))) {
+            c(numVar[1], 0, numVar[2])
+        } else if (grep("^BY$", inpVar) < grep("^WITH$", inpVar)) {
+            c(numVar[1], numVar[2], numVar[3])
+        } else if (grep("^BY$", inpVar) > grep("^WITH$", inpVar)) {
+           c(numVar[1], numVar[3], numVar[2])
+        }
+    }
+}
+
+
 
 clnArg <- function(crrArg = list(), crrFnc = "") {
    defArg = getArg(crrFnc, FALSE);
@@ -1331,22 +1425,26 @@ fmtFrm <- function(inpVar = c(), outFmt = "") {
         as.symbol(gsub(' \\+ BY \\+ | \\+ WITH \\+ ' , ' + ', sub(' \\+ BY \\+ | \\+ WITH \\+ ', ' ~ ', paste(inpVar, collapse=' + '))))
     } else if (grepl("^terms$",   outFmt)) {
         str2lang(paste0(" ~ ", paste(gsub("\\*", ":", inpVar), collapse = " + ")))
+    } else if (grepl("^ctForm$",  outFmt)) {        
+        as.symbol(paste("~", gsub(" BY ", ":", paste(inpVar, collapse = " "))))
     } else {
         stop(sprintf("fmtFrm: Not implemented for \"%s\" (or parameter outFmt not given).", outFmt));
     }
 }
 
 fmtVar <- function(inpVar = c(), asLng = FALSE, asPrs = FALSE) {
-    if        (asPrs) {
+    if (length(inpVar) == 0) {
+        NULL
+    } else if (asPrs) {
         posWth = grep("^WITH$", inpVar) - 1;
         if (length(posWth) != 1 || (length(inpVar) != posWth * 2 + 1)) { stop("Variables do not match up as pairs."); }
         outVar = vector(mode = "list", length = posWth); 
-        for (j in 1:posWth) { outVar[[j]] = list(i1 = inpVar[j], i2 = inpVar[j +  posWth + 1]); }
-        as.symbol(jmvcore::sourcify(outVar))
+        for (j in seq_len(posWth)) { outVar[[j]] = list(i1 = inpVar[j], i2 = inpVar[j +  posWth + 1]); }
+        as.symbol(jmvcore::sourcify(crrOut))
     } else if (asLng) {
-        str2lang( paste0(ifelse(length(inpVar) > 1, "vars(", ""), paste(inpVar, collapse=", "), ifelse(length(inpVar) > 1, ")", "")))   
+        str2lang(paste0(ifelse(length(inpVar) > 1, "vars(", ""), paste(inpVar, collapse=", "), ifelse(length(inpVar) > 1, ")", "")))
     } else {
-        as.symbol(paste0(ifelse(length(inpVar) > 1, "vars(", ""), paste(inpVar, collapse=", "), ifelse(length(inpVar) > 1, ")", "")))
+        as.symbol(ifelse(length(inpVar) > 0, paste0(ifelse(length(inpVar) > 1, "vars(", ""), paste(inpVar, collapse=", "), ifelse(length(inpVar) > 1, ")", "")), NULL))
     }
 }
 
@@ -1355,7 +1453,7 @@ chkVar <- function(vecVar = c(), crrSPS = c(), allVar = "") {
 # separated by a line feed) a vector of variables
 
     selVar = which(! grepl("^BY$|^WITH$", vecVar));
-    for (j in 1:length(selVar)) {
+    for (j in seq_along(selVar)) {
         if (! any(grepl(paste0("^", vecVar[selVar[j]], "$"), allVar, ignore.case = TRUE))) {
             if (j < length(selVar) && any(grepl(paste0("^", vecVar[selVar[j + 0]], vecVar[selVar[j + 1]], "$"), allVar, ignore.case = TRUE))) {
                 vecVar[selVar[j + 1]] = paste0(vecVar[selVar[j + 0]], vecVar[selVar[j + 1]]); vecVar[selVar[j + 0]] = "";
@@ -1385,7 +1483,7 @@ chkFlt <- function(fltCnd = "", data = data.frame()) {
     # the comparison operator in SPSS ios "=" vs. "==" in R
     fltCnd = gsub("\\s*=\\s*", " == ", fltCnd);
     fltVar = trimws(gsub("^[[|]]]$", "", gsub("\\$", "", gsub("data", "", unlist(lapply(strsplit(strSpl(fltCnd, '&|\\|'), "=|>|<"), function(x) x[1]))))));
-    for (j in 1:length(fltVar)) {
+    for (j in seq_along(fltVar)) {
         if (any(grepl(fltVar[j], names(data), ignore.case = TRUE))) {
             # SPSS is agnostic to variable names and accepts even those misspelled (i.e., different small / capital letters)
             rplVar = names(data)[grepl(fltVar[j], names(data), ignore.case = TRUE)];
@@ -1398,8 +1496,10 @@ chkFlt <- function(fltCnd = "", data = data.frame()) {
                     # if the variable is a factor, SPSS permits 0 as the smallest value whereas R starts counting with 0
                     # therefore the value of the lowest level is chosen (which equates to the level which is "0" in SPSS)
                     fltCnd = gsub(fltVar[j], paste0(fltVar[j], " != '", levels(data[[fltVar[j]]])[1], "'"), fltCnd);
+                } else if (is.numeric(data[[fltVar[j]]]) && any(data[[fltVar[j]]] == 0)) {
+                    # if the variable is numeric and if there exists 0 then all larger values can be selected: [FILTER] > 0
+                    fltCnd = gsub(fltVar[j], paste0(fltVar[j], " > 0"), fltCnd);
                 } else {
-#                   implement: "data[selPrt > 0, ]"
                     stop(sprintf("FILTER – not implemented yet for non-factor-variables - %s", fltVar[j]));
                 }
             }
@@ -1413,21 +1513,26 @@ chkFlt <- function(fltCnd = "", data = data.frame()) {
     pcdDta(fltCnd, fltVar)
 }
 
-argCI  <- function(crrSPS = c()) {
+argCI  <- function(crrSPS = c(), ci4ES = FALSE, ci4Std = FALSE, ci4EMM = FALSE) {
 # SPSS likes inconsistent: with EXAMINE it is CINTERVAL and a percent value (multiply by 1), with T-TEST it is CRITERIA=CI and a decimal value (0 - 1; multiply by 100),
 #                          with NPTEST it is CRITERIA ... CILEVEL
 # the c()-vector is a safety measure: if no value for the CI is given (empty string), as.double results in NA, which is the omitted (moving the 95 which is the second element in the vector
 #                                     to the first place, extracted with [1]
-
-    pairlist(ci = TRUE, ciWidth = na.omit(c(as.single(strSpl(gsub("^CINTERVAL|^CRITERIA=CI\\(|\\)|^CRITERIA.*?CILEVEL\\s*=|CI.*?CILEVEL\\s*=", "", 
-                                                             crrSPS[grepl("^CINTERVAL|^CRITERIA|^CI\\s+", crrSPS)]), "\\s+")[1])
-                                            * ifelse(any(grepl("^CRITERIA=CI", crrSPS)), 100, 1), 95))[1])
+    crrCIW = na.omit(c(as.single(strSpl(gsub("^.*?CI\\(|^.*?CILEVEL\\s*=|^.*?CIN\\(|^CINTERVAL|\\).*$", "",
+                                        crrSPS[grepl("^CINTERVAL|^CRITERIA|^CI\\s+|^METHOD.*?CI|^STATISTICS", crrSPS)]), "\\s+")[1])
+                       * ifelse(any(grepl("^CRITERIA=CI", crrSPS)), 100, 1), 95))[1];
+    outCI = pairlist(ci = TRUE, ciWidth = crrCIW)
+    if (ci4ES)  outCI = c(outCI, pairlist(ciES     = TRUE, ciWidthES     = crrCIW))
+    if (ci4Std) outCI = c(outCI, pairlist(ciStdEst = TRUE, ciWidthStdEst = crrCIW))
+    if (ci4EMM) outCI = c(outCI, pairlist(ciEmm    = TRUE, ciWidthEmm    = crrCIW))    
+    
+    outCI
 }
 
 argCon <- function(crrSPS = c()) {
     lneCon = grep("^CONTRAST", crrSPS);
     lstCon = vector(mode = "list", length = length(lneCon));
-    for (j in 1:length(lneCon)) {
+    for (j in seq_along(lneCon)) {
         splCon = strSpl(gsub("^CONTRAST\\(", "", crrSPS[[lneCon[j]]]), "\\)\\s*=");
         lstCon[[j]] = pairlist(var = splCon[1], type = gsub("special", "deviation", tolower(strSpl(splCon[2], "\\(")[1])));
     }
@@ -1581,7 +1686,7 @@ strSpl <- function(inpStr = "", splDlm = "") {
 }
 
 pcdDta <- function(strCmd, vecVar) {
-    for (j in 1:length(vecVar)) {
+    for (j in seq_along(vecVar)) {
         if (!grepl(paste0("data$", vecVar[j]), strCmd)) {
             strCmd = gsub(vecVar[j], paste0("data$", vecVar[j]), strCmd);
         }
@@ -1591,11 +1696,75 @@ pcdDta <- function(strCmd, vecVar) {
 }
 
 encQtn <- function(strCmd, vecVar) {
-    for (j in 1:length(vecVar)) {
+    for (j in seq_along(vecVar)) {
         strCmd = gsub(vecVar[j], paste0("\"", vecVar[j], "\""), strCmd)
     }
 
     strCmd
+}
+
+rmvRnd <- function(inpVar = c(), inpRnd = "") {
+    if (identical(inpRnd, character(0))) return(inpVar)
+
+    splStr = c("BY", "WITH");
+    if (any(grepl(paste(paste0("^", splStr, "$"), collapse = "|"), inpVar))) {
+        crrSpl = splVar(inpVar);
+        crrOut = c();        
+        for (j in seq_along(crrSpl)) {
+            crrSpl[[j]] = crrSpl[[j]][!grepl(inpRnd, crrSpl[[j]])];
+            if (length(crrSpl[[j]]) > 0) crrOut = c(crrOut, splStr[j - 1], crrSpl[[j]]);
+        }
+        crrOut
+    } else {
+        inpVar[!grepl(inpRnd, inpVar)]
+    }
+}
+
+xfmVar <- function(data = data.frame(), inpFnc = "", inpVar = list(), inpCls = c(), crrLne = NA, crrCmd = "") {
+    nmeVar = names(data);
+    # most analyses require numeric / continuous dependent variables; some (e.g., "descriptives") take either (→ "") and some (e.g., all "logReg...") a factor / categorical dependent var.
+    tgtCls = c(ifelse(grepl("logReg", inpFnc), "factor", ifelse(grepl("descriptives|contTables", inpFnc), "", "numeric")), "factor", "numeric");
+    # inpVar: [1] dependent - depends on the analysis; [2] independent, categorical / factorial; [3] independent, continuous
+    # inpCls: variable classes at load time
+    for (j in seq_along(inpVar)) {
+        if (tgtCls[j] == "" || length(inpVar[[j]]) == 0) next
+        for (k in seq_along(inpVar[[j]])) {
+            if (tgtCls[j] != class(data[[inpVar[[j]][k]]])) {
+                if (class(data[[inpVar[[j]][k]]]) != inpCls[[inpVar[[j]][k]]]) {
+                    stop(sprintf("Class of the variable \"%s\" (currently \"%s\") was already changed once (from \"%s\"), whereas now a change to \"%s\" is requested.",
+                                 inpVar[[j]][k], class(data[[inpVar[[j]][k]]]), inpCls[[inpVar[[j]][k]]], tgtCls[j]));
+                }
+                if        (tgtCls[j] == "numeric") {
+                    if        (class(data[[inpVar[[j]][k]]]) == "character") {
+                        stop(sprintf("Variable \"%s\" is about to be transformed from character to numeric, double-check whether this is intended (l. %d):\n%s\n\n",
+                                     inpVar[[j]][k], crrLne, crrCmd));
+                    } else if (class(data[[inpVar[[j]][k]]]) == "factor") {
+                        stop(sprintf("Variable \"%s\" is about to be transformed from factor to numeric, double-check whether this is intended (l. %d):\n%s\n\n",
+                                     inpVar[[j]][k], crrLne, crrCmd));
+                    } else {
+                        stop(sprintf("Variable \"%s\" - unexpected class \"%s\", double-check whether this is intended (l. %d):\n%s\n\n",
+                                     inpVar[[j]][k], class(inpVar[[j]][k]), crrLne, crrCmd));
+                    }
+                    data[[inpVar[[j]][k]]] = numeric(data[[inpVar[[j]][k]]]);
+                } else if (tgtCls[j] == "factor") {
+                    if        (class(data[[inpVar[[j]][k]]]) == "character") {
+                        data[[inpVar[[j]][k]]] = factor(trimws(data[[inpVar[[j]][k]]]), exclude = "");
+                    } else if (class(data[[inpVar[[j]][k]]]) == "numeric") {
+                        if ((length(unique(data[[inpVar[[j]][k]]])) / length(data[[inpVar[[j]][k]]])) > 0.1) {
+                            stop(sprintf("Variable \"%s\" is about to be transformed from numeric to factor, double-check whether this is intended (l. %d):\n%s\n\n",
+                                         inpVar[[j]][k], crrLne, crrCmd));
+                        }
+                        data[[inpVar[[j]][k]]] = factor(trimws(data[[inpVar[[j]][k]]]), exclude = NA);
+                    } else {
+                        stop(sprintf("Variable \"%s\" - unexpected class \"%s\", double-check whether this is intended (l. %d):\n%s\n\n",
+                                     inpVar[[j]][k], class(inpVar[[j]][k]), crrLne, crrCmd));
+                    }                       
+                }
+            }
+        }
+    }
+    
+    data
 }
 
 # =====================================================================================================================================================================================================

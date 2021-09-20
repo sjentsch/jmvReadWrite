@@ -34,25 +34,28 @@ cmdSPS = c("2SLS", "ACF", "ADD DOCUMENT", "ADD FILES", "ADD VALUE LABELS", "ADP"
            "TWOSTEP CLUSTER", "UNIANOVA", "UPDATE", "USE", "VALIDATEDATA", "VALUE LABELS", "VARCOMP", "VARIABLE ALIGNMENT", "VARIABLE ATTRIBUTE", "VARIABLE LABELS", "VARIABLE LEVEL",
            "VARIABLE ROLE", "VARIABLE WIDTH", "VARSTOCASES", "VECTOR", "VERIFY", "WEIGHT", "WEIGHTED KAPPA", "WLS", "WRITE", "WRITE FORMATS", "XGRAPH", "XSAVE");
 # only the following commands are covered (included) in the conversion
-cmdCnv = c("ADD VALUE LABELS", "ALTER TYPE", "ANOVA", "COMMENT", "COMPUTE", "CORRELATIONS", "CROSSTABS", "CTABLES", "DELETE VARIABLES", "EXAMINE", "FACTOR", "FILTER", "FREQUENCIES", "GLM",
-           "LOGISTIC REGRESSION", "LOGLINEAR", "MANOVA", "MEANS", "NONPAR CORR", "NPAR TESTS", "NPTESTS", "NUMERIC", "ONEWAY", "PARTIAL CORR", "RANK", "RECODE", "REGRESSION", "RELIABILITY",
+cmdCnv = c("ADD VALUE LABELS", "ALTER TYPE", "ANOVA", "COMMENT", "COMPUTE", "CORRELATIONS", "CROSSTABS", "CTABLES", "DELETE VARIABLES", "DESCRIPTIVES", "EXAMINE", "FACTOR", "FILTER", "FREQUENCIES",
+           "GLM", "LOGISTIC REGRESSION", "LOGLINEAR", "MANOVA", "MEANS", "NONPAR CORR", "NPAR TESTS", "NPTESTS", "NUMERIC", "ONEWAY", "PARTIAL CORR", "RANK", "RECODE", "REGRESSION", "RELIABILITY",
            "RENAME VARIABLES", "SAMPLE", "SORT CASES", "SORT VARIABLES", "STRING", "SUMMARIZE", "T-TEST", "UNIANOVA", "USE", "VALUE LABELS", "VARIABLE LABELS", "VARIABLE LEVEL");
 # grep: match complete commands - assumes that the command is followed by one or more white spaces (or no whitespace if it ends in ".")
 grcSPS = gsub("\\.\\\\s+", "\\\\.", paste0(paste0(paste0("^", cmdSPS), collapse="\\s+|"), "\\s+"));
 grpCnv = gsub("\\.\\\\s+", "\\\\.", paste0(paste0(paste0("^", cmdCnv), collapse="\\s+|"), "\\s+"));
 # grep: match abbreviated commands (SPSS permits that commands only contain of the first three characters [or more if the first 3 can"t be resolved without ambiguity])
 # adding a "\\s+" (one or more whitespaces) is for convenience, for the other matching condition (end of string), "\\s+" is replaced with "$" (see lneCmd = ...)
-graSPS = "";
-for (cmdCnt in 1:length(cmdSPS)) {
+graSPS <- "";
+for (cmdCnt in seq_along(cmdSPS)) {
     if (! grepl(" ", cmdSPS[cmdCnt])) {
         cmdLng = 3; while (length(grep(paste0("^", substr(cmdSPS[cmdCnt], 1, cmdLng)), cmdSPS)) > 1 && cmdLng < nchar(cmdSPS[cmdCnt])) { cmdLng = cmdLng + 1 };
-        graSPS = paste0(graSPS, "^", gsub("\\.$", "", substr(cmdSPS[[cmdCnt]], 1, cmdLng)), ifelse(nchar(gsub("\\.$", "", cmdSPS[[cmdCnt]])) > cmdLng, "[A-Z]*", ""));
+        graSPS <- paste0(graSPS, "^", gsub("\\.$", "", substr(cmdSPS[[cmdCnt]], 1, cmdLng)), ifelse(nchar(gsub("\\.$", "", cmdSPS[[cmdCnt]])) > cmdLng, "[A-Z]*", ""));
     } else {
         splSPS = strsplit(cmdSPS[[cmdCnt]], " ")[[1]];
-        for (splCnt in 1:length(splSPS)) {
-            graSPS = paste0(graSPS, ifelse(splCnt > 1, " ", "^"), gsub("\\.$", "", substr(splSPS[splCnt], 1, 3)), ifelse(nchar(gsub("\\.$", "", splSPS[splCnt])) > 3, "[A-Z]*", ""));
+        for (splCnt in seq_along(splSPS)) {
+            graSPS <- paste0(graSPS, ifelse(splCnt > 1, " ", "^"), gsub("\\.$", "", substr(splSPS[splCnt], 1, 3)), ifelse(nchar(gsub("\\.$", "", splSPS[splCnt])) > 3, "[A-Z]*", ""));
         }
     }
-    graSPS = paste0(graSPS, ifelse(grepl("\\.$", cmdSPS[[cmdCnt]]), "\\.", "\\s+"), ifelse(cmdCnt < length(cmdSPS), "|", ""));
+    graSPS <- paste0(graSPS, ifelse(grepl("\\.$", cmdSPS[[cmdCnt]]), "\\.", "\\s+"), ifelse(cmdCnt < length(cmdSPS), "|", ""));
 }
+rm("cmdCnt", "cmdLng", "splSPS", "splCnt");
 
+# define unicode-characters and their respective replacements
+lstRpl <- list("\x84" = "\"", "\x93" = "\"", "\xc4" = "Ae", "\xd6" = "Oe", "\xdc" = "Ue", "\xdf" = "ss", "\xe4" = "ae", "\xf6" = "oe", "\xfc" = "ue")

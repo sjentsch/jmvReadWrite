@@ -44,10 +44,12 @@ devtools::check_win_devel()
 devtools::release()
 
 # on the shell (after the submission got accepted):
-git tag -a "v$(grep "^Version:" DESCRIPTION | cut -d: -f2 | sed -e 's/ //')" $(tail -n 1 CRAN-RELEASE | cut -d\( -f2 | cut -d\) -f1 | sed 's/commit //') -m "CRAN submission: $(head -n1 CRAN-RELEASE | cut -c39-48)" && rm CRAN-RELEASE
+V="v$(grep "^Version:" DESCRIPTION | cut -d: -f2 | sed -e 's/ //')"
+git tag -a "${V}" $(tail -n 1 CRAN-RELEASE | cut -d\( -f2 | cut -d\) -f1 | sed 's/commit //') -m "CRAN submission: $(head -n1 CRAN-RELEASE | cut -c39-48)" && rm CRAN-RELEASE && git commit -a -m "Tagged CRAN-package on github and removed CRAN-RELEASE" && git push origin "${V}" 
+# optional: Use the tag to create a release on GitHub
 
-
-# for later - implement tests:
+ 
+# for later - implement tests: ====================================================================
 devtools::has_tests()
 devtools::test()
 devtools::test_active_file()

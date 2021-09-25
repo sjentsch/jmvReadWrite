@@ -2,16 +2,21 @@
 #'
 #' The function expects that either the parameter vecSPS is used [with the output from spv2sps] or that both fleSPS and fleSAV are given.
 #'
-#' @param character vector with SPSS-commands, the format is supposed to be the same as what is output from spv2sps: a character vector containing one command per element, and the attribute "datafile" that contains a string pointing to the location of the SPSS-data-file [incl. path] (if not found at the path or if no path is given, the file is searched in the current directory)
-#' @param string containing the location of a SPSS-syntax-file [.sps; incl. path]
-#' @param string containing the location of a SPSS-data-file [.sav; incl. path]
-#' @param string a filter condition to be applied to the dataset (default = "" → no filter; e.g., "VARNAME == 1")
+#' @param character vector with SPSS-commands, the format is supposed to be the same as what is output from spv2sps: a character vector containing one command per element,
+#'                  and the attribute "datafile" that contains a string pointing to the location of the SPSS-data-file [incl. path] (if not found at the path or if no path
+#'                  is given, the file is searched in the current directory)
+#' @param string    containing the location of a SPSS-syntax-file [.sps; incl. path]
+#' @param string    containing the location of a SPSS-data-file [.sav; incl. path]
+#' @param string    a filter condition to be applied to the dataset (default = "" → no filter; e.g., "VARNAME == 1")
+#' @param boolean   run analyses even though there are variables missing; if the value is set to FALSE (default), the whole analysis is preceded by "#" which would cause it not
+#'                  to be evaluated with "eval(parse(text = ...))"; if the value is set to TRUE, only the variable that is not found in the data set is excluded and the analyses
+#'                  are conducted with the remaining variables (which will lead to results that are different from those originally conducted in SPSS)
 #' 
 #' @return list with jamovi / jmv-analysis-function-calls and the data set stored in the attribute "dataset"
 #'
 #' @export sps2jmv
 #'
-sps2jmv <- function(vecSPS = c(), fleSPS = "", fleSAV = "", fltCnd = "") {
+sps2jmv <- function(vecSPS = c(), fleSPS = "", fleSAV = "", fltCnd = "", runMsV = FALSE) {
 
     # check the input parameter, at least either vecSPS has to be given (and to contain the attribute "datafile" with the location of an SPSS-SAV-file)
     # or a combination of fleSPS and fleSAV has to be given (and both files have to exist)
@@ -45,39 +50,40 @@ sps2jmv <- function(vecSPS = c(), fleSPS = "", fleSAV = "", fltCnd = "") {
         if (grepl(grpCnv, vecSPS[i])) {
             crrSPS = strSpl(gsub("\\.$", "", vecSPS[i]), " /");
             crrVar = getVar(crrSPS, data);
+            # assess whether there are missing variables and handle them accordingly
+            # 0 - no missing variables; 1 - missing variables, but run analyses with those variables excluded; 2 - missing variables, do not run analyses including such variables
+            crrMsV = chkMsV(crrVar, runMsV);
+print(crrMsV);            
+            # running analysis with missing variables excluded requires removing those variables, otherwise (2) the whole analysis is commented out
+            if (crrMsV == 1) crrVar = lapply(crrVar, function(x) x[!grepl("^#", x)]);
+            if (crrMsV == 2) crrVar = lapply(crrVar, function(x) if(!is.null(x)) gsub("^#", "", x));
+            # number of variables in each category (dep., ind. - categ., indep. - cont.)
             crrNmV = unlist(lapply(crrVar, length));
             # some commands don't require a variable list (they are parsed using other approaches)
             if (all(crrNmV == 0) && !grepl("^COMPUTE", crrSPS[1])) {
-                if (any(grepl("ZRE_\\d+", crrSPS))) {
-                     vecJMV = c(vecJMV, "", sprintf("# %s", vecSPS[i]),
-                                        "# Saving std. residuals is often done to evaluate whether they are normally distributed, etc. jamovi often offers this within analyses.", "");
-                     next
-                } else if (any(grepl("MAH_\\d+", crrSPS))) {
-                     vecJMV = c(vecJMV, "", sprintf("# %s", vecSPS[i]),
-                                        "# Saving the Mahalanobis distance is done to evaluate whether the data contain multivariate outliers; jamovi needs to do this with syntax.", "");
-                     next                              
-                } else if (! grepl("^COMPUTE", crrSPS[1])) {
+                stop("Handling missing variables has changed - crrNmV == 0 needs implementation.")
+                if (! grepl("^COMPUTE", crrSPS[1])) {
                     stop(sprintf("Variable list empty. - Current command: %s\n\n", crrSPS[1]));
                 }
             }
-        } else if (grepl("^DATASET\\s+|^SAVE\\s+OUTFILE\\s*=|^GET\\s+FILE\\s*=|^GET\\s+DATA\\s+|^NEW\\s+FILE\\.$|^PRESERVE\\.$|^RESTORE.$|^CACHE\\.$|^SET\\s+DECIMAL", vecSPS[i])) {    
-            vecJMV = c(vecJMV, "", sprintf("# %s", vecSPS[i]),
+        } else if (grepl("^DATASET\\s+|^SAVE\\s+OUTFILE\\s*=|^GET\\s+FILE\\s*=|^GET\\s+DATA\\s+|^NEW\\s+FILE\\.$|^PRESERVE\\.$|^RESTORE.$|^CACHE\\.$|^SET\\s+DECIMAL", vecSPS[i])) {
+            vecJMV = c(vecJMV, "", sprintf("# SPSS: %s", vecSPS[i]),
                                "# This SPSS-command is used to handle datasets and data files in SPSS and therefore not implemented.", "");
             next
         } else if (grepl("^EXECUTE\\.$", vecSPS[i])) {
-            vecJMV = c(vecJMV, "", sprintf("# %s", vecSPS[i]),
+            vecJMV = c(vecJMV, "", sprintf("# SPSS: %s", vecSPS[i]),
                                "# This SPSS-command is used to execute previous COMPUTE, FILTER, etc.-commands and therefore not implemented.", "");
             next
         } else if (grepl("^TITLE\\s+", vecSPS[i])) {
-            vecJMV = c(vecJMV, "", sprintf("# %s", vecSPS[i]), "");
+            vecJMV = c(vecJMV, "", sprintf("# SPSS: %s", vecSPS[i]), "");
             next
         } else if (grepl("^SPLIT\\s+FILE\\s+.*?BY", vecSPS[i])) {
-            vecJMV = c(vecJMV, "", paste("#", strrep("=", 100)), sprintf("# %s", vecSPS[i]),
+            vecJMV = c(vecJMV, "", paste("#", strrep("=", 100)), sprintf("# SPSS: %s", vecSPS[i]),
                                "# The SPLIT-command produces two (or more) separate analyses for each step of this variable, the following analyses DON\'T honour that split.",
                                "# Results will be different from those in SPSS.", paste("#", strrep("=", 100)), "");
             next
         } else if (grepl("^SPLIT\\s+FILE\\s+OFF.", vecSPS[i])) {
-            vecJMV = c(vecJMV, "", paste("#", strrep("=", 100)), sprintf("# %s", vecSPS[i]),
+            vecJMV = c(vecJMV, "", paste("#", strrep("=", 100)), sprintf("# SPSS: %s", vecSPS[i]),
                                "# The SPLIT-command produces two (or more) separate analyses for each step of this variable, the analyses above (up to the other SPLIT-comment) DON\'T honour that split.",
                                paste("#", strrep("=", 100)), "");
             next
@@ -85,12 +91,15 @@ sps2jmv <- function(vecSPS = c(), fleSPS = "", fleSAV = "", fltCnd = "") {
             vecJMV = c(vecJMV, "", sprintf("# %s", vecSPS[i]),
                                "# This SPSS-command is used to define the format of variable columns in SPSS and is therefore not implemented.", "");
             next
-        } else if (grepl("^UNIANOVA.*?RANDOM\\s*=", vecSPS[i])) {
-            vecJMV = c(vecJMV, "", sprintf("# %s", vecSPS[i]),
-                               "# The RANDOM-subcommand of the UNIANOVA permits to conduct an analysis that is better set up using a \"wide\" data set and an ANOVA for repeated measurements.", "");
-            next
         } else {
             warning(sprintf("SPSS-command in l. %d - \"%s\" not (yet) implemented.", i, vecSPS[i]));
+            next
+        }
+        # special case: UNIANOVA with the subcommand RANDOM (applying a repeated-measures-type analysis to a long dataset) has no equivalent in jmv
+        if (grepl("^UNIANOVA.*?RANDOM\\s*=", vecSPS[i])) {
+            stop("UNIANOVA with RANDOM: ", vecSPS[i]);
+            vecJMV = c(vecJMV, "", sprintf("# SPSS: %s", vecSPS[i]),
+                               "# The RANDOM-subcommand of the UNIANOVA permits to conduct an analysis that is better set up using a \"wide\" data set and an ANOVA for repeated measurements.", "");
             next
         }
 
@@ -168,7 +177,10 @@ sps2jmv <- function(vecSPS = c(), fleSPS = "", fleSAV = "", fltCnd = "") {
         # SORT CASES ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
         # https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=reference-sort-cases
         else if (grepl("^SORT CASES", crrSPS[1])) {
-            data = data[order(data[[chkVar(trimws(gsub("\\(A\\)|\\(D\\)", "", gsub("SORT\\s+CASES\\s+BY", "", crrSPS[1]))), crrSPS, names(data))]], decreasing = grepl("\\(D\\)", crrSPS[1])), ];
+            crrVar = chkVar(trimws(gsub("\\(A\\)|\\(D\\)", "", gsub("SORT\\s+CASES\\s+BY", "", crrSPS[1]))), crrSPS, names(data));
+            if (chkMsV(crrVar, runMsV) < 2)
+               crrVar = 
+               data = data[order(data[[crrVar]], decreasing = grepl("\\(D\\)", crrSPS[1])), ];
         }
 
         # SORT VARIABLES ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -689,7 +701,9 @@ sps2jmv <- function(vecSPS = c(), fleSPS = "", fleSAV = "", fltCnd = "") {
                                                      groupSumm    = TRUE));
             # within and between subjects design (WSDESIGN, DESIGN), type of square sum (METHOD), effect size (PRINT), and estimated marginal means (PLOT - PROFILE)
             if (any(grepl("^WSDESIGN\\s*=",     crrSPS))) { crrArg = updArg(crrArg, pairlist(rmTerms      = fmtTrm(       getLst(crrSPS, "^WSDESIGN\\s*=")))); }
-            if (any(grepl("^DESIGN\\s*=",       crrSPS))) { crrArg = updArg(crrArg, pairlist(bsTerms      = fmtTrm(chkVar(getLst(crrSPS,   "^DESIGN\\s*="), "", names(data))))); }
+            if (any(grepl("^DESIGN\\s*=",       crrSPS))) { crrTrm = chkVar(getLst(crrSPS,   "^DESIGN\\s*="), crrSPS, names(data));
+                                                            crrMsV = max(crrMsV, chkMsV(crrTrm, runMsV)); if (crrMsV == 1) stop("");
+                                                            crrArg = updArg(crrArg, pairlist(bsTerms      = fmtTrm(crrTrm))); }
             if (any(crrRpM[[4]] > 2))                     { crrArg = updArg(crrArg, pairlist(spherTests   = TRUE,
                                                                                              spherCorr    = str2lang("list(\"none\", \"GG\", \"HF\")"))); }
             if (any(grepl("PRINT\\s*=.*?ETASQ", crrSPS))) { crrArg = updArg(crrArg, pairlist(effectSize   = "partEta")); }
@@ -1181,9 +1195,9 @@ sps2jmv <- function(vecSPS = c(), fleSPS = "", fleSAV = "", fltCnd = "") {
         if (exists("crrFnc") && grepl("^jmv::", crrFnc)) {
             # ensure that the variable class matches what is required of the analyses
 #           data = xfmVar(data, crrFnc, crrVar, clsVar, i, vecSPS[i]);
-#           vecJMV = c(vecJMV, gsub("^list\\(", paste0(crrFnc, "("), gsub("\\( ", "\\(", gsub("\\n\\s+", " ", jmvcore::sourcify(clnArg(crrArg, crrFnc))))));
-            vecJMV = c(vecJMV, gsub("^list\\(", paste0(crrFnc, "("), gsub("\\( ", "\\(", gsub("\\n\\s+", " ",          sourcify(clnArg(crrArg, crrFnc))))));
-#           for testing commands: eval(parse(text = gsub("^list\\(", paste0(crrFnc, "("), gsub("\\( ", "\\(", gsub("\\n\\s+", " ", sourcify(clnArg(crrArg, crrFnc)))))))
+            vecJMV = c(vecJMV, "", paste0("# SPSS: ", vecSPS[i]), getCmt(crrMsV, crrSPS),
+                                   paste0(rep("# ", crrMsV > 1), gsub("^list\\(", paste0(crrFnc, "("), gsub("\\( ", "\\(", gsub("\\n\\s+", " ", sourcify(clnArg(crrArg, crrFnc)))))), "");
+#           for testing commands: if(!crrMsV) eval(parse(text = gsub("^list\\(", paste0(crrFnc, "("), gsub("\\( ", "\\(", gsub("\\n\\s+", " ", sourcify(clnArg(crrArg, crrFnc)))))))
         }
         rm(list = ls(pattern="crr*"));
     }
@@ -1451,6 +1465,27 @@ getRfL <- function(facVar = c(), data = data.frame()) {
     str2lang(jmvcore::sourcify(outRfL))
 }
 
+getCmt <- function(inpMsV = 0, inpSPS = c()) {
+    outCmt = character(0)
+    
+    if (inpMsV == 0) {
+        outCmt        
+    } else {
+        if (inpMsV == 1) {
+            outCmt = c(outCmt, "# The analysis below (jmv::...) is conducted but (at least) one variable is missing, the results are therefore different from the original analysis.");
+        } else if (inpMsV == 2) {
+            outCmt = c(outCmt, "# The analysis below (jmv::...) involves variables that are not contained in the dataset; it is therefore commented out (begins with \"#\") and not conducted.",
+                               "# If you tried to enforce runnning analysis although they contain missing variables (runMsV = TRUE), all variables within one category (e.g., dependent) were missing.");
+        }        
+        if (any(grepl("ZRE_\\d+", inpSPS))) {
+            outCmt = c(outCmt, "# Saving residuals or std. residuals is often done to evaluate whether they are normally distributed, etc. jamovi often offers this within analyses.");
+        } else if (any(grepl("MAH_\\d+", inpSPS))) {
+            outCmt = c(outCmt, "# Saving the Mahalanobis distance is done to evaluate whether the data contain multivariate outliers; jamovi needs to do this with syntax.");
+        }
+        outCmt
+    }
+}
+
 clnArg <- function(crrArg = list(), crrFnc = "") {
    defArg = getArg(crrFnc, FALSE);
    for (argNme in names(defArg)) {
@@ -1517,45 +1552,66 @@ fmtVar <- function(inpVar = c(), asLng = FALSE, asPrs = FALSE) {
 }
 
 chkVar <- function(vecVar = c(), crrSPS = c(), allVar = "") {
-# the function checks, and - if necessary - automatically fixes (concatenate variables that were
-# separated by a line feed) a vector of variables
+# the function checks, and - if necessary - automatically fixes a vector of variables
 
     selVar = which(! grepl("^BY$|^WITH$|^TO$|^ALL$", vecVar));
     for (j in seq_along(selVar)) {
+        # (1) concatenate variables that were separated by a line feed
         if (! any(grepl(paste0("^", vecVar[selVar[j]], "$"), allVar, ignore.case = TRUE))) {
             if (j < length(selVar) && any(grepl(paste0("^", vecVar[selVar[j + 0]], vecVar[selVar[j + 1]], "$"), allVar, ignore.case = TRUE))) {
-                vecVar[selVar[j + 1]] = paste0(vecVar[selVar[j + 0]], vecVar[selVar[j + 1]]); vecVar[selVar[j + 0]] = "";
+                vecVar[selVar[j + 1]] = paste0(vecVar[selVar[j + 0]], vecVar[selVar[j + 1]]);
+                vecVar[selVar[j + 0]] = "";
+                # skip to the next variable
                 next
             }
             if (j > 1              && any(grepl(paste0("^", vecVar[selVar[j - 1]], vecVar[selVar[j + 0]], "$"), allVar, ignore.case = TRUE))) {
-                vecVar[selVar[j + 0]] = paste0(vecVar[selVar[j - 1]], vecVar[selVar[j + 0]]); vecVar[selVar[j - 1]] = "";
-                next
+                vecVar[selVar[j + 0]] = paste0(vecVar[selVar[j - 1]], vecVar[selVar[j + 0]]);
+                vecVar[selVar[j - 1]] = "";
             }
-            if (grepl("^ZRE_\\d+$|^MAH_\\d+$", vecVar[selVar[j]])) {
-                warning(sprintf("Variable \"%s\" was generated as an output of an earlier analysis and is not contained in the data.", vecVar[selVar[j]]));
-                vecVar[selVar[j]] = "";
-                next
-            }
-            stop(sprintf("Variable \"%s\" not contained in the dataset.\nSPSS-command: %s\n\n", vecVar[selVar[j]], paste(crrSPS, collapse = " /")));
         }
-        # replace the variable name with the variable name from the column header if it is not a perfect match (i.e., if lower- / uppercase don't match up)
-        if (!any(grepl(paste0("^", vecVar[selVar[j]], "$"), allVar))) {
+        # (2) replace the variable name with the variable name from the column header if it is not a perfect match (i.e., if lower- / uppercase don't match up)
+        if ( any(grepl(paste0("^", vecVar[selVar[j]], "$"), allVar, ignore.case = TRUE)) &&
+            !any(grepl(paste0("^", vecVar[selVar[j]], "$"), allVar, ignore.case = FALSE))) {
             vecVar[selVar[j]] = allVar[grepl(paste0("^", vecVar[selVar[j]], "$"), allVar, ignore.case = TRUE)];
         }
+        # (3) if the variable is still not found, precede it with a "#" so that it can be excluded from the analysis
+        if (!any(grepl(paste0("^", vecVar[selVar[j]], "$"), allVar))) {
+            if (grepl("^ZRE_\\d+$|^MAH_\\d+$", vecVar[selVar[j]])) {
+                warning(sprintf("Variable \"%s\" was generated as an output of an earlier analysis and is not contained in the data.\nSPSS-command: %s\n\n",
+                                vecVar[selVar[j]], paste(crrSPS, collapse = " /")));
+            } else {
+                warning(sprintf("Variable \"%s\" not contained in the dataset.\nSPSS-command: %s\n\n",
+                                vecVar[selVar[j]], paste(crrSPS, collapse = " /")));
+            }
+            vecVar[selVar[j]] = paste0("#", vecVar[selVar[j]]);
+        }
     }
-
+    # remove empty entries that may have occured as consequence of (1)
+    vecVar = vecVar[vecVar != ""]
+        
+    # handle the keywords ALL and TO, and return vecVar
     if (any(grepl("^ALL$", vecVar))) {
         allVar    
     } else if (any(grepl("^TO$", vecVar))) {
-        vecVar = vecVar[vecVar != ""]
         for (j in grep("^TO$", vecVar)) {
             if (j < 2 || j > length(vecVar) - 1) stop(sprintf("The keyword \"TO\" is supposed to appear between variable names and not at the begin or the and of a variable list:\n%s\n\n", crrSPS));
             vecVar = c(vecVar[1:(j - 1)], allVar[seq(grep(vecVar[j - 1], allVar) + 1, grep(vecVar[j + 1], allVar) - 1, 1)], vecVar[(j + 1):length(vecVar)]);
         }
         vecVar
     } else {
-        vecVar[vecVar != ""]
+        vecVar
     }   
+}
+
+chkMsV <- function(inpVar = list(), inpMsV = FALSE) {
+    # the first line checks if there are any variables that were not found (preceded by "#") and returns 0 if there weren't any
+    # the second line checks for whether analyses should be run even though there are missing variables (inpMsV)
+    # if this flag is not set, 2 is returned; 2 is also returned if the flag is set but if there is not at least one variable per
+    # category (dep. / indep.-categ. / indep. - continuos) left (if there wasn't any variable in the category, the list entry is
+    # NULL and grepl("^#"... also returns FALSE; 1 is therefore only returned if the inpMsV is TRUE AND there are variables left
+    # to be included in an analyses
+    ifelse(!any(unlist(lapply(inpVar, function(x) any(grepl("^#", x))))), 0,
+        ifelse(inpMsV && all(unlist(lapply(crrVar, function(x) is.null(x) || !all(grepl("^#", x))))), 1, 2));
 }
 
 chkFlt <- function(fltCnd = "", data = data.frame()) {
@@ -1564,7 +1620,8 @@ chkFlt <- function(fltCnd = "", data = data.frame()) {
     fltSpl = strSpl(fltCnd, '&|\\|');
     for (j in seq_along(fltSpl)) {
         crrSpl = unlist(lapply(lapply(strsplit(fltSpl[[j]], "=|>|<"), trimws), function(x) x[x != ""]));
-        crrVar = chkVar(trimws(gsub("^[[|]]]$", "", gsub("data\\$", "^data", gsub("", "", crrSpl[1])))), "", names(data));
+        crrVar = chkVar(trimws(gsub("^[[|]]]$", "", gsub("data\\$", "^data", gsub("", "", crrSpl[1])))), sprintf("Filtering with the condition: %s", fltCnd), names(data));
+# TO-DO: handle variable not in the data - return fltCnd = ""?
         # prevents that the same variable is processed twice
         if (j > 1 && grepl(crrVar, fltSpl[seq_len(j - 1)])) next
         if (is.logical(data[[crrVar]])) {
@@ -1732,6 +1789,8 @@ clcRcd <- function(crrSPS = c(), data = data.frame()) {
     rcdLst = strsplit(strSpl(substr(crrSPS, rcdSpl[1] + 1, rcdSpl[2] - 1), "\\)\\s*\\("), "=");
     rcdVrO = chkVar(strSpl(trimws(gsub("^RECODE", "",  substr(crrSPS, 1, rcdSpl[1] - 1))), "\\s+"), crrSPS, names(data));
     rcdVrT =        strSpl(trimws(gsub("^\\s*INTO", "", substr(crrSPS, rcdSpl[2] + 1, nchar(crrSPS) - 1))), "\\s+");
+# TO-DO: handle variable not in the data - issue warning and remove the variable from rcdVrO
+
     if (identical(rcdVrT, character(0))) rcdVrT = rcdVrO; # if the target variable is empty, recode into the original variable
     if (length(rcdVrO) != length(rcdVrT)) stop(sprintf("The number of original and target variables have to macht up:\n%s\n\n", crrSPS));
 
@@ -1804,6 +1863,7 @@ clcCmp <- function(crrSPS = c(), data = data.frame()) {
     # remove further function arguments (e.g., numbers)
     cmpVrF = cmpVrF[!grepl('^\\d+$|^-\\d+$', cmpVrF)];
     cmpVrF = chkVar(cmpVrF, crrSPS, names(data));
+# TO-DO: handle variable not in the data
 
     # not any function used, just arithmetic, relational or boolean operators
     # https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=expressions-arithmetic-operations

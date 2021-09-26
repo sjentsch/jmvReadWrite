@@ -33,13 +33,16 @@ cmdSPS = c("2SLS", "ACF", "ADD DOCUMENT", "ADD FILES", "ADD VALUE LABELS", "ADP"
            "TCM MODEL", "TDISPLAY", "TEMPORARY", "TIME PROGRAM", "TITLE", "TMS BEGIN", "TMS END", "TMS IMPORT", "TMS MERGE", "TREE", "TSAPPLY", "TSET", "TSHOW", "TSMODEL", "TSPLOT", "T-TEST",
            "TWOSTEP CLUSTER", "UNIANOVA", "UPDATE", "USE", "VALIDATEDATA", "VALUE LABELS", "VARCOMP", "VARIABLE ALIGNMENT", "VARIABLE ATTRIBUTE", "VARIABLE LABELS", "VARIABLE LEVEL",
            "VARIABLE ROLE", "VARIABLE WIDTH", "VARSTOCASES", "VECTOR", "VERIFY", "WEIGHT", "WEIGHTED KAPPA", "WLS", "WRITE", "WRITE FORMATS", "XGRAPH", "XSAVE");
-# only the following commands are covered (included) in the conversion
-cmdCnv = c("ADD VALUE LABELS", "ALTER TYPE", "ANOVA", "COMMENT", "COMPUTE", "CORRELATIONS", "CROSSTABS", "CTABLES", "DELETE VARIABLES", "DESCRIPTIVES", "EXAMINE", "FACTOR", "FILTER", "FREQUENCIES",
-           "GLM", "LOGISTIC REGRESSION", "LOGLINEAR", "MANOVA", "MEANS", "NONPAR CORR", "NPAR TESTS", "NPTESTS", "NUMERIC", "ONEWAY", "PARTIAL CORR", "RANK", "RECODE", "REGRESSION", "RELIABILITY",
-           "RENAME VARIABLES", "SAMPLE", "SORT CASES", "SORT VARIABLES", "STRING", "SUMMARIZE", "T-TEST", "UNIANOVA", "USE", "VALUE LABELS", "VARIABLE LABELS", "VARIABLE LEVEL");
+# only the following commands / analyses are covered (included) in the conversion...
+cmdAnl = c("ANOVA", "CORRELATIONS", "CROSSTABS", "CTABLES", "DESCRIPTIVES", "EXAMINE", "FACTOR", "FREQUENCIES", "GLM", "GRAPH", "LOGISTIC REGRESSION", "LOGLINEAR", "MANOVA", "MEANS",
+           "NONPAR CORR", "NPAR TESTS", "NPTESTS", "ONEWAY", "PARTIAL CORR", "REGRESSION", "RELIABILITY", "SUMMARIZE", "T-TEST", "UNIANOVA");
+# and the following commands are used to modify the data set (the difference is that for the commands under "cmdAnl" extracting the variables is necessary)
+cmdMod = c("ADD VALUE LABELS", "ALTER TYPE", "COMMENT", "COMPUTE", "DELETE VARIABLES", "FILTER", "NUMERIC", "RANK", "RECODE", "RENAME VARIABLES", "SAMPLE", "SORT CASES", "SORT VARIABLES", "STRING",
+           "USE", "VALUE LABELS", "VARIABLE LABELS", "VARIABLE LEVEL");
 # grep: match complete commands - assumes that the command is followed by one or more white spaces (or no whitespace if it ends in ".")
 grcSPS = gsub("\\.\\\\s+", "\\\\.", paste0(paste0(paste0("^", cmdSPS), collapse="\\s+|"), "\\s+"));
-grpCnv = gsub("\\.\\\\s+", "\\\\.", paste0(paste0(paste0("^", cmdCnv), collapse="\\s+|"), "\\s+"));
+grpAnl = gsub("\\.\\\\s+", "\\\\.", paste0(paste0(paste0("^", cmdAnl), collapse="\\s+|"), "\\s+"));
+grpMod = gsub("\\.\\\\s+", "\\\\.", paste0(paste0(paste0("^", cmdMod), collapse="\\s+|"), "\\s+"));
 # grep: match abbreviated commands (SPSS permits that commands only contain of the first three characters [or more if the first 3 can"t be resolved without ambiguity])
 # adding a "\\s+" (one or more whitespaces) is for convenience, for the other matching condition (end of string), "\\s+" is replaced with "$" (see lneCmd = ...)
 graSPS <- "";

@@ -13,7 +13,9 @@
 #' data("ToothGrowth");
 #' wrtDta = write_omv(ToothGrowth, "Trial.omv");
 #' print(names(wrtDta));
-#' # the print-function is only used to force devtools::run_examples() to show output
+#' # the print-function is only used to force devtools::run_examples() to show the output
+#' # the same applies to the other "print"-functions further down in the code
+#' # on the command line, one can just run: names(wrtDta)
 #' # → "mtaDta" "xtdDta" "dtaFrm"
 #' # returns a list with the metadata (mtaDta, e.g., column and data type),
 #' # the extended data (xtdDta, e.g., variable lables), and the data frame (dtaFrm)

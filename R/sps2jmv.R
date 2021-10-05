@@ -48,7 +48,7 @@ sps2jmv <- function(vecSPS = c(), fleSPS = "", fleSAV = "", runMsV = FALSE) {
     for (i in seq_along(vecSPS)) {
        
         # General: Split, handle generic attributes (e.g., VAR1 TO VARx) ==============================================================================================================================
-        if (grepl(grpCnv, vecSPS[i])) {
+        if (grepl(grpAnl, vecSPS[i])) {
             crrSPS = strSpl(gsub("\\.$", "", vecSPS[i]), " /");
             crrVar = getVar(crrSPS, data);
             # assess whether there are missing variables and handle them accordingly
@@ -65,7 +65,7 @@ sps2jmv <- function(vecSPS = c(), fleSPS = "", fleSAV = "", runMsV = FALSE) {
             # for those commands, crrSPS, crrVar, etc. do not need to be extracted; those commands are one-liners where vecSPS[i] can directly be used
             # however, crrMsV is used by getCmt when assembling commands at the end and needs to be set; NB: if variable can't be found for COMPUTE or RECODE, an error is thrown
             crrMsV = 0;
-        } else if (grepl("^DATASET\\s+|^SAVE\\s+OUTFILE\\s*=|^GET\\s+FILE\\s*=|^GET\\s+DATA\\s+|^NEW\\s+FILE\\.$|^PRESERVE\\.$|^RESTORE.$|^CACHE\\.$|^SET\\s+DECIMAL", vecSPS[i])) {
+        } else if (grepl(paste0(grpDta, "|^DATASET\\s+|^PRESERVE\\.$|^RESTORE.$|^CACHE\\.$|^SET\\s+DECIMAL"), vecSPS[i])) {
             vecJMV = c(vecJMV, "", sprintf("# SPSS: %s", vecSPS[i]),
                                "# This SPSS-command is used to handle datasets and data files in SPSS and therefore not implemented.", "");
             next
@@ -155,7 +155,7 @@ sps2jmv <- function(vecSPS = c(), fleSPS = "", fleSAV = "", runMsV = FALSE) {
             if (grepl("^FILTER\\s+OFF", vecSPS[i])) {
                 fltAnl = "";
             } else if (!grepl("filter_\\S", vecSPS[i])) { 
-                fltAnl = chkVar(gsub("FILTER\\s+BY\\s+", "", vecSPS[i]), vecSPS[i], names(data));
+                fltAnl = chkVar(gsub("\\.$", "", gsub("FILTER\\s+BY\\s+", "", vecSPS[i])), vecSPS[i], names(data));
             } else if (fltAnl == "" && hasName(data, "filter_.")) {
                 fltAnl = "filter_.";
             } else if (fltAnl != "") {
@@ -483,7 +483,7 @@ sps2jmv <- function(vecSPS = c(), fleSPS = "", fleSAV = "", runMsV = FALSE) {
         # SUMMARIZE -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
         # https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=reference-summarize
         else if (grepl("^SUMMARIZE", crrSPS[1])) {
-            stop("SUMMARIZE");
+            print("SUMMARIZE");
             crrFnc = "jmv::descriptives";
             # "vars" (NB: Only the first variable list is considered) and CELLS subcommand
             crrArg = updArg(getArg(crrFnc), pairlist(vars         = fmtVar(crrVar[[1]]),
@@ -2018,6 +2018,10 @@ clcCmp <- function(crrSPS = c(), data = data.frame(), crrFlt = "") {
     if (any(any(grepl("^#", cmpVrF)))) stop(sprintf("Variable \"%s\" is not contained in the data, formula can't be calculated:\n \"%s\"\n\n", cmpVrF[grepl("^#", cmpVrF)], crrSPS));
 
     # ABS(number): Returns the absolute value of a number.
+    if (grepl("ABS\\(", cmpJMV, ignore.case = TRUE)) {
+        cmpJMV = gsub("ABS\\(", "ABS(", cmpJMV, ignore.case = TRUE);
+        cmpRpR = c(cmpRpR, "ABS\\(", "abs(");
+    }    
     # BETA(alpha, beta): Draws samples from a Beta distribution.
     # BOXCOX(variable, lambda): Returns a Box Cox transformation of the variable.
     # CONTAINS(item1, item2, item3, …, in1, in2, in3, …): Determines if any of the items appear in in1, in2, in3, ....
@@ -2032,8 +2036,8 @@ clcCmp <- function(crrSPS = c(), data = data.frame(), crrFlt = "") {
     # IQR(variable): Returns a whether the variable is an outlier according to the IQR: If the value is within the box of a Boxplot 0 is returned, absolute values larger than 1.5 are outside the whiskers.
     # LN(number): Returns the natural logarithm of a number.
     # LOG10(number): Returns the base-10 logarithm of a number.
-    if (grepl("LOG10\\(", cmpJMV)) {
-        cmpJMV = gsub("LG10\\(", "LOG10(", cmpJMV);
+    if (grepl("LG10\\(", cmpJMV, ignore.case = TRUE)) {
+        cmpJMV = gsub("LG10\\(", "LOG10(", cmpJMV, ignore.case = TRUE);
         cmpRpR = c(cmpRpR, "LOG10\\(", "log10(");
     }    
     # MATCH(value, value 1, value 2, …): The index of value in the provided values.
@@ -2041,7 +2045,8 @@ clcCmp <- function(crrSPS = c(), data = data.frame(), crrFlt = "") {
     # MAXABSIQR( variable 1, variable 2, … ): Max. absolute IQR-value (i.e., how far outside the box an individual datapoint is in terms of IQR - Q1/Q3-distance)
     # MAXABSZ(variable 1, variable 2, …, group_by=0): Max. absolute z-value / normalized value.
     # MEAN(number 1, number 2, …, ignore_missing=0, min_valid=0): Returns the mean of a set of numbers.
-    if (grepl("MEAN\\(", cmpJMV)) {
+    if (grepl("MEAN\\(", cmpJMV, ignore.case = TRUE)) {
+        cmpJMV = gsub("MEAN\\(", "MEAN(", cmpJMV, ignore.case = TRUE);
         cmpRpR = c(cmpRpR, "MEAN\\(", "rowMeans(");
     }    
     # MIN(variable): Returns the smallest value of a set of numbers.
@@ -2050,8 +2055,8 @@ clcCmp <- function(crrSPS = c(), data = data.frame(), crrFlt = "") {
     # OFFSET(variable, integer): Offsets the values up or down.
     # RANK(variable): Ranks each value
     # ROUND(variable, digits=0): Rounds each value
-    if (grepl("RND\\(", cmpJMV)) {
-        cmpJMV = gsub("RND\\(", "ROUND(", cmpJMV);
+    if (grepl("RND\\(", cmpJMV, ignore.case = TRUE)) {
+        cmpJMV = gsub("RND\\(", "ROUND(", cmpJMV, ignore.case = TRUE);
         cmpRpR = c(cmpRpR, "ROUND\\(", "round(");
     }    
     # ROW(NO ARGUMENTS): Returns the row numbers.
@@ -2061,7 +2066,8 @@ clcCmp <- function(crrSPS = c(), data = data.frame(), crrFlt = "") {
     # SQRT(number): Returns the square root of a number.
     # STDEV(number 1, number 2, …, ignore_missing=0): Returns the standard deviation of a set of numbers.
     # SUM(number 1, number 2, …, ignore_missing=0, min_valid=0): Returns the sum of a set of numbers.
-    if (grepl("SUM\\(", cmpJMV)) {
+    if (grepl("SUM\\(", cmpJMV, ignore.case = TRUE)) {
+        cmpJMV = gsub("SUM\\(", "SUM(", cmpJMV, ignore.case = TRUE);
         cmpRpR = c(cmpRpR, "SUM\\(", "rowSums(");
     }
     # TEXT(number): Converts the value to text.
@@ -2082,9 +2088,9 @@ clcCmp <- function(crrSPS = c(), data = data.frame(), crrFlt = "") {
     # Z(variable, group_by=0): Returns the normalized values of a set of numbers.
     
     # there is a couple of SPSS-functions / -operations that won't be implemented
-    if (grepl("IDF.NORMAL\\(", cmpJMV)) {
-        clcRpR = c("IDF.NORMAL\\(", "qnorm(");
-        clcVld = FALSE;
+    if (grepl("IDF.NORMAL\\(", cmpJMV, ignore.case = TRUE)) {
+        cmpRpR = c("IDF.NORMAL\\(", "qnorm(");
+        cmpVld = FALSE;
     }
 
     # not any function used, just arithmetic, relational or boolean operators
@@ -2096,6 +2102,8 @@ clcCmp <- function(crrSPS = c(), data = data.frame(), crrFlt = "") {
     # cmpJMV = gsub("", "", cmpJMV);
     # cmpRpR = c(cmpRpR, "", "");
 
+    if (length(cmpRpR) ==  0) { stop(); }
+    
     # add a data column (with the name of cmpVrT) and assign it to a temporary variable (which has the correct number of lines so that the filter is working)
     if (!any(grepl(cmpVrT, names(data)))) data[[cmpVrT]] = NA;
     cmpTmp = data[[cmpVrT]];

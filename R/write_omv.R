@@ -45,6 +45,7 @@ write_omv <- function(dtaFrm = NULL, fleNme = "") {
     if (length(fleNme) <= 0 || ! grepl(".omv", fleNme) || ! dir.exists(dirname(fleNme))) {
         stop(sprintf("Output file name (%s) doesn't have the correct format (e.g., wrong extension) or destination directory doesn't exist.", fleNme));
     }
+    fleNme = file.path(normalizePath(dirname(fleNme)), fleNme);
 
     colNum <- dim(dtaFrm)[2]
 
@@ -59,10 +60,10 @@ write_omv <- function(dtaFrm = NULL, fleNme = "") {
     xtdDta <- list();
 
     # create data.bin
-    binHdl <- file(description = "data.bin", open = "wb");
+    binHdl <- file(description = file.path(tempdir(), "data.bin"),    open = "wb");
 
     # create strings.bin
-    strHdl <- file(description = "strings.bin", open = "wb");
+    strHdl <- file(description = file.path(tempdir(), "strings.bin"), open = "wb");
     strPos <- 0
 
     for (i in seq_len(colNum)) {
@@ -235,62 +236,48 @@ write_omv <- function(dtaFrm = NULL, fleNme = "") {
     }
 
     # compress data.bin and discard the temporary file
-    close(binHdl); rm("binHdl");
-    add2ZIP(fleNme, "data.bin", newFle = TRUE);
+    add2ZIP(fleNme, binHdl, newFle = TRUE);
+    rm("binHdl");
 
     # compress strings.bin (only if it contains data) and discard the temporary file
-    close(strHdl); rm("strHdl");
-    add2ZIP(fleNme, "strings.bin", blnZIP = strPos > 0);
+    add2ZIP(fleNme, strHdl, blnZIP = strPos > 0);
+    rm("strHdl");
 
     # create meta, write it and add it to ZIP file
-    # this needs a bit of special handling because of \r\n on Windows vs. \n on Mac / Linux
-    # thanks to MAgojam for figuring out a solution
-    mnfTxt <- enc2utf8(c("Manifest-Version: 1.0",
-                         "Data-Archive-Version: 1.0.2",
-                         "jamovi-Archive-Version: 8.0",
-                         paste("Created-By: jmvReadWrite", utils::packageVersion("jmvReadWrite"))));
-
-    writeLines(mnfTxt, mnfHdl <- file("meta", open = "wb"), sep = "\n"); close(mnfHdl); rm("mnfTxt", "mnfHdl");
-    add2ZIP(fleNme, "meta");
+    mnfHdl <- file(file.path(tempdir(), "meta"),         open = "wb");
+    add2ZIP(fleNme, mnfHdl, txtOut = mnfTxt());
+    rm("mnfHdl");
 
     # write metadata.json
-    writeLines(fmtJSON(mtaDta), "metadata.json");
-    add2ZIP(fleNme, "metadata.json");
+    mtaHdl = file(file.path(tempdir(), "metadata.json"), open = "w");
+    add2ZIP(fleNme, mtaHdl, txtOut = fmtJSON(mtaDta));
+    rm("mtaHdl");
 
     # write xdata.json
-    writeLines(fmtJSON(xtdDta), "xdata.json");
-    add2ZIP(fleNme, "xdata.json");
+    xtdHdl = file(file.path(tempdir(), "xdata.json"),    open = "w"); 
+    add2ZIP(fleNme, xtdHdl, txtOut = fmtJSON(xtdDta));
+    rm("xtdHdl");
 
     # write index.html and add it to ZIP file
     # currently, the HTML that is stored in the HTML attribute can't be saved because it is only a "front"
     # that doesn't work without the analyses and images contained in it being stored too
+    htmHdl = file(file.path(tempdir(), "index.html"),    open = "w"); 
 #   if (!is.null(attr(dtaFrm, "HTML"))) {
-#      writeLines(attr(dtaFrm, "HTML"), "index.html");
+#      add2ZIP(fleNme, htmHdl, txtOut = attr(dtaFrm, "HTML"));
 #   } else {
-#      writeLines(empHTM(),             "index.html");
+#      add2ZIP(fleNme, htmHdl, txtOut = htmTxt());
 #   }
-    writeLines(empHTM(), "index.html");
-    add2ZIP(fleNme, "index.html");
+    add2ZIP(fleNme, htmHdl, txtOut = htmTxt());
+    rm("htmHdl");
 
     list(mtaDta = mtaDta, xtdDta = xtdDta, dtaFrm = dtaFrm);
 }
 
-add2ZIP <- function(fleZIP = "", crrFle = "", newFle = FALSE, blnZIP = TRUE) {
-    if (blnZIP) {
-        if (newFle) {
-            zip::zip(fleZIP, crrFle);
-        } else {
-            zip::zip_append(fleZIP, crrFle);
-        }
-    }
-    unlink(crrFle);
-}
-
 fmtJSON <- function(txtJSON = "") {
-    gsub(":", ": ", gsub(",", ", ", rjson::toJSON(txtJSON)))
+    gsub("  ", " ", gsub(":", ": ", gsub(",", ", ", rjson::toJSON(txtJSON))))
 }
 
-empHTM <- function() {
+htmTxt <- function() {
     c("<!DOCTYPE html>",
       "<html>",
       "    <head>",
@@ -332,4 +319,37 @@ empHTM <- function() {
       "<body>\n",
       "</body>",
       "</html>")
+}
+
+mnfTxt <- function() {
+    enc2utf8(c("Manifest-Version: 1.0",
+               "Data-Archive-Version: 1.0.2",
+               "jamovi-Archive-Version: 11.0",
+               paste("Created-By: jmvReadWrite", utils::packageVersion("jmvReadWrite"))))
+}
+
+add2ZIP <- function(fleZIP = "", crrHdl = NULL, newFle = FALSE, blnZIP = TRUE, txtOut = "") {
+
+    if (! all(class(crrHdl) == c("file", "connection"))) {
+        str(crrHdl);
+        stop("Parameter isn't the file handle pointing to a file to be zipped.")
+    }
+
+    if (all(nchar(txtOut) > 0)) {
+        # writing the manifest requires a bit of special handling because of \r\n on Windows vs. \n on Mac / Linux
+        # thanks to MAgojam for figuring out a solution
+        # for the other files (metadata.json, xdata.json, index.html), it doesn't matter, therefore sep = "\n" is added for all
+        writeLines(txtOut, crrHdl, sep = "\n");
+    }
+    crrFle = summary(crrHdl)$description;
+    close(crrHdl);
+
+    if (blnZIP) {
+        if (newFle) {
+            zip::zip(fleZIP,        basename(crrFle), root = dirname(crrFle));
+        } else {
+            zip::zip_append(fleZIP, basename(crrFle), root = dirname(crrFle));
+        }
+    }
+    unlink(crrFle); rm("crrFle");
 }

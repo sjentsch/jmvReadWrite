@@ -2,6 +2,7 @@
 
 ## Bug fixes and enhancements:
 * use `zip` R-package instead of `utils` to prevent that no ZIP-executable-file is found on Windows (`utils::zip` only works in cases where a `zip.exe` is found on the path)
+* use the (session-specific) temporary directory for creating files to be zipped and those files extracted
 * improved handling of the different variable types, implemented logical / boolean variables / data columns
 
 # jmvReadWrite 0.2.2

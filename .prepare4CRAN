@@ -1,3 +1,14 @@
+# compare the files in inst/extdata (write and read again)
+for (crrOMV in list.files('inst/extdata/')) {
+    data = read_omv(file.path('inst/extdata/', crrOMV), sveAtt = TRUE);
+    wrtDta = write_omv(data, 'Trial.omv');
+    data2 = read_omv('Trial.omv', sveAtt = TRUE);
+    cat(sprintf('\n\n%s\n', crrOMV));
+    suppressWarnings(print(diffdf::diffdf(data, data2)));
+    unlink('Trial.omv');
+    rm('data', 'data2');
+}
+
 # REMEMBER: error messages from R are not always pointing to the place where the error occurs - especially when using commands like build_readme()
 
 # checks the requirements (all dependencies up-to-date, etc.)

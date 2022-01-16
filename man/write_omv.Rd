@@ -19,6 +19,10 @@ a list containing the meta data (mtaDta, written to metadata.json in the OMV-fil
 Write files to be used with the statistical spreadsheet 'jamovi'
 (www.jamovi.org)
 }
+\details{
+jamovi has a specific measurement level / type "ID" (in addition to the "standard" ones "Nominal", "Ordinal", and "Continuous"). "ID" is used for columns that contain some form of ID (e.g., a
+participant code). In order to set a variable of your data frame to "ID", you have to manually set an attribute \code{jmv-id} (e.g., \code{attr(dtaFrm$column, "jmv-id") = TRUE}).
+}
 \examples{
 \dontrun{
 library(jmvReadWrite);

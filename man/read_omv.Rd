@@ -48,7 +48,7 @@ if (length(attr(data, 'syntax')) >= 1) {
     # eval(parse(text=attr(data, 'syntax')[[1]]))
     print(names(result));
     print(result$main);
-    # → "main"      "assump"    "contrasts" "postHoc"   "emm"       "residsOV"
+    # -> "main"      "assump"    "contrasts" "postHoc"   "emm"       "residsOV"
     # (the names of the six output tables)
 }
 }

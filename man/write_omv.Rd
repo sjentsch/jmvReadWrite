@@ -5,15 +5,17 @@
 \title{Write files to be used with the statistical spreadsheet 'jamovi'
 (www.jamovi.org)}
 \usage{
-write_omv(dtaFrm = NULL, fleNme = "")
+write_omv(dtaFrm = NULL, fleNme = "", retDbg = FALSE)
 }
 \arguments{
 \item{dtaFrm}{Data frame to be exported (default: NULL)}
 
 \item{fleNme}{Name / position of the output file to be generated ("FILENAME.omv"; default: "")}
+
+\item{retDbg}{Whether to return a list with debugging information (see Value; default: FALSE)}
 }
 \value{
-a list containing the meta data (mtaDta, written to metadata.json in the OMV-file), the extended data (xtdDta, written to xdata.json in the OMV-file) and the original data frame (dtaFrm)
+a list (if retDbg == TRUE), containing the meta data (mtaDta, metadata.json in the OMV-file), the extended data (xtdDta, xdata.json in the OMV-file) and the original data frame (dtaFrm)
 }
 \description{
 Write files to be used with the statistical spreadsheet 'jamovi'
@@ -32,7 +34,7 @@ data("ToothGrowth");
 wrtDta = write_omv(ToothGrowth, "Trial.omv");
 print(names(wrtDta));
 # the print-function is only used to force devtools::run_examples() to show output
-# → "mtaDta" "xtdDta" "dtaFrm"
+# -> "mtaDta" "xtdDta" "dtaFrm"
 # returns a list with the metadata (mtaDta, e.g., column and data type),
 # the extended data (xtdDta, e.g., variable lables), and the data frame (dtaFrm)
 # the purpose of these variables is merely for checking (understanding the file format)
@@ -41,9 +43,9 @@ print(names(wrtDta));
 # check whether the file was written to the disk, get the file information (size, etc.)
 # and delete the file afterwards
 print(list.files(".", "Trial.omv"));
-# → "Trial.omv"
+# -> "Trial.omv"
 print(file.info("Trial.omv")$size);
-# → 2111 (size may differ on different OSes)
+# -> 2111 (size may differ on different OSes)
 unlink("Trial.omv");
 }
 

@@ -126,7 +126,10 @@
 <a href="#bug-fixes-and-enhancements" class="anchor"></a>Bug fixes and enhancements:</h2>
 <ul>
 <li>use <code>zip</code> R-package instead of <code>utils</code> to prevent that no ZIP-executable-file is found on Windows (<code><a href="https://rdrr.io/r/utils/zip.html">utils::zip</a></code> only works in cases where a <code>zip.exe</code> is found on the path)</li>
+<li>use the (session-specific) temporary directory for creating files to be zipped and those files extracted</li>
 <li>improved handling of the different variable types, implemented logical / boolean variables / data columns</li>
+<li>improved handling of column attributes</li>
+<li>added parameter <code>retDbg</code> (default: <code>FALSE</code>) to write_omv so that output for debugging is only produced upon setting it</li>
 </ul>
 </div>
 </div>

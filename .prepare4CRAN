@@ -30,6 +30,8 @@ devtools::spell_check()
 devtools::check_man()
 
 # building / updating README, PDF manual, and the HTML documentation
+# REMEMBER: error messages from R are not always pointing to the place where the error occurs - especially when using commands like build_readme()
+# last time it helped to completely uninstall and re-install LaTeX
 devtools::build_readme()
 devtools::build_manual(path="doc")
 pkgdown::clean_site()
@@ -63,7 +65,7 @@ devtools::release()
 
 # on the shell (after the submission got accepted):
 V="v$(grep "^Version:" DESCRIPTION | cut -d: -f2 | sed -e 's/ //')"
-git tag -a "${V}" $(tail -n 1 CRAN-RELEASE | cut -d\( -f2 | cut -d\) -f1 | sed 's/commit //') -m "CRAN submission: $(head -n1 CRAN-RELEASE | cut -c39-48)" -s && rm CRAN-RELEASE && git commit -a -m "Tagged CRAN-package on github and removed CRAN-RELEASE" && git push origin "${V}" 
+git tag -a "${V}" $(tail -n 1 CRAN-SUBMISSION | cut -d\( -f2 | cut -d\) -f1 | sed 's/commit //') -m "CRAN submission: $(head -n1 CRAN-SUBMISSION | cut -c39-48)" -s && rm CRAN-SUBMISSION && git commit -a -m "Tagged CRAN-package on github and removed CRAN-SUBMISSION" && git push origin "${V}" 
 # optional: Use the tag to create a release on GitHub
 
  

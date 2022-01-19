@@ -71,7 +71,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">jmvReadWrite</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.3</span>
       </span>
     </div>
 
@@ -117,13 +117,29 @@
       <small>Source: <a href='https://github.com/sjentsch/jmvReadWrite/blob/main/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
-    <div id="jmvreadwrite-022" class="section level1">
-<h1 class="page-header" data-toc-text="0.2.2">
-<a href="#jmvreadwrite-022" class="anchor"></a>jmvReadWrite 0.2.2<small> Unreleased </small>
+    <div id="jmvreadwrite-023" class="section level1">
+<h1 class="page-header" data-toc-text="0.2.3">
+<a href="#jmvreadwrite-023" class="anchor"></a>jmvReadWrite 0.2.3<small> Unreleased </small>
 </h1>
 <div id="bug-fixes-and-enhancements" class="section level2">
 <h2 class="hasAnchor">
 <a href="#bug-fixes-and-enhancements" class="anchor"></a>Bug fixes and enhancements:</h2>
+<ul>
+<li>use <code>zip</code> R-package instead of <code>utils</code> to prevent that no ZIP-executable-file is found on Windows (<code><a href="https://rdrr.io/r/utils/zip.html">utils::zip</a></code> only works in cases where a <code>zip.exe</code> is found on the path)</li>
+<li>use the (session-specific) temporary directory for creating files to be zipped and those files extracted</li>
+<li>improved handling of the different variable types, implemented logical / boolean variables / data columns</li>
+<li>improved handling of column attributes</li>
+<li>added parameter <code>retDbg</code> (default: <code>FALSE</code>) to write_omv so that output for debugging is only produced upon setting it</li>
+</ul>
+</div>
+</div>
+    <div id="jmvreadwrite-022" class="section level1">
+<h1 class="page-header" data-toc-text="0.2.2">
+<a href="#jmvreadwrite-022" class="anchor"></a>jmvReadWrite 0.2.2<small> 2021-09-20 </small>
+</h1>
+<div id="bug-fixes-and-enhancements-1" class="section level2">
+<h2 class="hasAnchor">
+<a href="#bug-fixes-and-enhancements-1" class="anchor"></a>Bug fixes and enhancements:</h2>
 <ul>
 <li>bug fix in read_omv (some libraries required for syntax extraction are not available on certain platforms (Solaris, Windows with MinGW)</li>
 <li>added documentation (pkgdown) in docs/</li>
@@ -135,9 +151,9 @@
 <h1 class="page-header" data-toc-text="0.2.1">
 <a href="#jmvreadwrite-021" class="anchor"></a>jmvReadWrite 0.2.1<small> 2021-08-23 </small>
 </h1>
-<div id="bug-fixes-and-enhancements-1" class="section level2">
+<div id="bug-fixes-and-enhancements-2" class="section level2">
 <h2 class="hasAnchor">
-<a href="#bug-fixes-and-enhancements-1" class="anchor"></a>Bug fixes and enhancements:</h2>
+<a href="#bug-fixes-and-enhancements-2" class="anchor"></a>Bug fixes and enhancements:</h2>
 <ul>
 <li>bug in write_omv fixed (@MAgojam, <a href='https://github.com/sjentsch/jmvReadWrite/issues/2'>#2</a>); jamovi could not read the manifest (meta) when the file was created with <code>write_omv</code> on Windows (LF + CR, but only CR expected / decoded)</li>
 <li>updated the Created-by in the manifest string to use the jmvReadWrite version</li>

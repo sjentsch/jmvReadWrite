@@ -24,7 +24,7 @@
 #'     # eval(parse(text=attr(data, 'syntax')[[1]]))
 #'     print(names(result));
 #'     print(result$main);
-#'     # → "main"      "assump"    "contrasts" "postHoc"   "emm"       "residsOV"
+#'     # -> "main"      "assump"    "contrasts" "postHoc"   "emm"       "residsOV"
 #'     # (the names of the six output tables)
 #' }
 #' }
@@ -35,112 +35,92 @@ read_omv <- function(fleNme = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = FALSE
 
     # check whether the file / archive exists, get list of files contained in the archive and check whether it has the correct format
     if (! file.exists(fleNme))                       stop(sprintf("File \"%s\" not found.", fleNme));
-    hdrStr <- readBin(tmpHdl <- file(fleNme, "rb"), "character"); close(tmpHdl); rm("tmpHdl");
+    hdrStr <- readBin(tmpHdl <- file(fleNme, "rb"), "character"); close(tmpHdl); rm(tmpHdl);
     if (! hdrStr == "PK\003\004\024")                stop(sprintf("File \"%s\" has not the correct file format (is not a ZIP archive).", fleNme));
-    fleLst <- utils::unzip(fleNme, list = TRUE)$Name;
 
+    # get list of files contained in the archive and check whether it contains either the file "meta" (newer jamovi file format) or MANIFEST.MF (older format)
+    fleLst <- zip::zip_list(fleNme)$filename;
     if (! any(grepl("^meta$|MANIFEST.MF$", fleLst))) stop(sprintf("File \"%s\" has not the correct file format (is missing the jamovi-file-manifest).", fleNme));
+    # check the version information in the manifest and whether they are currently supported
+    chkVer(getTxt(fleNme, fleLst[grepl("^meta$|MANIFEST.MF$", fleLst)][[1]]));
 
-    # get list of files contained in the archive
-    fleLst <- utils::unzip(fleNme, list = TRUE)$Name;
-
+    # https://github.com/jamovi/jamovi/blob/current-dev/server/jamovi/server/formatio/omv.py describes
+    # how to handle the different jamovi-archive-versions
     # read and decode files: Manifest, metadata (metadata.json), metadata about value labels (xdata.json), binary numeric data (data.bin)
     # and binary string data (strings.bin; if present: it only exists if there are columns that contain text variables)
     strBin <- any(grepl("strings.bin", fleLst));
 
-    mnfTxt <- getTxt(fleNme, fleLst[grepl("^meta$|MANIFEST.MF$", fleLst)][[1]]);
-    mtaDta <- getTxt(fleNme, "metadata.json");
+    # load the meta-data (global and data column attributes of the data set) and the extended
+    # data (value labels)
+    mtaDta <- getTxt(fleNme, "metadata.json")$dataSet;
     xtdDta <- getTxt(fleNme, "xdata.json");
-                binHdl <- file(binFle <- utils::unzip(fleNme, "data.bin",      junkpaths = TRUE), "rb");
-    if (strBin) strHdl <- file(strFle <- utils::unzip(fleNme, "strings.bin",   junkpaths = TRUE), "rb");
-
-    # decode the manifest file and throw an error if an file version occurs that was written using a jamovi-version
-    # have a look at https://github.com/jamovi/jamovi/blob/current-dev/server/jamovi/server/formatio/omv.py (jav) for
-    # how to handle the different jamovi-archive-versions
-    mnfVer <- unlist(strsplit(gsub("Manifest-Version: ",       "", mnfTxt[grepl("Manifest-Version:",       mnfTxt)]), "\\."));
-    datVer <- unlist(strsplit(gsub("Data-Archive-Version: ",   "", mnfTxt[grepl("Data-Archive-Version:",   mnfTxt)]), "\\."));
-    jmvVer <- unlist(strsplit(gsub("jamovi-Archive-Version: ", "", mnfTxt[grepl("jamovi-Archive-Version:", mnfTxt)]), "\\."));
-#   crtStr <-                 gsub("Created-By: ",             "", mnfTxt[grepl("Created-By:",             mnfTxt)]);
-    if (any(mnfVer != c("1", "0")) || any(datVer != c("1", "0", "2")) || as.integer(jmvVer[1]) > 11) {
-        stop(sprintf("The file \"%s\" was written with a version of jamovi that currently is not implemented and therefore can\'t be read. Please send the file to sebastian.jentschke@uib.no!", fleNme));
-    }
+                binHdl <- getHdl(fleNme, "data.bin",    "rb");
+    if (strBin) strHdl <- getHdl(fleNme, "strings.bin", "rb");
 
     # process meta-data
-    if (any(names(mtaDta) != "dataSet")) stop("Unimplemeted field in the meta data");
+    if (! all(grepl(grpMta, names(mtaDta)))) stop("Unimplemeted field in the meta data");
 
     # rowCount, columnCount
-    rowNum <- mtaDta$dataSet$rowCount
-    colNum <- mtaDta$dataSet$columnCount
-    if (length(mtaDta$dataSet$fields) != colNum) stop("Number of fields in the metadata is not matching up the number of columns.");
+    rowNum <- mtaDta$rowCount
+    colNum <- mtaDta$columnCount
+    if (length(mtaDta$fields) != colNum) stop("Number of fields in the metadata is not matching up the number of columns.");
 
     # iterate through fields
     lblLst <- c()
     fltLst <- c()
     for (i in seq_len(colNum)) {
         # type: determines the format in the binary file
-        if      (mtaDta$dataSet$fields[[i]]$type == "integer") {
-
-            colRaw <- as.data.frame(readBin(binHdl,   integer(), n = rowNum))
-        } else if (mtaDta$dataSet$fields[[i]]$type == "number") {
-
-            colRaw <- as.data.frame(readBin(binHdl,    double(), n = rowNum))
-        } else if (mtaDta$dataSet$fields[[i]]$type == "string") {
-            colRaw <- as.data.frame(readBin(strHdl, character(), n = rowNum))
-                                    readBin(binHdl,   integer(), n = rowNum)
+        if        (chkFld(mtaDta$fields[[i]], "type", "integer")) {
+            colRaw <- as.data.frame(readBin(binHdl,   integer(), n = rowNum));
+        } else if (chkFld(mtaDta$fields[[i]], "type", "number"))  {
+            colRaw <- as.data.frame(readBin(binHdl,    double(), n = rowNum));
+        } else if (chkFld(mtaDta$fields[[i]], "type", "string"))  {
+            colRaw <- as.data.frame(readBin(strHdl, character(), n = rowNum));
+                                    readBin(binHdl,   integer(), n = rowNum);
         } else {
-            stop(sprintf("Variable type \"%s\" not implemented.", mtaDta$dataSet$fields[[i]]$type));
+            stop(sprintf("Variable type \"%s\" not implemented.", mtaDta$fields[[i]]$type));
         }
 
         # name, description
-        nmeCrr <- mtaDta$dataSet$fields[[i]]$name
-        lblCrr <- mtaDta$dataSet$fields[[i]]$description
+        nmeCrr <- mtaDta$fields[[i]]$name;
+        lblCrr <- mtaDta$fields[[i]]$description;
 
         lblLst <- c(lblLst, lblCrr)
 
         # value labels
         if (any(nmeCrr == names(xtdDta))) {
-            if    (any(mtaDta$dataSet$fields[[i]]$columnType == c("Data", "Recoded"))) {
-                colRaw[[1]] <- factor(colRaw[[1]], levels = unlist(sapply(xtdDta[[nmeCrr]]$labels, function(m) m[1])), labels = unlist(sapply(xtdDta[[nmeCrr]]$labels, function(m) m[2])))
-                if (mtaDta$dataSet$fields[[i]]$dataType == "Integer") {
-
-                    attr(colRaw[[1]], "values") <- unlist(sapply(xtdDta[[nmeCrr]]$labels, function(m) as.integer(m[1])))
+            if        (chkFld(mtaDta$fields[[i]], "columnType", "Filter") || chkFld(mtaDta$fields[[i]], "name", "^Filter [0-9]+$")) {
+                colRaw[[1]] <- as.logical(colRaw[[1]]);
+                fltLst <- c(fltLst, i);
+            } else if (chkFld(mtaDta$fields[[i]], "columnType", "Data|Recoded")) {
+                colRaw[[1]] <- factor(colRaw[[1]], levels = unlist(sapply(xtdDta[[nmeCrr]]$labels, function(m) m[1])), labels = unlist(sapply(xtdDta[[nmeCrr]]$labels, function(m) m[2])));
+                if    (chkFld(mtaDta$fields[[i]], "dataType",   "Integer")) {
+                    attr(colRaw[[1]], "values") <- unlist(sapply(xtdDta[[nmeCrr]]$labels, function(m) as.integer(m[1])));
                 }
-            } else if (mtaDta$dataSet$fields[[i]]$columnType == "Filter") {
-                colRaw[[1]] <- as.logical(colRaw[[1]])
-                fltLst <- c(fltLst, i)
             } else {
                 stop(sprintf("Error when reading value label - likely the column type is not implemented (yet): %s - %s - %s",
-                             nmeCrr, mtaDta$dataSet$fields[[i]]$dataType, mtaDta$dataSet$fields[[i]]$columnType));
+                             nmeCrr, mtaDta$fields[[i]]$dataType, mtaDta$fields[[i]]$columnType));
             }
         }
 
         if (i == 1) {
-
             names(colRaw) <- nmeCrr;
             dtaFrm <- colRaw;
         } else {
-
             dtaFrm[nmeCrr] <- colRaw;
         }
 
         if (lblCrr != "")
             attr(dtaFrm[[nmeCrr]], "jmv-desc") <- lblCrr;
 
-        if (mtaDta$dataSet$fields[[i]]$measureType == "ID") {
-            attr(dtaFrm[[nmeCrr]], "jmv-id") <- T;
+        if (chkFld(mtaDta$fields[[i]], "measureType", "ID")) {
+            attr(dtaFrm[[nmeCrr]], "jmv-id") <- TRUE;
         }
 
-        if (length(mtaDta$dataSet$fields[[i]]$missingValues) > 0) {
-            attr(dtaFrm[[nmeCrr]], "missingValues") <- mtaDta$dataSet$fields[[i]]$missingValues;
-        }
+        dtaFrm[[nmeCrr]] <- setAtt("missingValues",   mtaDta$fields[[i]], dtaFrm[[nmeCrr]])
 
         if (sveAtt) {
-            for (attNme in c("id", "columnType", "dataType", "measureType", "formula", "formulaMessage", "parentId", "width",
-                             "type", "importName", "transform", "edits", "trimLevels", "filterNo", "active")) {
-                if (! is.null(mtaDta$dataSet$fields[[i]][attNme])) {
-                    attr(dtaFrm[[nmeCrr]], attNme) <- mtaDta$dataSet$fields[[i]][[attNme]];
-                }
-            }
+            dtaFrm[[nmeCrr]] <- setAtt(names(mtaFld), mtaDta$fields[[i]], dtaFrm[[nmeCrr]])
         }
 
         if (rmMsVl) {
@@ -155,19 +135,17 @@ read_omv <- function(fleNme = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = FALSE
                dtaFrm[[nmeCrr]] <- dtaFrm[[nmeCrr]][, drop = TRUE];
                attCrr$missingValues <- list();
                attCrr$values <- attCrr$values[!rmvLvl];
-               for (attNme in setdiff(names(attCrr), names(attributes(dtaFrm[[nmeCrr]])))) {
-                   attr(dtaFrm[[nmeCrr]], attNme) <- attCrr[[attNme]];
-               }
+               dtaFrm[[nmeCrr]] <- setAtt(setdiff(names(attCrr), names(attributes(dtaFrm[[nmeCrr]]))), attCrr, dtaFrm[[nmeCrr]]);
+               rm(attCrr, rmvLvl);
             }
         }
-
-        rm("colRaw");
+        rm(colRaw);
     }
 
     # close and remove the binary file(s)
-    close(binHdl); unlink(binFle); rm("binHdl", "binFle");
+    clsHdl(binHdl); rm(binHdl);
     if (strBin) {
-        close(strHdl); unlink(strFle); rm("strHdl", "strFle");
+        clsHdl(strHdl); rm(strHdl);
     }
 
     # handle filters
@@ -184,14 +162,12 @@ read_omv <- function(fleNme = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = FALSE
     if (! all(lblLst == "")) {
         names(lblLst) <- names(dtaFrm);
         attr(dtaFrm, "variable.labels") <- lblLst;
-        rm("lblLst");
+        rm(lblLst);
     }
 
     # removedRows, addedRows, transforms
     if (sveAtt) {
-        for (attNme in c("removedRows", "addedRows", "transforms")) {
-            attr(dtaFrm, attNme) <- mtaDta$dataSet[[attNme]];
-        }
+        dtaFrm <- setAtt(c("removedRows", "addedRows", "transforms"), mtaDta, dtaFrm);
     }
 
     # import and extract syntax from the analyses
@@ -215,8 +191,8 @@ read_omv <- function(fleNme = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = FALSE
                                  );
                 if (blnPtb) {
                     for (anlNme in anlLst) {
-                        anlPBf <- RProtoBuf::read(jamovi.coms.AnalysisResponse, anlHdl <- file(anlFle <- utils::unzip(fleNme, anlNme, junkpaths = TRUE), "rb"));
-                        close(anlHdl); unlink(anlFle); rm("anlHdl", "anlFle");
+                        anlPBf <- RProtoBuf::read(jamovi.coms.AnalysisResponse, anlHdl <- getHdl(fleNme, anlNme, "rb"));
+                        clsHdl(anlHdl); rm(anlHdl);
                         # for (anlFld in names(anlPBf)) { print(paste(anlFld, anlPBf[[anlFld]])) }                 # helper function to show all fields
                         # for (anlFld in names(anlPBf$options)) { print(paste(anlFld, anlPBf$options[[anlFld]])) } # helper function to show all fields in options
                         # for (anlFld in names(anlPBf$results)) { print(paste(anlFld, anlPBf$results[[anlFld]])) } # helper function to show all fields in results
@@ -234,7 +210,7 @@ read_omv <- function(fleNme = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = FALSE
 
     # import the HTML output
     if (getHTM) {
-        attr(dtaFrm, "HTML") <- readLines(htmHdl <- file(htmFle <- utils::unzip(fleNme, "index.html", junkpaths = TRUE), "r"), warn = FALSE); close(htmHdl); unlink(htmFle); rm("htmHdl", "htmFle");
+        attr(dtaFrm, "HTML") <- getTxt(fleNme, "index.html");
     }
 
     # return the resulting data frame
@@ -253,14 +229,45 @@ fndSyn <- function(resElm = NULL) {
 }
 
 getTxt <- function(fleOMV = "", crrNme = "") {
-    crrTxt <- readLines(crrHdl <- file(crrFle <- utils::unzip(fleOMV, crrNme, junkpaths = TRUE), "r"), warn = FALSE);
-    close(crrHdl); unlink(crrFle); rm("crrHdl", "crrFle");
+    crrTxt <- readLines(crrHdl <- getHdl(fleOMV, crrNme), warn = FALSE);
+    clsHdl(crrHdl); rm(crrHdl);
 
     # depending on whether the original was a JSON file or not, return the appropriate result
     if (grepl("\\.json$", crrNme, ignore.case = TRUE)) {
         rjson::fromJSON(crrTxt, simplify = FALSE)
     } else {
         crrTxt
+    }
+}
 
+getHdl <- function(fleOMV = "", crrNme = "", crrMde = "r") {
+    zip::unzip(fleOMV, crrNme, exdir = tempdir(), junkpaths = TRUE);
+    crrFle <- file.path(tempdir(), list.files(path = tempdir(), pattern = basename(crrNme)));
+    if (length(crrFle) == 0) {
+        stop(sprintf("The file \"%s\" could not be extracted from \"%s\". Please register an issue.", crrNme, fleOMV));
+    }
+    file(crrFle, crrMde)
+}
+
+clsHdl <- function(crrHdl = NULL) {
+    crrFle <- summary(crrHdl)$description; close(crrHdl); unlink(crrFle); rm(crrFle);
+}
+
+chkVer <- function(crrTxt = "") {
+    if (length(crrTxt) != length(lstMnf) || !all(grepl(paste(sapply(lstMnf, "[[", 1), collapse = "|"), crrTxt))) {
+        stop("The file you try to read has an improper manifest file (meta) and is likely corrupted. If the error persists, send the file to sebastian.jentschke@uib.no!")
+    }
+    for (i in seq_along(lstMnf)) {
+        crrVer <- trimws(strsplit(crrTxt[grepl(paste0(lstMnf[[i]][1], ":"), crrTxt)], ":|\\.")[[1]]);
+        for (j in setdiff(seq_along(lstMnf[[i]]), 1)) {
+            # if any component of the version is lower then the minimum version, exit the loop
+            # (read_omv should be able to handle older file versions)
+            if (as.integer(crrVer[j]) < as.integer(lstMnf[[i]][j])) break
+            # don't do anything if the version number is equal, but throw an error if it is larger
+            if (as.integer(crrVer[j]) > as.integer(lstMnf[[i]][j])) {
+                stop(paste("The file that you try to read was written with a version of jamovi that currently is not implemented and",
+                           "therefore can\'t be read. Please send the file to sebastian.jentschke@uib.no!"));
+            }
+        }
     }
 }

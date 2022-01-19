@@ -44,6 +44,8 @@ devtools::install_github("sjentsch/jmvReadWrite")
 
 ## How to use the package?
 
+**read\_omv**
+
 The following code uses the ToothGrowth-data set that is part of the
 data sets included in R (the current file contains some modifications
 though for testing the reading and writing routines: `read_omv` and
@@ -134,11 +136,13 @@ if (length(attr(data, 'syntax')) >= 2) {
     eval(parse(text=attr(data, 'syntax')[[1]]))
     eval(parse(text=paste0('result2 = ', attr(data, 'syntax')[[2]])))
     names(result2)
-    # → "main"      "assump"    "contrasts" "postHoc"   "emm"
+    # -> "main"      "assump"    "contrasts" "postHoc"   "emm"
     # (the names of the five output tables)
 }
 #> [1] "main"      "assump"    "contrasts" "postHoc"   "emm"       "residsOV"
 ```
+
+**write\_omv**
 
 The `jmvReadWrite`-package also enables you to write `.omv`-files in
 order to use them in `jamovi`. Let’s assume that you have a large
@@ -146,23 +150,23 @@ collection of log-files (e.g., from an experiment) that you compile and
 process (summarize, filter, etc.) in R in order to later analyse them in
 `jamovi`. You will have those processed log-files stored in a data frame
 (called, e.g., `data`) which you then write to a file that you can open
-in jamovi afterwards. Although jamovi reads R-data files (.RData, .rda,
-.rds) `write_omv` permits to store `jamovi`-specific attributes (such as
-variable labels) in addition.
+in jamovi afterwards.
 
 ``` r
 library(jmvReadWrite)
 
-# use the data set "ToothGrowth" and, if it exists, write it as jamovi-file using write_omv()
+# use the data set "ToothGrowth" and, if it exists, write it as jamovi-file
+# using write_omv()
 data("ToothGrowth");
-wrtDta = write_omv(ToothGrowth, "Trial.omv");
+# "retDbg" has to be set in order to return debug information to wrtDta
+wrtDta = write_omv(ToothGrowth, "Trial.omv", retDbg = TRUE);
 names(wrtDta);
 #> [1] "mtaDta" "xtdDta" "dtaFrm"
-# → "mtaDta" "xtdDta" "dtaFrm"
-# returns a list with the metadata (mtaDta, e.g., column and data type),
-# the extended data (xtdDta, e.g., variable lables), and the data frame (dtaFrm)
-# the purpose of these variables is merely for checking (understanding the file format)
-# and debugging
+# -> "mtaDta" "xtdDta" "dtaFrm"
+# this debug information contains a list with the metadata ("mtaDta", e.g.,
+# column and data type), the extended data ("xtdDta", e.g., variable lables),
+# and the data frame (dtaFrm) for checking (understanding the file format) and
+# debugging
 
 # check whether the file was written to the disk, get the file information (size, etc.)
 # and delete the file afterwards
@@ -170,11 +174,46 @@ list.files(".", "Trial.omv");
 #> [1] "Trial.omv"
 file.info("Trial.omv");
 #>           size isdir mode               mtime               ctime
-#> Trial.omv 2111 FALSE  660 2021-09-15 19:17:59 2021-09-15 19:17:59
+#> Trial.omv 2238 FALSE  664 2022-01-19 12:01:25 2022-01-19 12:01:25
 #>                         atime  uid  gid    uname   grname
-#> Trial.omv 2021-09-15 19:17:59 1000 1000 sjentsch sjentsch
+#> Trial.omv 2022-01-19 12:01:25 1000 1000 sjentsch sjentsch
 unlink("Trial.omv");
 ```
+
+Although jamovi reads R-data files (.RData, .rda, .rds) `write_omv`
+permits to store `jamovi`-specific attributes (such as variable labels)
+in addition. Please note that if you are reading from an `.omv`-file in
+order to write back to an `.omv`-file (perhaps after some
+modifications), it is recommended to set the `sveAtt`-attribute.
+
+``` r
+# reading and writing a file with the "sveAtt"-parameter permits you to keep
+# essential meta-data to ensure that the written file looks and works like the
+# original file (plus you modifications)
+fleOMV = system.file("extdata", "ToothGrowth.omv", package = "jmvReadWrite");
+data = read_omv(fleNme = fleOMV, sveAtt = TRUE);
+# shows the names of the attributes for the whole data set (e.g., number of
+# rows and columns) and the names of the attributes of the first column
+names(attributes(data));
+#> [1] "row.names"       "names"           "class"           "fltLst"         
+#> [5] "variable.labels" "removedRows"     "addedRows"       "transforms"
+names(attributes(data[[1]]));
+#>  [1] "missingValues"  "name"           "id"             "columnType"    
+#>  [5] "dataType"       "measureType"    "formula"        "formulaMessage"
+#>  [9] "parentId"       "width"          "type"           "importName"    
+#> [13] "description"    "transform"      "edits"          "filterNo"      
+#> [17] "active"
+#
+# perhaps do some modifications to the file here and write it back afterwards
+write_omv(data, 'Trial.omv');
+unlink("Trial.omv");
+```
+
+If `Trial.omv` in the example above would have been kept, it should look
+like the original file (plus your possible modifications). If you, e.g.,
+added a new column, you could adjust some attributes (e.g., to enforce a
+specific `columnType` or `measurementType`): just look at how attributes
+are stored for other columns.
 
 -----
 

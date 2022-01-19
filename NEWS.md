@@ -1,3 +1,12 @@
+# jmvReadWrite 0.2.3
+
+## Bug fixes and enhancements:
+* use `zip` R-package instead of `utils` to prevent that no ZIP-executable-file is found on Windows (`utils::zip` only works in cases where a `zip.exe` is found on the path)
+* use the (session-specific) temporary directory for creating files to be zipped and those files extracted
+* improved handling of the different variable types, implemented logical / boolean variables / data columns
+* improved handling of column attributes
+* added parameter `retDbg` (default: `FALSE`) to write_omv so that output for debugging is only produced upon setting it 
+
 # jmvReadWrite 0.2.2
 
 ## Bug fixes and enhancements:

@@ -1,3 +1,21 @@
+# compare the files in inst/extdata (write and read again)
+for (crrFle in list.files('R')) { source(file.path('R', crrFle)) }
+OR
+devtools::load_all()
+
+for (blnAtt in c(TRUE, FALSE)) {
+    for (crrOMV in list.files('inst/extdata/')) {
+        data = read_omv(file.path('inst/extdata/', crrOMV), sveAtt = blnAtt);
+        write_omv(data, 'Trial.omv');
+        data2 = read_omv('Trial.omv', sveAtt = blnAtt);
+        cat(sprintf('\n%s\n\n%s\n\n', strrep("=", 100), crrOMV));
+        suppressWarnings(print(diffdf::diffdf(data, data2)));
+        unlink('Trial.omv');
+        rm('data', 'data2');
+    }
+    cat(sprintf('\n%s\n%s\n\n', strrep("=", 100), strrep("=", 100)));
+}
+
 # REMEMBER: error messages from R are not always pointing to the place where the error occurs - especially when using commands like build_readme()
 
 # checks the requirements (all dependencies up-to-date, etc.)
@@ -45,7 +63,7 @@ devtools::release()
 
 # on the shell (after the submission got accepted):
 V="v$(grep "^Version:" DESCRIPTION | cut -d: -f2 | sed -e 's/ //')"
-git tag -a "${V}" $(tail -n 1 CRAN-RELEASE | cut -d\( -f2 | cut -d\) -f1 | sed 's/commit //') -m "CRAN submission: $(head -n1 CRAN-RELEASE | cut -c39-48)" -s && rm CRAN-RELEASE && git commit -a -m "Tagged CRAN-package on github and removed CRAN-RELEASE" && git push origin "${V}" 
+git tag -a "${V}" $(tail -n 1 CRAN-SUBMISSION | cut -d\( -f2 | cut -d\) -f1 | sed 's/SHA //') -m "CRAN submission: $(grep Date: CRAN-SUBMISSION | cut -c7-16)" -s && rm CRAN-SUBMISSION && git commit -a -m "Tagged CRAN-package on github and removed CRAN-SUBMISSION" && git push origin "${V}"
 # optional: Use the tag to create a release on GitHub
 
  

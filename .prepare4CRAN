@@ -63,7 +63,7 @@ devtools::release()
 
 # on the shell (after the submission got accepted):
 V="v$(grep "^Version:" DESCRIPTION | cut -d: -f2 | sed -e 's/ //')"
-git tag -a "${V}" $(tail -n 1 CRAN-SUBMISSION | cut -d\( -f2 | cut -d\) -f1 | sed 's/commit //') -m "CRAN submission: $(head -n1 CRAN-SUBMISSION | cut -c39-48)" -s && rm CRAN-SUBMISSION && git commit -a -m "Tagged CRAN-package on github and removed CRAN-SUBMISSION" && git push origin "${V}" 
+git tag -a "${V}" $(tail -n 1 CRAN-SUBMISSION | cut -d\( -f2 | cut -d\) -f1 | sed 's/commit //') -m "CRAN submission: $(head -n1 CRAN-SUBMISSION | cut -c39-48)" -s && rm CRAN-SUBMISSION && git commit -a -m "Tagged CRAN-package on github and removed CRAN-SUBMISSION" && git push origin "${V}"
 # optional: Use the tag to create a release on GitHub
 
  

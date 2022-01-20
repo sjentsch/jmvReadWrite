@@ -1,7 +1,7 @@
 # jmvReadWrite 0.2.4
 
 ## Bug fixes and enhancements:
-* fixed an error when assembling the file name in write_omv
+* fixed an error when assembling the file name in `write_omv`, added assembling the file name with normalizePath to `read_omv`
 * fixed mssing retDbg-parameter in one of the examples
 
 # jmvReadWrite 0.2.3

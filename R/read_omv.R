@@ -34,13 +34,14 @@
 read_omv <- function(fleNme = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = FALSE, getSyn = FALSE, getHTM = FALSE) {
 
     # check whether the file / archive exists, get list of files contained in the archive and check whether it has the correct format
+    fleNme <- file.path(normalizePath(dirname(fleNme)), basename(fleNme));
     if (! file.exists(fleNme))                       stop(sprintf("File \"%s\" not found.", fleNme));
     hdrStr <- readBin(tmpHdl <- file(fleNme, "rb"), "character"); close(tmpHdl); rm(tmpHdl);
-    if (! hdrStr == "PK\003\004\024")                stop(sprintf("File \"%s\" has not the correct file format (is not a ZIP archive).", fleNme));
+    if (! hdrStr == "PK\003\004\024")                stop(sprintf("File \"%s\" has not the correct file format (is not a ZIP archive).", basename(fleNme)));
 
     # get list of files contained in the archive and check whether it contains either the file "meta" (newer jamovi file format) or MANIFEST.MF (older format)
     fleLst <- zip::zip_list(fleNme)$filename;
-    if (! any(grepl("^meta$|MANIFEST.MF$", fleLst))) stop(sprintf("File \"%s\" has not the correct file format (is missing the jamovi-file-manifest).", fleNme));
+    if (! any(grepl("^meta$|MANIFEST.MF$", fleLst))) stop(sprintf("File \"%s\" has not the correct file format (is missing the jamovi-file-manifest).", basename(fleNme)));
     # check the version information in the manifest and whether they are currently supported
     chkVer(getTxt(fleNme, fleLst[grepl("^meta$|MANIFEST.MF$", fleLst)][[1]]));
 

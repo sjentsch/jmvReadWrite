@@ -43,10 +43,10 @@ write_omv <- function(dtaFrm = NULL, fleNme = "", retDbg = FALSE) {
         stop("Input data frame is either not a data frame or has not the correct dimensions (at least one dimension has a size of < 1).");
     }
     # check that the file name isn't empty, that it ends in .omv, and that the destination directory exists
-    if (length(fleNme) <= 0 || ! grepl(".omv", fleNme) || ! dir.exists(dirname(fleNme))) {
-        stop(sprintf("Output file name (%s) doesn't have the correct format (e.g., wrong extension) or destination directory doesn't exist.", fleNme));
-    }
     fleNme <- file.path(normalizePath(dirname(fleNme)), basename(fleNme));
+    if (! grepl(".omv$", fleNme) || ! dir.exists(dirname(fleNme))) {
+        stop(sprintf("Output file name (%s) doesn't have the correct format (e.g., wrong extension) or destination directory doesn't exist.", basename(fleNme)));
+    }
 
     colNum <- dim(dtaFrm)[2];
 

@@ -1,7 +1,7 @@
 # CRAN Notes - jmvReadWrite
 
 ## Current version
-0.2.3
+0.2.4
 
 ## Test environments
 * ``devtools::check()`` - local: Ubuntu 20.04, R 4.1.0 (x86_64-pc-linux-gnu)

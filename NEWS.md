@@ -1,3 +1,9 @@
+# jmvReadWrite 0.2.4
+
+## Bug fixes and enhancements:
+* fixed an error when assembling the file name in write_omv
+* fixed mssing retDbg-parameter in one of the examples
+
 # jmvReadWrite 0.2.3
 
 ## Bug fixes and enhancements:
@@ -6,6 +12,7 @@
 * improved handling of the different variable types, implemented logical / boolean variables / data columns
 * improved handling of column attributes
 * added parameter `retDbg` (default: `FALSE`) to write_omv so that output for debugging is only produced upon setting it 
+
 
 # jmvReadWrite 0.2.2
 

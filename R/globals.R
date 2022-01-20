@@ -62,3 +62,23 @@ chkFld <- function(fldObj = NULL, fldNme = "", fldVal = NULL) {
 }
 
 # =================================================================================================
+# functions for reading data files from various formats
+
+read_all <- function(fleNme = "") {
+
+    # CSV
+
+    # Rdata
+    
+    # RDS
+    
+    # haven / foreign: SPSS
+    
+    # haven / foreign: Stata
+    
+    # haven: SAS
+
+    
+}
+
+# =================================================================================================

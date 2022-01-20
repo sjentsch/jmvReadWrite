@@ -46,7 +46,7 @@ write_omv <- function(dtaFrm = NULL, fleNme = "", retDbg = FALSE) {
     if (length(fleNme) <= 0 || ! grepl(".omv", fleNme) || ! dir.exists(dirname(fleNme))) {
         stop(sprintf("Output file name (%s) doesn't have the correct format (e.g., wrong extension) or destination directory doesn't exist.", fleNme));
     }
-    fleNme <- file.path(normalizePath(dirname(fleNme)), fleNme);
+    fleNme <- file.path(normalizePath(dirname(fleNme)), basename(fleNme));
 
     colNum <- dim(dtaFrm)[2];
 

@@ -2,7 +2,7 @@
 #' (www.jamovi.org)
 #'
 #' @param dtaFrm Data frame to be exported (default: NULL)
-#' @param fleNme Name / position of the output file to be generated ("FILENAME.omv"; default: "")
+#' @param fleOut Name / position of the output file to be generated ("FILENAME.omv"; default: "")
 #' @param retDbg Whether to return a list with debugging information (see Value; default: FALSE)
 #' @return a list (if retDbg == TRUE), containing the meta data (mtaDta, metadata.json in the OMV-file), the extended data (xtdDta, xdata.json in the OMV-file) and the original data frame (dtaFrm)
 #'
@@ -16,7 +16,7 @@
 #'
 #' # use the data set "ToothGrowth" and, if it exists, write it as jamovi-file using write_omv()
 #' data("ToothGrowth");
-#' wrtDta = write_omv(ToothGrowth, "Trial.omv");
+#' wrtDta = write_omv(ToothGrowth, "Trial.omv", retDbg = TRUE);
 #' print(names(wrtDta));
 #' # the print-function is only used to force devtools::run_examples() to show output
 #' # -> "mtaDta" "xtdDta" "dtaFrm"
@@ -36,18 +36,16 @@
 #'
 #' @export write_omv
 
-write_omv <- function(dtaFrm = NULL, fleNme = "", retDbg = FALSE) {
+write_omv <- function(dtaFrm = NULL, fleOut = "", retDbg = FALSE) {
+    if (is.null(dtaFrm))    stop("The data frame to be written needs to be given as parameter (dtaFrm = ...).");
+    if (nchar(fleOut) == 0) stop("Output file name needs to be given as parameter (fleOut = ...).");
 
-    # check whether dtaFrm is a data frame
-    if (is.null(dtaFrm) || ! is.data.frame(dtaFrm) || any(dim(dtaFrm) < 1)) {
-        stop("Input data frame is either not a data frame or has not the correct dimensions (at least one dimension has a size of < 1).");
-    }
-    # check that the file name isn't empty, that it ends in .omv, and that the destination directory exists
-    if (length(fleNme) <= 0 || ! grepl(".omv", fleNme) || ! dir.exists(dirname(fleNme))) {
-        stop(sprintf("Output file name (%s) doesn't have the correct format (e.g., wrong extension) or destination directory doesn't exist.", fleNme));
-    }
-    fleNme <- file.path(normalizePath(dirname(fleNme)), basename(fleNme));
+    # check that the file name isn't empty, that the destination directory exists and that it ends in .omv
+    fleOut <- file.path(normalizePath(dirname(fleOut)), basename(fleOut));
+    chkDir(fleOut) && chkExt(fleOut, ".omv");
 
+    # check whether dtaFrm is a data frame and extract the number of columns
+    chkDtF(dtaFrm);
     colNum <- dim(dtaFrm)[2];
 
     # initialize metadata.json
@@ -227,26 +225,26 @@ write_omv <- function(dtaFrm = NULL, fleNme = "", retDbg = FALSE) {
     }
 
     # compress data.bin and discard the temporary file
-    add2ZIP(fleNme, binHdl, newFle = TRUE);
+    add2ZIP(fleOut, binHdl, newFle = TRUE);
     rm(binHdl);
 
     # compress strings.bin (only if it contains data) and discard the temporary file
-    add2ZIP(fleNme, strHdl, blnZIP = strPos > 0);
+    add2ZIP(fleOut, strHdl, blnZIP = strPos > 0);
     rm(strHdl);
 
     # create meta, write it and add it to ZIP file
     mnfHdl <- file(file.path(tempdir(), "meta"),         open = "wb");
-    add2ZIP(fleNme, mnfHdl, txtOut = mnfTxt());
+    add2ZIP(fleOut, mnfHdl, txtOut = mnfTxt());
     rm(mnfHdl);
 
     # write metadata.json
     mtaHdl <- file(file.path(tempdir(), "metadata.json"), open = "w");
-    add2ZIP(fleNme, mtaHdl, txtOut = fmtJSON(list(dataSet = mtaDta)));
+    add2ZIP(fleOut, mtaHdl, txtOut = fmtJSON(list(dataSet = mtaDta)));
     rm(mtaHdl);
 
     # write xdata.json
     xtdHdl <- file(file.path(tempdir(), "xdata.json"),    open = "w");
-    add2ZIP(fleNme, xtdHdl, txtOut = fmtJSON(xtdDta));
+    add2ZIP(fleOut, xtdHdl, txtOut = fmtJSON(xtdDta));
     rm(xtdHdl);
 
     # write index.html and add it to ZIP file
@@ -254,11 +252,11 @@ write_omv <- function(dtaFrm = NULL, fleNme = "", retDbg = FALSE) {
     # that doesn't work without the analyses and images contained in it being stored too
     htmHdl <- file(file.path(tempdir(), "index.html"),    open = "w");
 #   if (!is.null(attr(dtaFrm, "HTML"))) {
-#      add2ZIP(fleNme, htmHdl, txtOut = attr(dtaFrm, "HTML"));
+#      add2ZIP(fleOut, htmHdl, txtOut = attr(dtaFrm, "HTML"));
 #   } else {
-#      add2ZIP(fleNme, htmHdl, txtOut = htmTxt());
+#      add2ZIP(fleOut, htmHdl, txtOut = htmTxt());
 #   }
-    add2ZIP(fleNme, htmHdl, txtOut = htmTxt());
+    add2ZIP(fleOut, htmHdl, txtOut = htmTxt());
     rm(htmHdl);
 
     if (retDbg) {

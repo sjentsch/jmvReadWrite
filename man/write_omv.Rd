@@ -31,7 +31,7 @@ library(jmvReadWrite);
 
 # use the data set "ToothGrowth" and, if it exists, write it as jamovi-file using write_omv()
 data("ToothGrowth");
-wrtDta = write_omv(ToothGrowth, "Trial.omv");
+wrtDta = write_omv(ToothGrowth, "Trial.omv", retDbg = TRUE);
 print(names(wrtDta));
 # the print-function is only used to force devtools::run_examples() to show output
 # -> "mtaDta" "xtdDta" "dtaFrm"

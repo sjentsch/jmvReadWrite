@@ -6,8 +6,8 @@ devtools::load_all()
 for (blnAtt in c(TRUE, FALSE)) {
     for (crrOMV in list.files('inst/extdata/')) {
         data = read_omv(file.path('inst/extdata/', crrOMV), sveAtt = blnAtt);
-        write_omv(data, 'Trial.omv');
-        data2 = read_omv('Trial.omv', sveAtt = blnAtt);
+        write_omv(data, '~/Trial.omv');
+        data2 = read_omv('~/Trial.omv', sveAtt = blnAtt);
         cat(sprintf('\n%s\n\n%s\n\n', strrep("=", 100), crrOMV));
         suppressWarnings(print(diffdf::diffdf(data, data2)));
         unlink('Trial.omv');
@@ -16,7 +16,8 @@ for (blnAtt in c(TRUE, FALSE)) {
     cat(sprintf('\n%s\n%s\n\n', strrep("=", 100), strrep("=", 100)));
 }
 
-# REMEMBER: error messages from R are not always pointing to the place where the error occurs - especially when using commands like build_readme()
+# update version number in: cran-comments.md, DESCRIPTION, NEWS.md
+system("gedit cran-comments.md DESCRIPTION NEWS.md")
 
 # checks the requirements (all dependencies up-to-date, etc.)
 # use devtools::update_packages("devtools") and devtools::install_dev_deps() if required
@@ -28,6 +29,10 @@ devtools::release_checks()
 # update man-pages and NAMESPACE
 devtools::spell_check()
 devtools::check_man()
+
+# ================================================================================================================================================
+# REMEMBER: error messages from R are not always pointing to the place where the error occurs - especially when using commands like build_readme()
+# ================================================================================================================================================
 
 # building / updating README, PDF manual, and the HTML documentation
 devtools::build_readme()

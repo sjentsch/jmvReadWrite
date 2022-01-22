@@ -1,6 +1,6 @@
 #' Read files created of the statistical spreadsheet 'jamovi' (www.jamovi.org)
 #'
-#' @param fleNme name (including the path, if required) of the 'jamovi'-file to be read ("FILENAME.omv"; default: "")
+#' @param fleInp name (including the path, if required) of the 'jamovi'-file to be read ("FILENAME.omv"; default: "")
 #' @param useFlt apply filters (remove the lines where the filter is set to 0; default: FALSE)
 #' @param rmMsVl remove values defined as missing values (replace them with NA; default - FALSE)
 #' @param sveAtt store attributes that are not required in the data set (if you want to write the same data set using write_omv; default – FALSE)
@@ -12,7 +12,7 @@
 #' \dontrun{
 #' library(jmvReadWrite);
 #' fleOMV <- system.file("extdata", "ToothGrowth.omv", package = "jmvReadWrite");
-#' data <- read_omv(fleNme = fleOMV, getSyn = TRUE);
+#' data <- read_omv(fleInp = fleOMV, getSyn = TRUE);
 #' # if the syntax couldn't be extracted, an empty list - length = 0 - is returned,
 #' # otherwise, the commands are shown and the first analysis is run, with the output
 #' # from the second analysis being assigned to the variable result
@@ -31,18 +31,15 @@
 #'
 #' @export read_omv
 #'
-read_omv <- function(fleNme = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = FALSE, getSyn = FALSE, getHTM = FALSE) {
+read_omv <- function(fleInp = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = FALSE, getSyn = FALSE, getHTM = FALSE) {
+    if (nchar(fleInp) == 0) stop("File name to the input data file needs to be given as parameter (fleInp = ...).");
 
-    # check whether the file / archive exists, get list of files contained in the archive and check whether it has the correct format
-    if (! file.exists(fleNme))                       stop(sprintf("File \"%s\" not found.", fleNme));
-    hdrStr <- readBin(tmpHdl <- file(fleNme, "rb"), "character"); close(tmpHdl); rm(tmpHdl);
-    if (! hdrStr == "PK\003\004\024")                stop(sprintf("File \"%s\" has not the correct file format (is not a ZIP archive).", fleNme));
-
-    # get list of files contained in the archive and check whether it contains either the file "meta" (newer jamovi file format) or MANIFEST.MF (older format)
-    fleLst <- zip::zip_list(fleNme)$filename;
-    if (! any(grepl("^meta$|MANIFEST.MF$", fleLst))) stop(sprintf("File \"%s\" has not the correct file format (is missing the jamovi-file-manifest).", fleNme));
-    # check the version information in the manifest and whether they are currently supported
-    chkVer(getTxt(fleNme, fleLst[grepl("^meta$|MANIFEST.MF$", fleLst)][[1]]));
+    # check whether the .omv-file exists and whether it has the correct format (must be a ZIP), then get the list of files contained in the .omv.-file
+    fleInp <- file.path(normalizePath(dirname(fleInp)), basename(fleInp));
+    fleLst <- zip::zip_list(fleInp)$filename;
+    # check whether the file list contains either the file "meta" (newer jamovi file format) or MANIFEST.MF (older format)
+    chkFle(fleInp, isZIP = TRUE)
+    chkMnf(fleInp, fleLst[grepl("^meta$|MANIFEST.MF$", fleLst)])
 
     # https://github.com/jamovi/jamovi/blob/current-dev/server/jamovi/server/formatio/omv.py describes
     # how to handle the different jamovi-archive-versions
@@ -52,10 +49,10 @@ read_omv <- function(fleNme = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = FALSE
 
     # load the meta-data (global and data column attributes of the data set) and the extended
     # data (value labels)
-    mtaDta <- getTxt(fleNme, "metadata.json")$dataSet;
-    xtdDta <- getTxt(fleNme, "xdata.json");
-                binHdl <- getHdl(fleNme, "data.bin",    "rb");
-    if (strBin) strHdl <- getHdl(fleNme, "strings.bin", "rb");
+    mtaDta <- getTxt(fleInp, "metadata.json")$dataSet;
+    xtdDta <- getTxt(fleInp, "xdata.json");
+                binHdl <- getHdl(fleInp, "data.bin",    "rb");
+    if (strBin) strHdl <- getHdl(fleInp, "strings.bin", "rb");
 
     # process meta-data
     if (! all(grepl(grpMta, names(mtaDta)))) stop("Unimplemeted field in the meta data");
@@ -191,7 +188,7 @@ read_omv <- function(fleNme = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = FALSE
                                  );
                 if (blnPtb) {
                     for (anlNme in anlLst) {
-                        anlPBf <- RProtoBuf::read(jamovi.coms.AnalysisResponse, anlHdl <- getHdl(fleNme, anlNme, "rb"));
+                        anlPBf <- RProtoBuf::read(jamovi.coms.AnalysisResponse, anlHdl <- getHdl(fleInp, anlNme, "rb"));
                         clsHdl(anlHdl); rm(anlHdl);
                         # for (anlFld in names(anlPBf)) { print(paste(anlFld, anlPBf[[anlFld]])) }                 # helper function to show all fields
                         # for (anlFld in names(anlPBf$options)) { print(paste(anlFld, anlPBf$options[[anlFld]])) } # helper function to show all fields in options
@@ -210,7 +207,7 @@ read_omv <- function(fleNme = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = FALSE
 
     # import the HTML output
     if (getHTM) {
-        attr(dtaFrm, "HTML") <- getTxt(fleNme, "index.html");
+        attr(dtaFrm, "HTML") <- getTxt(fleInp, "index.html");
     }
 
     # return the resulting data frame
@@ -218,8 +215,8 @@ read_omv <- function(fleNme = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = FALSE
 }
 
 fndSyn <- function(resElm = NULL) {
-    if (utils::hasName(resElm, "name") && utils::hasName(resElm, "preformatted") && resElm[["name"]] == "syntax" && resElm[["preformatted"]] != "") {
-        resElm[["preformatted"]];
+    if (chkSyn(resElm)) {
+        resElm[["preformatted"]]
     } else if (utils::hasName(resElm, "group") && length(resElm[["group"]]) > 0) {
         for (obj in resElm[["group"]][["elements"]]) {
             ret <- Recall(obj);
@@ -228,46 +225,61 @@ fndSyn <- function(resElm = NULL) {
     }
 }
 
-getTxt <- function(fleOMV = "", crrNme = "") {
-    crrTxt <- readLines(crrHdl <- getHdl(fleOMV, crrNme), warn = FALSE);
+chkSyn <- function(resElm = NULL) {
+   # checks whether the results element is a syntax entry
+   # it has to have the name syntax and the preformatted attribute must not be empty
+   utils::hasName(resElm, "name")         && resElm[["name"]]         == "syntax" &&
+   utils::hasName(resElm, "preformatted") && resElm[["preformatted"]] != ""
+}
+
+getTxt <- function(fleOMV = "", crrFle = "") {
+    crrTxt <- readLines(crrHdl <- getHdl(fleOMV, crrFle), warn = FALSE);
     clsHdl(crrHdl); rm(crrHdl);
 
     # depending on whether the original was a JSON file or not, return the appropriate result
-    if (grepl("\\.json$", crrNme, ignore.case = TRUE)) {
-        rjson::fromJSON(crrTxt, simplify = FALSE)
-    } else {
-        crrTxt
+    if (chkExt(crrFle, "json")) {
+        crrTxt <- rjson::fromJSON(crrTxt, simplify = FALSE);
     }
+    crrTxt
 }
 
-getHdl <- function(fleOMV = "", crrNme = "", crrMde = "r") {
-    zip::unzip(fleOMV, crrNme, exdir = tempdir(), junkpaths = TRUE);
-    crrFle <- file.path(tempdir(), list.files(path = tempdir(), pattern = basename(crrNme)));
+getHdl <- function(fleOMV = "", crrFle = "", crrMde = "r") {
+    zip::unzip(fleOMV, crrFle, exdir = tempdir(), junkpaths = TRUE);
+    crrFle <- file.path(tempdir(), list.files(path = tempdir(), pattern = basename(crrFle)));
     if (length(crrFle) == 0) {
-        stop(sprintf("The file \"%s\" could not be extracted from \"%s\". Please register an issue.", crrNme, fleOMV));
+        stop(sprintf("The file \"%s\" could not be extracted from \"%s\". Please register an issue.", crrFle, fleOMV));
     }
     file(crrFle, crrMde)
 }
 
 clsHdl <- function(crrHdl = NULL) {
-    crrFle <- summary(crrHdl)$description; close(crrHdl); unlink(crrFle); rm(crrFle);
+    crrFle <- summary(crrHdl)$description;
+    close(crrHdl);
+    unlink(crrFle);
+    rm(crrFle, crrHdl);
 }
 
-chkVer <- function(crrTxt = "") {
+chkMnf <- function(fleOMV = "", fleMnf = c("")) {
+    if (length(fleMnf) < 1) {
+        stop(sprintf("File \"%s\" has not the correct file format (is missing the jamovi-file-manifest).", basename(fleOMV)));
+    }
+
+    # check the version information in the manifest and whether they are currently supported
+    # [[1]] points to the first manifest file, in case both (MANIFEST.MF and meta) exist
+    crrTxt <- getTxt(fleOMV, fleMnf[[1]]);
     if (length(crrTxt) != length(lstMnf) || !all(grepl(paste(sapply(lstMnf, "[[", 1), collapse = "|"), crrTxt))) {
-        stop("The file you try to read has an improper manifest file (meta) and is likely corrupted. If the error persists, send the file to sebastian.jentschke@uib.no!")
+        stop(sprintf(paste("The file you are trying to read (%s) has an improper manifest file (meta) and is likely corrupted.",
+                           "If the error persists, send the file to sebastian.jentschke@uib.no!"), basename(fleOMV)));
     }
     for (i in seq_along(lstMnf)) {
-        crrVer <- trimws(strsplit(crrTxt[grepl(paste0(lstMnf[[i]][1], ":"), crrTxt)], ":|\\.")[[1]]);
-        for (j in setdiff(seq_along(lstMnf[[i]]), 1)) {
-            # if any component of the version is lower then the minimum version, exit the loop
-            # (read_omv should be able to handle older file versions)
-            if (as.integer(crrVer[j]) < as.integer(lstMnf[[i]][j])) break
-            # don't do anything if the version number is equal, but throw an error if it is larger
-            if (as.integer(crrVer[j]) > as.integer(lstMnf[[i]][j])) {
-                stop(paste("The file that you try to read was written with a version of jamovi that currently is not implemented and",
-                           "therefore can\'t be read. Please send the file to sebastian.jentschke@uib.no!"));
-            }
+        # if no version number is given, skip this entry
+        if (length(lstMnf[[i]]) == 1) break
+        # compare versions, and if the current version is higher then the version defined in lstMnf, issue a warning
+        crrVer <- trimws(strsplit(crrTxt[grepl(paste0(lstMnf[[i]][1], ":"), crrTxt)], ":")[[1]])[-1];
+        if (utils::compareVersion(crrVer, lstMnf[[i]][-1]) > 0) {
+             warning(sprintf(paste("The file that you are trying to read (%s) was written with a version of jamovi that currently is not implemented",
+                                   "(%s: %s vs. %s) and therefore may be read incorrectly. Please send the file to sebastian.jentschke@uib.no!"),
+                                   basename(fleOMV), lstMnf[[i]][1], crrVer, lstMnf[[i]][-1]));
         }
     }
 }

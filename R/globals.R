@@ -7,9 +7,9 @@ if (getRversion() >= "2.15.1") {
 # =================================================================================================
 # the next lines store the currently supported versions (stored in meta / MANIFEST.MF)
 # and the string that precedes the version number
-lstMnf <- list(mnfVer = c("Manifest-Version",        "1",  "0"),
-               datVer = c("Data-Archive-Version",    "1",  "0", "2"),
-               jmvVer = c("jamovi-Archive-Version",  "11", "0"),
+lstMnf <- list(mnfVer = c("Manifest-Version",        "1.0"),
+               datVer = c("Data-Archive-Version",    "1.0.2"),
+               jmvVer = c("jamovi-Archive-Version",  "11.0"),
                crtStr = c("Created-By"));
 
 # the next lines are dealing with storing the global and the data column attributes (that go into
@@ -62,23 +62,50 @@ chkFld <- function(fldObj = NULL, fldNme = "", fldVal = NULL) {
 }
 
 # =================================================================================================
-# functions for reading data files from various formats
+# functions for checking parameters (file and directory existence, correct file extension, correct
+# dimensions and existence of data frames
 
-read_all <- function(fleNme = "") {
+chkFle <- function(fleNme = "", fleCnt = "", isZIP = FALSE) {
+    if (! file_test("-f", fleNme)) {
+        if (nchar(fleCnt) > 0) {
+            stop(sprintf("File \"%s\" doesn't contain the file \"%s\".", fleCnt, fleNme));
+        } else {
+            stop(sprintf("File \"%s\" not found.", fleNme));
+        }
+    } else if (isZIP) {
+        hdrStr <- readBin(tmpHdl <- file(fleNme, "rb"), "character"); close(tmpHdl); rm(tmpHdl);
+        # only "PK\003\004" is considered, not "PK\005\006" (empty ZIP) or "PK\007\008" (spanned [over several files])
+        if (! hdrStr == "PK\003\004") {
+            stop(sprintf("File \"%s\" has not the correct file format (is not a ZIP archive).", basename(fleNme)));
+        }
+        rm(hdrStr);
+    }
+    TRUE
+}
 
-    # CSV
+chkDir <- function(fleNme = "") {
+    if (! file_test("-d", fleNme) || (file_test("-f", fleNme) && file_test("-d", basename(fleNme)))) {
+        stop(sprintf("Directory (%s) doesn't exist.", ifelse(file_test("-f", fleNme), basename(fleNme), fleNme)));
+    }
+    TRUE
+}
 
-    # Rdata
-    
-    # RDS
-    
-    # haven / foreign: SPSS
-    
-    # haven / foreign: Stata
-    
-    # haven: SAS
+chkExt <- function(fleNme = "", extNme = c("")) {
+    if (all(tolower(tools::file_ext(fleNme)) != tolower(extNme))) {
+        stop(sprintf("File name (%s) contains an unsupported file extension (%s).", basename(fleOut), paste(paste0(".", extNme[tools::file_ext(fleNme) != extNme]), collapse = ", ")));
+    }
+    TRUE
+}
 
-    
+chkDtF <- function(dtaFrm = NULL, minSze = c(1, 1)) {
+    if (length(minSze != 2)) minSze <- rep(minSze[1], 2)
+    if (is.null(dtaFrm) || ! is.data.frame(dtaFrm) || length(dim(dtaFrm)) != 2) {
+        stop("Input data frame is not a data frame or it has either only one or more than two dimensions.");
+    } else if (any(dim(dtaFrm) < minSze)) {
+        stop(sprintf("The %s dimension of the input data frame has not the required size (%d < %d).",
+                     ifelse(which(dim(data) < minSze)[1] == 1, "first", "second"), dim(data)[dim(data) < minSze][1], minSze[dim(data) < minSze][1]));
+    }
+    TRUE
 }
 
 # =================================================================================================

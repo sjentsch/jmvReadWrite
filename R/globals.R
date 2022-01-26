@@ -5,6 +5,13 @@ if (getRversion() >= "2.15.1") {
 }
 
 # =================================================================================================
+# define unicode-characters and their respective replacements
+lstRpl <- list("\x84" = "\"", "\x93" = "\"", "\xc4" = "Ae", "\xd6" = "Oe", "\xdc" = "Ue", "\xdf" = "ss", "\xe4" = "ae", "\xf6" = "oe", "\xfc" = "ue");
+
+lstRpl <- rbind(c("\x84", "\x93", "\xc4", "\xd6", "\xdc", "\xdf", "\xe4", "\xf6", "\xfc"),
+                c(  "\"",   "\"",   "Ae",   "Oe",   "Ue",   "ss",   "ae",   "oe",   "ue"));
+                
+# =================================================================================================
 # the next lines store the currently supported versions (stored in meta / MANIFEST.MF)
 # and the string that precedes the version number
 lstMnf <- list(mnfVer = c("Manifest-Version",        "1.0"),
@@ -75,7 +82,7 @@ chkFle <- function(fleNme = "", fleCnt = "", isZIP = FALSE) {
     } else if (isZIP) {
         hdrStr <- readBin(tmpHdl <- file(fleNme, "rb"), "character"); close(tmpHdl); rm(tmpHdl);
         # only "PK\003\004" is considered, not "PK\005\006" (empty ZIP) or "PK\007\008" (spanned [over several files])
-        if (! hdrStr == "PK\003\004") {
+        if (! hdrStr == "PK\003\004\024") {
             stop(sprintf("File \"%s\" has not the correct file format (is not a ZIP archive).", basename(fleNme)));
         }
         rm(hdrStr);
@@ -83,16 +90,10 @@ chkFle <- function(fleNme = "", fleCnt = "", isZIP = FALSE) {
     TRUE
 }
 
+# REMEMBER: requires the full file name, NOT the directory
 chkDir <- function(fleNme = "") {
-    if (! file_test("-d", fleNme) || (file_test("-f", fleNme) && file_test("-d", basename(fleNme)))) {
-        stop(sprintf("Directory (%s) doesn't exist.", ifelse(file_test("-f", fleNme), basename(fleNme), fleNme)));
-    }
-    TRUE
-}
-
-chkExt <- function(fleNme = "", extNme = c("")) {
-    if (all(tolower(tools::file_ext(fleNme)) != tolower(extNme))) {
-        stop(sprintf("File name (%s) contains an unsupported file extension (%s).", basename(fleOut), paste(paste0(".", extNme[tools::file_ext(fleNme) != extNme]), collapse = ", ")));
+    if (! file_test("-d", dirname(fleNme))) {
+        stop(sprintf("Directory (%s) doesn't exist.", dirname(fleNme)));
     }
     TRUE
 }
@@ -108,4 +109,26 @@ chkDtF <- function(dtaFrm = NULL, minSze = c(1, 1)) {
     TRUE
 }
 
+chkExt <- function(fleNme = "", extNme = c("")) {
+    if (! hasExt(fleNme, extNme)) {
+        stop(sprintf("File name (%s) contains an unsupported file extension (%s).", basename(fleNme), paste(paste0(".", extNme[tools::file_ext(fleNme) != extNme]), collapse = ", ")));
+    }
+}
+
+hasExt <- function(fleNme = "", extNme = c("")) {
+    any(tolower(tools::file_ext(fleNme)) == tolower(extNme))
+}
+
+hasPkg <- function(usePkg = c()) {
+    all(sapply(usePkg, function(X) nzchar(system.file(package = X))))
+}
+
+
 # =================================================================================================
+# get function arguments
+
+fcnArg <- function(fncNme = "") {
+    eval(parse(text = paste0("formals(", fncNme, ")")))
+}
+
+

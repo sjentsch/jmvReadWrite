@@ -31,7 +31,7 @@
 #'
 #' @export read_omv
 #'
-read_omv <- function(fleInp = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = FALSE, getSyn = FALSE, getHTM = FALSE) {
+read_omv <- function(fleInp = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = TRUE, getSyn = FALSE, getHTM = FALSE) {
     if (nchar(fleInp) == 0) stop("File name to the input data file needs to be given as parameter (fleInp = ...).");
 
     # check whether the .omv-file exists and whether it has the correct format (must be a ZIP), then get the list of files contained in the .omv.-file
@@ -175,7 +175,7 @@ read_omv <- function(fleInp = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = FALSE
         if (length(anlLst) > 0) {
             flePtB <- system.file("jamovi.proto", package = "jmvcore");
             # check whether all required packages and files are present
-            if (length(setdiff(c("RProtoBuf", "jmvcore", "rlang"), utils::installed.packages())) == 0 && file.exists(flePtB)) {
+            if (hasPkg(c("RProtoBuf", "jmvcore", "rlang")) && file.exists(flePtB)) {
                 # try reading the protobuffer-file (if it can be read / parsed, tryCatch returns TRUE and the syntax can be extracted)
                 blnPtb <- tryCatch(expr  = {
                                              RProtoBuf::readProtoFiles(flePtB);
@@ -237,7 +237,7 @@ getTxt <- function(fleOMV = "", crrFle = "") {
     clsHdl(crrHdl); rm(crrHdl);
 
     # depending on whether the original was a JSON file or not, return the appropriate result
-    if (chkExt(crrFle, "json")) {
+    if (hasExt(crrFle, "json")) {
         crrTxt <- rjson::fromJSON(crrTxt, simplify = FALSE);
     }
     crrTxt

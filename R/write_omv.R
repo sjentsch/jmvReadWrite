@@ -37,15 +37,17 @@
 #' @export write_omv
 
 write_omv <- function(dtaFrm = NULL, fleOut = "", retDbg = FALSE) {
-    if (is.null(dtaFrm))    stop("The data frame to be written needs to be given as parameter (dtaFrm = ...).");
-    if (nchar(fleOut) == 0) stop("Output file name needs to be given as parameter (fleOut = ...).");
+    if (is.null(dtaFrm))  stop("The data frame to be written needs to be given as parameter (dtaFrm = ...).");
+    if (! nzchar(fleOut)) stop("Output file name needs to be given as parameter (fleOut = ...).");
 
     # check that the file name isn't empty, that the destination directory exists and that it ends in .omv
     fleOut <- file.path(normalizePath(dirname(fleOut)), basename(fleOut));
-    chkDir(fleOut) && chkExt(fleOut, ".omv");
+    chkDir(fleOut)
+    chkExt(fleOut, "omv")
 
-    # check whether dtaFrm is a data frame and extract the number of columns
+    # check whether dtaFrm is a data frame
     chkDtF(dtaFrm);
+    # extract the number of columns
     colNum <- dim(dtaFrm)[2];
 
     # initialize metadata.json
@@ -69,32 +71,29 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", retDbg = FALSE) {
     strHdl <- file(description = file.path(tempdir(), "strings.bin"), open = "wb");
     strPos <- 0
 
+    # handle the attributes "variable.labels" and "value.labels" in the format provided by the R-package "foreign"
+    # the attribute "variable.labels" (attached to the data frame) is converted them to the format used by "haven" ("label" attached to the data column)
+    if (chkAtt(dtaFrm, "variable.labels")) dtaFrm <- fgnLbl(dtaFrm);
+    if (chkAtt(dtaFrm, "label.table")) stop("R-foreign-style value labels need to be implemented. Please send the data file that caused this problem to sebastian.jentschke@uib.no");
+
     for (i in seq_len(colNum)) {
-        # assign attributes that are stored in data frame for this data column
-        # (if available)
+        # assign the jamovi-specific-attributes that are stored in data frame for this data column (if available)
         mtaDta$fields[[i]] <- setAtt(names(mtaDta$fields[[i]]), dtaFrm[[i]], mtaDta$fields[[i]]);
 
         # name
         mtaDta$fields[[i]][["name"]] <- names(dtaFrm[i]);
 
-        # variable label: if column contains a "jmv-desc" use this, otherwise try whether the data frame contains "variable.labels" and use that
-        if        (chkAtt(dtaFrm[[i]], "jmv-desc")) {
-            mtaDta$fields[[i]][["description"]] <- attr(dtaFrm[[i]], "jmv-desc");
-        } else if (chkAtt(dtaFrm, "variable.labels")) {
-            mtaDta$fields[[i]][["description"]] <- attr(dtaFrm, "variable.labels")[[names(dtaFrm[i])]];
-        }
-
-        # value labels - R-foreign-style
-        if (chkAtt(dtaFrm, "label.table")) {
-            stop("R-foreign-style value labels need to be implemented. Please send the data file that caused this problem to sebastian.jentschke@uib.no");
-        }
+        # variable label: if available, choose "jmv-desc", "label", ...
+        # the attributes are concatenated if available (otherwise they will be NULL and dropped), if several are available,
+        # the first ("jmv-desc") takes precedence, if all are NULL, the content of mtaDta$fields serves as fallback-option
+        mtaDta$fields[[i]][["description"]] <- c(attr(dtaFrm[[i]], "jmv-desc"), attr(dtaFrm[[i]], "label"), mtaDta$fields[[i]][["description"]])[1];
 
         # assign column from the original data frame to colCrr (so that modifications don't affect the original)
         colCrr <- dtaFrm[[i]]
 
         # ID variables represent a special case and are therefore treated first
         # only if the jmv-id marker is set or if the measureType is set to "ID" in the original data
-        if (chkAtt(dtaFrm[[i]], "jmv-id", TRUE) || chkAtt(dtaFrm[[i]], "measureType", "ID")) {
+        if (chkAtt(dtaFrm[[i]], "jmv-id", TRUE) || chkAtt(dtaFrm[[i]], "measureType", "ID") || (i == 1 && is.character(colCrr) && length(unique(colCrr)) == length(colCrr))) {
             if (is.character(colCrr)) {
                 mtaDta$fields[[i]][["dataType"]] <- "Text";
                 mtaDta$fields[[i]][["type"]]     <- "string";
@@ -134,8 +133,8 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", retDbg = FALSE) {
             rm(facLvl, facVal);
         # [c] characters / strings
         } else if (is.character(colCrr)) {
-            facLvl <- unique(colCrr);
-            facVal <- seq(1, length(facVal));
+            facLvl <- unique(sort(colCrr));
+            facVal <- seq_along(facLvl);
             colCrr <- as.integer(as.factor(colCrr));
             mtaDta$fields[[i]][["type"]]        <- "integer";
             mtaDta$fields[[i]][["dataType"]]    <- "Text";
@@ -145,12 +144,13 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", retDbg = FALSE) {
             }
         # [d] numerical (integer / decimals)facLvl <- unique(colCrr)
         } else if (is.numeric(colCrr)) {
-            if (all(abs(colCrr - round(colCrr)) < sqrt(.Machine$double.eps), na.rm = TRUE)) {
+            if (! all(is.na(colCrr)) && max(abs(colCrr), na.rm = TRUE) <= .Machine$integer.max && all(abs(colCrr - round(colCrr)) < sqrt(.Machine$double.eps), na.rm = TRUE)) {
                 colCrr <- as.integer(colCrr);
                 mtaDta$fields[[i]][["type"]]     <- "integer";
                 mtaDta$fields[[i]][["dataType"]] <- "Integer";
-                # if "measureType" is already stored in the data frame, keep it, otherwise assign "Continuous" if there is a high enough value range and variability (sd)
-                if (length(unique(colCrr)) > diff(range(colCrr, na.rm = TRUE)) / 5 && stats::sd(colCrr, na.rm = TRUE) > diff(range(colCrr, na.rm = TRUE)) / 10) {
+                # if "measureType" is already stored in the data frame, keep it, otherwise assign "Continuous" if there are enough different values and a high value range and variability (sd)
+                if (length(unique(colCrr)) > length(colCrr) / 5 && length(unique(colCrr)) > diff(range(colCrr, na.rm = TRUE)) / 5 &&
+                    stats::sd(colCrr, na.rm = TRUE) > diff(range(colCrr, na.rm = TRUE)) / 10) {
                     mtaDta$fields[[i]][["measureType"]] <- ifelse(chkAtt(dtaFrm[[i]], "measureType"), attr(dtaFrm[[i]], "measureType"), "Continuous");
                 }
             } else {
@@ -159,9 +159,20 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", retDbg = FALSE) {
                 # if "measureType" is already stored in the data frame, keep it, otherwise assign "Continuous"
                 mtaDta$fields[[i]][["measureType"]] <- ifelse(chkAtt(dtaFrm[[i]], "measureType"), attr(dtaFrm[[i]], "measureType"), "Continuous");
             }
-        # [e] dates / times - not implemented yet
-        } else if (all(sapply(colCrr, inherits, c("Date", "POSIXt")))) {
-            stop("Needs to be implemented: Date / Time. Please send the data file that caused this problem to sebastian.jentschke@uib.no");
+        # [e] dates / times - jamovi actually doesn't support it but i perhaps makes most sense to implement it as numeric
+        # can be transformed back in R using - as.Date(..., origin = "1970-01-01") and hms::as_hms(...)
+        } else if (inherits(colCrr, c("Date", "POSIXt"))) {
+            colCrr <- as.numeric(colCrr);
+            mtaDta$fields[[i]][["type"]]        <- "number";
+            mtaDta$fields[[i]][["dataType"]]    <- "Decimal";
+            mtaDta$fields[[i]][["measureType"]] <- "Continuous";
+            mtaDta$fields[[i]][["description"]] <- paste(c(mtaDta$fields[[i]][["description"]], "(date converted to numeric; days since 1970-01-01)"), collapse = " ");
+        } else if (inherits(colCrr, c("difftime"))) {
+            colCrr <- as.numeric(colCrr);
+            mtaDta$fields[[i]][["type"]]        <- "number";
+            mtaDta$fields[[i]][["dataType"]]    <- "Decimal";
+            mtaDta$fields[[i]][["measureType"]] <- "Continuous";
+            mtaDta$fields[[i]][["description"]] <- paste(c(mtaDta$fields[[i]][["description"]], "(time converted to numeric; sec since 00:00)"), collapse = " ");
         } else {
             stop(sprintf("Variable type %s not implemented. Please send the data file that caused this problem to sebastian.jentschke@uib.no", class(colCrr)));
         }
@@ -185,9 +196,6 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", retDbg = FALSE) {
             mtaDta$fields[[i]][["outputDesiredColumnName"]]  <- NULL;
             mtaDta$fields[[i]][["outputAssignedColumnName"]] <- NULL;
         }
-
-        # fix problem with transforms
-
 
         # check that dataType, and measureType are set accordingly to type (attribute and column in the data frame)
         # dataType: Text, Integer, Decimal

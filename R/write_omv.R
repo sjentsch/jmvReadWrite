@@ -41,13 +41,12 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", retDbg = FALSE) {
     if (! nzchar(fleOut)) stop("Output file name needs to be given as parameter (fleOut = ...).");
 
     # check that the file name isn't empty, that the destination directory exists and that it ends in .omv
-    fleOut <- file.path(normalizePath(dirname(fleOut)), basename(fleOut));
+    fleOut <- nrmFle(fleOut);
     chkDir(fleOut)
     chkExt(fleOut, "omv")
 
-    # check whether dtaFrm is a data frame
+    # check whether dtaFrm is a data frame and extract the number of columns
     chkDtF(dtaFrm);
-    # extract the number of columns
     colNum <- dim(dtaFrm)[2];
 
     # initialize metadata.json
@@ -69,7 +68,7 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", retDbg = FALSE) {
 
     # create strings.bin
     strHdl <- file(description = file.path(tempdir(), "strings.bin"), open = "wb");
-    strPos <- 0
+    strPos <- 0;
 
     # handle the attributes "variable.labels" and "value.labels" in the format provided by the R-package "foreign"
     # the attribute "variable.labels" (attached to the data frame) is converted them to the format used by "haven" ("label" attached to the data column)
@@ -208,6 +207,7 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", retDbg = FALSE) {
         } else if (chkFld(mtaDta$fields[[i]], "type", "number"))  {
             colWrt <- as.double(colCrr);
         } else if (chkFld(mtaDta$fields[[i]], "type", "string"))  {
+            colCrr[is.na(colCrr)] <- "";
             colWrt <- rep(0, length(colCrr));
             for (j in seq_along(colCrr)) {
                 writeBin(colCrr[j], strHdl);
@@ -237,7 +237,7 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", retDbg = FALSE) {
     rm(binHdl);
 
     # compress strings.bin (only if it contains data) and discard the temporary file
-    add2ZIP(fleOut, strHdl, blnZIP = strPos > 0);
+    add2ZIP(fleOut, strHdl, blnZIP = (strPos > 0));
     rm(strHdl);
 
     # create meta, write it and add it to ZIP file

@@ -1,12 +1,29 @@
-#' Merges two .omv-files for the statistical spreadsheet 'jamovi' (www.jamovi.org) by adding the content of the second file (fleIn2) as columns to the first file (fleIn1)
+#' Merges two or more data files by adding the content of other input files as columns to the first input file and outputs them as files for the statistical spreadsheet 'jamovi' (www.jamovi.org)
 #'
-#' @param fleIn1 name (including the path, if required) of the data file to be read ("FILENAME.omv"; default: "")
-#' @param fleIn2 name (including the path, if required) of the data file to be read ("FILENAME.omv"; default: "")
-#' @param fleOut name (including the path, if required) of the data file to be written ("FILENAME.omv"; default: ""); if empty, FILENAME from fleIn1 is extended with "_addCols"
-#' @param typMrg type of merging operation ("inner" [default], "outer", "left", "right", "cross")
+#' @param fleInp vector with the file names of the input files (including the path, if required; c("FILE_IN1.omv", "FILE_IN2.omv"); default: c())
+#' @param fleOut name of the data file to be written (including the path, if required; "FILE_OUT.omv"; default: ""); if empty, the data frame with the added columns is returned as variable (but not written)
+#' @param varBy  variable by which the data sets are matched, can either be a string, a character or a list (see Setails below; default: list())
+#' @param typMrg type of merging operation ("inner" [default], "outer", "left", "right"; see Details below)
+#' @param usePkg name of the package ("haven" [default], "foreign") that shall be used to read SPSS, Stata and SAS files; "haven" is more comprehensive, but with problems you may try "foreign"
+#' @param selSet name of the data set that is to be selected from the workspace (only applies when reading .Rdata-files)
+#' @param usePkg = c("haven", "foreign")
+#' @param selSet = ""
+#' @param ...
+#' @return a data frame (if fleOut is empty) with where the columns of all input data sets (in the files given to fleInp) are concatenated
 #'
 #' @details
-#' The different types of merging operations:
+#' There are four different types of merging operations: "outer" keeps all cases (but columns in the resulting data set may be empty if they did not contain values in same input data sets), "inner" keeps
+#' only those cases where all datasets contain the same value in the matching variable, for "left" all cases from the first data set in fleInp are kept (whereas cases that are only contained in input data
+#' set two or higher are dropped), for "right" all cases from the second (or any higher) data set in fleInp are kept. The behaviour of "left" and "right" may be somewhat difficult to predict in case of
+#' merging several data sets, therefore "outer" might be a safer choice if several data sets are merged.
+#' The variable that is used for matching (varBy) can either be a string (if all datasets contain a matching variable with the same name), a character vector (containing several matching variables that
+#' are the same for all data sets) or a list with the same length as fleInp. In the latter case, each cell of that list can again contain either a string (one matching variable for each data set in FleInp)
+#' or a character vector (several matching variables for each data set in FleInp; NB: all character vectors in the cells of the list must have the same length as it is necessary to always use the same
+#' number of matching variables when merging).
+#' The ellipsis-parameter can be used to submit arguments / parameters to the functions that are used for adding columns or reading the data. Adding columns uses "merge". When reading the data, the
+#' functions are: "read_omv" (for jamovi-files), "read.table" (for CSV / TSV files; using similar defaults as "read.csv" for CSV and "read.delim" for TSV which both are based upon "read.table" but with
+#' adjusted defaults for the respective file types), "readRDS" (for rds-files), "read_sav" (needs R-package "haven") or "read.spss" (needs R-package "foreign") for SPSS-files, read_dta ("haven") /
+#' read.dta ("foreign") for Stata-files, read_sas ("haven") for SAS-data-files, and read_xpt ("haven") / read.xport ("foreign") for SAS-transport-files.
 #'
 #' @examples
 #' \dontrun{
@@ -15,12 +32,81 @@
 #'
 #' @export merge_cols_omv
 #'
-merge_cols_omv <- function(fleIn1 = "", fleIn2 = "", fleOut = "", typMrg = c("inner", "outer", "left", "right", "cross")) {
+merge_cols_omv <- function(fleInp = c(), fleOut = "", varBy = list(), typMrg = c("outer", "inner", "left", "right"), usePkg = c("haven", "foreign"), selSet = "", ...) {
+
+    # normalize the path of the input files and then check whether the files exist and whether they are of a supported file type
+    if (length(fleInp) < 2) {
+        stop("A character vector that contains at least two file names is required to be given as fleInp-argument.")
+    }
+    fleInp <- sapply(fleInp, nrmFle, USE.NAMES = FALSE);
+    all(sapply(fleInp, chkFle));
+    all(sapply(fleInp, chkExt, vldExt));
+
+    # handle / check further input arguments
+    typMrg <- match.arg(typMrg);
+    usePkg <- match.arg(usePkg);
+    varArg <- list(...);
 
     # read files
+    dtaInp <- vector(mode = "list", length = length(fleInp));
+    for (i in seq_along(fleInp)) {
+        dtaInp[[i]] <- read_all(fleInp[i], usePkg, selSet, varArg);
+    }
+
+    # check the matching variable(s)
+    varBy <- chkByV(varBy, dtaInp);
 
     # merge files
+    crrArg <- list(x = NULL, y = NULL, by.x = "", by.y = "", all.x = ifelse(any(typMrg %in% c("outer", "left")), TRUE, FALSE), all.y = ifelse(any(typMrg %in% c("outer", "right")), TRUE, FALSE));
+    crrArg <- adjArg(c("merge", "data.frame"), crrArg, varArg, c("x", "y", "by.x", "by.y", "all.x", "all.y"));
+    # store labels (getLbl: defined in long2wide_omv)
+    crrLnT <- getLbl(dtaInp, "");
+    dtaOut <- dtaInp[[1]];
+    for (i in setdiff(seq_along(fleInp), 1)) {
+        dtaOut <- do.call(merge, c(list(x = dtaOut, y = dtaInp[[i]], by.x = varBy[[1]], by.y = varBy[[i]]), crrArg[!grepl("^x$|^y$|^by.x$|^by.y$", names(crrArg))]));
+    }
 
-    # write files
+    # restore labels (rstLbl: defined in long2wide_omv)
+    dtaOut <- rstLbl(dtaOut, crrLnT);
 
+    # write files (if fleOut is not empty) or return resulting data frame
+    if (nzchar(fleOut)) {
+        write_omv(dtaOut, nrmFle(fleOut));
+    } else {
+        dtaOut
+    }
+}
+
+chkByV <- function(varBy = list(), dtaFrm = NULL) {
+    # varBy is empty
+    if ((is.list(varBy)      && length(varBy) == 0) ||
+        (is.vector(varBy)    && length(varBy) == 0) ||
+        (is.character(varBy) && !nzchar(varBy)) ||
+        is.null(varBy)) {
+        return(rep(list(mtcVar(dtaFrm)), length(dtaFrm)));
+    # varBy is a list with the same length as dtaFrm
+    } else if (is.list(varBy) && length(varBy) == length(dtaFrm)) {
+        if (all(sapply(seq_along(dtaFrm), function(i) all(varBy[[i]] %in% names(dtaFrm[[i]]))))) {
+            return(varBy);
+        } else {
+            stop("Not all data sets given in fleInp contain the variable(s) / column(s) that shall be used for matching.");
+        }
+    # varBy is a character vector (without empty elements) or a string
+    } else if ((is.vector(varBy) && length(varBy) >= 1 && all(nzchar(varBy))) || is.character(varBy)) {
+        if (all(sapply(dtaFrm, function(x) all(varBy %in% names(x))))) {
+            return(rep(list(varBy), length(dtaFrm)));
+        } else {
+            stop("Not all data sets given in fleInp contain the variable(s) / column(s) that shall be used for matching.");
+        }
+    } else {
+        stop("varBy must be either a list (with the same length as fleInp), a character vector, or a string.");
+    }
+}
+
+mtcVar <- function(dtaFrm = NULL) {
+    varCmm <- names(dtaFrm[[1]]);
+    for (i in setdiff(seq_along(dtaFrm), 1)) {
+        varCmm <- intersect(varCmm, names(dtaFrm[[i]]));
+    }
+    varCmm
 }

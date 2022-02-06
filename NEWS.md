@@ -8,6 +8,7 @@
 `long2wide_omv` (converts data sets from long to wide, e.g., for running mixed-model-analyses in jamovi)
 `wide2long_omv` (converts data sets from wide to long, e.g., for running mixed-model-analyses in jamovi)
 * default for `sveAtt` in `read_omv` (now `TRUE`; it makes more sense to store this attributes be default since `write_omv` will give you an exact copy of the original data set if they are stored and the helper functions above also respect and adjust them)
+* implemented unit tests for `read_omv`, `write_omv`, `convert_to_omv`, `merge_cols_omv`, `merge_rows_omv`, `long2wide_omv`, `wide2long_omv`
 
 
 # jmvReadWrite 0.2.4

@@ -9,7 +9,7 @@ if (getRversion() >= "2.15.1") {
 lstRpl <- list("\x84" = "\"", "\x93" = "\"", "\xc4" = "Ae", "\xd6" = "Oe", "\xdc" = "Ue", "\xdf" = "ss", "\xe4" = "ae", "\xf6" = "oe", "\xfc" = "ue");
 
 lstRpl <- rbind(c("\x84", "\x93", "\xc4", "\xd6", "\xdc", "\xdf", "\xe4", "\xf6", "\xfc"),
-                c(  "\"",   "\"",   "Ae",   "Oe",   "Ue",   "ss",   "ae",   "oe",   "ue"));
+                c("\"",   "\"",   "Ae",   "Oe",   "Ue",   "ss",   "ae",   "oe",   "ue"));
                 
 # =================================================================================================
 # the next lines store the currently supported versions (stored in meta / MANIFEST.MF)
@@ -28,6 +28,99 @@ mtaFld <- list(name = "", id = NA, columnType = "Data", dataType = "Integer", me
                outputDesiredColumnName = "", outputAssignedColumnName = "", importName = "", description = "", transform = 0,
                edits = list(), missingValues = list(), trimLevels = TRUE, filterNo = NA, active = FALSE)
 grpMta <- paste0("^", paste(c(names(mtaGlb), names(mtaFld)), collapse = "$|^"), "$");
+
+# =================================================================================================
+# functions for checking parameters (file and directory existence, correct file extension, correct
+# dimensions and existence of data frames) and normalizing the file name
+
+# REMEMBER: requires the full file name, NOT the directory
+chkDir <- function(fleNme = "", wrtPrm = TRUE) {
+    if (! file_test("-d", dirname(fleNme))) {
+        stop(sprintf("Directory (%s) doesn\'t exist.", dirname(fleNme)));
+    }
+    if (file.access(dirname(fleNme), mode = 2)) {
+        stop(sprintf("The directory (%s) exists, but you don\'t have writing permissions in that directory.", dirname(fleNme)));    
+    }
+    TRUE
+}
+
+chkDtF <- function(dtaFrm = NULL, minSze = c(1, 1)) {
+    if (length(minSze) != 2) minSze <- rep(minSze[1], 2)
+    if (is.null(dtaFrm) || ! is.data.frame(dtaFrm) || length(dim(dtaFrm)) != 2) {
+        stop("Input data are either not a data frame or have incorrect (only one or more than two) dimensions.");
+    } else if (any(dim(dtaFrm) < minSze)) {
+        stop(sprintf("The %s dimension of the input data frame has not the required size (%d < %d).",
+                     ifelse(which(dim(dtaFrm) < minSze)[1] == 1, "first", "second"), dim(dtaFrm)[dim(dtaFrm) < minSze][1], minSze[dim(dtaFrm) < minSze][1]));
+    }
+    TRUE
+}
+
+chkExt <- function(fleNme = "", extNme = c("")) {
+    if (! hasExt(fleNme, extNme)) {
+        stop(sprintf("File name (%s) contains an unsupported file extension (%s).", basename(fleNme), paste(paste0(".", extNme[tools::file_ext(fleNme) != extNme]), collapse = ", ")));
+    }
+    TRUE
+}
+
+chkFle <- function(fleNme = "", fleCnt = "", isZIP = FALSE) {
+    if (! file_test("-f", fleNme)) {
+        if (nchar(fleCnt) > 0) {
+            stop(sprintf("File \"%s\" doesn't contain the file \"%s\".", fleCnt, fleNme));
+        } else {
+            stop(sprintf("File \"%s\" not found.", fleNme));
+        }
+    } else if (isZIP) {
+        hdrStr <- readBin(tmpHdl <- file(fleNme, "rb"), "character"); close(tmpHdl); rm(tmpHdl);
+        # only "PK\003\004" is considered, not "PK\005\006" (empty ZIP) or "PK\007\008" (spanned [over several files])
+        if (! hdrStr == "PK\003\004\024") {
+            stop(sprintf("File \"%s\" has not the correct file format (is not a ZIP archive).", basename(fleNme)));
+        }
+        rm(hdrStr);
+    }
+    TRUE
+}
+
+chkVar <- function(dtaFrm = NULL, varNme = c()) {
+    if (!all(varNme %in% names(dtaFrm))) {
+        stop(sprintf("The variable(s) %s are not contained in the current data set.", paste(varNme[! (varNme %in% names(dtaFrm))], collapse = ", ")));
+    }
+    TRUE
+}
+
+hasExt <- function(fleNme = "", extNme = c("")) {
+    any(tolower(tools::file_ext(fleNme)) == tolower(extNme))
+}
+
+hasPkg <- function(usePkg = c()) {
+    all(sapply(usePkg, function(X) nzchar(system.file(package = X))))
+}
+
+nrmFle <- function(fleNme = "") {
+    file.path(normalizePath(dirname(fleNme)), basename(fleNme))
+}
+
+vldExt <- c("omv",    "csv", "tsv", "rdata", "rda", "rds", "sav", "zsav", "dta",   "sas7bdat", "sd2", "sd7", "xpt", "stx", "stc");
+dscExt <- c("jamovi", "CSV", "TSV", "Rdata",        "RDS", "SPSS",        "Stata", "SAS");
+
+
+# =================================================================================================
+# get function arguments and adjust them / select those valid for the current function call
+
+adjArg <- function(fcnNme = c(), dflArg = list(), varArg = list(), fxdArg = c()) {
+    chgArg <- setdiff(intersect(fcnArg(fcnNme), names(varArg)), fxdArg);
+    c(dflArg[setdiff(names(dflArg), chgArg)], varArg[chgArg])
+}
+
+fcnArg <- function(fcnNme = c()) {
+    if        (is.character(fcnNme) && length(fcnNme) == 1) {
+        eval(parse(text = paste0("formalArgs(", fcnNme, ")")))
+    } else if (is.character(fcnNme) && length(fcnNme) == 2) {
+        eval(parse(text = paste0("formalArgs(getS3method(\"", fcnNme[1], "\", \"", fcnNme[2], "\"))")))
+    } else {
+        stop("The argument to fcnArg must be a character (vector) with 1 or 2 elements.");
+    }
+}
+
 
 # =================================================================================================
 # functions for handling setting and storing metadata-information
@@ -67,68 +160,3 @@ chkAtt <- function(attObj = NULL, attNme = "", attVal = NULL) {
 chkFld <- function(fldObj = NULL, fldNme = "", fldVal = NULL) {
    ((fldNme %in% names(fldObj))    && length(fldObj[[fldNme]])     > 0 && ifelse(!is.null(fldVal), grepl(fldVal, fldObj[[fldNme]]),     TRUE))
 }
-
-# =================================================================================================
-# functions for checking parameters (file and directory existence, correct file extension, correct
-# dimensions and existence of data frames
-
-chkFle <- function(fleNme = "", fleCnt = "", isZIP = FALSE) {
-    if (! file_test("-f", fleNme)) {
-        if (nchar(fleCnt) > 0) {
-            stop(sprintf("File \"%s\" doesn't contain the file \"%s\".", fleCnt, fleNme));
-        } else {
-            stop(sprintf("File \"%s\" not found.", fleNme));
-        }
-    } else if (isZIP) {
-        hdrStr <- readBin(tmpHdl <- file(fleNme, "rb"), "character"); close(tmpHdl); rm(tmpHdl);
-        # only "PK\003\004" is considered, not "PK\005\006" (empty ZIP) or "PK\007\008" (spanned [over several files])
-        if (! hdrStr == "PK\003\004\024") {
-            stop(sprintf("File \"%s\" has not the correct file format (is not a ZIP archive).", basename(fleNme)));
-        }
-        rm(hdrStr);
-    }
-    TRUE
-}
-
-# REMEMBER: requires the full file name, NOT the directory
-chkDir <- function(fleNme = "") {
-    if (! file_test("-d", dirname(fleNme))) {
-        stop(sprintf("Directory (%s) doesn't exist.", dirname(fleNme)));
-    }
-    TRUE
-}
-
-chkDtF <- function(dtaFrm = NULL, minSze = c(1, 1)) {
-    if (length(minSze != 2)) minSze <- rep(minSze[1], 2)
-    if (is.null(dtaFrm) || ! is.data.frame(dtaFrm) || length(dim(dtaFrm)) != 2) {
-        stop("Input data frame is not a data frame or it has either only one or more than two dimensions.");
-    } else if (any(dim(dtaFrm) < minSze)) {
-        stop(sprintf("The %s dimension of the input data frame has not the required size (%d < %d).",
-                     ifelse(which(dim(data) < minSze)[1] == 1, "first", "second"), dim(data)[dim(data) < minSze][1], minSze[dim(data) < minSze][1]));
-    }
-    TRUE
-}
-
-chkExt <- function(fleNme = "", extNme = c("")) {
-    if (! hasExt(fleNme, extNme)) {
-        stop(sprintf("File name (%s) contains an unsupported file extension (%s).", basename(fleNme), paste(paste0(".", extNme[tools::file_ext(fleNme) != extNme]), collapse = ", ")));
-    }
-}
-
-hasExt <- function(fleNme = "", extNme = c("")) {
-    any(tolower(tools::file_ext(fleNme)) == tolower(extNme))
-}
-
-hasPkg <- function(usePkg = c()) {
-    all(sapply(usePkg, function(X) nzchar(system.file(package = X))))
-}
-
-
-# =================================================================================================
-# get function arguments
-
-fcnArg <- function(fncNme = "") {
-    eval(parse(text = paste0("formals(", fncNme, ")")))
-}
-
-

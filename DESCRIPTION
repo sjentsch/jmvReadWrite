@@ -20,8 +20,13 @@ BugReports: https://github.com/sjentsch/jmvReadWrite/issues
 Depends: R (>= 3.5.0)
 Imports: rjson,
          zip
-Suggests: jmv,
-          jmvcore,
-          knitr,
-          rmarkdown,
-          RProtoBuf
+Suggests: 
+    jmv,
+    jmvcore,
+    foreign,
+    haven,
+    knitr,
+    rmarkdown,
+    RProtoBuf,
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3

@@ -2,6 +2,19 @@
 #'
 #' @param fleInp name (including the path, if required) of the data file to be read ("FILENAME.omv"; default: "")
 #' @param fleOut name (including the path, if required) of the data file to be written ("FILENAME.omv"; default: ""); if empty, FILENAME from fleInp is extended with "_wide"
+#' @param varTme name of the variable that differentiates multiple records from the same group / individual (default: "")
+#' @param varID  names of one or more variables that identify the same group / individual (default: c())
+#' @param varSep separator character when concatenating the fixed and time-varying part of the variable name ("VAR1.1", "VAR1.2"; default: ".")
+#' @param varOrd how variables / columns are organized: for "times" [default] the steps of the time varying variable are adjacent, for "vars" the steps of the original columns in the long dataset
+#' @param usePkg name of the package ("haven" or "foreign") that shall be used to read SPSS, Stata and SAS files; "haven" is the default (it is more comprehensive), but with problems you may try "foreign"
+#' @param selSet name of the data set that is to be selected from the workspace (only applies when reading .Rdata-files)
+#' @param ...
+#'
+#' @details
+#' The ellipsis-parameter can be used to submit arguments / parameters to the functions that are used for transforming or reading the data. The transformation uses "reshape". When reading the data, the
+#' functions are: "read_omv" (for jamovi-files), "read.table" (for CSV / TSV files; using similar defaults as "read.csv" for CSV and "read.delim" for TSV which both are based upon "read.table" but with
+#' adjusted defaults for the respective file types), "readRDS" (for rds-files), "read_sav" (needs R-package "haven") or "read.spss" (needs R-package "foreign") for SPSS-files, read_dta ("haven") /
+#' read.dta ("foreign") for Stata-files, read_sas ("haven") for SAS-data-files, and read_xpt ("haven") / read.xport ("foreign") for SAS-transport-files.
 #'
 #' @examples
 #' \dontrun{
@@ -10,12 +23,84 @@
 #'
 #' @export long2wide_omv
 #'
-long2wide_omv <- function(fleInp = "", fleOut = "") {
+long2wide_omv <- function(fleInp = "", fleOut = "", varID = "", varTme = "", varSep = ".", varOrd = c("times", "vars"), usePkg = c("haven", "foreign"), selSet = "", ...) {
+
+    # normalize the path of the input file and then check whether the file exists and whether it is of a supported file type
+    # if fleOut is empty, fleInp is used with the file name extended by "_wide" and the extension set to ".omv"
+    fleInp <- nrmFle(fleInp);
+    chkFle(fleInp);
+    chkExt(fleInp, vldExt);
+    fleOut <- ifelse(nzchar(fleOut), nrmFle(fleOut), sub(paste0(".", tools::file_ext(fleInp)), "_long.omv", fleInp));
+
+    # handle / check further input arguments
+    # check varID (can be several) and varTme (must be one), neither can be empty
+    if (!all(nzchar(c(varID, varTme)))) {
+        stop("Using the arguments varID and varTme is mandatory (i.e., they can't be empty).");
+    } else if (length(varID) < 1 || length(varTme) != 1) {
+        stop("The argument varID must at least contain one variable, and varTme exactly one variable.");
+    }
+    varOrd <- match.arg(varOrd);
+    usePkg <- match.arg(usePkg);
+    varArg <- list(...);
 
     # read file
+    dtaFrm <- read_all(fleInp, usePkg, selSet, varArg);
 
     # transform data set
+    # [1] check whether varTme and varID are not empty and exist in the data set
+    chkVar(dtaFrm, c(varID, varTme));
+    # [2] store the original variable labels and the steps of the time-varying variable in crrLnT
+    crrLnT <- getLbl(dtaFrm, varTme);
+    # [3] call "reshape" with having the variable arguments limited to those valid when calling the function
+    crrArg <- list(data = dtaFrm, direction = "wide", idvar = varID, timevar = varTme);
+    if (nzchar(varSep)) crrArg <- c(crrArg, list(sep = varSep));
+    dtaFrm <- do.call(reshape, adjArg("reshape", crrArg, varArg, c("data", "direction", "idvar", "timevar")));
+
+    # change the order of column (if requested)
+    if (varOrd == "vars") dtaFrm <- chgVrO(dtaFrm);
+
+    # restore the original labels
+    dtaFrm <- rstLbl(dtaFrm, crrLnT);
 
     # write file
+    write_omv(dtaFrm, fleOut)
 
+}
+
+chgVrO <- function(dtaFrm = NULL) {
+    varVry <- attr(dtaFrm, "reshapeWide")$varying;
+    varLst <- setdiff(names(dtaFrm), varVry);
+    for (i in seq_len(dim(varVry)[1])) {
+        varLst <- c(varLst, varVry[i, ]);
+    }
+
+    dtaFrm[, varLst]
+}
+
+getLbl <- function(dtaFrm = NULL, varTme = "") {
+    # if only one data frame is given (not a list of them) it needs to be wrapped as list
+    if (!is.null(dim(dtaFrm))) dtaFrm <- list(dtaFrm);
+    lblLst <- tmeLst <- NULL;
+    for (i in seq_along(dtaFrm)) {
+        lblLst <- c(lblLst, sapply(dtaFrm[[i]], attr, "jmv-desc"), sapply(dtaFrm[[i]], attr, "label"));
+        tmeLst <- unique(c(tmeLst, dtaFrm[[i]][[varTme]]));
+    }
+    if (all(tmeLst == seq_along(tmeLst))) tmeLst <- NULL;
+
+    list(label = lblLst[! sapply(lblLst, is.null)], times = tmeLst)
+}
+
+rstLbl <- function(dtaFrm = NULL, crrLnT = list()) {
+    for (i in seq_along(dtaFrm)) {
+        varNme <- names(dtaFrm);
+        for (crrNme in names(crrLnT$label)) {
+            crrLbl <- crrLnT$label[[crrNme]];
+            crrCol <- grep(paste0("^", crrNme), varNme);
+            for (i in seq_along(crrCol)) {
+                attr(dtaFrm[[crrCol[i]]], "jmv-desc") <- ifelse(is.null(crrLnT$times), crrLbl, paste0(crrLbl, " (", as.character(crrLnT$times[i]), ")"));
+            }
+        }
+    }
+
+    dtaFrm
 }

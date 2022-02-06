@@ -18,4 +18,4 @@
 
 0 errors | 0 warnings | 0 note
 
-* This is a new release.
+* This is an updated release (0.2.4 -> 0.3.0).

@@ -1,0 +1,12 @@
+test_that("convert_to_omv works", {
+    # check whether writing the data is working (file existence, size, contents [.omv-files are ZIP archives and must contain files that include meta, metadata.json, data.bin])
+    nmeOut <- paste0(tempfile(), ".omv");
+    convert_to_omv(fleInp = system.file("data", "bfi_sample.rda",  package = "jmvReadWrite"), fleOut = nmeOut);
+    expect_true(file.exists(nmeOut));
+    expect_gt(file.info(nmeOut)$size, 1);
+    expect_true(chkFle(nmeOut, isZIP = TRUE));
+    expect_true(chkFle(nmeOut, "meta"));
+    expect_true(chkFle(nmeOut, "metadata.json"));
+    expect_true(chkFle(nmeOut, "data.bin"));
+    unlink(nmeOut);
+})

@@ -1,14 +1,16 @@
 #' Merges two .omv-files for the statistical spreadsheet 'jamovi' (www.jamovi.org) by adding the content of the second file (fleIn2) as rows to the first file (fleIn1)
 #'
-#' @param fleInp vector with file names (including the path, if required) of the data files to be read (c("FILE1.omv", "FILE2.omv"); default: c())
-#' @param fleOut name of the data file to be written (including the path, if required; "FILE_OUT.omv"; default: ""); if empty, the data frame with the added columns is returned as variable (but not written)
-#' @param typMrg type of merging operation ("all" [default], "common")
-#' @param colInd add a column with an indicator (the basename of the file minus the extension) marking from which input data set the respective rows are coming (default: FALSE)
-#' @param rstRwN reset row names (i.e., do not keep the row names of the original input data sets but number them consecutively - one to the row number of all input data sets added up; default: TRUE)
-#' @param rmvDpl remove duplicated rows (i.e., rows with the same content as a previous row in all columns; default: FALSE)
-#' @param usePkg name of the package ("haven" or "foreign") that shall be used to read SPSS, Stata and SAS files; "haven" is the default (it is more comprehensive), but with problems you may try "foreign"
-#' @param selSet name of the data set that is to be selected from the workspace (only applies when reading .Rdata-files)
-#' @param ...
+#' @param fleInp Vector with file names (including the path, if required) of the data files to be read (c("FILE1.omv", "FILE2.omv"); default: c())
+#' @param fleOut Name of the data file to be written (including the path, if required; "FILE_OUT.omv"; default: ""); if empty, the data frame with the added columns is returned as variable (but not written)
+#' @param typMrg Type of merging operation: "all" (default) or  "common"; see also Details
+#' @param colInd Add a column with an indicator (the basename of the file minus the extension) marking from which input data set the respective rows are coming (default: FALSE)
+#' @param rstRwN Reset row names (i.e., do not keep the row names of the original input data sets but number them consecutively - one to the row number of all input data sets added up; default: TRUE)
+#' @param rmvDpl Remove duplicated rows (i.e., rows with the same content as a previous row in all columns; default: FALSE)
+#' @param varSrt Variable(s) that are used to sort the data frame (see Details; if empty, the order after merging is kept; default: c())
+#' @param usePkg Name of the package: "haven" or "foreign" that shall be used to read SPSS, Stata and SAS files; "haven" is the default (it is more comprehensive), but with problems you may try "foreign"
+#' @param selSet Name of the data set that is to be selected from the workspace (only applies when reading .Rdata-files)
+#' @param ... Additional arguments passed on to methods; see Details below
+#'
 #' @return a data frame (if fleOut is empty) with where the rows of all input data sets (i.e., the files given in the fleInp-argument) are concatenated
 #'
 #' @details
@@ -28,17 +30,10 @@
 #'
 #' @export merge_rows_omv
 #'
-merge_rows_omv <- function(fleInp = c(), fleOut = "", typMrg = c("all", "common"), colInd = FALSE, rstRwN = TRUE, rmvDpl = FALSE, usePkg = c("haven", "foreign"), selSet = "", ...) {
+merge_rows_omv <- function(fleInp = c(), fleOut = "", typMrg = c("all", "common"), colInd = FALSE, rstRwN = TRUE, rmvDpl = FALSE, varSrt = c(), usePkg = c("haven", "foreign"), selSet = "", ...) {
 
-    # normalize the path of the input files and then check whether the files exist and whether they are of a supported file type
-    if (length(fleInp) < 2) {
-        stop("A character vector that contains at least two file names is required to be given as fleInp-argument.")
-    }
-    fleInp <- sapply(fleInp, nrmFle, USE.NAMES = FALSE);
-    all(sapply(fleInp, chkFle));
-    all(sapply(fleInp, chkExt, vldExt));
-
-    # handle / check further input arguments
+    # check and format input file names and handle / check further input arguments
+    fleInp <- fmtFlI(fleInp, minLng = 2);
     typMrg <- match.arg(typMrg);
     usePkg <- match.arg(usePkg);
     varArg <- list(...);
@@ -72,7 +67,7 @@ merge_rows_omv <- function(fleInp = c(), fleOut = "", typMrg = c("all", "common"
         }
     }
 
-    # remove duplicate rows
+    # remove row names
     if (rstRwN == TRUE) {
         rownames(dtaOut) <- NULL;
     }
@@ -81,6 +76,9 @@ merge_rows_omv <- function(fleInp = c(), fleOut = "", typMrg = c("all", "common"
     if (rmvDpl == TRUE) {
         dtaOut <- dtaOut[!duplicated(dtaOut), ];
     }
+
+    # sort data frame (if varSrt not empty)
+    dtaOut <- srtFrm(dtaOut, varSrt);
 
     # write files (if fleOut is not empty) or return resulting data frame
     if (nzchar(fleOut)) {

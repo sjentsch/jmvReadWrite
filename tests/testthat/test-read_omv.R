@@ -8,7 +8,7 @@ test_that("read_omv works", {
     expect_s3_class(dtaFrm, "data.frame")
     expect_equal(dim(dtaFrm), c(60, 12))
     expect_equal(as.vector(sapply(dtaFrm, typeof)), c("logical", "integer", "double", "integer", "double", "integer", "double", "integer", "integer", "double", "double", "double"))
-    expect_equal(names(attributes(dtaFrm)), c("row.names", "names", "class", "fltLst", "variable.labels"))
+    expect_equal(names(attributes(dtaFrm)), c("row.names", "names", "class", "fltLst"))
     expect_equal(names(attributes(dtaFrm[[4]])), c("levels", "class", "values", "missingValues"))
     expect_equal(names(attributes(dtaFrm[[4]])), c("levels", "class", "values", "missingValues"))
     expect_vector(attr(dtaFrm[[4]], "missingValues"), list(), 0)
@@ -30,7 +30,7 @@ test_that("read_omv works", {
     expect_s3_class(dtaFrm, "data.frame")
     expect_equal(dim(dtaFrm), c(60, 12))
     expect_equal(as.vector(sapply(dtaFrm, typeof)), c("logical", "integer", "double", "integer", "double", "integer", "double", "integer", "integer", "double", "double", "double"))
-    expect_equal(names(attributes(dtaFrm)), c("row.names", "names", "class", "fltLst", "variable.labels", "removedRows", "addedRows", "transforms"))
+    expect_equal(names(attributes(dtaFrm)), c("row.names", "names", "class", "fltLst", "removedRows", "addedRows", "transforms"))
     expect_equal(names(attributes(dtaFrm[[4]])),  c("levels", "class", "values", "missingValues", "name", "id", "columnType", "dataType", "measureType", "formula", "formulaMessage",
                                                     "parentId", "width", "type", "importName", "description", "transform", "edits", "trimLevels"))
     expect_equal(names(attributes(dtaFrm[[10]])), c("jmv-desc", "missingValues", "name", "id", "columnType", "dataType", "measureType", "formula", "formulaMessage", "parentId", "width",
@@ -40,13 +40,13 @@ test_that("read_omv works", {
     # read the data set (with the getSyn-argument set TRUE) and test its properties: correct attributes (should contain "syntax" and "protobuf"), as well as the type, size and content of "syntax"
     # (should start with "jmv::")
     dtaFrm <- read_omv(fleInp = nmeInp, useFlt = FALSE, rmMsVl = FALSE, sveAtt = FALSE, getSyn = TRUE, getHTM = FALSE);
-    expect_equal(names(attributes(dtaFrm)), c("row.names", "names", "class", "fltLst", "variable.labels", "syntax", "protobuf"))
+    expect_equal(names(attributes(dtaFrm)), c("row.names", "names", "class", "fltLst", "syntax", "protobuf"))
     expect_vector(attr(dtaFrm, "syntax"), list(), 2)
     expect_true(all(grepl("^jmv::", attr(dtaFrm, "syntax"))))
 
     # read the data set (with the getSyn-argument set TRUE) and test its properties: correct attributes (should contain "syntax" and "protobuf"), as well as the type, size and content of "syntax"
     dtaFrm <- read_omv(fleInp = nmeInp, useFlt = FALSE, rmMsVl = FALSE, sveAtt = FALSE, getSyn = FALSE, getHTM = TRUE);
-    expect_equal(names(attributes(dtaFrm)), c("row.names", "names", "class", "fltLst", "variable.labels", "HTML"))
+    expect_equal(names(attributes(dtaFrm)), c("row.names", "names", "class", "fltLst", "HTML"))
     expect_vector(attr(dtaFrm, "HTML"), character(), 266)
     expect_equal(attr(dtaFrm, "HTML")[1],   "<!DOCTYPE html>")
     expect_equal(attr(dtaFrm, "HTML")[2],   "<html>")
@@ -60,14 +60,16 @@ test_that("read_all works", {
     expect_s3_class(dtaFrm, "data.frame")
     expect_equal(dim(dtaFrm), c(60, 12))
     expect_equal(as.vector(sapply(dtaFrm, typeof)), c("logical", "integer", "double", "integer", "double", "integer", "double", "integer", "integer", "double", "double", "double"))
-    expect_equal(names(attributes(dtaFrm)), c("row.names", "names", "class", "fltLst", "variable.labels", "removedRows", "addedRows", "transforms"))
+    expect_equal(names(attributes(dtaFrm)), c("row.names", "names", "class", "fltLst", "removedRows", "addedRows", "transforms"))
     expect_equal(names(attributes(dtaFrm[[4]])),  c("levels", "class", "values", "missingValues", "name", "id", "columnType", "dataType", "measureType", "formula", "formulaMessage",
                                                     "parentId", "width", "type", "importName", "description", "transform", "edits", "trimLevels"))
 
     # read_all for ToothGrowth as Rdata-set has fewer columns and attributes, check data frame, size, correct column type, and several attributes of the data frame and columns
-    dtaFrm <- read_all(system.file("data",    "ToothGrowth.rda", package = "jmvReadWrite"));
-    expect_equal(dim(dtaFrm), c(60, 6))
-    expect_equal(as.vector(sapply(dtaFrm, typeof)), c("double", "integer", "double", "integer", "double", "integer"))
+    dtaFrm <- read_all(system.file("data", "ToothGrowth.rda", package = "jmvReadWrite"));
+    expect_equal(dim(dtaFrm), c(60, 7))
+    expect_equal(unname(sapply(dtaFrm, typeof)),                c("integer", "integer", "integer", "double", "integer", "double", "double"))
+    expect_equal(unname(sapply(sapply(dtaFrm, class), "[", 1)), c("integer", "factor", "factor", "numeric", "ordered", "numeric", "numeric"))
     expect_equal(names(attributes(dtaFrm)), c("names", "row.names", "class"))
-    expect_equal(names(attributes(dtaFrm[[4]])),  c("levels", "class"))
+    expect_equal(names(attributes(dtaFrm[[3]])),  c("levels", "class", "values"))
+    expect_equal(names(attributes(dtaFrm[[5]])),  c("levels", "class"))
 })

@@ -4,6 +4,7 @@
 #' @param dtaFrm Data frame to be exported (default: NULL)
 #' @param fleOut Name / position of the output file to be generated ("FILENAME.omv"; default: "")
 #' @param retDbg Whether to return a list with debugging information (see Value; default: FALSE)
+#'
 #' @return a list (if retDbg == TRUE), containing the meta data (mtaDta, metadata.json in the OMV-file), the extended data (xtdDta, xdata.json in the OMV-file) and the original data frame (dtaFrm)
 #'
 #' @details
@@ -123,7 +124,7 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", retDbg = FALSE) {
             }
             mtaDta$fields[[i]][["type"]]         <- "integer";
             # if "measureType" is already stored in the data frame, keep it, otherwise set it to "Ordinal" if the properties indicate it to be likely ("Nominal" is already the default)
-            if (chkFld(mtaDta$fields[[i]], "dataType", "Integer") && length(facVal) > 5 && !any(is.na(c(facVal, colCrr))) && stats::sd(diff(facVal)) < diff(range(colCrr)) / 10) {
+            if (is.ordered(colCrr) || (chkFld(mtaDta$fields[[i]], "dataType", "Integer") && length(facVal) > 5 && !any(is.na(c(facVal, colCrr))) && stats::sd(diff(facVal)) < diff(range(colCrr)) / 10)) {
                 mtaDta$fields[[i]][["measureType"]] <- ifelse(chkAtt(dtaFrm[[i]], "measureType"), attr(dtaFrm[[i]], "measureType"), "Ordinal");
             }
             if (length(facVal) > 0) {

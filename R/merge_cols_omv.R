@@ -1,14 +1,14 @@
 #' Merges two or more data files by adding the content of other input files as columns to the first input file and outputs them as files for the statistical spreadsheet 'jamovi' (www.jamovi.org)
 #'
 #' @param fleInp vector with the file names of the input files (including the path, if required; c("FILE_IN1.omv", "FILE_IN2.omv"); default: c())
-#' @param fleOut name of the data file to be written (including the path, if required; "FILE_OUT.omv"; default: ""); if empty, the data frame with the added columns is returned as variable (but not written)
-#' @param varBy  variable by which the data sets are matched, can either be a string, a character or a list (see Setails below; default: list())
-#' @param typMrg type of merging operation ("inner" [default], "outer", "left", "right"; see Details below)
-#' @param usePkg name of the package ("haven" [default], "foreign") that shall be used to read SPSS, Stata and SAS files; "haven" is more comprehensive, but with problems you may try "foreign"
-#' @param selSet name of the data set that is to be selected from the workspace (only applies when reading .Rdata-files)
-#' @param usePkg = c("haven", "foreign")
-#' @param selSet = ""
-#' @param ...
+#' @param fleOut Name of the data file to be written (including the path, if required; "FILE_OUT.omv"; default: ""); if empty, the data frame with the added columns is returned as variable (but not written)
+#' @param typMrg Type of merging operation: "inner" (default), "outer", "left" or "right"; see Details below
+#' @param varBy  Name of the variable by which the data sets are matched, can either be a string, a character or a list (see Details below; default: list())
+#' @param varSrt Variable(s) that are used to sort the data frame (see Details; if empty, the order after merging is kept; default: c())
+#' @param usePkg Name of the package: "haven" or "foreign" that shall be used to read SPSS, Stata and SAS files; "haven" is the default (it is more comprehensive), but with problems you may try "foreign"
+#' @param selSet Name of the data set that is to be selected from the workspace (only applies when reading .Rdata-files)
+#' @param ... Additional arguments passed on to methods; see Details below
+#'
 #' @return a data frame (if fleOut is empty) with where the columns of all input data sets (in the files given to fleInp) are concatenated
 #'
 #' @details
@@ -32,17 +32,10 @@
 #'
 #' @export merge_cols_omv
 #'
-merge_cols_omv <- function(fleInp = c(), fleOut = "", varBy = list(), typMrg = c("outer", "inner", "left", "right"), usePkg = c("haven", "foreign"), selSet = "", ...) {
+merge_cols_omv <- function(fleInp = c(), fleOut = "", typMrg = c("outer", "inner", "left", "right"), varBy = list(), varSrt = c(), usePkg = c("haven", "foreign"), selSet = "", ...) {
 
-    # normalize the path of the input files and then check whether the files exist and whether they are of a supported file type
-    if (length(fleInp) < 2) {
-        stop("A character vector that contains at least two file names is required to be given as fleInp-argument.")
-    }
-    fleInp <- sapply(fleInp, nrmFle, USE.NAMES = FALSE);
-    all(sapply(fleInp, chkFle));
-    all(sapply(fleInp, chkExt, vldExt));
-
-    # handle / check further input arguments
+    # check and format input file names and handle / check further input arguments
+    fleInp <- fmtFlI(fleInp, minLng = 2);
     typMrg <- match.arg(typMrg);
     usePkg <- match.arg(usePkg);
     varArg <- list(...);
@@ -68,6 +61,9 @@ merge_cols_omv <- function(fleInp = c(), fleOut = "", varBy = list(), typMrg = c
 
     # restore labels (rstLbl: defined in long2wide_omv)
     dtaOut <- rstLbl(dtaOut, crrLnT);
+
+    # sort data frame (if varSrt not empty)
+    dtaOut <- srtFrm(dtaOut, varSrt);
 
     # write files (if fleOut is not empty) or return resulting data frame
     if (nzchar(fleOut)) {

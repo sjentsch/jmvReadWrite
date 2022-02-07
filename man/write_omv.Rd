@@ -5,12 +5,12 @@
 \title{Write files to be used with the statistical spreadsheet 'jamovi'
 (www.jamovi.org)}
 \usage{
-write_omv(dtaFrm = NULL, fleNme = "", retDbg = FALSE)
+write_omv(dtaFrm = NULL, fleOut = "", retDbg = FALSE)
 }
 \arguments{
 \item{dtaFrm}{Data frame to be exported (default: NULL)}
 
-\item{fleNme}{Name / position of the output file to be generated ("FILENAME.omv"; default: "")}
+\item{fleOut}{Name / position of the output file to be generated ("FILENAME.omv"; default: "")}
 
 \item{retDbg}{Whether to return a list with debugging information (see Value; default: FALSE)}
 }

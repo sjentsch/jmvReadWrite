@@ -39,7 +39,7 @@ chkDir <- function(fleNme = "", wrtPrm = TRUE) {
         stop(sprintf("Directory (%s) doesn\'t exist.", dirname(fleNme)));
     }
     if (file.access(dirname(fleNme), mode = 2)) {
-        stop(sprintf("The directory (%s) exists, but you don\'t have writing permissions in that directory.", dirname(fleNme)));    
+        stop(sprintf("The directory (%s) exists, but you don\'t have writing permissions in that directory.", dirname(fleNme)));
     }
     TRUE
 }
@@ -70,17 +70,17 @@ chkFle <- function(fleNme = "", fleCnt = "", isZIP = FALSE) {
             stop(sprintf("File \"%s\" not found.", fleNme));
         }
     } else if (isZIP) {
-        hdrStr <- readBin(tmpHdl <- file(fleNme, "rb"), "character"); close(tmpHdl); rm(tmpHdl);
+        hdrStr <- readBin(tmpHdl <- file(fleNme, "rb"), "character"); close(tmpHdl);
         # only "PK\003\004" is considered, not "PK\005\006" (empty ZIP) or "PK\007\008" (spanned [over several files])
         if (! hdrStr == "PK\003\004\024") {
             stop(sprintf("File \"%s\" has not the correct file format (is not a ZIP archive).", basename(fleNme)));
         }
-        rm(hdrStr);
     }
     TRUE
 }
 
 chkVar <- function(dtaFrm = NULL, varNme = c()) {
+    if (is.null(varNme) || length(varNme) == 0 || !nzchar(varNme)) return(FALSE);
     if (!all(varNme %in% names(dtaFrm))) {
         stop(sprintf("The variable(s) %s are not contained in the current data set.", paste(varNme[! (varNme %in% names(dtaFrm))], collapse = ", ")));
     }
@@ -99,9 +99,32 @@ nrmFle <- function(fleNme = "") {
     file.path(normalizePath(dirname(fleNme)), basename(fleNme))
 }
 
-vldExt <- c("omv",    "csv", "tsv", "rdata", "rda", "rds", "sav", "zsav", "dta",   "sas7bdat", "sd2", "sd7", "xpt", "stx", "stc");
-dscExt <- c("jamovi", "CSV", "TSV", "Rdata",        "RDS", "SPSS",        "Stata", "SAS");
+#            jamovi  CSV   TSV     Rdata           RDS   SPSS           Stata  SAS
+vldExt <- c("omv",  "csv", "tsv", "rdata", "rda", "rds", "sav", "zsav", "dta", "sas7bdat", "sd2", "sd7", "xpt", "stx", "stc");
 
+fmtFlI <- function(fleInp = c(), minLng = 1, maxLng = Inf, excExt = "") {
+    # normalize the path of the input file and then check whether the file exists and whether it is of a supported file type
+    # ("omv" / "jamovi, " are excluded since it makes little sense to convert from jamovi to jamovi-files)
+    # if fleOut is empty, fleInp is used with its file extension replaced with ".omv"
+    if (length(fleInp) < minLng || length(fleInp) > maxLng) {
+        stop(sprintf("The fleInp-argument is supposed to be a character vector with a minimal length of %.0f and a maximal length of %.0f (current length is %.0f).%s",
+                     minLng, maxLng, length(fleInp), ifelse(length(fleInp) > maxLng, "If you would like to process several files, call the function individually for each.", "")));
+    }
+    fleInp <- unname(sapply(fleInp, nrmFle));
+    all(sapply(fleInp, chkFle));
+    all(sapply(fleInp, chkExt, setdiff(vldExt, excExt)));
+    fleInp
+}
+
+fmtFlO <- function(fleOut = "", fleInp = "", rplExt = "") {
+    if (nzchar(fleOut)) {
+        nrmFle(fleOut)
+    } else if (length(fleInp) == 1 && nzchar(fleInp[1])) {
+        sub(paste0(".", tools::file_ext(fleInp[1])), rplExt, fleInp[1])
+    } else {
+        stop(paste0("Either fleOut needs to be given as a valid non-empty file name or a single entry in fleInp where the extension is replaced with: \"", rplExt, "\"."));
+    }
+}
 
 # =================================================================================================
 # get function arguments and adjust them / select those valid for the current function call
@@ -149,8 +172,14 @@ setAtt <- function(attLst = c(), inpObj = NULL, outObj = NULL) {
             stop("Error when storing or accessing meta-data information. Please send the file causing the error to sebastian.jentschke@uib.no");
         }
     }
-    rm(attNme, inpObj);
     outObj
+}
+
+rmvAtt <- function(attObj = NULL) {
+    for (crrAtt in setdiff(names(attributes(attObj)), c("class", "comment", "dim", "jmv-id", "jmv-desc", "levels", "names", "row.names", "values"))) {
+        attr(attObj, crrAtt) <- NULL;
+    }
+    attObj
 }
 
 chkAtt <- function(attObj = NULL, attNme = "", attVal = NULL) {

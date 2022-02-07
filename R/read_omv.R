@@ -1,11 +1,12 @@
 #' Read files created of the statistical spreadsheet 'jamovi' (www.jamovi.org)
 #'
-#' @param fleInp name (including the path, if required) of the 'jamovi'-file to be read ("FILENAME.omv"; default: "")
-#' @param useFlt apply filters (remove the lines where the filter is set to 0; default: FALSE)
-#' @param rmMsVl remove values defined as missing values (replace them with NA; default: FALSE)
-#' @param sveAtt store attributes that are not required in the data set (if you want to write the same data set using write_omv; default: FALSE)
-#' @param getSyn extract syntax from the analyses in the 'jamovi'-file and store it in the attribute "syntax" (default: FALSE)
-#' @param getHTM store index.html in the attribute "HTML" (default: FALSE)
+#' @param fleInp Name (including the path, if required) of the 'jamovi'-file to be read ("FILENAME.omv"; default: "")
+#' @param useFlt Apply filters (remove the lines where the filter is set to 0; default: FALSE)?
+#' @param rmMsVl Remove values defined as missing values (replace them with NA; default: FALSE)?
+#' @param sveAtt Store attributes that are not required in the data set (if you want to write the same data set using write_omv; default: FALSE)?
+#' @param getSyn Extract syntax from the analyses in the 'jamovi'-file and store it in the attribute "syntax" (default: FALSE)?
+#' @param getHTM Store index.html in the attribute "HTML" (default: FALSE)?
+#'
 #' @return data frame (can be directly used with functions included in the R-package 'jmv' and syntax from 'jamovi'; also compatible with the format of the R-package "foreign")
 #'
 #' @examples
@@ -34,8 +35,8 @@
 read_omv <- function(fleInp = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = TRUE, getSyn = FALSE, getHTM = FALSE) {
     if (nchar(fleInp) == 0) stop("File name to the input data file needs to be given as parameter (fleInp = ...).");
 
-    # check whether the .omv-file exists and whether it has the correct format (must be a ZIP), then get the list of files contained in the .omv.-file
-    fleInp <- nrmFle(fleInp);
+    # check and format input file names
+    fleInp <- fmtFlI(fleInp, maxLng = 1);
     fleLst <- zip::zip_list(fleInp)$filename;
     # check whether the file list contains either the file "meta" (newer jamovi file format) or MANIFEST.MF (older format)
     chkFle(fleInp, isZIP = TRUE)
@@ -90,7 +91,9 @@ read_omv <- function(fleInp = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = TRUE,
                 colRaw[[1]] <- as.logical(colRaw[[1]]);
                 fltLst <- c(fltLst, i);
             } else if (chkFld(mtaDta$fields[[i]], "columnType", "Data|Recoded")) {
-                colRaw[[1]] <- factor(colRaw[[1]], levels = unlist(sapply(xtdDta[[nmeCrr]]$labels, function(m) m[1])), labels = unlist(sapply(xtdDta[[nmeCrr]]$labels, function(m) m[2])));
+                colRaw[[1]] <- factor(colRaw[[1]], levels = unlist(sapply(xtdDta[[nmeCrr]]$labels, function(m) m[1])),
+                                                   labels = unlist(sapply(xtdDta[[nmeCrr]]$labels, function(m) m[2])),
+                                                   ordered = chkFld(mtaDta$fields[[i]], "measureType", "Ordinal"));
                 if    (chkFld(mtaDta$fields[[i]], "dataType",   "Integer")) {
                     attr(colRaw[[1]], "values") <- unlist(sapply(xtdDta[[nmeCrr]]$labels, function(m) as.integer(m[1])));
                 }
@@ -153,13 +156,6 @@ read_omv <- function(fleInp = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = TRUE,
         dtaFrm[fltLst] <- NULL;
     } else if (length(fltLst) > 0) {
         attr(dtaFrm, "fltLst") <- names(dtaFrm)[fltLst];
-    }
-
-    # handle variable labels: R-foreign-style
-    if (! all(lblLst == "")) {
-        names(lblLst) <- names(dtaFrm);
-        attr(dtaFrm, "variable.labels") <- lblLst;
-        rm(lblLst);
     }
 
     # removedRows, addedRows, transforms

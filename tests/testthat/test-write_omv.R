@@ -17,10 +17,10 @@ test_that("write_omv works", {
     expect_equal(names(dtaDbg$mtaDta), c("rowCount", "columnCount", "removedRows", "addedRows", "fields", "transforms"));
     expect_true(all(grepl("labels", sapply(dtaDbg$xtdDta, attributes))));
     expect_s3_class(dtaDbg$dtaFrm, "data.frame");
-    expect_equal(dim(dtaDbg$dtaFrm), c(60, 6));
+    expect_equal(dim(dtaDbg$dtaFrm), c(60, 7));
     expect_equal(names(attributes(dtaDbg$dtaFrm)), c("names", "row.names", "class"));
-    expect_equal(names(attributes(dtaDbg$dtaFrm[[2]])), c("levels", "values", "class"));
-    expect_equal(names(attributes(dtaDbg$dtaFrm[[6]])), c("levels", "class", "jmv-desc"));
-    expect_equal(attributes(dtaDbg$dtaFrm[[3]]), NULL);
+    expect_equal(names(attributes(dtaDbg$dtaFrm[[3]])), c("levels", "class", "values"));
+    expect_equal(names(attributes(dtaDbg$dtaFrm[[7]])), c("jmv-desc"));
+    expect_equal(attributes(dtaDbg$dtaFrm[[4]]), NULL);
     expect_equal(sapply(ToothGrowth, class), sapply(dtaDbg$dtaFrm, class));
 })

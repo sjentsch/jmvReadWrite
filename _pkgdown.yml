@@ -12,6 +12,16 @@ reference:
 - contents: 
   - read_omv
   - write_omv
+- title: "Helper functions"
+  desc: >
+    Functions for carrying out often required data management tasks for jamovi's omv-files
+- contents:
+  - convert_to_omv
+  - long2wide_omv
+  - wide2long_omv
+  - merge_cols_omv
+  - merge_rows_omv
+  - sort_omv
 - title: "Example datasets"
 - contents:
   - AlbumSales

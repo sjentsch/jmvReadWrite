@@ -43,7 +43,8 @@ devtools::install_github("sjentsch/jmvReadWrite")
 
 ## How to use the package?
 
-<br /> [**read\_omv**](reference/read_omv.html)
+<br />
+[**read\_omv**](https://sjentsch.github.io/jmvReadWrite/reference/read_omv.html)
 
 The following code uses the ToothGrowth-data set that is part of the
 data sets included in R (the current file contains some modifications
@@ -114,13 +115,15 @@ jmv::ANOVA(
 #>  ─────────────────────────────
 ```
 
-Since version 0.2.0, [`read_omv`](reference/read_omv.html) also extracts
-the syntax from analyses that you may have conducted in the jamovi-GUI
-and that are stored in the .omv-file. To extract them, you have to set
-the parameter `getSyn = TRUE` when calling
-[`read_omv`](reference/read_omv.html) (default is `FALSE`). When the
-parameter is set, the analyses are stored in the attribute `syntax`.
-They can be used as shown in the following examples:
+Since version 0.2.0,
+[`read_omv`](https://sjentsch.github.io/jmvReadWrite/reference/read_omv.html)
+also extracts the syntax from analyses that you may have conducted in
+the jamovi-GUI and that are stored in the .omv-file. To extract them,
+you have to set the parameter `getSyn = TRUE` when calling
+[`read_omv`](https://sjentsch.github.io/jmvReadWrite/reference/read_omv.html)
+(default is `FALSE`). When the parameter is set, the analyses are stored
+in the attribute `syntax`. They can be used as shown in the following
+examples:
 
 ``` r
 library(jmvReadWrite);
@@ -145,7 +148,7 @@ if (length(attr(data, 'syntax')) >= 2) {
 
 <br/>
 
-[**write\_omv**](reference/write_omv.html)
+[**write\_omv**](https://sjentsch.github.io/jmvReadWrite/reference/write_omv.html)
 
 The `jmvReadWrite`-package also enables you to write `.omv`-files in
 order to use them in `jamovi`. Let’s assume that you have a large
@@ -177,19 +180,19 @@ list.files(".", "Trial.omv");
 #> [1] "Trial.omv"
 file.info("Trial.omv");
 #>           size isdir mode               mtime               ctime
-#> Trial.omv 2199 FALSE  664 2022-02-08 18:56:30 2022-02-08 18:56:30
+#> Trial.omv 2199 FALSE  664 2022-02-08 19:35:49 2022-02-08 19:35:49
 #>                         atime  uid  gid    uname   grname
-#> Trial.omv 2022-02-08 18:56:30 1000 1000 sjentsch sjentsch
+#> Trial.omv 2022-02-08 19:35:49 1000 1000 sjentsch sjentsch
 unlink("Trial.omv");
 ```
 
 Although jamovi reads R-data files (.RData, .rda, .rds)
-[`write_omv`](reference/write_omv.html) permits to store
-`jamovi`-specific attributes (such as variable labels) in addition.
-Please note that if you are reading from an `.omv`-file in order to
-write back to an `.omv`-file (perhaps after some modifications), it is
-recommended to leave the `sveAtt`-attribute set to `TRUE` (which is the
-default).
+[`write_omv`](https://sjentsch.github.io/jmvReadWrite/reference/write_omv.html)
+permits to store `jamovi`-specific attributes (such as variable labels)
+in addition. Please note that if you are reading from an `.omv`-file in
+order to write back to an `.omv`-file (perhaps after some
+modifications), it is recommended to leave the `sveAtt`-attribute set to
+`TRUE` (which is the default).
 
 ``` r
 # reading and writing a file with the "sveAtt"-parameter permits you to keep
@@ -225,28 +228,32 @@ are stored for other columns. <br /><br />
 Since version 0.3.0, `jmvReadWrite` contains a number of helper
 functions that support you with commonly required data management tasks:
 
-  - [`convert_to_omv`](reference/convert_to_omv.html): Converts data
-    sets from other file formats into jamovi-format (this function may
-    be helpful if you have to convert a larger amount of files).
+  - [`convert_to_omv`](https://sjentsch.github.io/jmvReadWrite/reference/convert_to_omv.html):
+    Converts data sets from other file formats into jamovi-format (this
+    function may be helpful if you have to convert a larger amount of
+    files).
 
-  - [`long2wide_omv`](reference/long2wide_omv.html): Convert a data set
-    from long to wide format (time points for repeated measurements are
-    arranged as rows in the original and converted into columns).
+  - [`long2wide_omv`](https://sjentsch.github.io/jmvReadWrite/reference/long2wide_omv.html):
+    Convert a data set from long to wide format (time points for
+    repeated measurements are arranged as rows in the original and
+    converted into columns).
 
-  - [`wide2long_omv`](reference/wide2long_omv.html): Convert a data set
-    from wide to long format (time points for repeated measurements are
-    arranged as columns in the original and converted into rows).
+  - [`wide2long_omv`](https://sjentsch.github.io/jmvReadWrite/reference/wide2long_omv.html):
+    Convert a data set from wide to long format (time points for
+    repeated measurements are arranged as columns in the original and
+    converted into rows).
 
-  - [`merge_cols_omv`](reference/merge_cols_omv.html): Add cases from
-    several data sets (i.e., the cases / rows in the second, etc. data
-    set are added as rows to the first data set).
+  - [`merge_cols_omv`](https://sjentsch.github.io/jmvReadWrite/reference/merge_cols_omv.html):
+    Add cases from several data sets (i.e., the cases / rows in the
+    second, etc. data set are added as rows to the first data set).
 
-  - [`merge_rows_omv`](reference/merge_rows_omv.html): Add variables
-    from several data sets (i.e., the variables / columns in the second,
-    etc. input data set are added as columns to the first data set).
+  - [`merge_rows_omv`](https://sjentsch.github.io/jmvReadWrite/reference/merge_rows_omv.html):
+    Add variables from several data sets (i.e., the variables / columns
+    in the second, etc. input data set are added as columns to the first
+    data set).
 
-  - [`sort_omv`](reference/sort_omv.html): Sort a data set according to
-    one or more variable(s).
+  - [`sort_omv`](https://sjentsch.github.io/jmvReadWrite/reference/sort_omv.html):
+    Sort a data set according to one or more variable(s).
 
 -----
 

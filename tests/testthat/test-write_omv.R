@@ -22,5 +22,5 @@ test_that("write_omv works", {
     expect_equal(names(attributes(dtaDbg$dtaFrm[[3]])), c("levels", "class", "values"));
     expect_equal(names(attributes(dtaDbg$dtaFrm[[7]])), c("jmv-desc"));
     expect_equal(attributes(dtaDbg$dtaFrm[[4]]), NULL);
-    expect_equal(sapply(ToothGrowth, class), sapply(dtaDbg$dtaFrm, class));
+    expect_equal(sapply(jmvReadWrite::ToothGrowth, class), sapply(dtaDbg$dtaFrm, class));
 })

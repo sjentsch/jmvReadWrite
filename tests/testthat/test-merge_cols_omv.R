@@ -1,7 +1,7 @@
 test_that("merge_cols_omv works", {
     nmeOut <- paste0(tempfile(), "_W.omv");
     nmeInp <- vector(mode = "character", length = 3);
-    dtaTmp <- rmvAtt(read_all(fleInp = system.file("data", "bfi_sample2.rda",  package = "jmvReadWrite")));
+    dtaTmp <- rmvAtt(jmvReadWrite::bfi_sample2);
     varTmp <- names(dtaTmp)[-1];
     for (i in seq_along(nmeInp)) {
         nmeInp[i] <- gsub("_W.omv", paste0("_", i, ".rds"), nmeOut);
@@ -32,6 +32,6 @@ test_that("merge_cols_omv works", {
     dtaFrm <- merge_cols_omv(nmeInp[-2], typMrg = "inner", varBy = "ID", varSrt = c("gender_3", "age_3"));
     expect_s3_class(dtaFrm, "data.frame");
     expect_equal(dim(dtaFrm), c(245, 55));
-    
+
     unlink(nmeInp);
 })

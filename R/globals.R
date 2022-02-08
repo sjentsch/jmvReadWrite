@@ -35,7 +35,7 @@ grpMta <- paste0("^", paste(c(names(mtaGlb), names(mtaFld)), collapse = "$|^"), 
 
 # REMEMBER: requires the full file name, NOT the directory
 chkDir <- function(fleNme = "", wrtPrm = TRUE) {
-    if (! file_test("-d", dirname(fleNme))) {
+    if (! utils::file_test("-d", dirname(fleNme))) {
         stop(sprintf("Directory (%s) doesn\'t exist.", dirname(fleNme)));
     }
     if (file.access(dirname(fleNme), mode = 2)) {
@@ -63,7 +63,7 @@ chkExt <- function(fleNme = "", extNme = c("")) {
 }
 
 chkFle <- function(fleNme = "", fleCnt = "", isZIP = FALSE) {
-    if (! file_test("-f", fleNme)) {
+    if (! utils::file_test("-f", fleNme)) {
         if (nchar(fleCnt) > 0) {
             stop(sprintf("File \"%s\" doesn't contain the file \"%s\".", fleCnt, fleNme));
         } else {
@@ -80,7 +80,7 @@ chkFle <- function(fleNme = "", fleCnt = "", isZIP = FALSE) {
 }
 
 chkVar <- function(dtaFrm = NULL, varNme = c()) {
-    if (is.null(varNme) || length(varNme) == 0 || !nzchar(varNme)) return(FALSE);
+    if (is.null(varNme) || length(varNme) == 0 || !all(nzchar(varNme))) return(FALSE);
     if (!all(varNme %in% names(dtaFrm))) {
         stop(sprintf("The variable(s) %s are not contained in the current data set.", paste(varNme[! (varNme %in% names(dtaFrm))], collapse = ", ")));
     }

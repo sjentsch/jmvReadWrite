@@ -9,29 +9,35 @@ long2wide_omv(
   fleOut = "",
   varID = "",
   varTme = "",
+  varTgt = c(),
   varSep = ".",
   varOrd = c("times", "vars"),
+  varSrt = c(),
   usePkg = c("haven", "foreign"),
   selSet = "",
   ...
 )
 }
 \arguments{
-\item{fleInp}{Name (including the path, if required) of the data file to be read ("FILENAME.omv"; default: "")}
+\item{fleInp}{Name (including the path, if required) of the data file to be read ('FILENAME.omv'; default: '')}
 
-\item{fleOut}{Name (including the path, if required) of the data file to be written ("FILENAME.omv"; default: ""); if empty, FILENAME from fleInp is extended with "_wide"}
+\item{fleOut}{Name (including the path, if required) of the data file to be written ('FILENAME.omv'; default: ''); if empty, FILENAME from fleInp is extended with '_wide'}
 
 \item{varID}{Names of one or more variables that identify the same group / individual (default: c())}
 
-\item{varTme}{Name of the variable that differentiates multiple records from the same group / individual (default: "")}
+\item{varTme}{Name of the variable that differentiates multiple records from the same group / individual (default: '')}
 
-\item{varSep}{Separator character when concatenating the fixed and time-varying part of the variable name ("VAR1.1", "VAR1.2"; default: ".")}
+\item{varTgt}{Names of one or more variables to be transformed / reshaped (other variables are excluded, if empty(c()) all variables except varTme and varID are included; default: c())}
 
-\item{varOrd}{How variables / columns are organized: for "times" (default) the steps of the time varying variable are adjacent, for "vars" the steps of the original columns in the long dataset}
+\item{varSep}{Separator character when concatenating the fixed and time-varying part of the variable name ('VAR1.1', 'VAR1.2'; default: '.')}
 
-\item{usePkg}{Name of the package: "haven" or "foreign" that shall be used to read SPSS, Stata and SAS files; "haven" is the default (it is more comprehensive), but with problems you may try "foreign"}
+\item{varOrd}{How variables / columns are organized: for 'times' (default) the steps of the time varying variable are adjacent, for 'vars' the steps of the original columns in the long dataset}
 
-\item{selSet}{Name of the data set that is to be selected from the workspace (only applies when reading .Rdata-files)}
+\item{varSrt}{Variable(s) that are used to sort the data frame (see Details; if empty, the order returned from reshape is kept; default: c())}
+
+\item{usePkg}{Name of the package: 'haven' or 'foreign' that shall be used to read SPSS, Stata and SAS files; 'haven' is the default (it is more comprehensive), but with problems you may try 'foreign'}
+
+\item{selSet}{Name of the data set that is to be selected from the workspace (only applies when reading .RData-files)}
 
 \item{...}{Additional arguments passed on to methods; see Details below}
 }
@@ -39,10 +45,12 @@ long2wide_omv(
 Converts .omv-files for the statistical spreadsheet 'jamovi' (www.jamovi.org) from long to wide format
 }
 \details{
-The ellipsis-parameter (...) can be used to submit arguments / parameters to the functions that are used for transforming or reading the data. The transformation uses "reshape". When reading the data,
-the functions are: "read_omv" (for jamovi-files), "read.table" (for CSV / TSV files; using similar defaults as "read.csv" for CSV and "read.delim" for TSV which both are based upon "read.table" but with
-adjusted defaults for the respective file types), "readRDS" (for rds-files), "read_sav" (needs R-package "haven") or "read.spss" (needs R-package "foreign") for SPSS-files, read_dta ("haven") /
-read.dta ("foreign") for Stata-files, read_sas ("haven") for SAS-data-files, and read_xpt ("haven") / read.xport ("foreign") for SAS-transport-files.
+The ellipsis-parameter (...) can be used to submit arguments / parameters to the functions that are used for transforming or reading the data. The transformation uses 'reshape'. When reading the
+data, the functions are: 'read_omv' (for jamovi-files), 'read.table' (for CSV / TSV files; using similar defaults as 'read.csv' for CSV and 'read.delim' for TSV which both are based upon
+'read.table' but with adjusted defaults for the respective file types), 'readRDS' (for rds-files), 'read_sav' (needs R-package 'haven') or 'read.spss' (needs R-package 'foreign') for SPSS-files,
+'read_dta' ('haven') / 'read.dta' ('foreign') for Stata-files, 'read_sas' ('haven') for SAS-data-files, and 'read_xpt' ('haven') / 'read.xport' ('foreign') for SAS-transport-files.
+Please note that the R-packages 'haven' and 'foreign' are not marked as 'Imports' (i.e., they are not installed by default). If you wish to convert files from SPSS, SAS or Stata and haven't installed
+them yet, please install them manually (e.g., \code{install.packages('haven', dep = TRUE)}).
 }
 \examples{
 \dontrun{

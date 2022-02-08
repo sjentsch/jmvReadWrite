@@ -297,11 +297,11 @@ read_all <- function(fleInp = "", usePkg = c("haven", "foreign"), selSet = "", .
                            error = function(errMsg) tryErr(fleInp, errMsg), warning = function(wrnMsg) tryWrn(fleInp, wrnMsg));
     # CSV
     } else if (hasExt(fleInp, c("csv"))) {
-        dtaFrm <- tryCatch(rmvQtn(do.call(read.table, adjArg("read.table", list(file = fleInp, sep = ",",  header = TRUE, fill = TRUE), varArg, "file"))),
+        dtaFrm <- tryCatch(rmvQtn(do.call(utils::read.table, adjArg("read.table", list(file = fleInp, sep = ",",  header = TRUE, fill = TRUE), varArg, "file"))),
                            error = function(errMsg) tryErr(fleInp, errMsg), warning = function(wrnMsg) tryWrn(fleInp, wrnMsg));
     # TSV
     } else if (hasExt(fleInp, c("tsv"))) {
-        dtaFrm <- tryCatch(rmvQtn(do.call(read.table, adjArg("read.table", list(file = fleInp, sep = "\t", header = TRUE, fill = TRUE), varArg, "file"))),
+        dtaFrm <- tryCatch(rmvQtn(do.call(utils::read.table, adjArg("read.table", list(file = fleInp, sep = "\t", header = TRUE, fill = TRUE), varArg, "file"))),
                            error = function(errMsg) tryErr(fleInp, errMsg), warning = function(wrnMsg) tryWrn(fleInp, wrnMsg));
     # Rdata
     } else if (hasExt(fleInp, c("rdata", "rda"))) {
@@ -435,7 +435,7 @@ rplAtt <- function(dtaFrm = NULL) {
         if (!any(sapply(lstAtt, is.character))) break
         if (!all(sapply(lstAtt, is.character))) stop(sprintf("Some attribute values of \"%s\" are not of the type character.", crrAtt));
         for (crrCol in names(lstAtt)[sapply(lstAtt, function(x) !all(validEnc(x)))]) {
-            attr(dtaFrm[[crrCol]], crrAtt) <- rplStr(attr(dtaFrm[[crrCol]], crrAtt), paste0(c(crrCol, crrAtt), collapse = " – "));
+            attr(dtaFrm[[crrCol]], crrAtt) <- rplStr(attr(dtaFrm[[crrCol]], crrAtt), paste0(c(crrCol, crrAtt), collapse = " - "));
         }
     }
 

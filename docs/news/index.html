@@ -54,10 +54,12 @@
 <h2 class="page-header" data-toc-text="0.3.0" id="jmvreadwrite-030">jmvReadWrite 0.3.0<a class="anchor" aria-label="anchor" href="#jmvreadwrite-030"></a></h2>
 <div class="section level3">
 <h3 id="bug-fixes-and-enhancements-0-3-0">Bug fixes and enhancements:<a class="anchor" aria-label="anchor" href="#bug-fixes-and-enhancements-0-3-0"></a></h3>
-<ul><li>added a number of helper functions: <code>convert_to_omv</code> (converts data sets from other formats - CSV, R, SPSS, SAS, Stata) to <code>.omv</code> <code>merge_cols_omv</code> (merges two or more data sets by concatenating columns) <code>merge_rows_omv</code> (merges two or more data sets by concatenating rows) <code>long2wide_omv</code> (converts data sets from long to wide, e.g., for running mixed-model-analyses in jamovi) <code>wide2long_omv</code> (converts data sets from wide to long, e.g., for running mixed-model-analyses in jamovi)</li>
-<li>default for <code>sveAtt</code> in <code>read_omv</code> (now <code>TRUE</code>; it makes more sense to store this attributes be default since <code>write_omv</code> will give you an exact copy of the original data set if they are stored and the helper functions above also respect and adjust them)</li>
-<li>implemented unit tests for <code>read_omv</code>, <code>write_omv</code>, <code>convert_to_omv</code>, <code>merge_cols_omv</code>, <code>merge_rows_omv</code>, <code>long2wide_omv</code>, <code>wide2long_omv</code>
+<ul><li>added a couple of helper functions: <code>convert_to_omv</code> (converts data sets from other formats - CSV, R, SPSS, SAS, Stata) to <code>.omv</code> <code>merge_cols_omv</code> (merges two or more data sets by concatenating columns) <code>merge_rows_omv</code> (merges two or more data sets by concatenating rows) <code>long2wide_omv</code> (converts data sets from long to wide, e.g., for running mixed-model-analyses in jamovi) <code>wide2long_omv</code> (converts data sets from wide to long, e.g., for running mixed-model-analyses in jamovi) <code>sort_omv</code> (sorts the dataset according to one or more variable)</li>
+<li>implemented unit tests for <code>read_omv</code>, <code>write_omv</code>, <code>convert_to_omv</code>, <code>merge_cols_omv</code>, <code>merge_rows_omv</code>, <code>long2wide_omv</code>, <code>wide2long_omv</code>, <code>sort_omv</code>
 </li>
+<li>implemented treating variables in <code>read_omv</code> and <code>write_omv</code> as ordered factor if <code>measureType</code> has the value <code>Ordinal</code>
+</li>
+<li>default for <code>sveAtt</code> in <code>read_omv</code> (now <code>TRUE</code>; it makes more sense to store this attributes be default since <code>write_omv</code> will give you an exact copy of the original data set if they are stored and the helper functions above also respect and adjust them)</li>
 </ul></div>
 </div>
     <div class="section level2">

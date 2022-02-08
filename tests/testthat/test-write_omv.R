@@ -1,7 +1,7 @@
 test_that("write_omv works", {
     # check whether writing the data is working (file existence, size, contents [.omv-files are ZIP archives and must contain files that include meta, metadata.json, data.bin])
     nmeOut <- paste0(tempfile(), ".omv");
-    dtaDbg <- write_omv(ToothGrowth, fleOut = nmeOut, retDbg = TRUE);
+    dtaDbg <- write_omv(jmvReadWrite::ToothGrowth, fleOut = nmeOut, retDbg = TRUE);
     expect_true(file.exists(nmeOut));
     expect_gt(file.info(nmeOut)$size, 1);
     expect_true(chkFle(nmeOut, isZIP = TRUE));

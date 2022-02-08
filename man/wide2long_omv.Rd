@@ -11,27 +11,30 @@ wide2long_omv(
   varSep = ".",
   varID = "",
   varTme = "",
+  varSrt = c(),
   usePkg = c("haven", "foreign"),
   selSet = "",
   ...
 )
 }
 \arguments{
-\item{fleInp}{Name (including the path, if required) of the data file to be read ("FILENAME.omv"; default: "")}
+\item{fleInp}{Name (including the path, if required) of the data file to be read ('FILENAME.omv'; default: '')}
 
-\item{fleOut}{Name (including the path, if required) of the data file to be written ("FILENAME.omv"; default: ""); if empty, FILENAME from fleInp is extended with "_long"}
+\item{fleOut}{Name (including the path, if required) of the data file to be written ('FILENAME.omv'; default: ''); if empty, FILENAME from fleInp is extended with '_long'}
 
-\item{varLst}{List / set of variables that are to be transformed into single (‘time-varying’) variables in long format (default: c())}
+\item{varLst}{List / set of variables that are to be transformed into single (time-varying) variables in long format (default: c())}
 
-\item{varSep}{Character that separates the variables in varLst into a time-varying part and a part that forms the variable name in long format ("." in "VAR.1", "VAR.2", default: ".")}
+\item{varSep}{Character that separates the variables in varLst into a time-varying part and a part that forms the variable name in long format ('.' in 'VAR.1', 'VAR.2', default: '.')}
 
-\item{varID}{Name(s) of one or more variables that (is created to) identify the same group / individual (if empty, "id" is added with row numbers identifying cases; default: "")}
+\item{varID}{Name(s) of one or more variables that (is created to) identify the same group / individual (if empty, 'id' is added with row numbers identifying cases; default: '')}
 
-\item{varTme}{Name of the variable that (is created to) differentiate multiple records from the same group / individual (if empty, "time" is added with a marker for each time-varying part; default: "")}
+\item{varTme}{Name of the variable that (is created to) differentiate multiple records from the same group / individual (if empty, 'time' is added with a marker for each time-varying part; default: '')}
 
-\item{usePkg}{Name of the package: "haven" or "foreign" that shall be used to read SPSS, Stata and SAS files; "haven" is the default (it is more comprehensive), but with problems you may try "foreign"}
+\item{varSrt}{Variable(s) that are used to sort the data frame (see Details; if empty, the order returned from reshape is kept; default: c())}
 
-\item{selSet}{Name of the data set that is to be selected from the workspace (only applies when reading .Rdata-files)}
+\item{usePkg}{Name of the package: 'haven' or 'foreign' that shall be used to read SPSS, Stata and SAS files; 'haven' is the default (it is more comprehensive), but with problems you may try 'foreign'}
+
+\item{selSet}{Name of the data set that is to be selected from the workspace (only applies when reading .RData-files)}
 
 \item{...}{Additional arguments passed on to methods; see Details below}
 }
@@ -41,10 +44,13 @@ Converts .omv-files for the statistical spreadsheet 'jamovi' (www.jamovi.org) fr
 \details{
 If varLst is empty, it is tried to generate it using all variables in the data frame except those defined by varID. For further arguments, see the help for reshape (where varLst ~ varying, varSep ~ sep,
 varID ~ idvar, varTme ~ timevar).
-The ellipsis-parameter can be used to submit arguments / parameters to the functions that are used for transforming or reading the data. The transformation uses "reshape". When reading the data, the
-functions are: "read_omv" (for jamovi-files), "read.table" (for CSV / TSV files; using similar defaults as "read.csv" for CSV and "read.delim" for TSV which both are based upon "read.table" but with
-adjusted defaults for the respective file types), "readRDS" (for rds-files), "read_sav" (needs R-package "haven") or "read.spss" (needs R-package "foreign") for SPSS-files, read_dta ("haven") /
-read.dta ("foreign") for Stata-files, read_sas ("haven") for SAS-data-files, and read_xpt ("haven") / read.xport ("foreign") for SAS-transport-files.
+varSrt is a character vector containing column names that are used to sort the data frame before it is written.
+The ellipsis-parameter (...) can be used to submit arguments / parameters to the functions that are used for transforming or reading the data. The transformation uses 'reshape'. When reading the
+data, the functions are: 'read_omv' (for jamovi-files), 'read.table' (for CSV / TSV files; using similar defaults as 'read.csv' for CSV and 'read.delim' for TSV which both are based upon
+'read.table' but with adjusted defaults for the respective file types), 'readRDS' (for rds-files), 'read_sav' (needs R-package 'haven') or 'read.spss' (needs R-package 'foreign') for SPSS-files,
+'read_dta' ('haven') / 'read.dta' ('foreign') for Stata-files, 'read_sas' ('haven') for SAS-data-files, and 'read_xpt' ('haven') / 'read.xport' ('foreign') for SAS-transport-files.
+Please note that the R-packages 'haven' and 'foreign' are not marked as 'Imports' (i.e., they are not installed by default). If you wish to convert files from SPSS, SAS or Stata and haven't installed
+them yet, please install them manually (e.g., \code{install.packages('haven', dep = TRUE)}).
 }
 \examples{
 \dontrun{

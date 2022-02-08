@@ -1,6 +1,5 @@
 test_that("read_omv works", {
-
-    nmeInp <- system.file("extdata", "ToothGrowth.omv", package = "jmvReadWrite");
+    nmeInp <- file.path("..", "ToothGrowth.omv");
 
     # read the data set (without default arguments) and test its properties: data frame, size, correct column type, attributes (data frame and fourth column),
     # whether the "missingValues"-attribute is an empty list, and whether the factor levels at columns 4, 6, and 8 have the correct length and content
@@ -51,12 +50,12 @@ test_that("read_omv works", {
     expect_equal(attr(dtaFrm, "HTML")[1],   "<!DOCTYPE html>")
     expect_equal(attr(dtaFrm, "HTML")[2],   "<html>")
     expect_equal(attr(dtaFrm, "HTML")[266], "</html>")
-    expect_equal(length(grep("<.*?>", attr(dtaFrm, "HTML"))), 75)
+    expect_equal(length(grep("<.*?>", attr(dtaFrm, "HTML"))), 75);
 })
 
 test_that("read_all works", {
     # read_all should work as read_omv (with the sveAtt-argument set TRUE) and have the same properties: data frame, size, correct column type, and several attributes of the data frame and columns
-    dtaFrm <- read_all(system.file("extdata", "ToothGrowth.omv", package = "jmvReadWrite"));
+    dtaFrm <- read_all(file.path("..", "ToothGrowth.omv"));
     expect_s3_class(dtaFrm, "data.frame")
     expect_equal(dim(dtaFrm), c(60, 12))
     expect_equal(as.vector(sapply(dtaFrm, typeof)), c("logical", "integer", "double", "integer", "double", "integer", "double", "integer", "integer", "double", "double", "double"))
@@ -65,11 +64,15 @@ test_that("read_all works", {
                                                     "parentId", "width", "type", "importName", "description", "transform", "edits", "trimLevels"))
 
     # read_all for ToothGrowth as Rdata-set has fewer columns and attributes, check data frame, size, correct column type, and several attributes of the data frame and columns
-    dtaFrm <- read_all(system.file("data", "ToothGrowth.rda", package = "jmvReadWrite"));
+    nmeTmp <- paste0(tempfile(), ".rds");
+    saveRDS(jmvReadWrite::ToothGrowth, nmeTmp);
+    dtaFrm <- read_all(nmeTmp);
     expect_equal(dim(dtaFrm), c(60, 7))
     expect_equal(unname(sapply(dtaFrm, typeof)),                c("integer", "integer", "integer", "double", "integer", "double", "double"))
     expect_equal(unname(sapply(sapply(dtaFrm, class), "[", 1)), c("integer", "factor", "factor", "numeric", "ordered", "numeric", "numeric"))
     expect_equal(names(attributes(dtaFrm)), c("names", "row.names", "class"))
     expect_equal(names(attributes(dtaFrm[[3]])),  c("levels", "class", "values"))
     expect_equal(names(attributes(dtaFrm[[5]])),  c("levels", "class"))
+
+    unlink(nmeTmp);
 })

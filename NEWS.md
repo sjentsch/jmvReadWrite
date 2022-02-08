@@ -1,13 +1,14 @@
 # jmvReadWrite 0.3.0
 
 ## Bug fixes and enhancements:
-* added a number of helper functions:
+* added a couple of helper functions:
 `convert_to_omv` (converts data sets from other formats - CSV, R, SPSS, SAS, Stata) to `.omv` 
 `merge_cols_omv` (merges two or more data sets by concatenating columns)
 `merge_rows_omv` (merges two or more data sets by concatenating rows)
 `long2wide_omv` (converts data sets from long to wide, e.g., for running mixed-model-analyses in jamovi)
 `wide2long_omv` (converts data sets from wide to long, e.g., for running mixed-model-analyses in jamovi)
-* implemented unit tests for `read_omv`, `write_omv`, `convert_to_omv`, `merge_cols_omv`, `merge_rows_omv`, `long2wide_omv`, `wide2long_omv`
+`sort_omv` (sorts the dataset according to one or more variable)
+* implemented unit tests for `read_omv`, `write_omv`, `convert_to_omv`, `merge_cols_omv`, `merge_rows_omv`, `long2wide_omv`, `wide2long_omv`, `sort_omv`
 * implemented treating variables in `read_omv` and `write_omv` as ordered factor if `measureType` has the value `Ordinal`
 * default for `sveAtt` in `read_omv` (now `TRUE`; it makes more sense to store this attributes be default since `write_omv` will give you an exact copy of the original data set if they are stored and the helper functions above also respect and adjust them)
 

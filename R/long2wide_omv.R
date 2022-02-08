@@ -1,22 +1,24 @@
 #' Converts .omv-files for the statistical spreadsheet 'jamovi' (www.jamovi.org) from long to wide format
 #'
-#' @param fleInp Name (including the path, if required) of the data file to be read ("FILENAME.omv"; default: "")
-#' @param fleOut Name (including the path, if required) of the data file to be written ("FILENAME.omv"; default: ""); if empty, FILENAME from fleInp is extended with "_wide"
-#' @param varTme Name of the variable that differentiates multiple records from the same group / individual (default: "")
+#' @param fleInp Name (including the path, if required) of the data file to be read ('FILENAME.omv'; default: '')
+#' @param fleOut Name (including the path, if required) of the data file to be written ('FILENAME.omv'; default: ''); if empty, FILENAME from fleInp is extended with '_wide'
+#' @param varTme Name of the variable that differentiates multiple records from the same group / individual (default: '')
 #' @param varID  Names of one or more variables that identify the same group / individual (default: c())
 #' @param varTgt Names of one or more variables to be transformed / reshaped (other variables are excluded, if empty(c()) all variables except varTme and varID are included; default: c())
-#' @param varSep Separator character when concatenating the fixed and time-varying part of the variable name ("VAR1.1", "VAR1.2"; default: ".")
-#' @param varOrd How variables / columns are organized: for "times" (default) the steps of the time varying variable are adjacent, for "vars" the steps of the original columns in the long dataset
+#' @param varSep Separator character when concatenating the fixed and time-varying part of the variable name ('VAR1.1', 'VAR1.2'; default: '.')
+#' @param varOrd How variables / columns are organized: for 'times' (default) the steps of the time varying variable are adjacent, for 'vars' the steps of the original columns in the long dataset
 #' @param varSrt Variable(s) that are used to sort the data frame (see Details; if empty, the order returned from reshape is kept; default: c())
-#' @param usePkg Name of the package: "haven" or "foreign" that shall be used to read SPSS, Stata and SAS files; "haven" is the default (it is more comprehensive), but with problems you may try "foreign"
-#' @param selSet Name of the data set that is to be selected from the workspace (only applies when reading .Rdata-files)
+#' @param usePkg Name of the package: 'haven' or 'foreign' that shall be used to read SPSS, Stata and SAS files; 'haven' is the default (it is more comprehensive), but with problems you may try 'foreign'
+#' @param selSet Name of the data set that is to be selected from the workspace (only applies when reading .RData-files)
 #' @param ... Additional arguments passed on to methods; see Details below
 #'
 #' @details
-#' The ellipsis-parameter (...) can be used to submit arguments / parameters to the functions that are used for transforming or reading the data. The transformation uses "reshape". When reading the data,
-#' the functions are: "read_omv" (for jamovi-files), "read.table" (for CSV / TSV files; using similar defaults as "read.csv" for CSV and "read.delim" for TSV which both are based upon "read.table" but with
-#' adjusted defaults for the respective file types), "readRDS" (for rds-files), "read_sav" (needs R-package "haven") or "read.spss" (needs R-package "foreign") for SPSS-files, read_dta ("haven") /
-#' read.dta ("foreign") for Stata-files, read_sas ("haven") for SAS-data-files, and read_xpt ("haven") / read.xport ("foreign") for SAS-transport-files.
+#' The ellipsis-parameter (...) can be used to submit arguments / parameters to the functions that are used for transforming or reading the data. The transformation uses 'reshape'. When reading the
+#' data, the functions are: 'read_omv' (for jamovi-files), 'read.table' (for CSV / TSV files; using similar defaults as 'read.csv' for CSV and 'read.delim' for TSV which both are based upon
+#' 'read.table' but with adjusted defaults for the respective file types), 'readRDS' (for rds-files), 'read_sav' (needs R-package 'haven') or 'read.spss' (needs R-package 'foreign') for SPSS-files,
+#' 'read_dta' ('haven') / 'read.dta' ('foreign') for Stata-files, 'read_sas' ('haven') for SAS-data-files, and 'read_xpt' ('haven') / 'read.xport' ('foreign') for SAS-transport-files.
+#' Please note that the R-packages 'haven' and 'foreign' are not marked as 'Imports' (i.e., they are not installed by default). If you wish to convert files from SPSS, SAS or Stata and haven't installed
+#' them yet, please install them manually (e.g., `install.packages('haven', dep = TRUE)`).
 #'
 #' @examples
 #' \dontrun{
@@ -50,13 +52,13 @@ long2wide_omv <- function(fleInp = "", fleOut = "", varID = "", varTme = "", var
     chkVar(dtaFrm, varID);
     chkVar(dtaFrm, varTme);
     if (!chkVar(dtaFrm, varTgt)) {
-        varTgt = setdiff(names(dtaFrm), c(varID, varTme));
-    }    
+        varTgt <- setdiff(names(dtaFrm), c(varID, varTme));
+    }
     # [2] store the original variable labels and the steps of the time-varying variable in crrLnT
     crrLnT <- getLbl(dtaFrm, varTme);
     # [3] call "reshape" with having the variable arguments limited to those valid when calling the function
     crrArg <- list(data = dtaFrm[, c(varID, varTme, varTgt)], direction = "wide", idvar = varID, timevar = varTme, sep = varSep);
-    dtaFrm <- do.call(reshape, adjArg("reshape", crrArg, varArg, c("data", "direction", "idvar", "timevar")));
+    dtaFrm <- do.call(stats::reshape, adjArg("reshape", crrArg, varArg, c("data", "direction", "idvar", "timevar")));
 
     # change the order of column (if requested)
     if (varOrd == "vars") dtaFrm <- chgVrO(dtaFrm);

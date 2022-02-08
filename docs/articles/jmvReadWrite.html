@@ -73,7 +73,7 @@
 </h1>
                         <h4 data-toc-skip class="author">Sebastian Jentschke</h4>
             
-            <h4 data-toc-skip class="date">2022-02-06</h4>
+            <h4 data-toc-skip class="date">2022-02-08</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/sjentsch/jmvReadWrite/blob/main/vignettes/jmvReadWrite.Rmd" class="external-link"><code>vignettes/jmvReadWrite.Rmd</code></a></small>
       <div class="hidden name"><code>jmvReadWrite.Rmd</code></div>
@@ -190,9 +190,9 @@
 <span class="co">#&gt; [1] "Trial.omv"</span>
 <span class="fu"><a href="https://rdrr.io/r/base/file.info.html" class="external-link">file.info</a></span><span class="op">(</span><span class="st">"Trial.omv"</span><span class="op">)</span>;
 <span class="co">#&gt;           size isdir mode               mtime               ctime</span>
-<span class="co">#&gt; Trial.omv 2238 FALSE  664 2022-02-06 21:46:40 2022-02-06 21:46:40</span>
+<span class="co">#&gt; Trial.omv 2199 FALSE  664 2022-02-08 00:05:17 2022-02-08 00:05:17</span>
 <span class="co">#&gt;                         atime  uid  gid    uname   grname</span>
-<span class="co">#&gt; Trial.omv 2022-02-06 21:46:40 1000 1000 sjentsch sjentsch</span>
+<span class="co">#&gt; Trial.omv 2022-02-08 00:05:17 1000 1000 sjentsch sjentsch</span>
 <span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="st">"Trial.omv"</span><span class="op">)</span>;</code></pre></div>
 <p>Although jamovi reads R-data files (.RData, .rda, .rds) <a href="./reference/write_omv.html"><code>write_omv</code></a> permits to store <code>jamovi</code>-specific attributes (such as variable labels) in addition. Please note that if you are reading from an <code>.omv</code>-file in order to write back to an <code>.omv</code>-file (perhaps after some modifications), it is recommended to leave the <code>sveAtt</code>-attribute set to <code>TRUE</code> (which is the default).</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
@@ -204,8 +204,8 @@
 <span class="co"># shows the names of the attributes for the whole data set (e.g., number of</span>
 <span class="co"># rows and columns) and the names of the attributes of the first column</span>
 <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/attributes.html" class="external-link">attributes</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span><span class="op">)</span>;
-<span class="co">#&gt; [1] "row.names"       "names"           "class"           "fltLst"         </span>
-<span class="co">#&gt; [5] "variable.labels" "removedRows"     "addedRows"       "transforms"</span>
+<span class="co">#&gt; [1] "row.names"   "names"       "class"       "fltLst"      "removedRows"</span>
+<span class="co">#&gt; [6] "addedRows"   "transforms"</span>
 <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/attributes.html" class="external-link">attributes</a></span><span class="op">(</span><span class="va">data</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span>;
 <span class="co">#&gt;  [1] "missingValues"  "name"           "id"             "columnType"    </span>
 <span class="co">#&gt;  [5] "dataType"       "measureType"    "formula"        "formulaMessage"</span>
@@ -225,6 +225,7 @@
 <li><p><a href="./reference/wide2long_omv.html"><code>wide2long_omv</code></a>: Convert a data set from wide to long format (time points for repeated measurements are arranged as columns in the original and converted into rows).</p></li>
 <li><p><a href="./reference/merge_cols_omv.html"><code>merge_cols_omv</code></a>: Add cases from several data sets (i.e., the cases / rows in the second, etc. data set are added as rows to the first data set).</p></li>
 <li><p><a href="./reference/merge_rows_omv.html"><code>merge_rows_omv</code></a>: Add variables from several data sets (i.e., the variables / columns in the second, etc. input data set are added as columns to the first data set).</p></li>
+<li><p><a href="./reference/sort_omv.html"><code>sort_omv</code></a>: Sort a data set according to one or more variable(s).</p></li>
 </ul>
 </div>
   </div>

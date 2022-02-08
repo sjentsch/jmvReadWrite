@@ -17,6 +17,7 @@
 #'
 #' # use the data set "ToothGrowth" and, if it exists, write it as jamovi-file using write_omv()
 #' data("ToothGrowth");
+#' fleOMV <- paste0(tempfile(), ".omv");
 #' wrtDta = write_omv(ToothGrowth, "Trial.omv", retDbg = TRUE);
 #' print(names(wrtDta));
 #' # the print-function is only used to force devtools::run_examples() to show output
@@ -28,11 +29,12 @@
 #'
 #' # check whether the file was written to the disk, get the file information (size, etc.)
 #' # and delete the file afterwards
-#' print(list.files(".", "Trial.omv"));
-#' # -> "Trial.omv"
-#' print(file.info("Trial.omv")$size);
-#' # -> 2111 (size may differ on different OSes)
-#' unlink("Trial.omv");
+#' convert_to_omv(fleInp = fleRda, fleOut = fleOMV);
+#' print(list.files(dirname(fleOMV), basename(fleOMV)));
+#' # -> "file[...].omv" ([...] contains a random combination of numbers / characters
+#' print(file.info(fleOMV)$size);
+#' # -> 2199 (size may differ on different OSes)
+#' unlink(fleOMV);
 #' }
 #'
 #' @export write_omv
@@ -93,7 +95,7 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", retDbg = FALSE) {
 
         # ID variables represent a special case and are therefore treated first
         # only if the jmv-id marker is set or if the measureType is set to "ID" in the original data
-        if (chkAtt(dtaFrm[[i]], "jmv-id", TRUE) || chkAtt(dtaFrm[[i]], "measureType", "ID") || (i == 1 && is.character(colCrr) && length(unique(colCrr)) == length(colCrr))) {
+        if (chkAtt(dtaFrm[[i]], "jmv-id", TRUE) || chkAtt(dtaFrm[[i]], "measureType", "ID") || (i == 1 && length(unique(colCrr)) == length(colCrr))) {
             if (is.character(colCrr)) {
                 mtaDta$fields[[i]][["dataType"]] <- "Text";
                 mtaDta$fields[[i]][["type"]]     <- "string";
@@ -112,19 +114,20 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", retDbg = FALSE) {
             xtdDta[[names(dtaFrm[i])]] <- list(labels = lapply(0:1, function(i) list(i, as.character(i), as.character(i), FALSE)));
         # [b] factors
         } else if (is.factor(colCrr)) {
+            facOrd <- is.ordered(colCrr);
             facLvl <- attr(colCrr, "levels");
             facVal <- attr(colCrr, "values");
             if (is.null(facVal)) {
                 colCrr <- as.integer(colCrr);
                 facVal <- unique(sort(colCrr));
-                mtaDta$fields[[i]][["dataType"]] <- ifelse(all(!is.na(suppressWarnings(as.integer(facLvl)))) && all(as.character(as.integer(facLvl)) == facLvl), "Integer", "Text")
+                mtaDta$fields[[i]][["dataType"]] <- ifelse(all(!is.na(suppressWarnings(as.integer(facLvl)))) && all(as.character(as.integer(facLvl)) == facLvl), "Integer", "Text");
             } else {
                 colCrr <- facVal[as.integer(colCrr)]
                 mtaDta$fields[[i]][["dataType"]] <- "Integer";
             }
             mtaDta$fields[[i]][["type"]]         <- "integer";
             # if "measureType" is already stored in the data frame, keep it, otherwise set it to "Ordinal" if the properties indicate it to be likely ("Nominal" is already the default)
-            if (is.ordered(colCrr) || (chkFld(mtaDta$fields[[i]], "dataType", "Integer") && length(facVal) > 5 && !any(is.na(c(facVal, colCrr))) && stats::sd(diff(facVal)) < diff(range(colCrr)) / 10)) {
+            if (facOrd || (chkFld(mtaDta$fields[[i]], "dataType", "Integer") && length(facVal) > 5 && !any(is.na(c(facVal, colCrr))) && stats::sd(diff(facVal)) < diff(range(colCrr)) / 10)) {
                 mtaDta$fields[[i]][["measureType"]] <- ifelse(chkAtt(dtaFrm[[i]], "measureType"), attr(dtaFrm[[i]], "measureType"), "Ordinal");
             }
             if (length(facVal) > 0) {

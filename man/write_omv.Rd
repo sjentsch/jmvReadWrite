@@ -31,6 +31,7 @@ library(jmvReadWrite);
 
 # use the data set "ToothGrowth" and, if it exists, write it as jamovi-file using write_omv()
 data("ToothGrowth");
+fleOMV <- paste0(tempfile(), ".omv");
 wrtDta = write_omv(ToothGrowth, "Trial.omv", retDbg = TRUE);
 print(names(wrtDta));
 # the print-function is only used to force devtools::run_examples() to show output
@@ -42,11 +43,12 @@ print(names(wrtDta));
 
 # check whether the file was written to the disk, get the file information (size, etc.)
 # and delete the file afterwards
-print(list.files(".", "Trial.omv"));
-# -> "Trial.omv"
-print(file.info("Trial.omv")$size);
-# -> 2111 (size may differ on different OSes)
-unlink("Trial.omv");
+convert_to_omv(fleInp = fleRda, fleOut = fleOMV);
+print(list.files(dirname(fleOMV), basename(fleOMV)));
+# -> "file[...].omv" ([...] contains a random combination of numbers / characters
+print(file.info(fleOMV)$size);
+# -> 2199 (size may differ on different OSes)
+unlink(fleOMV);
 }
 
 }

@@ -201,3 +201,6 @@ support you with commonly required data management tasks:
 * [`merge_rows_omv`](./reference/merge_rows_omv.html): Add variables from
   several data sets (i.e., the variables / columns in the second, etc. input
   data set are added as columns to the first data set).
+
+* [`sort_omv`](./reference/sort_omv.html): Sort a data set according to one
+  or more variable(s).

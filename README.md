@@ -177,9 +177,9 @@ list.files(".", "Trial.omv");
 #> [1] "Trial.omv"
 file.info("Trial.omv");
 #>           size isdir mode               mtime               ctime
-#> Trial.omv 2238 FALSE  664 2022-02-06 21:46:21 2022-02-06 21:46:21
+#> Trial.omv 2199 FALSE  664 2022-02-08 00:05:02 2022-02-08 00:05:02
 #>                         atime  uid  gid    uname   grname
-#> Trial.omv 2022-02-06 21:46:21 1000 1000 sjentsch sjentsch
+#> Trial.omv 2022-02-08 00:05:02 1000 1000 sjentsch sjentsch
 unlink("Trial.omv");
 ```
 
@@ -200,8 +200,8 @@ data = read_omv(fleOMV, sveAtt = TRUE);
 # shows the names of the attributes for the whole data set (e.g., number of
 # rows and columns) and the names of the attributes of the first column
 names(attributes(data));
-#> [1] "row.names"       "names"           "class"           "fltLst"         
-#> [5] "variable.labels" "removedRows"     "addedRows"       "transforms"
+#> [1] "row.names"   "names"       "class"       "fltLst"      "removedRows"
+#> [6] "addedRows"   "transforms"
 names(attributes(data[[1]]));
 #>  [1] "missingValues"  "name"           "id"             "columnType"    
 #>  [5] "dataType"       "measureType"    "formula"        "formulaMessage"
@@ -244,6 +244,9 @@ functions that support you with commonly required data management tasks:
   - [`merge_rows_omv`](./reference/merge_rows_omv.html): Add variables
     from several data sets (i.e., the variables / columns in the second,
     etc. input data set are added as columns to the first data set).
+
+  - [`sort_omv`](./reference/sort_omv.html): Sort a data set according
+    to one or more variable(s).
 
 -----
 

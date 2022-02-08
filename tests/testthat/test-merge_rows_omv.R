@@ -1,5 +1,7 @@
 test_that("merge_rows_omv works", {
-    nmeInp <- system.file("data", c("bfi_sample.rda", "bfi_sample2.rda", "bfi_sample.rda"),  package = "jmvReadWrite");
+    dtaInp <- list(jmvReadWrite::bfi_sample, jmvReadWrite::bfi_sample2, jmvReadWrite::bfi_sample);
+    nmeInp <- paste0(tempfile(), "_", 1:3, ".rds");
+    for (i in seq_along(nmeInp)) { saveRDS(dtaInp[[i]], nmeInp[i]); }
 
     # check merging rows with writing an output file and afterwards checking it (existence, size, whether it is a ZIP-file and content)
     nmeOut <- paste0(tempfile(), ".omv");
@@ -28,7 +30,7 @@ test_that("merge_rows_omv works", {
     dtaFrm <- merge_rows_omv(fleInp = nmeInp, colInd = TRUE);
     expect_s3_class(dtaFrm, "data.frame");
     expect_equal(dim(dtaFrm), c(758, 34));
-    expect_true(all(table(dtaFrm$fleInd) == c(bfi_sample = 508, bfi_sample2 = 250)));
+    expect_true(all(unname(table(dtaFrm$fleInd)) == sapply(dtaInp, dim)[1, ]));
 
     dtaFrm <- merge_rows_omv(fleInp = nmeInp, rstRwN = TRUE);
     expect_s3_class(dtaFrm, "data.frame");

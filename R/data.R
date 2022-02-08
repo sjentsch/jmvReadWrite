@@ -130,8 +130,7 @@
 "bfi_sample2"
 
 #' Twenty-five personality self-report items taken from the International Personality Item Pool
-#' (includes jamovi-attributes; should result in a file identical to bfi_sample3.omv under "extdata" when
-#' written with write_omv)
+#' (testing file for ordered factors / "Ordinal"-variables in jamovi)
 #'
 #' The data set contains responses from 250 participants filling in twenty-five personality self-report items
 #' taken from the International Personality Item Pool (https://ipip.ori.org) as part of the Synthetic Aperture

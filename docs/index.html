@@ -96,7 +96,7 @@
 <div class="section level2">
 <h2 id="how-to-use-the-package">How to use the package?<a class="anchor" aria-label="anchor" href="#how-to-use-the-package"></a>
 </h2>
-<p><br><a href="./reference/read_omv.html"><strong>read_omv</strong></a></p>
+<p><br><a href="reference/read_omv.html"><strong>read_omv</strong></a></p>
 <p>The following code uses the ToothGrowth-data set that is part of the data sets included in R (the current file contains some modifications though for testing the reading and writing routines: <code>read_omv</code> and <code>write_omv</code>). With this data set, a syntax to conduct an ANOVA is run.</p>
 <p>The results should be similar to those obtained when running the same analysis in jamovi (using the GUI). To do so, open the file menu (☰) choose <code>Open</code>, <code>Data Library</code> and <code>ToothGrowth</code>. Afterwards, click on the <code>ANOVA</code>-button in the <code>Analyses</code>-tab and choose <code>ANOVA</code>. There, you assign the variable <code>len</code> to <code>Dependent Variable</code> and <code>supp</code> and <code>dose</code> to <code>Fixed Factors</code>. Afterwards, you choose / tick <code>Overall Model Test</code> and <code>ω²</code>. Open the drop-down menu <code>Assumption Checks</code> and tick <code>Homogeneity test</code> and <code>Normality test</code>. The results should be identical apart from that the table output looks nicer in <code>jamovi</code> (not only text, as below), numbers are rounded and maybe one or two other cosmetic differences.</p>
 <p>If you want to copy the syntax generated in jamovi, you have to switch on the <a href="https://jamovi.readthedocs.io/en/latest/_pages/um_6_syntax_mode.html" class="external-link"><code>Syntax Mode</code></a>. Afterwards, the syntax is shown at the top of the analysis and can be copied from there.</p>
@@ -144,7 +144,7 @@
 <span class="co">#&gt;  ───────────────────────────── </span>
 <span class="co">#&gt;    0.9849884    0.6694242   </span>
 <span class="co">#&gt;  ─────────────────────────────</span></code></pre></div>
-<p>Since version 0.2.0, <a href="./reference/read_omv.html"><code>read_omv</code></a> also extracts the syntax from analyses that you may have conducted in the jamovi-GUI and that are stored in the .omv-file. To extract them, you have to set the parameter <code>getSyn = TRUE</code> when calling <a href="./reference/read_omv.html"><code>read_omv</code></a> (default is <code>FALSE</code>). When the parameter is set, the analyses are stored in the attribute <code>syntax</code>. They can be used as shown in the following examples:</p>
+<p>Since version 0.2.0, <a href="reference/read_omv.html"><code>read_omv</code></a> also extracts the syntax from analyses that you may have conducted in the jamovi-GUI and that are stored in the .omv-file. To extract them, you have to set the parameter <code>getSyn = TRUE</code> when calling <a href="reference/read_omv.html"><code>read_omv</code></a> (default is <code>FALSE</code>). When the parameter is set, the analyses are stored in the attribute <code>syntax</code>. They can be used as shown in the following examples:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://sjentsch.github.io/jmvReadWrite/" class="external-link">jmvReadWrite</a></span><span class="op">)</span>;
 <span class="va">fleOMV</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"ToothGrowth.omv"</span>, package <span class="op">=</span> <span class="st">"jmvReadWrite"</span><span class="op">)</span>;
@@ -165,7 +165,7 @@
 <span class="op">}</span>
 <span class="co">#&gt; [1] "main"      "assump"    "contrasts" "postHoc"   "emm"       "residsOV"</span></code></pre></div>
 <p><br></p>
-<p><a href="./reference/write_omv.html"><strong>write_omv</strong></a></p>
+<p><a href="reference/write_omv.html"><strong>write_omv</strong></a></p>
 <p>The <code>jmvReadWrite</code>-package also enables you to write <code>.omv</code>-files in order to use them in <code>jamovi</code>. Let’s assume that you have a large collection of log-files (e.g., from an experiment) that you compile and process (summarize, filter, etc.) in R in order to later analyse them in <code>jamovi</code>. You will have those processed log-files stored in a data frame (called, e.g., <code>data</code>) which you then write to a file that you can open in jamovi afterwards.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://sjentsch.github.io/jmvReadWrite/" class="external-link">jmvReadWrite</a></span><span class="op">)</span>
@@ -189,11 +189,11 @@
 <span class="co">#&gt; [1] "Trial.omv"</span>
 <span class="fu"><a href="https://rdrr.io/r/base/file.info.html" class="external-link">file.info</a></span><span class="op">(</span><span class="st">"Trial.omv"</span><span class="op">)</span>;
 <span class="co">#&gt;           size isdir mode               mtime               ctime</span>
-<span class="co">#&gt; Trial.omv 2199 FALSE  664 2022-02-08 00:05:02 2022-02-08 00:05:02</span>
+<span class="co">#&gt; Trial.omv 2199 FALSE  664 2022-02-08 18:56:30 2022-02-08 18:56:30</span>
 <span class="co">#&gt;                         atime  uid  gid    uname   grname</span>
-<span class="co">#&gt; Trial.omv 2022-02-08 00:05:02 1000 1000 sjentsch sjentsch</span>
+<span class="co">#&gt; Trial.omv 2022-02-08 18:56:30 1000 1000 sjentsch sjentsch</span>
 <span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="st">"Trial.omv"</span><span class="op">)</span>;</code></pre></div>
-<p>Although jamovi reads R-data files (.RData, .rda, .rds) <a href="./reference/write_omv.html"><code>write_omv</code></a> permits to store <code>jamovi</code>-specific attributes (such as variable labels) in addition. Please note that if you are reading from an <code>.omv</code>-file in order to write back to an <code>.omv</code>-file (perhaps after some modifications), it is recommended to leave the <code>sveAtt</code>-attribute set to <code>TRUE</code> (which is the default).</p>
+<p>Although jamovi reads R-data files (.RData, .rda, .rds) <a href="reference/write_omv.html"><code>write_omv</code></a> permits to store <code>jamovi</code>-specific attributes (such as variable labels) in addition. Please note that if you are reading from an <code>.omv</code>-file in order to write back to an <code>.omv</code>-file (perhaps after some modifications), it is recommended to leave the <code>sveAtt</code>-attribute set to <code>TRUE</code> (which is the default).</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># reading and writing a file with the "sveAtt"-parameter permits you to keep</span>
 <span class="co"># essential meta-data to ensure that the written file looks and works like the</span>
@@ -219,12 +219,12 @@
 <p><strong>Helper functions</strong></p>
 <p>Since version 0.3.0, <code>jmvReadWrite</code> contains a number of helper functions that support you with commonly required data management tasks:</p>
 <ul>
-<li><p><a href="./reference/convert_to_omv.html"><code>convert_to_omv</code></a>: Converts data sets from other file formats into jamovi-format (this function may be helpful if you have to convert a larger amount of files).</p></li>
-<li><p><a href="./reference/long2wide_omv.html"><code>long2wide_omv</code></a>: Convert a data set from long to wide format (time points for repeated measurements are arranged as rows in the original and converted into columns).</p></li>
-<li><p><a href="./reference/wide2long_omv.html"><code>wide2long_omv</code></a>: Convert a data set from wide to long format (time points for repeated measurements are arranged as columns in the original and converted into rows).</p></li>
-<li><p><a href="./reference/merge_cols_omv.html"><code>merge_cols_omv</code></a>: Add cases from several data sets (i.e., the cases / rows in the second, etc. data set are added as rows to the first data set).</p></li>
-<li><p><a href="./reference/merge_rows_omv.html"><code>merge_rows_omv</code></a>: Add variables from several data sets (i.e., the variables / columns in the second, etc. input data set are added as columns to the first data set).</p></li>
-<li><p><a href="./reference/sort_omv.html"><code>sort_omv</code></a>: Sort a data set according to one or more variable(s).</p></li>
+<li><p><a href="reference/convert_to_omv.html"><code>convert_to_omv</code></a>: Converts data sets from other file formats into jamovi-format (this function may be helpful if you have to convert a larger amount of files).</p></li>
+<li><p><a href="reference/long2wide_omv.html"><code>long2wide_omv</code></a>: Convert a data set from long to wide format (time points for repeated measurements are arranged as rows in the original and converted into columns).</p></li>
+<li><p><a href="reference/wide2long_omv.html"><code>wide2long_omv</code></a>: Convert a data set from wide to long format (time points for repeated measurements are arranged as columns in the original and converted into rows).</p></li>
+<li><p><a href="reference/merge_cols_omv.html"><code>merge_cols_omv</code></a>: Add cases from several data sets (i.e., the cases / rows in the second, etc. data set are added as rows to the first data set).</p></li>
+<li><p><a href="reference/merge_rows_omv.html"><code>merge_rows_omv</code></a>: Add variables from several data sets (i.e., the variables / columns in the second, etc. input data set are added as columns to the first data set).</p></li>
+<li><p><a href="reference/sort_omv.html"><code>sort_omv</code></a>: Sort a data set according to one or more variable(s).</p></li>
 </ul>
 <hr>
 <p><a href="https://github.com/sjentsch/jmvReadWrite/blob/main/NEWS.md" class="external-link">Changelog</a></p>

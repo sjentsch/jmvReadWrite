@@ -2,7 +2,7 @@ test_that("sort_omv works", {
     nmeInp <- paste0(tempfile(), ".rds");
     nmeOut <- paste0(tempfile(), "_S.omv");
     saveRDS(jmvReadWrite::AlbumSales, nmeInp);
-    
+
     sort_omv(nmeInp, nmeOut, varSrt = "Image");
     expect_true(file.exists(nmeOut));
     expect_gt(file.info(nmeOut)$size, 1);

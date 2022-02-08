@@ -43,7 +43,7 @@ pkgdown::build_reference(run_dont_run = TRUE, preview = FALSE)
 pkgdown::build_reference_index()
 devtools::build_manual(path="doc")
 
-# check whether the examples run through, run unit tests and do some linting
+# check whether the examples and the unit tests run through and do some linting
 devtools::run_examples(run_dontrun = TRUE)
 devtools::test()
 devtools::lint()

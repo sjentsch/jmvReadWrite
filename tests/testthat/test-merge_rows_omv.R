@@ -1,7 +1,7 @@
 test_that("merge_rows_omv works", {
     dtaInp <- list(jmvReadWrite::bfi_sample, jmvReadWrite::bfi_sample2, jmvReadWrite::bfi_sample);
     nmeInp <- paste0(tempfile(), "_", 1:3, ".rds");
-    for (i in seq_along(nmeInp)) { saveRDS(dtaInp[[i]], nmeInp[i]); }
+    for (i in seq_along(nmeInp)) saveRDS(dtaInp[[i]], nmeInp[i]);
 
     # check merging rows with writing an output file and afterwards checking it (existence, size, whether it is a ZIP-file and content)
     nmeOut <- paste0(tempfile(), ".omv");

@@ -1,3 +1,6 @@
+# this file
+.gitignore
+
 # History files
 .Rhistory
 .Rapp.history
@@ -48,4 +51,3 @@ Meta/
 inst/doc
 /doc/
 /Meta/
-docs

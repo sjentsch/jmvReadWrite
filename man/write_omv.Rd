@@ -32,8 +32,9 @@ library(jmvReadWrite);
 # use the data set "ToothGrowth" and, if it exists, write it as jamovi-file using write_omv()
 data("ToothGrowth");
 fleOMV <- paste0(tempfile(), ".omv");
-wrtDta = write_omv(ToothGrowth, "Trial.omv", retDbg = TRUE);
-print(names(wrtDta));
+# typically, one would use a "real" file name instead of tempfile(), e.g., "Data1.omv"
+dtaDbg = write_omv(ToothGrowth, fleOMV, retDbg = TRUE);
+print(names(dtaDbg));
 # the print-function is only used to force devtools::run_examples() to show output
 # -> "mtaDta" "xtdDta" "dtaFrm"
 # returns a list with the metadata (mtaDta, e.g., column and data type),

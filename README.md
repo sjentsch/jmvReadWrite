@@ -180,9 +180,9 @@ list.files(".", "Trial.omv");
 #> [1] "Trial.omv"
 file.info("Trial.omv");
 #>           size isdir mode               mtime               ctime
-#> Trial.omv 2199 FALSE  664 2022-02-08 19:46:54 2022-02-08 19:46:54
+#> Trial.omv 2199 FALSE  664 2022-02-08 19:57:23 2022-02-08 19:57:23
 #>                         atime  uid  gid    uname   grname
-#> Trial.omv 2022-02-08 19:46:54 1000 1000 sjentsch sjentsch
+#> Trial.omv 2022-02-08 19:57:23 1000 1000 sjentsch sjentsch
 unlink("Trial.omv");
 ```
 

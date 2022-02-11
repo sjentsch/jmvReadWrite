@@ -45,8 +45,9 @@ devtools::build_manual(path="doc")
 
 # check whether the examples and the unit tests run through and do some linting
 devtools::run_examples(run_dontrun = TRUE)
-devtools::test()
 devtools::lint()
+devtools::test()
+devtools::test_coverage()
 
 # the package itself (tar.gz) - build() also builds vignettes
 # ping-pong between build() and check() until all errors, warnings, notes are resolved 

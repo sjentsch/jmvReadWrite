@@ -34,4 +34,13 @@ test_that("merge_cols_omv works", {
     expect_equal(dim(dtaFrm), c(245, 55));
 
     unlink(nmeInp);
+
+    # test cases for code coverage ============================================================================================================================
+    dtaFrm <- list(data.frame(ID = runif(10), A = runif(10)), data.frame(ID = runif(10), B = runif(10)), data.frame(ID = runif(10), C = runif(10)), data.frame(ID = runif(10), D = runif(10)));
+    expect_equal(chkByV(list(), dtaFrm), rep(list("ID"), 4));
+    expect_equal(chkByV(rep(list("ID"), 4), dtaFrm), rep(list("ID"), 4));
+    expect_error(chkByV(rep(list("ID2"), 4), dtaFrm));
+    expect_equal(chkByV("ID", dtaFrm), rep(list("ID"), 4));
+    expect_error(chkByV("ID2", dtaFrm));
+    expect_error(chkByV(rep(list("ID"), 3), dtaFrm));
 })

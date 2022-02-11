@@ -18,13 +18,17 @@
 #' @examples
 #' \dontrun{
 #' library(jmvReadWrite);
-#' fleRda <- system.file("data", "ToothGrowth.rda", package = "jmvReadWrite");
+#' fleRDS <- paste0(tempfile(), ".rds");
 #' fleOMV <- paste0(tempfile(), ".omv");
-#' convert_to_omv(fleInp = fleRda, fleOut = fleOMV);
+#' saveRDS(jmvReadWrite::ToothGrowth, fleRDS);
+#' convert_to_omv(fleInp = fleRDS, fleOut = fleOMV);
 #' print(list.files(dirname(fleOMV), basename(fleOMV)));
 #' # -> "file[...].omv" ([...] contains a random combination of numbers / characters
 #' print(file.info(fleOMV)$size);
 #' # -> 2199 (size may differ on different OSes)
+#' cat(str(read_omv(fleOMV, sveAtt = FALSE)));
+#' # gives a overview of the dataframe (all columns and some attributes,
+#' # sveAtt is intentionally set to FALSE to make the output not too overwhelming)
 #' unlink(fleOMV);
 #' }
 #'

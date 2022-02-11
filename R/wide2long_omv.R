@@ -59,7 +59,7 @@ wide2long_omv <- function(fleInp = "", fleOut = "", varLst = c(), varSep = ".", 
     crrArg <- list(data = dtaFrm, direction = "long", varying = varLst, sep = varSep);
     if (nzchar(varID))  crrArg <- c(crrArg, list(idvar   = varID));
     if (nzchar(varTme)) crrArg <- c(crrArg, list(timevar = varTme));
-    dtaFrm <- do.call(stats::reshape, adjArg("reshape", crrArg, varArg, c("data", "direction", "varying", "sep")));
+    dtaFrm <- do.call(stats::reshape, adjArg("stats::reshape", crrArg, varArg, c("data", "direction", "varying", "sep")));
 
     # correct labels (if available)
     dtaFrm <- rplLbl(dtaFrm);

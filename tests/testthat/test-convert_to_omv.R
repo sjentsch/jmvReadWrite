@@ -10,5 +10,6 @@ test_that("convert_to_omv works", {
     expect_true(chkFle(nmeOut, "meta"));
     expect_true(chkFle(nmeOut, "metadata.json"));
     expect_true(chkFle(nmeOut, "data.bin"));
+    unlink(nmeInp);
     unlink(nmeOut);
 })

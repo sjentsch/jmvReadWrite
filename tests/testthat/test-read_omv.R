@@ -5,8 +5,8 @@ test_that("read_omv works", {
     # whether the "missingValues"-attribute is an empty list, and whether the factor levels at columns 4, 6, and 8 have the correct length and content
     dtaFrm <- read_omv(fleInp = nmeInp, useFlt = FALSE, rmMsVl = FALSE, sveAtt = FALSE, getSyn = FALSE, getHTM = FALSE);
     expect_s3_class(dtaFrm, "data.frame")
-    expect_equal(dim(dtaFrm), c(60, 12))
-    expect_equal(as.vector(sapply(dtaFrm, typeof)), c("logical", "integer", "double", "integer", "double", "integer", "double", "integer", "integer", "double", "double", "double"))
+    expect_equal(dim(dtaFrm), c(60, 13))
+    expect_equal(as.vector(sapply(dtaFrm, typeof)), c("logical", "character", "double", "integer", "double", "integer", "double", "integer", "integer", "double", "double", "double", "integer"))
     expect_equal(names(attributes(dtaFrm)), c("row.names", "names", "class", "fltLst"))
     expect_equal(names(attributes(dtaFrm[[4]])), c("levels", "class", "values", "missingValues"))
     expect_equal(names(attributes(dtaFrm[[4]])), c("levels", "class", "values", "missingValues"))
@@ -20,21 +20,27 @@ test_that("read_omv works", {
 
     # read the data set (with the useFlt-argument set TRUE) and test its properties: data frame, size, correct column type (NB: two rows and the first column - "Filter 1" are removed)
     dtaFrm <- read_omv(fleInp = nmeInp, useFlt = TRUE, rmMsVl = FALSE, sveAtt = FALSE, getSyn = FALSE, getHTM = FALSE);
+    expect_s3_class(dtaFrm, "data.frame");
+    expect_equal(dim(dtaFrm), c(58, 12));
+    expect_equal(as.vector(sapply(dtaFrm, typeof)), c("character", "double", "integer", "double", "integer", "double", "integer", "integer", "double", "double", "double", "integer"));
+
+    # read the data set (with the rmMsVl-argument set TRUE) and test its properties: data frame, size, correct column type
+    dtaFrm <- read_omv(fleInp = nmeInp, useFlt = FALSE, rmMsVl = TRUE, sveAtt = FALSE, getSyn = FALSE, getHTM = FALSE);
     expect_s3_class(dtaFrm, "data.frame")
-    expect_equal(dim(dtaFrm), c(58, 11))
-    expect_equal(as.vector(sapply(dtaFrm, typeof)), c("integer", "double", "integer", "double", "integer", "double", "integer", "integer", "double", "double", "double"))
+    expect_equal(dim(dtaFrm), c(60, 13))
+    expect_equal(as.vector(sapply(dtaFrm, typeof)), c("logical", "character", "double", "integer", "double", "integer", "double", "integer", "integer", "double", "double", "double", "integer"));
 
     # read the data set (with the sveAtt-argument set TRUE) and test its properties: data frame, size, correct column type, and several attributes of the whole data frame and columns within it
     dtaFrm <- read_omv(fleInp = nmeInp, useFlt = FALSE, rmMsVl = FALSE, sveAtt = TRUE, getSyn = FALSE, getHTM = FALSE);
     expect_s3_class(dtaFrm, "data.frame")
-    expect_equal(dim(dtaFrm), c(60, 12))
-    expect_equal(as.vector(sapply(dtaFrm, typeof)), c("logical", "integer", "double", "integer", "double", "integer", "double", "integer", "integer", "double", "double", "double"))
-    expect_equal(names(attributes(dtaFrm)), c("row.names", "names", "class", "fltLst", "removedRows", "addedRows", "transforms"))
+    expect_equal(dim(dtaFrm), c(60, 13))
+    expect_equal(as.vector(sapply(dtaFrm, typeof)), c("logical", "character", "double", "integer", "double", "integer", "double", "integer", "integer", "double", "double", "double", "integer"));
+    expect_equal(names(attributes(dtaFrm)), c("row.names", "names", "class", "fltLst", "removedRows", "addedRows", "transforms"));
     expect_equal(names(attributes(dtaFrm[[4]])),  c("levels", "class", "values", "missingValues", "name", "id", "columnType", "dataType", "measureType", "formula", "formulaMessage",
-                                                    "parentId", "width", "type", "importName", "description", "transform", "edits", "trimLevels"))
+                                                    "parentId", "width", "type", "importName", "description", "transform", "edits", "trimLevels"));
     expect_equal(names(attributes(dtaFrm[[10]])), c("jmv-desc", "missingValues", "name", "id", "columnType", "dataType", "measureType", "formula", "formulaMessage", "parentId", "width",
                                                     "type", "outputAnalysisId", "outputOptionName", "outputName", "outputDesiredColumnName", "outputAssignedColumnName", "importName",
-                                                    "description", "transform", "edits"))
+                                                    "description", "transform", "edits"));
 
     # read the data set (with the getSyn-argument set TRUE) and test its properties: correct attributes (should contain "syntax" and "protobuf"), as well as the type, size and content of "syntax"
     # (should start with "jmv::")
@@ -51,14 +57,20 @@ test_that("read_omv works", {
     expect_equal(attr(dtaFrm, "HTML")[2],   "<html>")
     expect_equal(attr(dtaFrm, "HTML")[266], "</html>")
     expect_equal(length(grep("<.*?>", attr(dtaFrm, "HTML"))), 75);
+
+    # test cases for code coverage ============================================================================================================================
+    expect_error(read_omv());
+    expect_error(read_omv(""));
+    expect_error(chkMnf(nmeInp, c()));
+    expect_error(chkMnf(nmeInp, "index.html"));
 })
 
 test_that("read_all works", {
     # read_all should work as read_omv (with the sveAtt-argument set TRUE) and have the same properties: data frame, size, correct column type, and several attributes of the data frame and columns
     dtaFrm <- read_all(file.path("..", "ToothGrowth.omv"));
     expect_s3_class(dtaFrm, "data.frame")
-    expect_equal(dim(dtaFrm), c(60, 12))
-    expect_equal(as.vector(sapply(dtaFrm, typeof)), c("logical", "integer", "double", "integer", "double", "integer", "double", "integer", "integer", "double", "double", "double"))
+    expect_equal(dim(dtaFrm), c(60, 13))
+    expect_equal(as.vector(sapply(dtaFrm, typeof)), c("logical", "character", "double", "integer", "double", "integer", "double", "integer", "integer", "double", "double", "double", "integer"))
     expect_equal(names(attributes(dtaFrm)), c("row.names", "names", "class", "fltLst", "removedRows", "addedRows", "transforms"))
     expect_equal(names(attributes(dtaFrm[[4]])),  c("levels", "class", "values", "missingValues", "name", "id", "columnType", "dataType", "measureType", "formula", "formulaMessage",
                                                     "parentId", "width", "type", "importName", "description", "transform", "edits", "trimLevels"))
@@ -67,12 +79,56 @@ test_that("read_all works", {
     nmeTmp <- paste0(tempfile(), ".rds");
     saveRDS(jmvReadWrite::ToothGrowth, nmeTmp);
     dtaFrm <- read_all(nmeTmp);
-    expect_equal(dim(dtaFrm), c(60, 7))
-    expect_equal(unname(sapply(dtaFrm, typeof)),                c("integer", "integer", "integer", "double", "integer", "double", "double"))
-    expect_equal(unname(sapply(sapply(dtaFrm, class), "[", 1)), c("integer", "factor", "factor", "numeric", "ordered", "numeric", "numeric"))
-    expect_equal(names(attributes(dtaFrm)), c("names", "row.names", "class"))
-    expect_equal(names(attributes(dtaFrm[[3]])),  c("levels", "class", "values"))
-    expect_equal(names(attributes(dtaFrm[[5]])),  c("levels", "class"))
+    expect_equal(dim(dtaFrm), c(60, 7));
+    expect_equal(unname(sapply(dtaFrm, typeof)),                c("integer", "integer", "integer", "double", "integer", "double", "double"));
+    expect_equal(unname(sapply(sapply(dtaFrm, class), "[", 1)), c("integer", "factor", "factor", "numeric", "ordered", "numeric", "numeric"));
+    expect_equal(names(attributes(dtaFrm)), c("names", "row.names", "class"));
+    expect_equal(names(attributes(dtaFrm[[3]])),  c("levels", "class", "values"));
+    expect_equal(names(attributes(dtaFrm[[5]])),  c("levels", "class"));
 
     unlink(nmeTmp);
+
+    # test cases for code coverage ============================================================================================================================
+    # empty file name
+    expect_error(read_all());
+    expect_error(read_all(""));
+    expect_error(rplStr(strMod = "\xfa\xb4\xbf\xbf\x9f", crrAtt = "Trial"));
+
+    # more than one object when using Rdata
+    D1 <- data.frame(A = runif(n = 100));
+    D2 <- data.frame(B = runif(n = 100));
+    nmeInp <- paste0(tempfile(), ".rda");
+    save(list = ls()[grepl("D[1-2]", ls())], file = nmeInp);
+    # throw error when selSet is not sepcified
+    expect_error(suppressMessages(read_all(nmeInp)));
+    # check whether reading works correct with using selSet
+    dtaFrm <- read_all(nmeInp, selSet = "D1");
+    expect_s3_class(dtaFrm, class = "data.frame");
+    expect_equal(dim(dtaFrm), c(100, 1));
+    unlink(nmeInp);
+
+    # test cases for CSV / TSV
+    nmeInp <- paste0(tempfile(), ".tsv");
+    write.table(D1, file = nmeInp, sep = "\t");
+    dtaFrm <- read_all(nmeInp);
+    expect_s3_class(dtaFrm, class = "data.frame");
+    expect_equal(dim(dtaFrm), c(100, 1));
+    unlink(nmeInp);
+
+    nmeInp <- paste0(tempfile(), ".csv");
+    write.table(D1, file = nmeInp, sep = ",");
+    dtaFrm <- read_all(nmeInp);
+    expect_s3_class(dtaFrm, class = "data.frame");
+    expect_equal(dim(dtaFrm), c(100, 1));
+    unlink(nmeInp);
+
+    nmeInp <- paste0(tempfile(), ".csv");
+    write.table(D1, file = nmeInp, sep = ";");
+    # if the separator is not given, the input column can't be converted into a number
+    expect_type(read_all(nmeInp)$A, "character");
+    dtaFrm <- read_all(nmeInp, sep = ";");
+    expect_s3_class(dtaFrm, class = "data.frame");
+    expect_equal(dim(dtaFrm), c(100, 1));
+    expect_type(dtaFrm$A, "double");
+    unlink(nmeInp);
 })

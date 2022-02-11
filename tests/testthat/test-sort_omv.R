@@ -21,4 +21,7 @@ test_that("sort_omv works", {
 
     unlink(nmeInp);
     unlink(nmeOut);
+
+    # test cases for code coverage ============================================================================================================================
+    expect_error(sort_omv(nmeInp, nmeOut, varSrt = c()));
 })

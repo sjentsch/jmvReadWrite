@@ -41,4 +41,12 @@ test_that("merge_rows_omv works", {
     expect_s3_class(dtaFrm, "data.frame");
     expect_equal(dim(dtaFrm), c(504, 34));
     expect_true(all(table(dtaFrm$fleInd) == c(bfi_sample = 254, bfi_sample2 = 250)));
+
+    unlink(nmeInp);
+
+    # test cases for code coverage ============================================================================================================================
+    nmeInp <- paste0(tempfile(), "_", 1:4, ".rds");
+    for (i in seq_along(nmeInp)) saveRDS(setNames(data.frame(runif(n = 100)), LETTERS[i]), nmeInp[i]);
+    expect_error(dtaFrm <- merge_rows_omv(fleInp = nmeInp, typMrg = "common"));
+    unlink(nmeInp);
 })

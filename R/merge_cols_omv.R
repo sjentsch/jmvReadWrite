@@ -90,7 +90,7 @@ chkByV <- function(varBy = list(), dtaFrm = NULL) {
             stop("Not all data sets given in fleInp contain the variable(s) / column(s) that shall be used for matching.");
         }
     # varBy is a character vector (without empty elements) or a string
-    } else if ((is.vector(varBy) && length(varBy) >= 1 && all(nzchar(varBy))) || is.character(varBy)) {
+    } else if ((is.vector(varBy) && !is.list(varBy) && length(varBy) >= 1 && all(nzchar(varBy))) || is.character(varBy)) {
         if (all(sapply(dtaFrm, function(x) all(varBy %in% names(x))))) {
             return(rep(list(varBy), length(dtaFrm)));
         } else {

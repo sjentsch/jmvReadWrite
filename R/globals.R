@@ -38,7 +38,7 @@ chkDir <- function(fleNme = "", wrtPrm = TRUE) {
     if (! utils::file_test("-d", dirname(fleNme))) {
         stop(sprintf("Directory (%s) doesn\'t exist.", dirname(fleNme)));
     }
-    if (file.access(dirname(fleNme), mode = 2)) {
+    if (file.access(dirname(fleNme), mode = 2) != 0) {
         stop(sprintf("The directory (%s) exists, but you don\'t have writing permissions in that directory.", dirname(fleNme)));
     }
     TRUE
@@ -108,7 +108,7 @@ fmtFlI <- function(fleInp = c(), minLng = 1, maxLng = Inf, excExt = "") {
     # if fleOut is empty, fleInp is used with its file extension replaced with ".omv"
     if (length(fleInp) < minLng || length(fleInp) > maxLng) {
         stop(sprintf("The fleInp-argument is supposed to be a character vector with a minimal length of %.0f and a maximal length of %.0f (current length is %.0f).%s",
-                     minLng, maxLng, length(fleInp), ifelse(length(fleInp) > maxLng, "If you would like to process several files, call the function individually for each.", "")));
+                     minLng, maxLng, length(fleInp), ifelse(length(fleInp) > maxLng, "\n  If you would like to process several files, call the function individually for each.", "")));
     }
     fleInp <- unname(sapply(fleInp, nrmFle));
     all(sapply(fleInp, chkFle));

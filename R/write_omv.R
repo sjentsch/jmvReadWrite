@@ -53,6 +53,11 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", retDbg = FALSE) {
     chkDtF(dtaFrm);
     colNum <- dim(dtaFrm)[2];
 
+    # handle the attributes "variable.labels" and "value.labels" in the format provided by the R-package "foreign"
+    # the attribute "variable.labels" (attached to the data frame) is converted them to the format used by "haven" ("label" attached to the data column)
+    if (chkAtt(dtaFrm, "variable.labels")) dtaFrm <- fgnLbl(dtaFrm);
+    if (chkAtt(dtaFrm, "label.table")) stop("R-foreign-style value labels need to be implemented. Please send the data file that caused this problem to sebastian.jentschke@uib.no");
+
     # initialize metadata.json
     mtaDta <- mtaGlb;
     # use the attributes stored in the data frame (for the whole data set) to
@@ -73,11 +78,6 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", retDbg = FALSE) {
     # create strings.bin
     strHdl <- file(description = file.path(tempdir(), "strings.bin"), open = "wb");
     strPos <- 0;
-
-    # handle the attributes "variable.labels" and "value.labels" in the format provided by the R-package "foreign"
-    # the attribute "variable.labels" (attached to the data frame) is converted them to the format used by "haven" ("label" attached to the data column)
-    if (chkAtt(dtaFrm, "variable.labels")) dtaFrm <- fgnLbl(dtaFrm);
-    if (chkAtt(dtaFrm, "label.table")) stop("R-foreign-style value labels need to be implemented. Please send the data file that caused this problem to sebastian.jentschke@uib.no");
 
     for (i in seq_len(colNum)) {
         # assign the jamovi-specific-attributes that are stored in data frame for this data column (if available)
@@ -170,13 +170,15 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", retDbg = FALSE) {
             mtaDta$fields[[i]][["type"]]        <- "number";
             mtaDta$fields[[i]][["dataType"]]    <- "Decimal";
             mtaDta$fields[[i]][["measureType"]] <- "Continuous";
-            mtaDta$fields[[i]][["description"]] <- paste(c(mtaDta$fields[[i]][["description"]], "(date converted to numeric; days since 1970-01-01)"), collapse = " ");
+            mtaDta$fields[[i]][["description"]] <- paste(c(ifelse(nzchar(mtaDta$fields[[i]][["description"]]), mtaDta$fields[[i]][["description"]], names(dtaFrm[i])),
+                                                         "(date converted to numeric; days since 1970-01-01)"), collapse = " ");
         } else if (inherits(colCrr, c("difftime"))) {
             colCrr <- as.numeric(colCrr);
             mtaDta$fields[[i]][["type"]]        <- "number";
             mtaDta$fields[[i]][["dataType"]]    <- "Decimal";
             mtaDta$fields[[i]][["measureType"]] <- "Continuous";
-            mtaDta$fields[[i]][["description"]] <- paste(c(mtaDta$fields[[i]][["description"]], "(time converted to numeric; sec since 00:00)"), collapse = " ");
+            mtaDta$fields[[i]][["description"]] <- paste(c(ifelse(nzchar(mtaDta$fields[[i]][["description"]]), mtaDta$fields[[i]][["description"]], names(dtaFrm[i])),
+                                                         "(time converted to numeric; sec since 00:00)"), collapse = " ");
         } else {
             stop(sprintf("Variable type %s not implemented. Please send the data file that caused this problem to sebastian.jentschke@uib.no", class(colCrr)));
         }
@@ -278,7 +280,7 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", retDbg = FALSE) {
 }
 
 fmtJSON <- function(txtJSON = "") {
-    gsub("  ", " ", gsub(":", ": ", gsub(",", ", ", rjson::toJSON(txtJSON))))
+    gsub("00: 00", "00:00", gsub("  ", " ", gsub(":", ": ", gsub(",", ", ", rjson::toJSON(txtJSON)))))
 }
 
 htmTxt <- function() {
@@ -341,7 +343,7 @@ add2ZIP <- function(fleZIP = "", crrHdl = NULL, newFle = FALSE, blnZIP = TRUE, t
 
     if (! all(class(crrHdl) == c("file", "connection"))) {
         cat(utils::str(crrHdl));
-        stop("Parameter isn't the file handle pointing to a file to be zipped.")
+        stop("Parameter isn't a file handle pointing to a file to be zipped.")
     }
 
     if (all(nchar(txtOut) > 0)) {

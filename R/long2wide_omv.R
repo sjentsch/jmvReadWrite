@@ -23,6 +23,7 @@
 #' @examples
 #' \dontrun{
 #' library(jmvReadWrite);
+
 #' }
 #'
 #' @export long2wide_omv

@@ -25,6 +25,8 @@
 #' @examples
 #' \dontrun{
 #' library(jmvReadWrite);
+#' # create an example data set with 8 repeated measurements (arranged in columns, i.e., wide)
+#' 
 #' }
 #'
 #' @export long2wide_omv

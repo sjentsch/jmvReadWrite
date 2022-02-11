@@ -55,6 +55,8 @@ them yet, please install them manually (e.g., \code{install.packages('haven', de
 \examples{
 \dontrun{
 library(jmvReadWrite);
+# create an example data set with 8 repeated measurements (arranged in columns, i.e., wide)
+
 }
 
 }

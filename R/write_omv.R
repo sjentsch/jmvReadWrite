@@ -30,7 +30,6 @@
 #'
 #' # check whether the file was written to the disk, get the file information (size, etc.)
 #' # and delete the file afterwards
-#' convert_to_omv(fleInp = fleRda, fleOut = fleOMV);
 #' print(list.files(dirname(fleOMV), basename(fleOMV)));
 #' # -> "file[...].omv" ([...] contains a random combination of numbers / characters
 #' print(file.info(fleOMV)$size);

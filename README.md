@@ -11,6 +11,8 @@
 [![Dependencies](https://tinyverse.netlify.com/badge/jmvReadWrite)](https://cran.r-project.org/package=jmvReadWrite)
 [![Last
 Commit](https://img.shields.io/github/last-commit/sjentsch/jmvReadWrite)](https://github.com/sjentsch/jmvReadWrite)
+[![Codecov test
+coverage](https://codecov.io/gh/sjentsch/jmvReadWrite/branch/main/graph/badge.svg)](https://app.codecov.io/gh/sjentsch/jmvReadWrite?branch=main)
 <!-- badges: end -->
 
 <!---
@@ -180,9 +182,9 @@ list.files(".", "Trial.omv");
 #> [1] "Trial.omv"
 file.info("Trial.omv");
 #>           size isdir mode               mtime               ctime
-#> Trial.omv 2199 FALSE  664 2022-02-08 20:08:56 2022-02-08 20:08:56
+#> Trial.omv 2199 FALSE  664 2022-02-11 23:54:59 2022-02-11 23:54:59
 #>                         atime  uid  gid    uname   grname
-#> Trial.omv 2022-02-08 20:08:56 1000 1000 sjentsch sjentsch
+#> Trial.omv 2022-02-11 23:54:59 1000 1000 sjentsch sjentsch
 unlink("Trial.omv");
 ```
 

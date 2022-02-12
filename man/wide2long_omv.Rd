@@ -55,8 +55,46 @@ them yet, please install them manually (e.g., \code{install.packages('haven', de
 \examples{
 \dontrun{
 library(jmvReadWrite);
-# create an example data set with 8 repeated measurements (arranged in columns, i.e., wide)
+# generate a test dataframe with 100 (imaginary) participants / units of observation (ID), and 8 repeated measurements of variable (X.1, X.2, ...)
+dtaInp <- cbind(data.frame(ID = seq(1:100)), setNames(as.data.frame(matrix(runif(800, -10, 10), nrow = 100)), paste0("X.", 1:8)))
+cat(str(dtaInp))
+# 'data.frame':	100 obs. of  9 variables:
+#  $ ID : int  1 2 3 4 5 6 7 8 9 10 ...
+#  $ X.1: num  7.684 5.86 -0.283 6.712 5.814 ...
+#  $ X.2: num  6.4 -9.49 -6.16 -4 -8.77 ...
+#  $ X.3: num  -6.35 9.28 -6.1 -8.73 8.74 ...
+#  $ X.4: num  -6.13 6.51 -6.17 -3.5 5 ...
+#  $ X.5: num  4.26 7.31 -2.93 -6.88 -5.39 ...
+#  $ X.6: num  0.805 -2.988 6.544 7.672 0.76 ...
+#  $ X.7: num  -7.8 1.64 2.8 3.19 8.29 ...
+#  $ X.8: num  3.788 0.941 -8.533 -3.961 2.263 ...
+# this data set is stored as (temporary) RDS-file and later processed by wide2long
+nmeInp <- paste0(tempfile(), '.rds');
+nmeOut <- paste0(tempfile(), '.omv');
+saveRDS(dtaInp, nmeInp);
+wide2long_omv(fleInp = nmeInp, fleOut = nmeOut, varID = "ID", varTme = "Measure", varLst = setdiff(names(dtaInp), "ID"), varSrt = c("ID", "Measure"));
+# it is required to give at least the arguments fleInp and varID
+# "reshape" then assigns all variables expect the variable defined by varID to varLst (but throws a warning)
+# varSrt enforces sorting the data set after the transformation (sorted, the measurements within one person come after another;
+# unsorted all measurements for one repetition would come after another)
+# check whether the file was created and its size
+print(list.files(dirname(nmeOut), basename(nmeOut)));
+# -> "file[...].omv" ([...] contains a random combination of numbers / characters
+print(file.info(nmeOut)$size);
+# -> 6286 (size may differ on different OSes)
+cat(str(read_omv(nmeOut, sveAtt = FALSE)))
+# the data set is now transformed into long (and each the measurements is now indicated by the "Measure")
+# 'data.frame':	800 obs. of  3 variables:
+#  $ ID     : int  1 1 1 1 1 1 1 1 2 2 ...
+#   ..- attr(*, "missingValues")= list()
+#  $ Measure: int  1 2 3 4 5 6 7 8 1 2 ...
+#   ..- attr(*, "missingValues")= list()
+#  $ X      : num  7.68 6.4 -6.35 -6.13 4.26 ...
+#   ..- attr(*, "missingValues")= list()
+# NB: the values in X are randomly generated and therefore different from those on your screen 
 
+unlink(nmeInp);
+unlink(nmeOut);
 }
 
 }

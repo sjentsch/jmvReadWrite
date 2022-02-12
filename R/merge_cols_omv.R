@@ -30,6 +30,7 @@
 #' @examples
 #' \dontrun{
 #' library(jmvReadWrite);
+#' 
 #' }
 #'
 #' @export merge_cols_omv

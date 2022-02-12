@@ -48,6 +48,9 @@ devtools::run_examples(run_dontrun = TRUE)
 devtools::lint()
 devtools::test()
 devtools::test_coverage()
+covr::report()
+# once happy with the coverage, it can be uploaded using
+covr::codecov(token = "2f521d97-d1e2-4baf-b05b-0b569a7c6f0f")
 
 # the package itself (tar.gz) - build() also builds vignettes
 # ping-pong between build() and check() until all errors, warnings, notes are resolved 

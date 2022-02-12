@@ -57,6 +57,7 @@ them yet, please install them manually (e.g., \code{install.packages('haven', de
 \examples{
 \dontrun{
 library(jmvReadWrite);
+
 }
 
 }

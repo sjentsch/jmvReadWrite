@@ -23,7 +23,51 @@
 #' @examples
 #' \dontrun{
 #' library(jmvReadWrite);
-
+#' # generate a test dataframe with 100 (imaginary) participants / units of observation (ID), 8 measurement (Measure) of one variable (X)
+#' dtaInp <- data.frame(ID = sort(rep(seq(1:100), 8)), Measure = rep(seq(1, 8), 100), X = runif(800, -10, 10));
+#' cat(str(dtaInp));
+#' # the output should look like this
+#' # 'data.frame': 800 obs. of  3 variables:
+#' #  $ ID     : int  1 1 1 1 1 1 1 1 2 2 ...
+#' #  $ Measure: int  1 2 3 4 5 6 7 8 1 2 ...
+#' #  $ X      : num  8.05 -3.88 4.99 -8.94 2.41 ...
+#' # this data set is stored as (temporary) RDS-file and later processed by long2wide
+#' nmeInp <- paste0(tempfile(), '.rds');
+#' nmeOut <- paste0(tempfile(), '.omv');
+#' saveRDS(dtaInp, nmeInp);
+#' long2wide_omv(fleInp = nmeInp, fleOut = nmeOut, varID = "ID", varTme = "Measure", varTgt = "X");
+#' # it is required to give at least the arguments fleInp, varID and varTme
+#' # check whether the file was created and its size
+#' cat(list.files(dirname(nmeOut), basename(nmeOut)));
+#' # -> "file[...].omv" ([...] contains a random combination of numbers / characters
+#' cat(file.info(nmeOut)$size);
+#' # -> 6200 (size may differ on different OSes)
+#' cat(str(read_omv(nmeOut, sveAtt = FALSE)));
+#' # the data set is now transformed into wide (and each the measurements is now indicated as a suffix to X; X.1, X.2, ...)
+#' # 'data.frame':	100 obs. of  9 variables:
+#' #  $ ID : int  1 2 3 4 5 6 7 8 9 10 ...
+#' #   ..- attr(*, "jmv-id")= logi TRUE
+#' #   ..- attr(*, "missingValues")= list()
+#' #  $ X.1: num  7.17 -3.23 8.51 7.39 6.91 ...
+#' #   ..- attr(*, "missingValues")= list()
+#' #  $ X.2: num  -9.31 -9.37 8.34 -9.28 5.57 ...
+#' #   ..- attr(*, "missingValues")= list()
+#' #  $ X.3: num  9.42 -2.93 -5.15 -5.6 -1.98 ...
+#' #   ..- attr(*, "missingValues")= list()
+#' #  $ X.4: num  4.9 -2.26 4.34 -2.66 1.54 ...
+#' #   ..- attr(*, "missingValues")= list()
+#' #  $ X.5: num  -4.53 -2.86 -3.02 -3.89 -8.47 ...
+#' #   ..- attr(*, "missingValues")= list()
+#' #  $ X.6: num  3.54 9.2 1.09 4.56 7.46 ...
+#' #   ..- attr(*, "missingValues")= list()
+#' #  $ X.7: num  -3.04 -2.33 4.86 3.99 9.13 ...
+#' #   ..- attr(*, "missingValues")= list()
+#' #  $ X.8: num  8.94 0.927 6.394 8.201 0.111 ...
+#' #   ..- attr(*, "missingValues")= list()
+#' # NB: the values in X.1, X.2, ... are randomly generated and therefore different from those on your screen 
+#'
+#' unlink(nmeInp);
+#' unlink(nmeOut);
 #' }
 #'
 #' @export long2wide_omv

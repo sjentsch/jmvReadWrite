@@ -22,9 +22,9 @@
 #' fleOMV <- paste0(tempfile(), ".omv");
 #' saveRDS(jmvReadWrite::ToothGrowth, fleRDS);
 #' convert_to_omv(fleInp = fleRDS, fleOut = fleOMV);
-#' print(list.files(dirname(fleOMV), basename(fleOMV)));
+#' cat(list.files(dirname(fleOMV), basename(fleOMV)));
 #' # -> "file[...].omv" ([...] contains a random combination of numbers / characters
-#' print(file.info(fleOMV)$size);
+#' cat(file.info(fleOMV)$size);
 #' # -> 2199 (size may differ on different OSes)
 #' cat(str(read_omv(fleOMV, sveAtt = FALSE)));
 #' # gives a overview of the dataframe (all columns and some attributes,

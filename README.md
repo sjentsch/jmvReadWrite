@@ -4,18 +4,16 @@
 # jmvReadWrite
 
 <!-- badges: start -->
-
 [![CRAN](http://www.r-pkg.org/badges/version/jmvReadWrite)](https://cran.r-project.org/package=jmvReadWrite)
 [![License](https://img.shields.io/badge/License-AGPL%20v3-green.svg)](https://www.gnu.org/licenses/agpl-3.0.html)
 [![Downloads](https://cranlogs.r-pkg.org/badges/jmvReadWrite?color=brightgreen)](https://cran.r-project.org/package=jmvReadWrite)
 [![Dependencies](https://tinyverse.netlify.com/badge/jmvReadWrite)](https://cran.r-project.org/package=jmvReadWrite)
-[![Last
-Commit](https://img.shields.io/github/last-commit/sjentsch/jmvReadWrite)](https://github.com/sjentsch/jmvReadWrite)
-[![Codecov test
-coverage](https://codecov.io/gh/sjentsch/jmvReadWrite/branch/main/graph/badge.svg)](https://app.codecov.io/gh/sjentsch/jmvReadWrite?branch=main)
+[![Last Commit](https://img.shields.io/github/last-commit/sjentsch/jmvReadWrite)](https://github.com/sjentsch/jmvReadWrite)
+[![Codecov test coverage](https://codecov.io/gh/sjentsch/jmvReadWrite/branch/main/graph/badge.svg)](https://app.codecov.io/gh/sjentsch/jmvReadWrite?branch=main)
 <!-- badges: end -->
 
 <!---
+[//]: 
 [//]: [![Build Status](https://travis-ci.com/sjentsch/jmvReadWrite.svg)](https://travis-ci.com/sjentsch/jmvReadWrite)
 [//]: [![CI](https://github.com/sjentsch/jmvReadWrite/workflows/ci/badge.svg)](https://github.com/sjentsch/jmvReadWrite/actions?query=workflow%3Aci)
 --->

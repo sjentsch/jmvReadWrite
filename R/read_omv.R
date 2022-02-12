@@ -17,14 +17,14 @@
 #' # if the syntax couldn't be extracted, an empty list - length = 0 - is returned,
 #' # otherwise, the commands are shown and the first analysis is run, with the output
 #' # from the second analysis being assigned to the variable result
-#' if (length(attr(data, 'syntax')) >= 1) {
+#' if (length(attr(data, "syntax")) >= 1) {
 #'     print(attr(data, "syntax"));
 #'     # the print-function is only used to force devtools::run_examples() to show output
-#'     eval(parse(text=paste0('result = ', attr(data, 'syntax')[[1]])));
+#'     eval(parse(text=paste0("result = ", attr(data, "syntax")[[1]])));
 #'     # without assigning the output to a variable, the command would be:
-#'     # eval(parse(text=attr(data, 'syntax')[[1]]))
-#'     cat(names(result));
-#'     cat(result$main);
+#'     # eval(parse(text=attr(data, "syntax")[[1]]))
+#'     print(names(result));
+#'     print(result$main);
 #'     # -> "main"      "assump"    "contrasts" "postHoc"   "emm"       "residsOV"
 #'     # (the names of the six output tables)
 #' }
@@ -284,7 +284,7 @@ chkMnf <- function(fleOMV = "", fleMnf = c("")) {
 # =================================================================================================
 # read_all: for reading data files from various formats (incl. functions that are called)
 
-read_all <- function(fleInp = "", usePkg = c("haven", "foreign"), selSet = "", ...) {
+read_all <- function(fleInp = "", usePkg = c("foreign", "haven"), selSet = "", ...) {
     # check whether the file exists
     chkFle(fleInp)
     varArg <- list(...);
@@ -376,7 +376,7 @@ read_all <- function(fleInp = "", usePkg = c("haven", "foreign"), selSet = "", .
 }
 
 tryErr <- function(fleInp = "", errMsg = NULL) {
-    message(sprintf("File \"%s\" couldn't be read.\nThe error message was: %s\n", basename(fleInp), conditionMessage(errMsg)));
+    message(sprintf("File \"%s\" couldn\'t be read.\nThe error message was: %s\n", basename(fleInp), conditionMessage(errMsg)));
     return(NULL)
 }
 

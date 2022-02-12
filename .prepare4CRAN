@@ -30,6 +30,15 @@ devtools::release_checks()
 devtools::spell_check()
 devtools::check_man()
 
+
+# check whether the examples and the unit tests run through and do some linting
+devtools::run_examples(run_dontrun = TRUE)
+devtools::lint()
+devtools::test()
+devtools::test_coverage()
+# once happy with the coverage, it can be uploaded using
+covr::codecov(token = "2f521d97-d1e2-4baf-b05b-0b569a7c6f0f")
+
 # ================================================================================================================================================
 # REMEMBER: error messages from R are not always pointing to the place where the error occurs - especially when using commands like build_readme()
 # ================================================================================================================================================
@@ -42,15 +51,6 @@ pkgdown::build_site()
 pkgdown::build_reference(run_dont_run = TRUE, preview = FALSE)
 pkgdown::build_reference_index()
 devtools::build_manual(path="doc")
-
-# check whether the examples and the unit tests run through and do some linting
-devtools::run_examples(run_dontrun = TRUE)
-devtools::lint()
-devtools::test()
-devtools::test_coverage()
-covr::report()
-# once happy with the coverage, it can be uploaded using
-covr::codecov(token = "2f521d97-d1e2-4baf-b05b-0b569a7c6f0f")
 
 # the package itself (tar.gz) - build() also builds vignettes
 # ping-pong between build() and check() until all errors, warnings, notes are resolved 

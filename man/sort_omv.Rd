@@ -8,19 +8,19 @@ sort_omv(
   fleInp = c(),
   fleOut = "",
   varSrt = c(),
-  usePkg = c("haven", "foreign"),
+  usePkg = c("foreign", "haven"),
   selSet = "",
   ...
 )
 }
 \arguments{
-\item{fleInp}{Name (including the path, if required) of the data file to be read ('FILENAME.ext'; default: ''); supports CSV and R-files natively, or other file types if 'haven' or 'foreign' are installed}
+\item{fleInp}{Name (including the path, if required) of the data file to be read ("FILENAME.ext"; default: ""); can be any supported file type, see Details below}
 
-\item{fleOut}{Name (including the path, if required) of the data file to be written ('FILENAME.omv'; default: ''); if empty, the extension of fleInp is replaced with '_sorted.omv'}
+\item{fleOut}{Name (including the path, if required) of the data file to be written ("FILENAME.omv"; default: ""); if empty, the extension of fleInp is replaced with "_sorted(file extension -> .omv)"}
 
 \item{varSrt}{Variable(s) that are used to sort the data frame (see Details; default: c())}
 
-\item{usePkg}{Name of the package: 'haven' or 'foreign' that shall be used to read SPSS, Stata and SAS files; 'haven' is the default (it is more comprehensive), but with problems you may try 'foreign'}
+\item{usePkg}{Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata and SAS files; "foreign" is the default (it comes with base R), but "haven" is newer and more comprehensive}
 
 \item{selSet}{Name of the data set that is to be selected from the workspace (only applies when reading .RData-files)}
 
@@ -32,12 +32,11 @@ Sort data (using one or more variables) in .omv-files for the statistical spread
 \details{
 varSrt can be either a character or a character vector (with one or more variables respectively). The sorting order for a particular variable can be inverted with preceding the variable name with
 "-". Please note that this doesn't make sense and hence throws a warning for certain variable types (e.g., factors).
-The ellipsis-parameter can be used to submit arguments / parameters to the functions that are used for reading the data. These are: 'read_omv' (for jamovi-files), 'read.table' (for CSV / TSV
-files; using similar defaults as 'read.csv' for CSV and 'read.delim' for TSV which both are based upon 'read.table' but with adjusted defaults for the respective file types), 'readRDS' (for
-rds-files), 'read_sav' (needs R-package 'haven') or 'read.spss' (needs R-package 'foreign') for SPSS-files, 'read_dta' ('haven') / 'read.dta' ('foreign') for Stata-files, 'read_sas' ('haven') for
-SAS-data-files, and 'read_xpt' ('haven') / 'read.xport' ('foreign') for SAS-transport-files.
-Please note that the R-packages 'haven' and 'foreign' are not marked as 'Imports' (i.e., they are not installed by default). If you wish to convert files from SPSS, SAS or Stata and haven't installed
-them yet, please install them manually (e.g., \code{install.packages('haven', dep = TRUE)}).
+The ellipsis-parameter can be used to submit arguments / parameters to the functions that are used for reading the data. These are: \code{read_omv} (for jamovi-files), \code{read.table} (for CSV / TSV
+files; using similar defaults as \code{read.csv} for CSV and \code{read.delim} for TSV which both are based upon \code{read.table} but with adjusted defaults for the respective file types), \code{readRDS} (for
+rds-files), \code{read_sav} (needs R-package "haven") or \code{read.spss} (needs R-package "foreign") for SPSS-files, \code{read_dta} ("haven") / \code{read.dta} ("foreign") for Stata-files, \code{read_sas} ("haven") for
+SAS-data-files, and \code{read_xpt} ("haven") / \code{read.xport} ("foreign") for SAS-transport-files. If you would like to use "haven", it may be needed to install it manually
+(i.e., \code{install.packages("haven", dep = TRUE)}).
 }
 \examples{
 \dontrun{
@@ -56,9 +55,10 @@ dtaFrm <- read_omv(fleInp = fleTmp);
 cat(dtaFrm$Image);
 # shows that the variable "Image" is now sorted in descending order
 cat(is.unsorted(dtaFrm$Image));
-# this first returns TRUE (the variable is unsorted since it is not in ascending order)
+# this first returns TRUE (the variable is not in ascending order, i.e., unsorted)
 cat(is.unsorted(-dtaFrm$Image));
-# if the sign of the variable is changed, it returns FALSE (i.e., the variable is NOT unsorted)
+# if the sign of the variable is changed, it returns FALSE (i.e., the variable is
+# NOT unsorted)
 unlink(fleTmp);
 }
 

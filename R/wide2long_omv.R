@@ -1,13 +1,13 @@
 #' Converts .omv-files for the statistical spreadsheet 'jamovi' (www.jamovi.org) from wide to long format
 #'
-#' @param fleInp Name (including the path, if required) of the data file to be read ('FILENAME.omv'; default: '')
-#' @param fleOut Name (including the path, if required) of the data file to be written ('FILENAME.omv'; default: ''); if empty, FILENAME from fleInp is extended with '_long'
+#' @param fleInp Name (including the path, if required) of the data file to be read ("FILENAME.omv"; default: ""); can be any supported file type, see Details below
+#' @param fleOut Name (including the path, if required) of the data file to be written ("FILENAME.omv"; default: ""); if empty, FILENAME from fleInp is extended with "_long(file extension -> .omv)"
 #' @param varLst List / set of variables that are to be transformed into single (time-varying) variables in long format (default: c())
-#' @param varSep Character that separates the variables in varLst into a time-varying part and a part that forms the variable name in long format ('.' in 'VAR.1', 'VAR.2', default: '.')
-#' @param varID  Name(s) of one or more variables that (is created to) identify the same group / individual (if empty, 'id' is added with row numbers identifying cases; default: '')
-#' @param varTme Name of the variable that (is created to) differentiate multiple records from the same group / individual (if empty, 'time' is added with a marker for each time-varying part; default: '')
+#' @param varSep Character that separates the variables in varLst into a time-varying part and a part that forms the variable name in long format ("." in "VAR.1", "VAR.2", default: ".")
+#' @param varID  Name(s) of one or more variables that (is created to) identify the same group / individual (if empty, "id" is added with row numbers identifying cases; default: "")
+#' @param varTme Name of the variable that (is created to) differentiate multiple records from the same group / individual (if empty, "time" is added with a marker for each time-varying part; default: "")
 #' @param varSrt Variable(s) that are used to sort the data frame (see Details; if empty, the order returned from reshape is kept; default: c())
-#' @param usePkg Name of the package: 'haven' or 'foreign' that shall be used to read SPSS, Stata and SAS files; 'haven' is the default (it is more comprehensive), but with problems you may try 'foreign'
+#' @param usePkg Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata and SAS files; "foreign" is the default (it comes with base R), but "haven" is newer and more comprehensive
 #' @param selSet Name of the data set that is to be selected from the workspace (only applies when reading .RData-files)
 #' @param ... Additional arguments passed on to methods; see Details below
 #'
@@ -15,53 +15,61 @@
 #' If varLst is empty, it is tried to generate it using all variables in the data frame except those defined by varID. For further arguments, see the help for reshape (where varLst ~ varying, varSep ~ sep,
 #' varID ~ idvar, varTme ~ timevar).
 #' varSrt is a character vector containing column names that are used to sort the data frame before it is written.
-#' The ellipsis-parameter (...) can be used to submit arguments / parameters to the functions that are used for transforming or reading the data. The transformation uses 'reshape'. When reading the
-#' data, the functions are: 'read_omv' (for jamovi-files), 'read.table' (for CSV / TSV files; using similar defaults as 'read.csv' for CSV and 'read.delim' for TSV which both are based upon
-#' 'read.table' but with adjusted defaults for the respective file types), 'readRDS' (for rds-files), 'read_sav' (needs R-package 'haven') or 'read.spss' (needs R-package 'foreign') for SPSS-files,
-#' 'read_dta' ('haven') / 'read.dta' ('foreign') for Stata-files, 'read_sas' ('haven') for SAS-data-files, and 'read_xpt' ('haven') / 'read.xport' ('foreign') for SAS-transport-files.
-#' Please note that the R-packages 'haven' and 'foreign' are not marked as 'Imports' (i.e., they are not installed by default). If you wish to convert files from SPSS, SAS or Stata and haven't installed
-#' them yet, please install them manually (e.g., `install.packages('haven', dep = TRUE)`).
+#' The ellipsis-parameter (...) can be used to submit arguments / parameters to the functions that are used for transforming or reading the data. The transformation uses `reshape`. When reading the
+#' data, the functions are: `read_omv` (for jamovi-files), `read.table` (for CSV / TSV files; using similar defaults as `read.csv` for CSV and `read.delim` for TSV which both are based upon
+#' `read.table` but with adjusted defaults for the respective file types), `readRDS` (for rds-files), `read_sav` (needs R-package "haven") or `read.spss` (needs R-package "foreign") for SPSS-files,
+#' `read_dta` ("haven") / `read.dta` ("foreign") for Stata-files, `read_sas` ("haven") for SAS-data-files, and `read_xpt` ("haven") / `read.xport` ("foreign") for SAS-transport-files. If you would like
+#' to use "haven", it may be needed to install it manually (i.e., `install.packages("haven", dep = TRUE)`).
 #'
 #' @examples
 #' \dontrun{
 #' library(jmvReadWrite);
-#' # generate a test dataframe with 100 (imaginary) participants / units of observation (ID), and 8 repeated measurements of variable (X.1, X.2, ...)
-#' dtaInp <- cbind(data.frame(ID = seq(1:100)), setNames(as.data.frame(matrix(runif(800, -10, 10), nrow = 100)), paste0("X.", 1:8)))
-#' cat(str(dtaInp))
+#' # generate a test dataframe with 100 (imaginary) participants / units of
+#' # observation (ID), and 8 repeated measurements of variable (X.1, X.2, ...)
+#' dtaInp <- cbind(data.frame(ID = seq(1:100)),
+#'                 setNames(
+#'                     as.data.frame(matrix(runif(800, -10, 10), nrow = 100)),
+#'                     paste0("X.", 1:8)));
+#' cat(str(dtaInp));
 #' # 'data.frame':	100 obs. of  9 variables:
 #' #  $ ID : int  1 2 3 4 5 6 7 8 9 10 ...
-#' #  $ X.1: num  7.684 5.86 -0.283 6.712 5.814 ...
-#' #  $ X.2: num  6.4 -9.49 -6.16 -4 -8.77 ...
-#' #  $ X.3: num  -6.35 9.28 -6.1 -8.73 8.74 ...
-#' #  $ X.4: num  -6.13 6.51 -6.17 -3.5 5 ...
-#' #  $ X.5: num  4.26 7.31 -2.93 -6.88 -5.39 ...
-#' #  $ X.6: num  0.805 -2.988 6.544 7.672 0.76 ...
-#' #  $ X.7: num  -7.8 1.64 2.8 3.19 8.29 ...
-#' #  $ X.8: num  3.788 0.941 -8.533 -3.961 2.263 ...
+#' #  $ X.1: num  ...
+#' #  $ X.2: num  ...
+#' #  $ X.3: num  ...
+#' #  $ X.4: num  ...
+#' #  $ X.5: num  ...
+#' #  $ X.6: num  ...
+#' #  $ X.7: num  ...
+#' #  $ X.8: num  ...
 #' # this data set is stored as (temporary) RDS-file and later processed by wide2long
-#' nmeInp <- paste0(tempfile(), '.rds');
-#' nmeOut <- paste0(tempfile(), '.omv');
+#' nmeInp <- paste0(tempfile(), ".rds");
+#' nmeOut <- paste0(tempfile(), ".omv");
 #' saveRDS(dtaInp, nmeInp);
-#' wide2long_omv(fleInp = nmeInp, fleOut = nmeOut, varID = "ID", varTme = "Measure", varLst = setdiff(names(dtaInp), "ID"), varSrt = c("ID", "Measure"));
+#' wide2long_omv(fleInp = nmeInp, fleOut = nmeOut, varID = "ID", varTme = "Meas",
+#'     varLst = setdiff(names(dtaInp), "ID"), varSrt = c("ID", "Meas"));
 #' # it is required to give at least the arguments fleInp and varID
-#' # "reshape" then assigns all variables expect the variable defined by varID to varLst (but throws a warning)
-#' # varSrt enforces sorting the data set after the transformation (sorted, the measurements within one person come after another;
-#' # unsorted all measurements for one repetition would come after another)
+#' # "reshape" then assigns all variables expect the variable defined by varID to
+#' # varLst (but throws a warning)
+#' # varSrt enforces sorting the data set after the transformation (sorted, the
+#' # measurements within one person come after another; unsorted all measurements
+#' # for one repetition would come after another)
+#'
 #' # check whether the file was created and its size
 #' cat(list.files(dirname(nmeOut), basename(nmeOut)));
 #' # -> "file[...].omv" ([...] contains a random combination of numbers / characters
 #' cat(file.info(nmeOut)$size);
-#' # -> 6286 (size may differ on different OSes)
-#' cat(str(read_omv(nmeOut, sveAtt = FALSE)))
-#' # the data set is now transformed into long (and each the measurements is now indicated by the "Measure")
+#' # -> 6286 (approximate size; size may differ in every run [in dependence of how
+#' #          well the generated random data can be compressed])
+#' cat(str(read_omv(nmeOut, sveAtt = FALSE)));
+#' # the data set is now transformed into long (and each the measurements is now
+#' # indicated by the "Meas")
 #' # 'data.frame':	800 obs. of  3 variables:
-#' #  $ ID     : int  1 1 1 1 1 1 1 1 2 2 ...
+#' #  $ ID  : int  1 1 1 1 1 1 1 1 2 2 ...
 #' #   ..- attr(*, "missingValues")= list()
-#' #  $ Measure: int  1 2 3 4 5 6 7 8 1 2 ...
+#' #  $ Meas: int  1 2 3 4 5 6 7 8 1 2 ...
 #' #   ..- attr(*, "missingValues")= list()
-#' #  $ X      : num  7.68 6.4 -6.35 -6.13 4.26 ...
+#' #  $ X   : num  ...
 #' #   ..- attr(*, "missingValues")= list()
-#' # NB: the values in X are randomly generated and therefore different from those on your screen 
 #'
 #' unlink(nmeInp);
 #' unlink(nmeOut);
@@ -69,7 +77,7 @@
 #'
 #' @export wide2long_omv
 #'
-wide2long_omv <- function(fleInp = "", fleOut = "", varLst = c(), varSep = ".", varID = "", varTme = "", varSrt = c(), usePkg = c("haven", "foreign"), selSet = "", ...) {
+wide2long_omv <- function(fleInp = "", fleOut = "", varLst = c(), varSep = ".", varID = "", varTme = "", varSrt = c(), usePkg = c("foreign", "haven"), selSet = "", ...) {
 
     # check and format input and output files, handle / check further input arguments
     fleInp <- fmtFlI(fleInp, maxLng = 1);

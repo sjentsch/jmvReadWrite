@@ -131,4 +131,38 @@ test_that("read_all works", {
     expect_equal(dim(dtaFrm), c(100, 1));
     expect_type(dtaFrm$A, "double");
     unlink(nmeInp);
+
+    fleInp <- paste0(tempfile(), ".sav");
+    writeBin("$FL2@(#) IBM SPSS STATISTICS 64-bit Linux 25.0.0.0              \002", con = fleInp);
+    expect_error(suppressMessages(read_all(fleInp, usePkg = "haven")));
+    expect_error(suppressMessages(read_all(fleInp, usePkg = "foreign")));
+    unlink(fleInp);
+
+    fleInp <- paste0(tempfile(), ".dta");
+    writeBin("<stata_dta><header><release>117</release><byteorder>LSF</byteorder><K>\x8f", con = fleInp);
+    expect_error(suppressMessages(read_all(fleInp, usePkg = "haven")));
+    expect_error(suppressMessages(read_all(fleInp, usePkg = "foreign")));
+    unlink(fleInp);
+
+    fleInp <- paste0(tempfile(), ".sas7bdat");
+    writeBin("", con = fleInp);
+    expect_error(suppressMessages(capture.output(read_all(fleInp, usePkg = "haven"))));
+    expect_error(suppressMessages(read_all(fleInp, usePkg = "foreign")));
+    unlink(fleInp);
+
+    fleInp <- paste0(tempfile(), ".xpt");
+    writeBin("HEADER RECORD*******LIBRARY HEADER RECORD!!!!!!!", con = fleInp);
+    expect_error(suppressMessages(read_all(fleInp, usePkg = "haven")));
+    expect_error(suppressMessages(read_all(fleInp, usePkg = "foreign")));
+    unlink(fleInp);
+
+    expect_null(attributes(hvnDrp(jmvReadWrite::ToothGrowth, c("jmv-id", "jmv-desc"))[[1]]));
+    expect_null(attributes(hvnDrp(jmvReadWrite::ToothGrowth, c("jmv-id", "jmv-desc"))[[7]]));
+
+    dtaTmp <- jmvReadWrite::AlbumSales[-1];
+    attr(dtaTmp, "variable.labels") <- c(Adverts = "Advertsing budget (thousands)",
+                                         Airplay = "No. of plays on radio",
+                                         Image = "Band image rating (0-10)",
+                                         Sales = "Album sales (thousands)");
+    expect_identical(sapply(fgnLbl(dtaTmp), attr, "label"), attr(dtaTmp, "variable.labels"));
 })

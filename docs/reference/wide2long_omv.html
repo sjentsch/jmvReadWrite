@@ -110,6 +110,55 @@ them yet, please install them manually (e.g., <code>install.packages('haven', de
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
 <span class="r-in"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://sjentsch.github.io/jmvReadWrite/" class="external-link">jmvReadWrite</a></span><span class="op">)</span>;</span>
+<span class="r-in"><span class="co"># generate a test dataframe with 100 (imaginary) participants / units of</span></span>
+<span class="r-in"><span class="co"># observation (ID), and 8 repeated measurements of variable (X.1, X.2, ...)</span></span>
+<span class="r-in"><span class="va">dtaInp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>ID <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">100</span><span class="op">)</span><span class="op">)</span>,</span>
+<span class="r-in">                <span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span></span>
+<span class="r-in">                    <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">800</span>, <span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span>, nrow <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span>,</span>
+<span class="r-in">                    <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"X."</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">8</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>;</span>
+<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">dtaInp</span><span class="op">)</span><span class="op">)</span>;</span>
+<span class="r-in"><span class="co"># 'data.frame':  100 obs. of  9 variables:</span></span>
+<span class="r-in"><span class="co">#  $ ID : int  1 2 3 4 5 6 7 8 9 10 ...</span></span>
+<span class="r-in"><span class="co">#  $ X.1: num  ...</span></span>
+<span class="r-in"><span class="co">#  $ X.2: num  ...</span></span>
+<span class="r-in"><span class="co">#  $ X.3: num  ...</span></span>
+<span class="r-in"><span class="co">#  $ X.4: num  ...</span></span>
+<span class="r-in"><span class="co">#  $ X.5: num  ...</span></span>
+<span class="r-in"><span class="co">#  $ X.6: num  ...</span></span>
+<span class="r-in"><span class="co">#  $ X.7: num  ...</span></span>
+<span class="r-in"><span class="co">#  $ X.8: num  ...</span></span>
+<span class="r-in"><span class="co"># this data set is stored as (temporary) RDS-file and later processed by wide2long</span></span>
+<span class="r-in"><span class="va">nmeInp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">'.rds'</span><span class="op">)</span>;</span>
+<span class="r-in"><span class="va">nmeOut</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">'.omv'</span><span class="op">)</span>;</span>
+<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="va">dtaInp</span>, <span class="va">nmeInp</span><span class="op">)</span>;</span>
+<span class="r-in"><span class="fu">wide2long_omv</span><span class="op">(</span>fleInp <span class="op">=</span> <span class="va">nmeInp</span>, fleOut <span class="op">=</span> <span class="va">nmeOut</span>, varID <span class="op">=</span> <span class="st">"ID"</span>, varTme <span class="op">=</span> <span class="st">"Meas"</span>,</span>
+<span class="r-in">    varLst <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sets.html" class="external-link">setdiff</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">dtaInp</span><span class="op">)</span>, <span class="st">"ID"</span><span class="op">)</span>, varSrt <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ID"</span>, <span class="st">"Meas"</span><span class="op">)</span><span class="op">)</span>;</span>
+<span class="r-in"><span class="co"># it is required to give at least the arguments fleInp and varID</span></span>
+<span class="r-in"><span class="co"># "reshape" then assigns all variables expect the variable defined by varID to</span></span>
+<span class="r-in"><span class="co"># varLst (but throws a warning)</span></span>
+<span class="r-in"><span class="co"># varSrt enforces sorting the data set after the transformation (sorted, the</span></span>
+<span class="r-in"><span class="co"># measurements within one person come after another; unsorted all measurements</span></span>
+<span class="r-in"><span class="co"># for one repetition would come after another)</span></span>
+<span class="r-in"></span>
+<span class="r-in"><span class="co"># check whether the file was created and its size</span></span>
+<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/basename.html" class="external-link">dirname</a></span><span class="op">(</span><span class="va">nmeOut</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/basename.html" class="external-link">basename</a></span><span class="op">(</span><span class="va">nmeOut</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>;</span>
+<span class="r-in"><span class="co"># -&gt; "file[...].omv" ([...] contains a random combination of numbers / characters</span></span>
+<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.info.html" class="external-link">file.info</a></span><span class="op">(</span><span class="va">nmeOut</span><span class="op">)</span><span class="op">$</span><span class="va">size</span><span class="op">)</span>;</span>
+<span class="r-in"><span class="co"># -&gt; 6286 (approximate size; size may differ in every run [in dependence of how</span></span>
+<span class="r-in"><span class="co">#          well the generated random data can be compressed])</span></span>
+<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="fu"><a href="read_omv.html">read_omv</a></span><span class="op">(</span><span class="va">nmeOut</span>, sveAtt <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>;</span>
+<span class="r-in"><span class="co"># the data set is now transformed into long (and each the measurements is now</span></span>
+<span class="r-in"><span class="co"># indicated by the "Meas")</span></span>
+<span class="r-in"><span class="co"># 'data.frame':  800 obs. of  3 variables:</span></span>
+<span class="r-in"><span class="co">#  $ ID  : int  1 1 1 1 1 1 1 1 2 2 ...</span></span>
+<span class="r-in"><span class="co">#   ..- attr(*, "missingValues")= list()</span></span>
+<span class="r-in"><span class="co">#  $ Meas: int  1 2 3 4 5 6 7 8 1 2 ...</span></span>
+<span class="r-in"><span class="co">#   ..- attr(*, "missingValues")= list()</span></span>
+<span class="r-in"><span class="co">#  $ X   : num  ...</span></span>
+<span class="r-in"><span class="co">#   ..- attr(*, "missingValues")= list()</span></span>
+<span class="r-in"></span>
+<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="va">nmeInp</span><span class="op">)</span>;</span>
+<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="va">nmeOut</span><span class="op">)</span>;</span>
 <span class="r-in"><span class="op">}</span></span>
 <span class="r-in"></span>
 </code></pre></div>

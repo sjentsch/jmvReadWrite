@@ -65,7 +65,7 @@ chkExt <- function(fleNme = "", extNme = c("")) {
 chkFle <- function(fleNme = "", fleCnt = "", isZIP = FALSE) {
     if (! utils::file_test("-f", fleNme)) {
         if (nchar(fleCnt) > 0) {
-            stop(sprintf("File \"%s\" doesn't contain the file \"%s\".", fleCnt, fleNme));
+            stop(sprintf("File \"%s\" doesn\'t contain the file \"%s\".", fleCnt, fleNme));
         } else {
             stop(sprintf("File \"%s\" not found.", fleNme));
         }

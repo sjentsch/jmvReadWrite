@@ -29,23 +29,26 @@ participant code). In order to set a variable of your data frame to "ID", you ha
 \dontrun{
 library(jmvReadWrite);
 
-# use the data set "ToothGrowth" and, if it exists, write it as jamovi-file using write_omv()
+# use the data set "ToothGrowth" and, if it exists, write it as
+# jamovi-file using write_omv()
 data("ToothGrowth");
 fleOMV <- paste0(tempfile(), ".omv");
-# typically, one would use a "real" file name instead of tempfile(), e.g., "Data1.omv"
+# typically, one would use a "real" file name instead of tempfile(),
+# e.g., "Data1.omv"
 dtaDbg = write_omv(ToothGrowth, fleOMV, retDbg = TRUE);
 print(names(dtaDbg));
-# the print-function is only used to force devtools::run_examples() to show output
+# the print-function is only used to force devtools::run_examples()
+# to show output
 # -> "mtaDta" "xtdDta" "dtaFrm"
 # returns a list with the metadata (mtaDta, e.g., column and data type),
-# the extended data (xtdDta, e.g., variable lables), and the data frame (dtaFrm)
-# the purpose of these variables is merely for checking (understanding the file format)
-# and debugging
+# the extended data (xtdDta, e.g., variable lables), and the data frame
+# (dtaFrm) the purpose of these variables is merely for checking (under-
+# standing the file format) and debugging
 
-# check whether the file was written to the disk, get the file information (size, etc.)
-# and delete the file afterwards
+# check whether the file was written to the disk, get the file informa-
+# tion (size, etc.) and delete the file afterwards
 print(list.files(dirname(fleOMV), basename(fleOMV)));
-# -> "file[...].omv" ([...] contains a random combination of numbers / characters
+# -> "file[...].omv" ([...] is a combination of random numbers / characters
 print(file.info(fleOMV)$size);
 # -> 2199 (size may differ on different OSes)
 unlink(fleOMV);

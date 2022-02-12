@@ -1,21 +1,20 @@
 #' Sort data (using one or more variables) in .omv-files for the statistical spreadsheet 'jamovi' (www.jamovi.org)
 #'
-#' @param fleInp Name (including the path, if required) of the data file to be read ('FILENAME.ext'; default: ''); supports CSV and R-files natively, or other file types if 'haven' or 'foreign' are installed
-#' @param fleOut Name (including the path, if required) of the data file to be written ('FILENAME.omv'; default: ''); if empty, the extension of fleInp is replaced with '_sorted.omv'
+#' @param fleInp Name (including the path, if required) of the data file to be read ("FILENAME.ext"; default: ""); can be any supported file type, see Details below
+#' @param fleOut Name (including the path, if required) of the data file to be written ("FILENAME.omv"; default: ""); if empty, the extension of fleInp is replaced with "_sorted(file extension -> .omv)"
 #' @param varSrt Variable(s) that are used to sort the data frame (see Details; default: c())
-#' @param usePkg Name of the package: 'haven' or 'foreign' that shall be used to read SPSS, Stata and SAS files; 'haven' is the default (it is more comprehensive), but with problems you may try 'foreign'
+#' @param usePkg Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata and SAS files; "foreign" is the default (it comes with base R), but "haven" is newer and more comprehensive
 #' @param selSet Name of the data set that is to be selected from the workspace (only applies when reading .RData-files)
 #' @param ... Additional arguments passed on to methods; see Details below
 #'
 #' @details
 #' varSrt can be either a character or a character vector (with one or more variables respectively). The sorting order for a particular variable can be inverted with preceding the variable name with
 #' "-". Please note that this doesn't make sense and hence throws a warning for certain variable types (e.g., factors).
-#' The ellipsis-parameter can be used to submit arguments / parameters to the functions that are used for reading the data. These are: 'read_omv' (for jamovi-files), 'read.table' (for CSV / TSV
-#' files; using similar defaults as 'read.csv' for CSV and 'read.delim' for TSV which both are based upon 'read.table' but with adjusted defaults for the respective file types), 'readRDS' (for
-#' rds-files), 'read_sav' (needs R-package 'haven') or 'read.spss' (needs R-package 'foreign') for SPSS-files, 'read_dta' ('haven') / 'read.dta' ('foreign') for Stata-files, 'read_sas' ('haven') for
-#' SAS-data-files, and 'read_xpt' ('haven') / 'read.xport' ('foreign') for SAS-transport-files.
-#' Please note that the R-packages 'haven' and 'foreign' are not marked as 'Imports' (i.e., they are not installed by default). If you wish to convert files from SPSS, SAS or Stata and haven't installed
-#' them yet, please install them manually (e.g., `install.packages('haven', dep = TRUE)`).
+#' The ellipsis-parameter can be used to submit arguments / parameters to the functions that are used for reading the data. These are: `read_omv` (for jamovi-files), `read.table` (for CSV / TSV
+#' files; using similar defaults as `read.csv` for CSV and `read.delim` for TSV which both are based upon `read.table` but with adjusted defaults for the respective file types), `readRDS` (for
+#' rds-files), `read_sav` (needs R-package "haven") or `read.spss` (needs R-package "foreign") for SPSS-files, `read_dta` ("haven") / `read.dta` ("foreign") for Stata-files, `read_sas` ("haven") for
+#' SAS-data-files, and `read_xpt` ("haven") / `read.xport` ("foreign") for SAS-transport-files. If you would like to use "haven", it may be needed to install it manually
+#' (i.e., `install.packages("haven", dep = TRUE)`).
 #'
 #' @examples
 #' \dontrun{
@@ -34,15 +33,16 @@
 #' cat(dtaFrm$Image);
 #' # shows that the variable "Image" is now sorted in descending order
 #' cat(is.unsorted(dtaFrm$Image));
-#' # this first returns TRUE (the variable is unsorted since it is not in ascending order)
+#' # this first returns TRUE (the variable is not in ascending order, i.e., unsorted)
 #' cat(is.unsorted(-dtaFrm$Image));
-#' # if the sign of the variable is changed, it returns FALSE (i.e., the variable is NOT unsorted)
+#' # if the sign of the variable is changed, it returns FALSE (i.e., the variable is
+#' # NOT unsorted)
 #' unlink(fleTmp);
 #' }
 #'
 #' @export sort_omv
 #'
-sort_omv <- function(fleInp = c(), fleOut = "", varSrt = c(), usePkg = c("haven", "foreign"), selSet = "", ...) {
+sort_omv <- function(fleInp = c(), fleOut = "", varSrt = c(), usePkg = c("foreign", "haven"), selSet = "", ...) {
     if (length(varSrt) == 0 || !all(nzchar(varSrt))) {
         stop("Calling sort_omv requires giving at least one variable to sort after.");
     }

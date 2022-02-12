@@ -12,17 +12,17 @@ merge_rows_omv(
   rstRwN = TRUE,
   rmvDpl = FALSE,
   varSrt = c(),
-  usePkg = c("haven", "foreign"),
+  usePkg = c("foreign", "haven"),
   selSet = "",
   ...
 )
 }
 \arguments{
-\item{fleInp}{Vector with file names (including the path, if required) of the data files to be read (c('FILE1.omv', 'FILE2.omv'); default: c())}
+\item{fleInp}{Vector with file names (including the path, if required) of the data files to be read (c("FILE1.omv", "FILE2.omv"); default: c()); can be any supported file type, see Details below}
 
-\item{fleOut}{Name of the data file to be written (including the path, if required; 'FILE_OUT.omv'; default: ''); if empty, the data frame with the added columns is returned as variable (but not written)}
+\item{fleOut}{Name of the data file to be written (including the path, if required; "FILE_OUT.omv"; default: ""); if empty, the data frame with the added columns is returned as variable (but not written)}
 
-\item{typMrg}{Type of merging operation: 'all' (default) or  'common'; see also Details}
+\item{typMrg}{Type of merging operation: "all" (default) or  "common"; see also Details}
 
 \item{colInd}{Add a column with an indicator (the basename of the file minus the extension) marking from which input data set the respective rows are coming (default: FALSE)}
 
@@ -32,7 +32,7 @@ merge_rows_omv(
 
 \item{varSrt}{Variable(s) that are used to sort the data frame (see Details; if empty, the order after merging is kept; default: c())}
 
-\item{usePkg}{Name of the package: 'haven' or 'foreign' that shall be used to read SPSS, Stata and SAS files; 'haven' is the default (it is more comprehensive), but with problems you may try 'foreign'}
+\item{usePkg}{Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata and SAS files; "foreign" is the default (it comes with base R), but "haven" is newer and more comprehensive}
 
 \item{selSet}{Name of the data set that is to be selected from the workspace (only applies when reading .RData-files)}
 
@@ -45,20 +45,58 @@ a data frame (if fleOut is empty) with where the rows of all input data sets (i.
 Merges two .omv-files for the statistical spreadsheet 'jamovi' (www.jamovi.org) by adding the content of the second, etc.  file(s) as rows to the first file
 }
 \details{
-The different types of merging operations: 'all' keeps all existing variables / columns that are contained in any of the input data sets and fills them up with NA where the variable / column doesn't
-exist in a input data set. 'common' only keeps the variables / columns that are common to all input data sets (i.e., that are contained in all data sets).
-The ellipsis-parameter can be used to submit arguments / parameters to the functions that are used for merging or reading the data. The merging operation uses 'rbind'. When reading the data, the
-functions are: 'read_omv' (for jamovi-files), 'read.table' (for CSV / TSV files; using similar defaults as 'read.csv' for CSV and 'read.delim' for TSV which both are based upon 'read.table' but with
-adjusted defaults for the respective file types), 'readRDS' (for rds-files), 'read_sav' (needs R-package 'haven') or 'read.spss' (needs R-package 'foreign') for SPSS-files, read_dta ('haven') /
-read.dta ('foreign') for Stata-files, read_sas ('haven') for SAS-data-files, and read_xpt ('haven') / read.xport ('foreign') for SAS-transport-files.
-Please note that the R-packages 'haven' and 'foreign' are not marked as 'Imports' (i.e., they are not installed by default). If you wish to convert files from SPSS, SAS or Stata and haven't installed
-them yet, please install them manually (e.g., \code{install.packages('haven', dep = TRUE)}).
-Please note that if the columns / variables have attributes (e.g., labels), the attributes of the first input data set (i.e., those contained in the first file given in the fleInp-argument) determine
-the attributes of the output data set (i.e., the attributes of the second to the last input data set are disregarded).
+The different types of merging operations: "all" keeps all existing variables / columns that are contained in any of the input data sets and fills them up with NA where the variable / column doesn't
+exist in a input data set. "common" only keeps the variables / columns that are common to all input data sets (i.e., that are contained in all data sets).
+The ellipsis-parameter can be used to submit arguments / parameters to the functions that are used for merging or reading the data. The merging operation uses \code{rbind}. When reading the data, the
+functions are: \code{read_omv} (for jamovi-files), \code{read.table} (for CSV / TSV files; using similar defaults as \code{read.csv} for CSV and \code{read.delim} for TSV which both are based upon \code{read.table} but with
+adjusted defaults for the respective file types), \code{readRDS} (for rds-files), \code{read_sav} (needs R-package "haven") or \code{read.spss} (needs R-package "foreign") for SPSS-files, read_dta ("haven") /
+read.dta ("foreign") for Stata-files, read_sas ("haven") for SAS-data-files, and read_xpt ("haven") / read.xport ("foreign") for SAS-transport-files. If you would like to use "haven", it may be needed
+to install it manually (i.e., \code{install.packages("haven", dep = TRUE)}).
 }
 \examples{
 \dontrun{
 library(jmvReadWrite);
+dtaInp <- bfi_sample2;
+nmeInp <- paste0(tempfile(), "_", 1:3, ".rds");
+nmeOut <- paste0(tempfile(), ".omv");
+for (i in seq_along(nmeInp)) saveRDS(dtaInp[-i - 1], nmeInp[i]);
+# save dtaInp three times (i.e., the length of nmeInp), removing one data columns in
+# each data set (for demonstration purposes, A1 in the first, A2 in the second, ...)
+merge_rows_omv(fleInp = nmeInp, fleOut = nmeOut, colInd = TRUE);
+cat(file.info(nmeOut)$size);
+# -> 6768 (size may differ on different OSes)
+dtaOut <- read_omv(nmeOut, sveAtt = FALSE);
+# read the data set where the three original datasets were added as rows and show
+# the variable names
+cat(names(dtaInp));
+cat(names(dtaOut));
+# compared to the input data set, we have the same variable names; fleInd (switched
+# on by colInd = TRUE and showing from which data set the rows are coming from) is
+# new and A1 is moved to the end of the list (the "original" order of variables may
+# not always be preserved and columns missing from at least one of the input data
+# sets may be added at the end)
+cat(dim(dtaInp), dim(dtaOut));
+# the first dimension of the data sets (rows) is now three times of that of the input
+# data set (250 -> 750), the second dimension (columns / variables) is increased by 1
+# (for "fleInd")
+
+merge_rows_omv(fleInp = nmeInp, fleOut = nmeOut, typMrg = "common");
+# the argument typMrg = "common" removes the columns that are not present in all of
+# the input data sets (i.e., A1, A2, A3)
+dtaOut <- read_omv(nmeOut, sveAtt = FALSE);
+# read the data set where the three original datasets were added as rows and show
+# the variable names
+cat(names(dtaInp));
+cat(names(dtaOut));
+# compared to the input data set, the variables that were missing in at least one
+# data set (i.e., "A1", "A2" and "A3") are removed
+cat(dim(dtaInp), dim(dtaOut));
+# the first dimension of the data sets (rows) is now three times of that of the
+# input data set (250 -> 750), the second dimension (columns / variables) is
+# reduced by 3 (i.e., "A1", "A2", "A3")
+
+unlink(nmeInp);
+unlink(nmeOut);
 }
 
 }

@@ -111,9 +111,10 @@ them yet, please install them manually (e.g., <code>install.packages('haven', de
 <span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="va">dtaFrm</span><span class="op">$</span><span class="va">Image</span><span class="op">)</span>;</span>
 <span class="r-in"><span class="co"># shows that the variable "Image" is now sorted in descending order</span></span>
 <span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/is.unsorted.html" class="external-link">is.unsorted</a></span><span class="op">(</span><span class="va">dtaFrm</span><span class="op">$</span><span class="va">Image</span><span class="op">)</span><span class="op">)</span>;</span>
-<span class="r-in"><span class="co"># this first returns TRUE (the variable is unsorted since it is not in ascending order)</span></span>
+<span class="r-in"><span class="co"># this first returns TRUE (the variable is not in ascending order, i.e., unsorted)</span></span>
 <span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/is.unsorted.html" class="external-link">is.unsorted</a></span><span class="op">(</span><span class="op">-</span><span class="va">dtaFrm</span><span class="op">$</span><span class="va">Image</span><span class="op">)</span><span class="op">)</span>;</span>
-<span class="r-in"><span class="co"># if the sign of the variable is changed, it returns FALSE (i.e., the variable is NOT unsorted)</span></span>
+<span class="r-in"><span class="co"># if the sign of the variable is changed, it returns FALSE (i.e., the variable is</span></span>
+<span class="r-in"><span class="co"># NOT unsorted)</span></span>
 <span class="r-in"><span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="va">fleTmp</span><span class="op">)</span>;</span>
 <span class="r-in"><span class="op">}</span></span>
 <span class="r-in"></span>

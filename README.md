@@ -4,16 +4,18 @@
 # jmvReadWrite
 
 <!-- badges: start -->
+
 [![CRAN](http://www.r-pkg.org/badges/version/jmvReadWrite)](https://cran.r-project.org/package=jmvReadWrite)
 [![License](https://img.shields.io/badge/License-AGPL%20v3-green.svg)](https://www.gnu.org/licenses/agpl-3.0.html)
 [![Downloads](https://cranlogs.r-pkg.org/badges/jmvReadWrite?color=brightgreen)](https://cran.r-project.org/package=jmvReadWrite)
 [![Dependencies](https://tinyverse.netlify.com/badge/jmvReadWrite)](https://cran.r-project.org/package=jmvReadWrite)
-[![Last Commit](https://img.shields.io/github/last-commit/sjentsch/jmvReadWrite)](https://github.com/sjentsch/jmvReadWrite)
-[![Codecov test coverage](https://codecov.io/gh/sjentsch/jmvReadWrite/branch/main/graph/badge.svg)](https://app.codecov.io/gh/sjentsch/jmvReadWrite?branch=main)
+[![Last
+commit](https://img.shields.io/github/last-commit/sjentsch/jmvReadWrite)](https://github.com/sjentsch/jmvReadWrite)
+[![Codecov
+coverage](https://codecov.io/gh/sjentsch/jmvReadWrite/branch/main/graph/badge.svg)](https://app.codecov.io/gh/sjentsch/jmvReadWrite?branch=main)
 <!-- badges: end -->
 
 <!---
-[//]: 
 [//]: [![Build Status](https://travis-ci.com/sjentsch/jmvReadWrite.svg)](https://travis-ci.com/sjentsch/jmvReadWrite)
 [//]: [![CI](https://github.com/sjentsch/jmvReadWrite/workflows/ci/badge.svg)](https://github.com/sjentsch/jmvReadWrite/actions?query=workflow%3Aci)
 --->
@@ -75,13 +77,16 @@ library(jmv);
 
 fleOMV = system.file("extdata", "ToothGrowth.omv", package = "jmvReadWrite");
 data = read_omv(fleOMV);
-jmv::ANOVA(
-    formula = len ~ supp + dose + supp:dose,
-    data = data,
-    effectSize = c("omega"),
-    modelTest = TRUE,
-    homo = TRUE,
-    norm = TRUE);
+# if the "jmv"-package is installed, we can run a test analysis with the data
+if ("jmv" %in% rownames(installed.packages())) {
+    jmv::ANOVA(
+        formula = len ~ supp + dose + supp:dose,
+        data = data,
+        effectSize = c("omega"),
+        modelTest = TRUE,
+        homo = TRUE,
+        norm = TRUE);
+    }
 #> 
 #>  ANOVA
 #> 
@@ -135,13 +140,16 @@ data = read_omv(fleOMV, getSyn = TRUE);
 # otherwise, the syntax of the analyses from the .omv-file is shown and  
 # the commands of the first and the second analysis are run, with the
 # output of the second analysis assigned to the variable result2
-if (length(attr(data, 'syntax')) >= 2) {
-    attr(data, 'syntax')
-    eval(parse(text=attr(data, 'syntax')[[1]]))
-    eval(parse(text=paste0('result2 = ', attr(data, 'syntax')[[2]])))
-    names(result2)
-    # -> "main"      "assump"    "contrasts" "postHoc"   "emm"
-    # (the names of the five output tables)
+if (length(attr(data, "syntax")) >= 2) {
+    attr(data, "syntax")
+    # if the "jmv"-package is installed, we can run the analyses in "syntax"     
+    if ("jmv" %in% rownames(installed.packages())) {
+        eval(parse(text=attr(data, "syntax")[[1]]))
+        eval(parse(text=paste0("result2 = ", attr(data, "syntax")[[2]])))
+        names(result2)
+        # -> "main"      "assump"    "contrasts" "postHoc"   "emm"
+        # (the names of the five output tables)
+    }
 }
 #> [1] "main"      "assump"    "contrasts" "postHoc"   "emm"       "residsOV"
 ```
@@ -180,9 +188,9 @@ list.files(".", "Trial.omv");
 #> [1] "Trial.omv"
 file.info("Trial.omv");
 #>           size isdir mode               mtime               ctime
-#> Trial.omv 2199 FALSE  664 2022-02-11 23:54:59 2022-02-11 23:54:59
+#> Trial.omv 2199 FALSE  664 2022-02-12 20:42:19 2022-02-12 20:42:19
 #>                         atime  uid  gid    uname   grname
-#> Trial.omv 2022-02-11 23:54:59 1000 1000 sjentsch sjentsch
+#> Trial.omv 2022-02-12 20:42:19 1000 1000 sjentsch sjentsch
 unlink("Trial.omv");
 ```
 

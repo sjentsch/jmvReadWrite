@@ -4,7 +4,8 @@
 \name{bfi_sample2}
 \alias{bfi_sample2}
 \title{Twenty-five personality self-report items taken from the International Personality Item Pool
-(includes jamovi-attributes; should result in a file identical to bfi_sample2.omv under "extdata" when written with write_omv)}
+(includes jamovi-attributes; should result in a file identical to bfi_sample2.omv under "extdata" when
+written with write_omv)}
 \format{
 A data.frame with 250 rows and 29 variables
 \describe{

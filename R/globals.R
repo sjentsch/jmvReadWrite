@@ -5,11 +5,16 @@ if (getRversion() >= "2.15.1") {
 }
 
 # =================================================================================================
+# define unicode-characters and their respective replacements
+lstRpl <- rbind(c("\x84", "\x93", "\xc4", "\xd6", "\xdc", "\xdf", "\xe4", "\xf6", "\xfc"),
+                c("\"",   "\"",   "Ae",   "Oe",   "Ue",   "ss",   "ae",   "oe",   "ue"));
+                
+# =================================================================================================
 # the next lines store the currently supported versions (stored in meta / MANIFEST.MF)
 # and the string that precedes the version number
-lstMnf <- list(mnfVer = c("Manifest-Version",        "1",  "0"),
-               datVer = c("Data-Archive-Version",    "1",  "0", "2"),
-               jmvVer = c("jamovi-Archive-Version",  "11", "0"),
+lstMnf <- list(mnfVer = c("Manifest-Version",        "1.0"),
+               datVer = c("Data-Archive-Version",    "1.0.2"),
+               jmvVer = c("jamovi-Archive-Version",  "11.0"),
                crtStr = c("Created-By"));
 
 # the next lines are dealing with storing the global and the data column attributes (that go into
@@ -21,6 +26,122 @@ mtaFld <- list(name = "", id = NA, columnType = "Data", dataType = "Integer", me
                outputDesiredColumnName = "", outputAssignedColumnName = "", importName = "", description = "", transform = 0,
                edits = list(), missingValues = list(), trimLevels = TRUE, filterNo = NA, active = FALSE)
 grpMta <- paste0("^", paste(c(names(mtaGlb), names(mtaFld)), collapse = "$|^"), "$");
+
+# =================================================================================================
+# functions for checking parameters (file and directory existence, correct file extension, correct
+# dimensions and existence of data frames) and normalizing the file name
+
+#            jamovi  CSV   TSV     Rdata           RDS   SPSS           Stata  SAS
+vldExt <- c("omv",  "csv", "tsv", "rdata", "rda", "rds", "sav", "zsav", "dta", "sas7bdat", "sd2", "sd7", "xpt", "stx", "stc");
+
+# REMEMBER: requires the full file name, NOT the directory
+chkDir <- function(fleNme = "", wrtPrm = TRUE) {
+    if (! utils::file_test("-d", dirname(fleNme))) {
+        stop(sprintf("Directory (%s) doesn\'t exist.", dirname(fleNme)));
+    }
+    if (file.access(dirname(fleNme), mode = 2) != 0) {
+        stop(sprintf("The directory (%s) exists, but you don\'t have writing permissions in that directory.", dirname(fleNme)));
+    }
+    TRUE
+}
+
+chkDtF <- function(dtaFrm = NULL, minSze = c(1, 1)) {
+    if (length(minSze) != 2) minSze <- rep(minSze[1], 2)
+    if (is.null(dtaFrm) || ! is.data.frame(dtaFrm) || length(dim(dtaFrm)) != 2) {
+        stop("Input data are either not a data frame or have incorrect (only one or more than two) dimensions.");
+    } else if (any(dim(dtaFrm) < minSze)) {
+        stop(sprintf("The %s dimension of the input data frame has not the required size (%d < %d).",
+                     ifelse(which(dim(dtaFrm) < minSze)[1] == 1, "first", "second"), dim(dtaFrm)[dim(dtaFrm) < minSze][1], minSze[dim(dtaFrm) < minSze][1]));
+    }
+    TRUE
+}
+
+chkExt <- function(fleNme = "", extNme = c("")) {
+    if (! hasExt(fleNme, extNme)) {
+        stop(sprintf("File name (%s) contains an unsupported file extension (%s).", basename(fleNme), paste(paste0(".", extNme[tools::file_ext(fleNme) != extNme]), collapse = ", ")));
+    }
+    TRUE
+}
+
+chkFle <- function(fleNme = "", fleCnt = "", isZIP = FALSE) {
+    if (! utils::file_test("-f", fleNme)) {
+        if (nchar(fleCnt) > 0) {
+            stop(sprintf("File \"%s\" doesn\'t contain the file \"%s\".", fleCnt, fleNme));
+        } else {
+            stop(sprintf("File \"%s\" not found.", fleNme));
+        }
+    } else if (isZIP) {
+        hdrStr <- readBin(tmpHdl <- file(fleNme, "rb"), "character"); close(tmpHdl);
+        # only "PK\003\004" is considered, not "PK\005\006" (empty ZIP) or "PK\007\008" (spanned [over several files])
+        if (! hdrStr == "PK\003\004\024") {
+            stop(sprintf("File \"%s\" has not the correct file format (is not a ZIP archive).", basename(fleNme)));
+        }
+    }
+    TRUE
+}
+
+chkVar <- function(dtaFrm = NULL, varNme = c()) {
+    if (is.null(varNme) || length(varNme) == 0 || !all(nzchar(varNme))) return(FALSE);
+    if (!all(varNme %in% names(dtaFrm))) {
+        stop(sprintf("The variable(s) %s are not contained in the current data set.", paste(varNme[! (varNme %in% names(dtaFrm))], collapse = ", ")));
+    }
+    TRUE
+}
+
+hasExt <- function(fleNme = "", extNme = c("")) {
+    any(tolower(tools::file_ext(fleNme)) == tolower(extNme))
+}
+
+hasPkg <- function(usePkg = c()) {
+    all(sapply(usePkg, function(X) nzchar(system.file(package = X))))
+}
+
+nrmFle <- function(fleNme = "") {
+    file.path(normalizePath(dirname(fleNme)), basename(fleNme))
+}
+
+fmtFlI <- function(fleInp = c(), minLng = 1, maxLng = Inf, excExt = "") {
+    # normalize the path of the input file and then check whether the file exists and whether it is of a supported file type
+    # ("omv" / "jamovi, " are excluded since it makes little sense to convert from jamovi to jamovi-files)
+    # if fleOut is empty, fleInp is used with its file extension replaced with ".omv"
+    if (length(fleInp) < minLng || length(fleInp) > maxLng) {
+        stop(sprintf("The fleInp-argument is supposed to be a character vector with a minimal length of %.0f and a maximal length of %.0f (current length is %.0f).%s",
+                     minLng, maxLng, length(fleInp), ifelse(length(fleInp) > maxLng, "\n  If you would like to process several files, call the function individually for each.", "")));
+    }
+    fleInp <- unname(sapply(fleInp, nrmFle));
+    all(sapply(fleInp, chkFle));
+    all(sapply(fleInp, chkExt, setdiff(vldExt, excExt)));
+    fleInp
+}
+
+fmtFlO <- function(fleOut = "", fleInp = "", rplExt = "") {
+    if (nzchar(fleOut)) {
+        nrmFle(fleOut)
+    } else if (length(fleInp) == 1 && nzchar(fleInp[1])) {
+        sub(paste0(".", tools::file_ext(fleInp[1])), rplExt, fleInp[1])
+    } else {
+        stop(paste0("Either fleOut needs to be given as a valid non-empty file name or a single entry in fleInp where the extension is replaced with: \"", rplExt, "\"."));
+    }
+}
+
+# =================================================================================================
+# get function arguments and adjust them / select those valid for the current function call
+
+adjArg <- function(fcnNme = c(), dflArg = list(), varArg = list(), fxdArg = c()) {
+    chgArg <- setdiff(intersect(fcnArg(fcnNme), names(varArg)), fxdArg);
+    c(dflArg[setdiff(names(dflArg), chgArg)], varArg[chgArg])
+}
+
+fcnArg <- function(fcnNme = c()) {
+    if        (is.character(fcnNme) && length(fcnNme) == 1) {
+        eval(parse(text = paste0("formalArgs(", fcnNme, ")")))
+    } else if (is.character(fcnNme) && length(fcnNme) == 2) {
+        eval(parse(text = paste0("formalArgs(getS3method(\"", fcnNme[1], "\", \"", fcnNme[2], "\"))")))
+    } else {
+        stop("The argument to fcnArg must be a character (vector) with 1 or 2 elements.");
+    }
+}
+
 
 # =================================================================================================
 # functions for handling setting and storing metadata-information
@@ -49,8 +170,14 @@ setAtt <- function(attLst = c(), inpObj = NULL, outObj = NULL) {
             stop("Error when storing or accessing meta-data information. Please send the file causing the error to sebastian.jentschke@uib.no");
         }
     }
-    rm(attNme, inpObj);
     outObj
+}
+
+rmvAtt <- function(attObj = NULL) {
+    for (crrAtt in setdiff(names(attributes(attObj)), c("class", "comment", "dim", "jmv-id", "jmv-desc", "levels", "names", "row.names", "values"))) {
+        attr(attObj, crrAtt) <- NULL;
+    }
+    attObj
 }
 
 chkAtt <- function(attObj = NULL, attNme = "", attVal = NULL) {
@@ -59,69 +186,67 @@ chkAtt <- function(attObj = NULL, attNme = "", attVal = NULL) {
 
 chkFld <- function(fldObj = NULL, fldNme = "", fldVal = NULL) {
    ((fldNme %in% names(fldObj))    && length(fldObj[[fldNme]])     > 0 && ifelse(!is.null(fldVal), grepl(fldVal, fldObj[[fldNme]]),     TRUE))
+}
 
 # =================================================================================================
 
 # Definitions: SPSS commands (copied from the left panel in https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=reference-introduction-guide-command-syntax, replace "-" with "\n",
 # restore "T-TEST" manually, find commands with a ":" and delete them, sort the commands, and replace "\n" with "", "", manually added "ELSE", "ELSE IF" and "END IF"as well as the
 # command terminator "." after "CACHE", "ELSE", all "END ..."-commands, "EXECUTE", "NEW FILE", "PRESERVE", "RESTORE")
-cmdSPS = c("2SLS", "ACF", "ADD DOCUMENT", "ADD FILES", "ADD VALUE LABELS", "ADP", "AGGREGATE", "AIM", "ALSCAL", "ALTER TYPE", "ANACOR", "ANOVA", "APPLY DICTIONARY", "AREG", "ARIMA", "AUTORECODE",
-           "BAYES ANOVA", "BAYES CORRELATION", "BAYES INDEPENDENT", "BAYES LOGLINEAR", "BAYES ONESAMPLE", "BAYES REGRESSION", "BAYES RELATED", "BAYES REPEATED", "BEGIN DATA", "BEGIN EXPR",
-           "BEGIN GPL", "BEGIN PROGRAM", "BOOTSTRAP", "BREAK", "CACHE.", "CASEPLOT", "CASESTOVARS", "CATPCA", "CATREG", "CCF", "CD", "CLEAR TIME PROGRAM", "CLEAR TRANSFORMATIONS", "CLUSTER",
-           "CODEBOOK", "COMMENT", "COMPARE DATASETS", "COMPUTE", "CONJOINT", "CORRELATIONS", "CORRESPONDENCE", "COUNT", "COXREG", "CREATE", "CROSSTABS", "CSCOXREG", "CSDESCRIPTIVES", "CSGLM",
-           "CSLOGISTIC", "CSORDINAL", "CSPLAN", "CSSELECT", "CSTABULATE", "CTABLES", "CURVEFIT", "DATAFILE ATTRIBUTE", "DATA LIST", "DATASET ACTIVATE", "DATASET CLOSE", "DATASET COPY",
-           "DATASET DECLARE", "DATASET DISPLAY", "DATASET NAME", "DATE", "DEFINE", "DELETE VARIABLES", "DESCRIPTIVES", "DETECTANOMALY", "DISCRIMINANT", "DISPLAY", "DMCLUSTER", "DMLOGISTIC",
-           "DMROC", "DMTABLES", "DMTREE", "DOCUMENT", "DO IF", "DO REPEAT", "DROP DOCUMENTS", "ECHO", "ELSE.", "ELSE IF", "END CASE.", "END DATA.", "!ENDDEFINE.", "END EXPR.", "END FILE.",
-           "END FILE TYPE.", "END GPL.", "END IF.", "END INPUT PROGRAM.", "END LOOP.", "END MATRIX.", "END PROGRAM.", "END REPEAT.", "ERASE", "EXAMINE", "EXECUTE.", "EXPORT", "EXSMOOTH", "EXTENSION",
-           "FACTOR", "FILE HANDLE", "FILE LABEL", "FILE TYPE", "FILTER", "FINISH", "FIT", "FLEISS MULTIRATER KAPPA", "FLIP", "FORMATS", "FREQUENCIES", "GENLIN", "GENLINMIXED", "GENLOG", "GET",
-           "GET CAPTURE", "GETCOGNOS", "GET DATA", "GET SAS", "GET STATA", "GETTM1", "GET TRANSLATE", "GGRAPH", "GLM", "GRAPH", "HILOGLINEAR", "HOMALS", "HOST", "IF", "IGRAPH", "IMPORT",
-           "INCLUDE", "INFO", "INPUT PROGRAM", "INSERT", "INSERT EXEC", "INSERT HIDDEN", "KEYED DATA LIST", "KM", "KNN", "LEAVE", "LINEAR", "LIST", "LOGISTIC REGRESSION", "LOGLINEAR", "LOOP",
-           "MANOVA", "MATCH FILES", "MATRIX", "MATRIX DATA", "MCONVERT", "MEANS", "META BINARY", "META CONTINUOUS", "META ES BINARY", "META ES CONTINUOUS", "META REGRESSION", "MISSING VALUES",
-           "MIXED", "MLP", "MODEL CLOSE", "MODEL HANDLE", "MODEL LIST", "MODEL NAME", "MRSETS", "MULTIPLE CORRESPONDENCE", "MULTIPLE IMPUTATION", "MULT RESPONSE", "MVA", "NAIVEBAYES", 
-           "NEW FILE.", "NLR", "N OF CASES", "NOMREG", "NONPAR CORR", "NPAR TESTS", "NPTESTS", "NUMERIC", "OLAP CUBES", "OMS", "OMSEND", "OMSINFO", "OMSLOG", "ONEWAY", "OPTIMAL BINNING",
-           "ORTHOPLAN", "OUTPUT ACTIVATE", "OUTPUT CLOSE", "OUTPUT DISPLAY", "OUTPUT EXPORT", "OUTPUT MODIFY", "OUTPUT NAME", "OUTPUT NEW", "OUTPUT OPEN", "OUTPUT SAVE", "OVERALS", "PACF",
-           "PARTIAL CORR", "PERMISSIONS", "PLANCARDS", "PLS", "PLUM", "POINT", "POWER MEANS INDEPENDENT", "POWER MEANS ONESAMPLE", "POWER MEANS RELATED", "POWER ONEWAY ANOVA",
-           "POWER PARTIALCORR", "POWER PEARSON ONESAMPLE", "POWER PROPORTIONS INDEPENDENT", "POWER PROPORTIONS ONESAMPLE", "POWER PROPORTIONS RELATED", "POWER SPEARMAN ONESAMPLE",
-           "POWER UNIVARIATE LINEAR", "PPLOT", "PREDICT", "PREFSCAL", "PRESERVE.", "PRINCALS", "PRINT", "PRINT EJECT", "PRINT FORMATS", "PRINT SPACE", "PROBIT", "PROCEDURE OUTPUT",
-           "PROPORTIONS", "PROXIMITIES", "PROXSCAL", "QUANTILE REGRESSION", "QUICK CLUSTER", "RANK", "RATIO STATISTICS", "RBF", "READ MODEL", "RECODE", "RECORD TYPE", "REFORMAT", "REGRESSION",
-           "RELATIONSHIP MAP", "RELIABILITY", "RENAME VARIABLES", "REPEATING DATA", "REPORT", "REPOSITORY ATTRIBUTES", "REPOSITORY CONNECT", "REPOSITORY COPY", "REREAD", "RESPONSE RATE",
-           "RESTORE.", "RMV", "ROC", "ROC ANALYSIS", "SAMPLE", "SAVE", "SAVE CODEPAGE", "SAVE DATA COLLECTION", "SAVE MODEL", "SAVETM1", "SAVE TRANSLATE", "SCRIPT", "SEASON", "SELECT IF",
-           "SELECTPRED", "SET", "SHIFT VALUES", "SHOW", "SIMPLAN", "SIMPREP BEGIN", "SIMPREP END", "SIMRUN", "SORT CASES", "SORT VARIABLES", "SPATIAL ASSOCIATION RULES", "SPATIAL MAPSPEC",
-           "SPATIAL TEMPORAL PREDICTION", "SPCHART", "SPECTRA", "SPLIT FILE", "STAR JOIN", "STRING", "SUBTITLE", "SUMMARIZE", "SURVIVAL", "SYSFILE INFO", "TABLES", "TCM ANALYSIS", "TCM APPLY",
-           "TCM MODEL", "TDISPLAY", "TEMPORARY", "TIME PROGRAM", "TITLE", "TMS BEGIN", "TMS END", "TMS IMPORT", "TMS MERGE", "TREE", "TSAPPLY", "TSET", "TSHOW", "TSMODEL", "TSPLOT", "T-TEST",
-           "TWOSTEP CLUSTER", "UNIANOVA", "UPDATE", "USE", "VALIDATEDATA", "VALUE LABELS", "VARCOMP", "VARIABLE ALIGNMENT", "VARIABLE ATTRIBUTE", "VARIABLE LABELS", "VARIABLE LEVEL",
-           "VARIABLE ROLE", "VARIABLE WIDTH", "VARSTOCASES", "VECTOR", "VERIFY", "WEIGHT", "WEIGHTED KAPPA", "WLS", "WRITE", "WRITE FORMATS", "XGRAPH", "XSAVE");
+cmdSPS <- c("2SLS", "ACF", "ADD DOCUMENT", "ADD FILES", "ADD VALUE LABELS", "ADP", "AGGREGATE", "AIM", "ALSCAL", "ALTER TYPE", "ANACOR", "ANOVA", "APPLY DICTIONARY", "AREG", "ARIMA", "AUTORECODE",
+            "BAYES ANOVA", "BAYES CORRELATION", "BAYES INDEPENDENT", "BAYES LOGLINEAR", "BAYES ONESAMPLE", "BAYES REGRESSION", "BAYES RELATED", "BAYES REPEATED", "BEGIN DATA", "BEGIN EXPR",
+            "BEGIN GPL", "BEGIN PROGRAM", "BOOTSTRAP", "BREAK", "CACHE.", "CASEPLOT", "CASESTOVARS", "CATPCA", "CATREG", "CCF", "CD", "CLEAR TIME PROGRAM", "CLEAR TRANSFORMATIONS", "CLUSTER",
+            "CODEBOOK", "COMMENT", "COMPARE DATASETS", "COMPUTE", "CONJOINT", "CORRELATIONS", "CORRESPONDENCE", "COUNT", "COXREG", "CREATE", "CROSSTABS", "CSCOXREG", "CSDESCRIPTIVES", "CSGLM",
+            "CSLOGISTIC", "CSORDINAL", "CSPLAN", "CSSELECT", "CSTABULATE", "CTABLES", "CURVEFIT", "DATAFILE ATTRIBUTE", "DATA LIST", "DATASET ACTIVATE", "DATASET CLOSE", "DATASET COPY",
+            "DATASET DECLARE", "DATASET DISPLAY", "DATASET NAME", "DATE", "DEFINE", "DELETE VARIABLES", "DESCRIPTIVES", "DETECTANOMALY", "DISCRIMINANT", "DISPLAY", "DMCLUSTER", "DMLOGISTIC",
+            "DMROC", "DMTABLES", "DMTREE", "DOCUMENT", "DO IF", "DO REPEAT", "DROP DOCUMENTS", "ECHO", "ELSE.", "ELSE IF", "END CASE.", "END DATA.", "!ENDDEFINE.", "END EXPR.", "END FILE.",
+            "END FILE TYPE.", "END GPL.", "END IF.", "END INPUT PROGRAM.", "END LOOP.", "END MATRIX.", "END PROGRAM.", "END REPEAT.", "ERASE", "EXAMINE", "EXECUTE.", "EXPORT", "EXSMOOTH", "EXTENSION",
+            "FACTOR", "FILE HANDLE", "FILE LABEL", "FILE TYPE", "FILTER", "FINISH", "FIT", "FLEISS MULTIRATER KAPPA", "FLIP", "FORMATS", "FREQUENCIES", "GENLIN", "GENLINMIXED", "GENLOG", "GET",
+            "GET CAPTURE", "GETCOGNOS", "GET DATA", "GET SAS", "GET STATA", "GETTM1", "GET TRANSLATE", "GGRAPH", "GLM", "GRAPH", "HILOGLINEAR", "HOMALS", "HOST", "IF", "IGRAPH", "IMPORT",
+            "INCLUDE", "INFO", "INPUT PROGRAM", "INSERT", "INSERT EXEC", "INSERT HIDDEN", "KEYED DATA LIST", "KM", "KNN", "LEAVE", "LINEAR", "LIST", "LOGISTIC REGRESSION", "LOGLINEAR", "LOOP",
+            "MANOVA", "MATCH FILES", "MATRIX", "MATRIX DATA", "MCONVERT", "MEANS", "META BINARY", "META CONTINUOUS", "META ES BINARY", "META ES CONTINUOUS", "META REGRESSION", "MISSING VALUES",
+            "MIXED", "MLP", "MODEL CLOSE", "MODEL HANDLE", "MODEL LIST", "MODEL NAME", "MRSETS", "MULTIPLE CORRESPONDENCE", "MULTIPLE IMPUTATION", "MULT RESPONSE", "MVA", "NAIVEBAYES",
+            "NEW FILE.", "NLR", "N OF CASES", "NOMREG", "NONPAR CORR", "NPAR TESTS", "NPTESTS", "NUMERIC", "OLAP CUBES", "OMS", "OMSEND", "OMSINFO", "OMSLOG", "ONEWAY", "OPTIMAL BINNING",
+            "ORTHOPLAN", "OUTPUT ACTIVATE", "OUTPUT CLOSE", "OUTPUT DISPLAY", "OUTPUT EXPORT", "OUTPUT MODIFY", "OUTPUT NAME", "OUTPUT NEW", "OUTPUT OPEN", "OUTPUT SAVE", "OVERALS", "PACF",
+            "PARTIAL CORR", "PERMISSIONS", "PLANCARDS", "PLS", "PLUM", "POINT", "POWER MEANS INDEPENDENT", "POWER MEANS ONESAMPLE", "POWER MEANS RELATED", "POWER ONEWAY ANOVA",
+            "POWER PARTIALCORR", "POWER PEARSON ONESAMPLE", "POWER PROPORTIONS INDEPENDENT", "POWER PROPORTIONS ONESAMPLE", "POWER PROPORTIONS RELATED", "POWER SPEARMAN ONESAMPLE",
+            "POWER UNIVARIATE LINEAR", "PPLOT", "PREDICT", "PREFSCAL", "PRESERVE.", "PRINCALS", "PRINT", "PRINT EJECT", "PRINT FORMATS", "PRINT SPACE", "PROBIT", "PROCEDURE OUTPUT",
+            "PROPORTIONS", "PROXIMITIES", "PROXSCAL", "QUANTILE REGRESSION", "QUICK CLUSTER", "RANK", "RATIO STATISTICS", "RBF", "READ MODEL", "RECODE", "RECORD TYPE", "REFORMAT", "REGRESSION",
+            "RELATIONSHIP MAP", "RELIABILITY", "RENAME VARIABLES", "REPEATING DATA", "REPORT", "REPOSITORY ATTRIBUTES", "REPOSITORY CONNECT", "REPOSITORY COPY", "REREAD", "RESPONSE RATE",
+            "RESTORE.", "RMV", "ROC", "ROC ANALYSIS", "SAMPLE", "SAVE", "SAVE CODEPAGE", "SAVE DATA COLLECTION", "SAVE MODEL", "SAVETM1", "SAVE TRANSLATE", "SCRIPT", "SEASON", "SELECT IF",
+            "SELECTPRED", "SET", "SHIFT VALUES", "SHOW", "SIMPLAN", "SIMPREP BEGIN", "SIMPREP END", "SIMRUN", "SORT CASES", "SORT VARIABLES", "SPATIAL ASSOCIATION RULES", "SPATIAL MAPSPEC",
+            "SPATIAL TEMPORAL PREDICTION", "SPCHART", "SPECTRA", "SPLIT FILE", "STAR JOIN", "STRING", "SUBTITLE", "SUMMARIZE", "SURVIVAL", "SYSFILE INFO", "TABLES", "TCM ANALYSIS", "TCM APPLY",
+            "TCM MODEL", "TDISPLAY", "TEMPORARY", "TIME PROGRAM", "TITLE", "TMS BEGIN", "TMS END", "TMS IMPORT", "TMS MERGE", "TREE", "TSAPPLY", "TSET", "TSHOW", "TSMODEL", "TSPLOT", "T-TEST",
+            "TWOSTEP CLUSTER", "UNIANOVA", "UPDATE", "USE", "VALIDATEDATA", "VALUE LABELS", "VARCOMP", "VARIABLE ALIGNMENT", "VARIABLE ATTRIBUTE", "VARIABLE LABELS", "VARIABLE LEVEL",
+            "VARIABLE ROLE", "VARIABLE WIDTH", "VARSTOCASES", "VECTOR", "VERIFY", "WEIGHT", "WEIGHTED KAPPA", "WLS", "WRITE", "WRITE FORMATS", "XGRAPH", "XSAVE");
 # only the following commands / analyses are covered (included) in the conversion ...
-cmdAnl = c("ANOVA", "CORRELATIONS", "CROSSTABS", "CTABLES", "DESCRIPTIVES", "EXAMINE", "FACTOR", "FREQUENCIES", "GLM", "GRAPH", "LOGISTIC REGRESSION", "LOGLINEAR", "MANOVA", "MEANS",
-           "NONPAR CORR", "NPAR TESTS", "NPTESTS", "ONEWAY", "PARTIAL CORR", "REGRESSION", "RELIABILITY", "SUMMARIZE", "T-TEST", "UNIANOVA");
+cmdAnl <- c("ANOVA", "CORRELATIONS", "CROSSTABS", "CTABLES", "DESCRIPTIVES", "EXAMINE", "FACTOR", "FREQUENCIES", "GLM", "GRAPH", "LOGISTIC REGRESSION", "LOGLINEAR", "MANOVA", "MEANS",
+            "NONPAR CORR", "NPAR TESTS", "NPTESTS", "ONEWAY", "PARTIAL CORR", "REGRESSION", "RELIABILITY", "SUMMARIZE", "T-TEST", "UNIANOVA");
 # the following commands are used to modify the data set (the difference is that for the commands under "cmdAnl" extracting the variables is necessary) ...
-cmdMod = c("ADD VALUE LABELS", "ALTER TYPE", "COMMENT", "COMPUTE", "DELETE VARIABLES", "FILTER", "NUMERIC", "RANK", "RECODE", "RENAME VARIABLES", "SAMPLE", "SORT CASES", "SORT VARIABLES", "STRING",
-           "USE", "VALUE LABELS", "VARIABLE LABELS", "VARIABLE LEVEL");
+cmdMod <- c("ADD VALUE LABELS", "ALTER TYPE", "COMMENT", "COMPUTE", "DELETE VARIABLES", "FILTER", "NUMERIC", "RANK", "RECODE", "RENAME VARIABLES", "SAMPLE", "SORT CASES", "SORT VARIABLES", "STRING",
+            "USE", "VALUE LABELS", "VARIABLE LABELS", "VARIABLE LEVEL");
 # and the following commands are used to load or save data sets
-cmdDta = c("SAVE OUTFILE", "GET FILE", "GET DATA", "NEW FILE.")
+cmdDta <- c("SAVE OUTFILE", "GET FILE", "GET DATA", "NEW FILE.");
+
 # grep: match complete commands - assumes that the command is followed by one or more white spaces (or no whitespace if it ends in ".")
-grcSPS = gsub("\\.\\\\s+", "\\\\.", paste0(paste0(paste0("^", cmdSPS), collapse="\\s+|"), "\\s+"));
-grpAnl = gsub("\\.\\\\s+", "\\\\.", paste0(paste0(paste0("^", cmdAnl), collapse="\\s+|"), "\\s+"));
-grpMod = gsub("\\.\\\\s+", "\\\\.", paste0(paste0(paste0("^", cmdMod), collapse="\\s+|"), "\\s+"));
-grpDta = gsub("\\.\\\\s+", "\\\\.", paste0(paste0(paste0("^", cmdMod), collapse="\\s+|"), "\\s+"));
+grcSPS <- gsub("\\.\\\\s+", "\\\\.", paste0(paste0(paste0("^", cmdSPS), collapse = "\\s+|"), "\\s+"));
+grpAnl <- gsub("\\.\\\\s+", "\\\\.", paste0(paste0(paste0("^", cmdAnl), collapse = "\\s+|"), "\\s+"));
+grpMod <- gsub("\\.\\\\s+", "\\\\.", paste0(paste0(paste0("^", cmdMod), collapse = "\\s+|"), "\\s+"));
+grpDta <- gsub("\\.\\\\s+", "\\\\.", paste0(paste0(paste0("^", cmdMod), collapse = "\\s+|"), "\\s+"));
 # grep: match abbreviated commands (SPSS permits that commands only contain of the first three characters [or more if the first 3 can"t be resolved without ambiguity])
 # adding a "\\s+" (one or more whitespaces) is for convenience, for the other matching condition (end of string), "\\s+" is replaced with "$" (see lneCmd = ...)
 graSPS <- "";
 for (cmdCnt in seq_along(cmdSPS)) {
     if (! grepl(" ", cmdSPS[cmdCnt])) {
-        cmdLng = 3; while (length(grep(paste0("^", substr(cmdSPS[cmdCnt], 1, cmdLng)), cmdSPS)) > 1 && cmdLng < nchar(cmdSPS[cmdCnt])) { cmdLng = cmdLng + 1 };
+        cmdLng <- 3; while (length(grep(paste0("^", substr(cmdSPS[cmdCnt], 1, cmdLng)), cmdSPS)) > 1 && cmdLng < nchar(cmdSPS[cmdCnt])) cmdLng <- cmdLng + 1;
         graSPS <- paste0(graSPS, "^", gsub("\\.$", "", substr(cmdSPS[[cmdCnt]], 1, cmdLng)), ifelse(nchar(gsub("\\.$", "", cmdSPS[[cmdCnt]])) > cmdLng, "[A-Z]*", ""));
     } else {
-        splSPS = strsplit(cmdSPS[[cmdCnt]], " ")[[1]];
+        splSPS <- strsplit(cmdSPS[[cmdCnt]], " ")[[1]];
         for (splCnt in seq_along(splSPS)) {
             graSPS <- paste0(graSPS, ifelse(splCnt > 1, " ", "^"), gsub("\\.$", "", substr(splSPS[splCnt], 1, 3)), ifelse(nchar(gsub("\\.$", "", splSPS[splCnt])) > 3, "[A-Z]*", ""));
         }
     }
     graSPS <- paste0(graSPS, ifelse(grepl("\\.$", cmdSPS[[cmdCnt]]), "\\.", "\\s+"), ifelse(cmdCnt < length(cmdSPS), "|", ""));
 }
-rm("cmdCnt", "cmdLng", "splSPS", "splCnt");
-
-# define unicode-characters and their respective replacements
-lstRpl <- list("\x84" = "\"", "\x93" = "\"", "\xc4" = "Ae", "\xd6" = "Oe", "\xdc" = "Ue", "\xdf" = "ss", "\xe4" = "ae", "\xf6" = "oe", "\xfc" = "ue")
 
 # =================================================================================================

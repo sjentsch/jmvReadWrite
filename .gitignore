@@ -1,3 +1,6 @@
+# this file
+.gitignore
+
 # History files
 .Rhistory
 .Rapp.history
@@ -43,8 +46,8 @@ doc/
 
 TrialSPSS
 TrialOMV
+TrialOther
 Meta/
 inst/doc
 /doc/
 /Meta/
-

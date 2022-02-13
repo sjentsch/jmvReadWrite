@@ -2,18 +2,32 @@
 % Please edit documentation in R/sps2jmv.R
 \name{sps2jmv}
 \alias{sps2jmv}
-\title{Converts SPPS-syntax (either from a SPSS-syntax file .sps or read from a SPSS-output-file .spv \link{using spv2sps}) into jamovi / jmv-syntax}
+\title{Converts SPPS-syntax either from a SPSS-syntax file .sps or read from a SPSS-output-file .spv (using spv2sps) into jamovi / jmv-syntax}
 \usage{
-sps2jmv(vecSPS = c(), fleSPS = "", fleSAV = "", fltCnd = "")
+sps2jmv(vecSPS = c(), fleSPS = "", fleSAV = "", runMsV = FALSE)
 }
 \arguments{
-\item{character}{vector with SPSS-commands, the format is supposed to be the same as what is output from spv2sps: a character vector containing one command per element, and the attribute "datafile" that contains a string pointing to the location of the SPSS-data-file \link{incl. path} (if not found at the path or if no path is given, the file is searched in the current directory)}
+\item{vecSPS}{vector with SPSS-commands, the format is supposed to be the same as what is output from spv2sps: a character vector containing one command per element,
+and the attribute "datafile" that contains a string pointing to the location of the SPSS-data-file (incl. path; if not found at the path or if no path
+is given, the file is searched in the current directory)}
 
-\item{string}{a filter condition to be applied to the dataset (default = "" → no filter; e.g., "data$\link{VARNAME} == 1")}
+\item{fleSPS}{containing the location of a SPSS-syntax-file (.sps; incl. path)}
+
+\item{fleSAV}{containing the location of a SPSS-data-file (.sav; incl. path)}
+
+\item{runMsV}{run analyses even though there are variables missing; if the value is set to FALSE (default), the whole analysis is preceded by "#" which would cause it not
+to be evaluated with "eval(parse(text = ...))"; if the value is set to TRUE, only the variable that is not found in the data set is excluded and the analyses
+are conducted with the remaining variables (which will lead to results that are different from those originally conducted in SPSS)}
 }
 \value{
 list with jamovi / jmv-analysis-function-calls and the data set stored in the attribute "dataset"
 }
 \description{
-The function expects that either the parameter vecSPS is used \link{with the output from spv2sps} or that both fleSPS and fleSAV are given.
+The function expects that either the parameter vecSPS is used (with the output from spv2sps) or that both fleSPS and fleSAV are given.
+}
+\examples{
+\dontrun{
+library(jmvReadWrite);
+}
+
 }

@@ -2,8 +2,9 @@
 #' (www.jamovi.org)
 #'
 #' @param dtaFrm Data frame to be exported (default: NULL)
-#' @param fleNme Name / position of the output file to be generated ("FILENAME.omv"; default: "")
+#' @param fleOut Name / position of the output file to be generated ("FILENAME.omv"; default: "")
 #' @param retDbg Whether to return a list with debugging information (see Value; default: FALSE)
+#'
 #' @return a list (if retDbg == TRUE), containing the meta data (mtaDta, metadata.json in the OMV-file), the extended data (xtdDta, xdata.json in the OMV-file) and the original data frame (dtaFrm)
 #'
 #' @details
@@ -14,43 +15,50 @@
 #' \dontrun{
 #' library(jmvReadWrite);
 #'
-#' # use the data set "ToothGrowth" and, if it exists, write it as jamovi-file using write_omv()
+#' # use the data set "ToothGrowth" and, if it exists, write it as
+#' # jamovi-file using write_omv()
 #' data("ToothGrowth");
-#' wrtDta = write_omv(ToothGrowth, "Trial.omv");
-#' print(names(wrtDta));
-#' # the print-function is only used to force devtools::run_examples() to show the output
-#' # the same applies to the other "print"-functions further down in the code
-#' # on the command line, one can just run: names(wrtDta)
+#' fleOMV <- paste0(tempfile(), ".omv");
+#' # typically, one would use a "real" file name instead of tempfile(),
+#' # e.g., "Data1.omv"
+#' dtaDbg = write_omv(ToothGrowth, fleOMV, retDbg = TRUE);
+#' print(names(dtaDbg));
+#' # the print-function is only used to force devtools::run_examples()
+#' # to show output
 #' # -> "mtaDta" "xtdDta" "dtaFrm"
 #' # returns a list with the metadata (mtaDta, e.g., column and data type),
-#' # the extended data (xtdDta, e.g., variable lables), and the data frame (dtaFrm)
-#' # the purpose of these variables is merely for checking (understanding the file format)
-#' # and debugging
+#' # the extended data (xtdDta, e.g., variable lables), and the data frame
+#' # (dtaFrm) the purpose of these variables is merely for checking (under-
+#' # standing the file format) and debugging
 #'
-#' # check whether the file was written to the disk, get the file information (size, etc.)
-#' # and delete the file afterwards
-#' print(list.files(".", "Trial.omv"));
-#' # -> "Trial.omv"
-#' print(file.info("Trial.omv")$size);
-#' # -> 2111 (size may differ on different OSes)
-#' unlink("Trial.omv");
+#' # check whether the file was written to the disk, get the file informa-
+#' # tion (size, etc.) and delete the file afterwards
+#' print(list.files(dirname(fleOMV), basename(fleOMV)));
+#' # -> "file[...].omv" ([...] is a combination of random numbers / characters
+#' print(file.info(fleOMV)$size);
+#' # -> 2199 (size may differ on different OSes)
+#' unlink(fleOMV);
 #' }
 #'
 #' @export write_omv
 
-write_omv <- function(dtaFrm = NULL, fleNme = "", retDbg = FALSE) {
+write_omv <- function(dtaFrm = NULL, fleOut = "", retDbg = FALSE) {
+    if (is.null(dtaFrm))  stop("The data frame to be written needs to be given as parameter (dtaFrm = ...).");
+    if (! nzchar(fleOut)) stop("Output file name needs to be given as parameter (fleOut = ...).");
 
-    # check whether dtaFrm is a data frame
-    if (is.null(dtaFrm) || ! is.data.frame(dtaFrm) || any(dim(dtaFrm) < 1)) {
-        stop("Input data frame is either not a data frame or has not the correct dimensions (at least one dimension has a size of < 1).");
-    }
-    # check that the file name isn't empty, that it ends in .omv, and that the destination directory exists
-    if (length(fleNme) <= 0 || ! grepl(".omv", fleNme) || ! dir.exists(dirname(fleNme))) {
-        stop(sprintf("Output file name (%s) doesn't have the correct format (e.g., wrong extension) or destination directory doesn't exist.", fleNme));
-    }
-    fleNme <- file.path(normalizePath(dirname(fleNme)), fleNme);
+    # check that the file name isn't empty, that the destination directory exists and that it ends in .omv
+    fleOut <- nrmFle(fleOut);
+    chkDir(fleOut)
+    chkExt(fleOut, "omv")
 
+    # check whether dtaFrm is a data frame and extract the number of columns
+    chkDtF(dtaFrm);
     colNum <- dim(dtaFrm)[2];
+
+    # handle the attributes "variable.labels" and "value.labels" in the format provided by the R-package "foreign"
+    # the attribute "variable.labels" (attached to the data frame) is converted them to the format used by "haven" ("label" attached to the data column)
+    if (chkAtt(dtaFrm, "variable.labels")) dtaFrm <- fgnLbl(dtaFrm);
+    if (chkAtt(dtaFrm, "label.table")) stop("R-foreign-style value labels need to be implemented. Please send the data file that caused this problem to sebastian.jentschke@uib.no");
 
     # initialize metadata.json
     mtaDta <- mtaGlb;
@@ -71,34 +79,26 @@ write_omv <- function(dtaFrm = NULL, fleNme = "", retDbg = FALSE) {
 
     # create strings.bin
     strHdl <- file(description = file.path(tempdir(), "strings.bin"), open = "wb");
-    strPos <- 0
+    strPos <- 0;
 
     for (i in seq_len(colNum)) {
-        # assign attributes that are stored in data frame for this data column
-        # (if available)
+        # assign the jamovi-specific-attributes that are stored in data frame for this data column (if available)
         mtaDta$fields[[i]] <- setAtt(names(mtaDta$fields[[i]]), dtaFrm[[i]], mtaDta$fields[[i]]);
 
         # name
         mtaDta$fields[[i]][["name"]] <- names(dtaFrm[i]);
 
-        # variable label: if column contains a "jmv-desc" use this, otherwise try whether the data frame contains "variable.labels" and use that
-        if        (chkAtt(dtaFrm[[i]], "jmv-desc")) {
-            mtaDta$fields[[i]][["description"]] <- attr(dtaFrm[[i]], "jmv-desc");
-        } else if (chkAtt(dtaFrm, "variable.labels")) {
-            mtaDta$fields[[i]][["description"]] <- attr(dtaFrm, "variable.labels")[[names(dtaFrm[i])]];
-        }
-
-        # value labels - R-foreign-style
-        if (chkAtt(dtaFrm, "label.table")) {
-            stop("R-foreign-style value labels need to be implemented. Please send the data file that caused this problem to sebastian.jentschke@uib.no");
-        }
+        # variable label: if available, choose "jmv-desc", "label", ...
+        # the attributes are concatenated if available (otherwise they will be NULL and dropped), if several are available,
+        # the first ("jmv-desc") takes precedence, if all are NULL, the content of mtaDta$fields serves as fallback-option
+        mtaDta$fields[[i]][["description"]] <- c(attr(dtaFrm[[i]], "jmv-desc"), attr(dtaFrm[[i]], "label"), mtaDta$fields[[i]][["description"]])[1];
 
         # assign column from the original data frame to colCrr (so that modifications don't affect the original)
         colCrr <- dtaFrm[[i]]
 
         # ID variables represent a special case and are therefore treated first
         # only if the jmv-id marker is set or if the measureType is set to "ID" in the original data
-        if (chkAtt(dtaFrm[[i]], "jmv-id", TRUE) || chkAtt(dtaFrm[[i]], "measureType", "ID")) {
+        if (chkAtt(dtaFrm[[i]], "jmv-id", TRUE) || chkAtt(dtaFrm[[i]], "measureType", "ID") || (i == 1 && length(unique(colCrr)) == length(colCrr))) {
             if (is.character(colCrr)) {
                 mtaDta$fields[[i]][["dataType"]] <- "Text";
                 mtaDta$fields[[i]][["type"]]     <- "string";
@@ -117,19 +117,20 @@ write_omv <- function(dtaFrm = NULL, fleNme = "", retDbg = FALSE) {
             xtdDta[[names(dtaFrm[i])]] <- list(labels = lapply(0:1, function(i) list(i, as.character(i), as.character(i), FALSE)));
         # [b] factors
         } else if (is.factor(colCrr)) {
+            facOrd <- is.ordered(colCrr);
             facLvl <- attr(colCrr, "levels");
             facVal <- attr(colCrr, "values");
             if (is.null(facVal)) {
                 colCrr <- as.integer(colCrr);
                 facVal <- unique(sort(colCrr));
-                mtaDta$fields[[i]][["dataType"]] <- ifelse(all(!is.na(suppressWarnings(as.integer(facLvl)))) && all(as.character(as.integer(facLvl)) == facLvl), "Integer", "Text")
+                mtaDta$fields[[i]][["dataType"]] <- ifelse(all(!is.na(suppressWarnings(as.integer(facLvl)))) && all(as.character(as.integer(facLvl)) == facLvl), "Integer", "Text");
             } else {
                 colCrr <- facVal[as.integer(colCrr)]
                 mtaDta$fields[[i]][["dataType"]] <- "Integer";
             }
             mtaDta$fields[[i]][["type"]]         <- "integer";
             # if "measureType" is already stored in the data frame, keep it, otherwise set it to "Ordinal" if the properties indicate it to be likely ("Nominal" is already the default)
-            if (chkFld(mtaDta$fields[[i]], "dataType", "Integer") && length(facVal) > 5 && !any(is.na(c(facVal, colCrr))) && stats::sd(diff(facVal)) < diff(range(colCrr)) / 10) {
+            if (facOrd || (chkFld(mtaDta$fields[[i]], "dataType", "Integer") && length(facVal) > 5 && !any(is.na(c(facVal, colCrr))) && stats::sd(diff(facVal)) < diff(range(colCrr)) / 10)) {
                 mtaDta$fields[[i]][["measureType"]] <- ifelse(chkAtt(dtaFrm[[i]], "measureType"), attr(dtaFrm[[i]], "measureType"), "Ordinal");
             }
             if (length(facVal) > 0) {
@@ -138,8 +139,8 @@ write_omv <- function(dtaFrm = NULL, fleNme = "", retDbg = FALSE) {
             rm(facLvl, facVal);
         # [c] characters / strings
         } else if (is.character(colCrr)) {
-            facLvl <- unique(colCrr);
-            facVal <- seq(1, length(facVal));
+            facLvl <- unique(sort(colCrr));
+            facVal <- seq_along(facLvl);
             colCrr <- as.integer(as.factor(colCrr));
             mtaDta$fields[[i]][["type"]]        <- "integer";
             mtaDta$fields[[i]][["dataType"]]    <- "Text";
@@ -149,12 +150,13 @@ write_omv <- function(dtaFrm = NULL, fleNme = "", retDbg = FALSE) {
             }
         # [d] numerical (integer / decimals)facLvl <- unique(colCrr)
         } else if (is.numeric(colCrr)) {
-            if (all(abs(colCrr - round(colCrr)) < sqrt(.Machine$double.eps), na.rm = TRUE)) {
+            if (! all(is.na(colCrr)) && max(abs(colCrr), na.rm = TRUE) <= .Machine$integer.max && all(abs(colCrr - round(colCrr)) < sqrt(.Machine$double.eps), na.rm = TRUE)) {
                 colCrr <- as.integer(colCrr);
                 mtaDta$fields[[i]][["type"]]     <- "integer";
                 mtaDta$fields[[i]][["dataType"]] <- "Integer";
-                # if "measureType" is already stored in the data frame, keep it, otherwise assign "Continuous" if there is a high enough value range and variability (sd)
-                if (length(unique(colCrr)) > diff(range(colCrr, na.rm = TRUE)) / 5 && stats::sd(colCrr, na.rm = TRUE) > diff(range(colCrr, na.rm = TRUE)) / 10) {
+                # if "measureType" is already stored in the data frame, keep it, otherwise assign "Continuous" if there are enough different values and a high value range and variability (sd)
+                if (length(unique(colCrr)) > length(colCrr) / 5 && length(unique(colCrr)) > diff(range(colCrr, na.rm = TRUE)) / 5 &&
+                    stats::sd(colCrr, na.rm = TRUE) > diff(range(colCrr, na.rm = TRUE)) / 10) {
                     mtaDta$fields[[i]][["measureType"]] <- ifelse(chkAtt(dtaFrm[[i]], "measureType"), attr(dtaFrm[[i]], "measureType"), "Continuous");
                 }
             } else {
@@ -163,9 +165,22 @@ write_omv <- function(dtaFrm = NULL, fleNme = "", retDbg = FALSE) {
                 # if "measureType" is already stored in the data frame, keep it, otherwise assign "Continuous"
                 mtaDta$fields[[i]][["measureType"]] <- ifelse(chkAtt(dtaFrm[[i]], "measureType"), attr(dtaFrm[[i]], "measureType"), "Continuous");
             }
-        # [e] dates / times - not implemented yet
-        } else if (all(sapply(colCrr, inherits, c("Date", "POSIXt")))) {
-            stop("Needs to be implemented: Date / Time. Please send the data file that caused this problem to sebastian.jentschke@uib.no");
+        # [e] dates / times - jamovi actually doesn't support it but i perhaps makes most sense to implement it as numeric
+        # can be transformed back in R using - as.Date(..., origin = "1970-01-01") and hms::as_hms(...)
+        } else if (inherits(colCrr, c("Date", "POSIXt"))) {
+            colCrr <- as.numeric(colCrr);
+            mtaDta$fields[[i]][["type"]]        <- "number";
+            mtaDta$fields[[i]][["dataType"]]    <- "Decimal";
+            mtaDta$fields[[i]][["measureType"]] <- "Continuous";
+            mtaDta$fields[[i]][["description"]] <- paste(c(ifelse(nzchar(mtaDta$fields[[i]][["description"]]), mtaDta$fields[[i]][["description"]], names(dtaFrm[i])),
+                                                         "(date converted to numeric; days since 1970-01-01)"), collapse = " ");
+        } else if (inherits(colCrr, c("difftime"))) {
+            colCrr <- as.numeric(colCrr);
+            mtaDta$fields[[i]][["type"]]        <- "number";
+            mtaDta$fields[[i]][["dataType"]]    <- "Decimal";
+            mtaDta$fields[[i]][["measureType"]] <- "Continuous";
+            mtaDta$fields[[i]][["description"]] <- paste(c(ifelse(nzchar(mtaDta$fields[[i]][["description"]]), mtaDta$fields[[i]][["description"]], names(dtaFrm[i])),
+                                                         "(time converted to numeric; sec since 00:00)"), collapse = " ");
         } else {
             stop(sprintf("Variable type %s not implemented. Please send the data file that caused this problem to sebastian.jentschke@uib.no", class(colCrr)));
         }
@@ -190,9 +205,6 @@ write_omv <- function(dtaFrm = NULL, fleNme = "", retDbg = FALSE) {
             mtaDta$fields[[i]][["outputAssignedColumnName"]] <- NULL;
         }
 
-        # fix problem with transforms
-
-
         # check that dataType, and measureType are set accordingly to type (attribute and column in the data frame)
         # dataType: Text, Integer, Decimal
         #
@@ -204,6 +216,7 @@ write_omv <- function(dtaFrm = NULL, fleNme = "", retDbg = FALSE) {
         } else if (chkFld(mtaDta$fields[[i]], "type", "number"))  {
             colWrt <- as.double(colCrr);
         } else if (chkFld(mtaDta$fields[[i]], "type", "string"))  {
+            colCrr[is.na(colCrr)] <- "";
             colWrt <- rep(0, length(colCrr));
             for (j in seq_along(colCrr)) {
                 writeBin(colCrr[j], strHdl);
@@ -229,26 +242,26 @@ write_omv <- function(dtaFrm = NULL, fleNme = "", retDbg = FALSE) {
     }
 
     # compress data.bin and discard the temporary file
-    add2ZIP(fleNme, binHdl, newFle = TRUE);
+    add2ZIP(fleOut, binHdl, newFle = TRUE);
     rm(binHdl);
 
     # compress strings.bin (only if it contains data) and discard the temporary file
-    add2ZIP(fleNme, strHdl, blnZIP = strPos > 0);
+    add2ZIP(fleOut, strHdl, blnZIP = (strPos > 0));
     rm(strHdl);
 
     # create meta, write it and add it to ZIP file
     mnfHdl <- file(file.path(tempdir(), "meta"),         open = "wb");
-    add2ZIP(fleNme, mnfHdl, txtOut = mnfTxt());
+    add2ZIP(fleOut, mnfHdl, txtOut = mnfTxt());
     rm(mnfHdl);
 
     # write metadata.json
     mtaHdl <- file(file.path(tempdir(), "metadata.json"), open = "w");
-    add2ZIP(fleNme, mtaHdl, txtOut = fmtJSON(list(dataSet = mtaDta)));
+    add2ZIP(fleOut, mtaHdl, txtOut = fmtJSON(list(dataSet = mtaDta)));
     rm(mtaHdl);
 
     # write xdata.json
     xtdHdl <- file(file.path(tempdir(), "xdata.json"),    open = "w");
-    add2ZIP(fleNme, xtdHdl, txtOut = fmtJSON(xtdDta));
+    add2ZIP(fleOut, xtdHdl, txtOut = fmtJSON(xtdDta));
     rm(xtdHdl);
 
     # write index.html and add it to ZIP file
@@ -256,11 +269,11 @@ write_omv <- function(dtaFrm = NULL, fleNme = "", retDbg = FALSE) {
     # that doesn't work without the analyses and images contained in it being stored too
     htmHdl <- file(file.path(tempdir(), "index.html"),    open = "w");
 #   if (!is.null(attr(dtaFrm, "HTML"))) {
-#      add2ZIP(fleNme, htmHdl, txtOut = attr(dtaFrm, "HTML"));
+#      add2ZIP(fleOut, htmHdl, txtOut = attr(dtaFrm, "HTML"));
 #   } else {
-#      add2ZIP(fleNme, htmHdl, txtOut = htmTxt());
+#      add2ZIP(fleOut, htmHdl, txtOut = htmTxt());
 #   }
-    add2ZIP(fleNme, htmHdl, txtOut = htmTxt());
+    add2ZIP(fleOut, htmHdl, txtOut = htmTxt());
     rm(htmHdl);
 
     if (retDbg) {
@@ -269,7 +282,7 @@ write_omv <- function(dtaFrm = NULL, fleNme = "", retDbg = FALSE) {
 }
 
 fmtJSON <- function(txtJSON = "") {
-    gsub("  ", " ", gsub(":", ": ", gsub(",", ", ", rjson::toJSON(txtJSON))))
+    gsub("00: 00", "00:00", gsub("  ", " ", gsub(":", ": ", gsub(",", ", ", rjson::toJSON(txtJSON)))))
 }
 
 htmTxt <- function() {
@@ -332,7 +345,7 @@ add2ZIP <- function(fleZIP = "", crrHdl = NULL, newFle = FALSE, blnZIP = TRUE, t
 
     if (! all(class(crrHdl) == c("file", "connection"))) {
         cat(utils::str(crrHdl));
-        stop("Parameter isn't the file handle pointing to a file to be zipped.")
+        stop("Parameter isn\'t a file handle pointing to a file to be zipped.")
     }
 
     if (all(nchar(txtOut) > 0)) {

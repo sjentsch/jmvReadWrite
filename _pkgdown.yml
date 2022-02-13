@@ -12,9 +12,26 @@ reference:
 - contents: 
   - read_omv
   - write_omv
+- title: "Helper functions"
+  desc: >
+    Functions for carrying out often required data management tasks for jamovi's omv-files
+- contents:
+  - convert_to_omv
+  - long2wide_omv
+  - wide2long_omv
+  - merge_cols_omv
+  - merge_rows_omv
+  - sort_omv
+- title: "Functions for conversion from SPSS"
+  desc: >
+    Functions to extract syntax from SPSS-output files (.spv) and converting this syntax (either extracted from .spv or from .sps-files) into jamovi-syntax (jmv::...)
+- contents:
+  - spv2sps
+  - sps2jmv
 - title: "Example datasets"
 - contents:
   - AlbumSales
   - ToothGrowth
   - bfi_sample
   - bfi_sample2
+  - bfi_sample3

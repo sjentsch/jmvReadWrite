@@ -31,4 +31,4 @@ jobs:
       osx_image: xcode12.5  
 
 after_success:
-  - Rscript -e 'library(covr); codecov()'
+  - Rscript -e 'covr::codecov()'

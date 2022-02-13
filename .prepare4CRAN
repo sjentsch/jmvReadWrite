@@ -6,8 +6,8 @@ devtools::load_all()
 for (blnAtt in c(TRUE, FALSE)) {
     for (crrOMV in list.files('inst/extdata/')) {
         data = read_omv(file.path('inst/extdata/', crrOMV), sveAtt = blnAtt);
-        write_omv(data, 'Trial.omv');
-        data2 = read_omv('Trial.omv', sveAtt = blnAtt);
+        write_omv(data, '~/Trial.omv');
+        data2 = read_omv('~/Trial.omv', sveAtt = blnAtt);
         cat(sprintf('\n%s\n\n%s\n\n', strrep("=", 100), crrOMV));
         suppressWarnings(print(diffdf::diffdf(data, data2)));
         unlink('Trial.omv');
@@ -15,8 +15,6 @@ for (blnAtt in c(TRUE, FALSE)) {
     }
     cat(sprintf('\n%s\n%s\n\n', strrep("=", 100), strrep("=", 100)));
 }
-
-# REMEMBER: error messages from R are not always pointing to the place where the error occurs - especially when using commands like build_readme()
 
 # checks the requirements (all dependencies up-to-date, etc.)
 # use devtools::update_packages("devtools") and devtools::install_dev_deps() if required
@@ -29,17 +27,26 @@ devtools::release_checks()
 devtools::spell_check()
 devtools::check_man()
 
+# check whether the examples and the unit tests run through and do some linting
+devtools::run_examples(run_dontrun = TRUE)
+devtools::lint()
+devtools::test()
+devtools::test_coverage()
+# once happy with the coverage, it can be uploaded using
+covr::codecov(token = "2f521d97-d1e2-4baf-b05b-0b569a7c6f0f")
+
+# ================================================================================================================================================
+# REMEMBER: error messages from R are not always pointing to the place where the error occurs - especially when using commands like build_readme()
+# ================================================================================================================================================
+
 # building / updating README, PDF manual, and the HTML documentation
+# add new functions to .pkgdown.yaml if required
 devtools::build_readme()
-devtools::build_manual(path="doc")
 pkgdown::clean_site()
 pkgdown::build_site()
 pkgdown::build_reference(run_dont_run = TRUE, preview = FALSE)
 pkgdown::build_reference_index()
-
-# check whether the examples run through and do some linting
-devtools::run_examples(run_dontrun = TRUE)
-devtools::lint()
+devtools::build_manual(path="doc")
 
 # the package itself (tar.gz) - build() also builds vignettes
 # ping-pong between build() and check() until all errors, warnings, notes are resolved 
@@ -57,6 +64,9 @@ devtools::check_rhub(pkg = ".", platforms = crrPlt$name, env_vars = c("_R_CHECK_
 
 # check on win-builder
 devtools::check_win_devel()
+
+# update version number in: cran-comments.md, DESCRIPTION, NEWS.md
+system("gedit cran-comments.md DESCRIPTION NEWS.md")
 
 # now, we are ready to release the package onto CRAN
 devtools::release()

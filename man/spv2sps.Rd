@@ -7,12 +7,12 @@
 spv2sps(fleSPV = "", rmvInv = FALSE)
 }
 \arguments{
-\item{fleSPV}{name (incl. path) of the SPSS-output-file to be read ("FILENAME.spv"; default = "")}
+\item{fleSPV}{name (incl. path) of the SPSS-output-file to be read ("FILENAME.spv"; default: "")}
 
-\item{rmvInv}{}
+\item{rmvInv}{remove lines that are deemed to be invalid (TRUE / FALSE; default: FALSE)}
 }
 \value{
-character vector with SPSS commands (like what is typically stored in SPSS syntax files - .sps); the vector contains one command per entry and the position of the SPSS-data-file \link{incl. path}
+character vector with SPSS commands (like what is typically stored in SPSS syntax files - .sps); the vector contains one command per entry and the position of the SPSS-data-file (incl. path)
 that was used in the analyses is stored as a character vector in the attribute "datafile" (the attribute will be empty if either the SPSS-datafile used in the analyses was not stored or if
 there was more than one data file used in the analyses stored in the original .spv-file
 }

@@ -5,12 +5,12 @@
 \title{Write files to be used with the statistical spreadsheet 'jamovi'
 (www.jamovi.org)}
 \usage{
-write_omv(dtaFrm = NULL, fleNme = "", retDbg = FALSE)
+write_omv(dtaFrm = NULL, fleOut = "", retDbg = FALSE)
 }
 \arguments{
 \item{dtaFrm}{Data frame to be exported (default: NULL)}
 
-\item{fleNme}{Name / position of the output file to be generated ("FILENAME.omv"; default: "")}
+\item{fleOut}{Name / position of the output file to be generated ("FILENAME.omv"; default: "")}
 
 \item{retDbg}{Whether to return a list with debugging information (see Value; default: FALSE)}
 }
@@ -29,24 +29,29 @@ participant code). In order to set a variable of your data frame to "ID", you ha
 \dontrun{
 library(jmvReadWrite);
 
-# use the data set "ToothGrowth" and, if it exists, write it as jamovi-file using write_omv()
+# use the data set "ToothGrowth" and, if it exists, write it as
+# jamovi-file using write_omv()
 data("ToothGrowth");
-wrtDta = write_omv(ToothGrowth, "Trial.omv");
-print(names(wrtDta));
-# the print-function is only used to force devtools::run_examples() to show output
+fleOMV <- paste0(tempfile(), ".omv");
+# typically, one would use a "real" file name instead of tempfile(),
+# e.g., "Data1.omv"
+dtaDbg = write_omv(ToothGrowth, fleOMV, retDbg = TRUE);
+print(names(dtaDbg));
+# the print-function is only used to force devtools::run_examples()
+# to show output
 # -> "mtaDta" "xtdDta" "dtaFrm"
 # returns a list with the metadata (mtaDta, e.g., column and data type),
-# the extended data (xtdDta, e.g., variable lables), and the data frame (dtaFrm)
-# the purpose of these variables is merely for checking (understanding the file format)
-# and debugging
+# the extended data (xtdDta, e.g., variable lables), and the data frame
+# (dtaFrm) the purpose of these variables is merely for checking (under-
+# standing the file format) and debugging
 
-# check whether the file was written to the disk, get the file information (size, etc.)
-# and delete the file afterwards
-print(list.files(".", "Trial.omv"));
-# -> "Trial.omv"
-print(file.info("Trial.omv")$size);
-# -> 2111 (size may differ on different OSes)
-unlink("Trial.omv");
+# check whether the file was written to the disk, get the file informa-
+# tion (size, etc.) and delete the file afterwards
+print(list.files(dirname(fleOMV), basename(fleOMV)));
+# -> "file[...].omv" ([...] is a combination of random numbers / characters
+print(file.info(fleOMV)$size);
+# -> 2199 (size may differ on different OSes)
+unlink(fleOMV);
 }
 
 }

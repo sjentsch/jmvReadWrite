@@ -5,6 +5,7 @@
 
 <!-- badges: start -->
 
+[![CI](https://github.com/sjentsch/jmvReadWrite/workflows/ci/badge.svg)](https://github.com/sjentsch/jmvReadWrite/actions?query=workflow%3Aci)
 [![CRAN](http://www.r-pkg.org/badges/version/jmvReadWrite)](https://cran.r-project.org/package=jmvReadWrite)
 [![License](https://img.shields.io/badge/License-AGPL%20v3-green.svg)](https://www.gnu.org/licenses/agpl-3.0.html)
 [![Downloads](https://cranlogs.r-pkg.org/badges/jmvReadWrite?color=brightgreen)](https://cran.r-project.org/package=jmvReadWrite)
@@ -13,11 +14,11 @@
 commit](https://img.shields.io/github/last-commit/sjentsch/jmvReadWrite)](https://github.com/sjentsch/jmvReadWrite)
 [![Codecov
 coverage](https://codecov.io/gh/sjentsch/jmvReadWrite/branch/main/graph/badge.svg)](https://app.codecov.io/gh/sjentsch/jmvReadWrite?branch=main)
+[![Documentation](https://img.shields.io/badge/documentation-is_here-blue)](https://sjentsch.github.io/jmvReadWrite)
 <!-- badges: end -->
 
 <!---
 [//]: [![Build Status](https://travis-ci.com/sjentsch/jmvReadWrite.svg)](https://travis-ci.com/sjentsch/jmvReadWrite)
-[//]: [![CI](https://github.com/sjentsch/jmvReadWrite/workflows/ci/badge.svg)](https://github.com/sjentsch/jmvReadWrite/actions?query=workflow%3Aci)
 --->
 
 The R-package `jmvReadWrite` reads and writes the .omv-files that are
@@ -188,9 +189,9 @@ list.files(".", "Trial.omv");
 #> [1] "Trial.omv"
 file.info("Trial.omv");
 #>           size isdir mode               mtime               ctime
-#> Trial.omv 2199 FALSE  664 2022-02-13 00:36:32 2022-02-13 00:36:32
+#> Trial.omv 2199 FALSE  664 2022-02-13 23:30:16 2022-02-13 23:30:16
 #>                         atime  uid  gid    uname   grname
-#> Trial.omv 2022-02-13 00:36:32 1000 1000 sjentsch sjentsch
+#> Trial.omv 2022-02-13 23:30:16 1000 1000 sjentsch sjentsch
 unlink("Trial.omv");
 ```
 

@@ -6,8 +6,6 @@ if (getRversion() >= "2.15.1") {
 
 # =================================================================================================
 # define unicode-characters and their respective replacements
-lstRpl <- list("\x84" = "\"", "\x93" = "\"", "\xc4" = "Ae", "\xd6" = "Oe", "\xdc" = "Ue", "\xdf" = "ss", "\xe4" = "ae", "\xf6" = "oe", "\xfc" = "ue");
-
 lstRpl <- rbind(c("\x84", "\x93", "\xc4", "\xd6", "\xdc", "\xdf", "\xe4", "\xf6", "\xfc"),
                 c("\"",   "\"",   "Ae",   "Oe",   "Ue",   "ss",   "ae",   "oe",   "ue"));
                 
@@ -32,6 +30,9 @@ grpMta <- paste0("^", paste(c(names(mtaGlb), names(mtaFld)), collapse = "$|^"), 
 # =================================================================================================
 # functions for checking parameters (file and directory existence, correct file extension, correct
 # dimensions and existence of data frames) and normalizing the file name
+
+#            jamovi  CSV   TSV     Rdata           RDS   SPSS           Stata  SAS
+vldExt <- c("omv",  "csv", "tsv", "rdata", "rda", "rds", "sav", "zsav", "dta", "sas7bdat", "sd2", "sd7", "xpt", "stx", "stc");
 
 # REMEMBER: requires the full file name, NOT the directory
 chkDir <- function(fleNme = "", wrtPrm = TRUE) {
@@ -98,9 +99,6 @@ hasPkg <- function(usePkg = c()) {
 nrmFle <- function(fleNme = "") {
     file.path(normalizePath(dirname(fleNme)), basename(fleNme))
 }
-
-#            jamovi  CSV   TSV     Rdata           RDS   SPSS           Stata  SAS
-vldExt <- c("omv",  "csv", "tsv", "rdata", "rda", "rds", "sav", "zsav", "dta", "sas7bdat", "sd2", "sd7", "xpt", "stx", "stc");
 
 fmtFlI <- function(fleInp = c(), minLng = 1, maxLng = Inf, excExt = "") {
     # normalize the path of the input file and then check whether the file exists and whether it is of a supported file type

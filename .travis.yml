@@ -1,34 +1,38 @@
-language: r
+# Run CI for R using https://eddelbuettel.github.io/r-ci/
 
-sudo: required
+language: r
+dist: focal
+
+jobs:
+  include:
+    - name: linux
+      os: linux
+    - name: macOS
+      os: osx
 
 env:
+  - _R_CHECK_FORCE_SUGGESTS_="false"
   - _R_CHECK_CRAN_INCOMING_=FALSE
   - CODECOV_TOKEN='2f521d97-d1e2-4baf-b05b-0b569a7c6f0f'
 
-cache: packages
+before_install:
+  - curl -OLs https://eddelbuettel.github.io/r-ci/run.sh
+  - chmod 0755 run.sh
+  - ./run.sh bootstrap
 
-r_packages:
-  - covr
-  - devtools
-    
-r:
-  - oldrel
-  - release
+install:
+  - ./run.sh install_all
 
-r_github_packages:
-  - sjentsch/jmvReadWrite
+script:
+  - ./run.sh run_tests
 
-os:
-  - linux
-  - osx
-  
-jobs:
-  include:
-    - os: linux
-      dist: focal
-    - os: osx
-      osx_image: xcode12.5  
+after_failure:
+  - ./run.sh dump_logs
+ 
+#after_success:
+#  - ./run.sh coverage
 
-after_success:
-  - Rscript -e 'covr::codecov()'
+notifications:
+  email:
+    on_success: change
+    on_failure: change

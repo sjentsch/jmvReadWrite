@@ -93,7 +93,7 @@ test_that("read_all works", {
     # empty file name
     expect_error(read_all());
     expect_error(read_all(""));
-    expect_error(rplStr(strMod = "\xfa\xb4\xbf\xbf\x9f", crrAtt = "Trial"));
+#   expect_error(rplStr(strMod = "\xfa\xb4\xbf\xbf\x9f", crrAtt = "Trial"));
 
     # more than one object when using Rdata
     D1 <- data.frame(A = runif(n = 100));

@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">jmvReadWrite</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.1</span>
       </span>
     </div>
 
@@ -54,6 +54,13 @@
 <h2 class="page-header" data-toc-text="0.3.0" id="jmvreadwrite-030">jmvReadWrite 0.3.0<small>2022-02-13</small><a class="anchor" aria-label="anchor" href="#jmvreadwrite-030"></a></h2>
 <div class="section level3">
 <h3 id="bug-fixes-and-enhancements-0-3-0">Bug fixes and enhancements:<a class="anchor" aria-label="anchor" href="#bug-fixes-and-enhancements-0-3-0"></a></h3>
+<ul><li>fixed a “bug” in a testthat-condition that resulted in an error on several systems</li>
+</ul></div>
+</div>
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.3.0" id="jmvreadwrite-030-1">jmvReadWrite 0.3.0<small>2022-02-13</small><a class="anchor" aria-label="anchor" href="#jmvreadwrite-030-1"></a></h2>
+<div class="section level3">
+<h3 id="bug-fixes-and-enhancements-0-3-0-1">Bug fixes and enhancements:<a class="anchor" aria-label="anchor" href="#bug-fixes-and-enhancements-0-3-0-1"></a></h3>
 <ul><li>added a couple of helper functions: <code>convert_to_omv</code> (converts data sets from other formats - CSV, R, SPSS, SAS, Stata) to <code>.omv</code> <code>merge_cols_omv</code> (merges two or more data sets by concatenating columns) <code>merge_rows_omv</code> (merges two or more data sets by concatenating rows) <code>long2wide_omv</code> (converts data sets from long to wide, e.g., for running mixed-model-analyses in jamovi) <code>wide2long_omv</code> (converts data sets from wide to long, e.g., for running mixed-model-analyses in jamovi) <code>sort_omv</code> (sorts the dataset according to one or more variable)</li>
 <li>implemented unit tests and code coverage for <code>read_omv</code>, <code>write_omv</code>, <code>convert_to_omv</code>, <code>merge_cols_omv</code>, <code>merge_rows_omv</code>, <code>long2wide_omv</code>, <code>wide2long_omv</code>, <code>sort_omv</code>
 </li>

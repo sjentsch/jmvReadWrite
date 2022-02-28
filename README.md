@@ -5,7 +5,7 @@
 
 <!-- badges: start -->
 
-[![CI](https://github.com/sjentsch/jmvReadWrite/workflows/ci/badge.svg)](https://github.com/sjentsch/jmvReadWrite/actions?query=workflow%3Aci)
+[![CI](https://github.com/sjentsch/jmvReadWrite/actions/workflows/ci.yml/badge.svg)](https://github.com/sjentsch/jmvReadWrite/actions/workflows/ci.yml)
 [![CRAN](http://www.r-pkg.org/badges/version/jmvReadWrite)](https://cran.r-project.org/package=jmvReadWrite)
 [![License](https://img.shields.io/badge/License-AGPL%20v3-green.svg)](https://www.gnu.org/licenses/agpl-3.0.html)
 [![Downloads](https://cranlogs.r-pkg.org/badges/jmvReadWrite?color=brightgreen)](https://cran.r-project.org/package=jmvReadWrite)
@@ -14,11 +14,11 @@
 commit](https://img.shields.io/github/last-commit/sjentsch/jmvReadWrite)](https://github.com/sjentsch/jmvReadWrite)
 [![Codecov
 coverage](https://codecov.io/gh/sjentsch/jmvReadWrite/branch/main/graph/badge.svg)](https://app.codecov.io/gh/sjentsch/jmvReadWrite?branch=main)
-[![Documentation](https://img.shields.io/badge/documentation-is_here-blue)](https://sjentsch.github.io/jmvReadWrite)
+[![Documentation](https://img.shields.io/badge/documentation-is_here-blue)](https://sjentsch.github.io/jmvReadWrite/)
 <!-- badges: end -->
 
 <!---
-[//]: [![Build Status](https://travis-ci.com/sjentsch/jmvReadWrite.svg)](https://travis-ci.com/sjentsch/jmvReadWrite)
+[//]: [![Build Status](https://app.travis-ci.com/sjentsch/jmvReadWrite.svg?branch=main)](https://app.travis-ci.com/sjentsch/jmvReadWrite)
 --->
 
 The R-package `jmvReadWrite` reads and writes the .omv-files that are
@@ -37,7 +37,7 @@ install.packages("jmvReadWrite")
 ```
 
 or you can install the development version of the `jmvReadWrite` package
-from [GitHub](https://github.com/sjentsch/jmvReadWrite):
+from [GitHub](https://github.com/sjentsch/jmvReadWrite/):
 
 ``` r
 if(!require(devtools)) install.packages("devtools")
@@ -68,7 +68,7 @@ differences.
 
 If you want to copy the syntax generated in jamovi, you have to switch
 on the [`Syntax
-Mode`](https://jamovi.readthedocs.io/en/latest/_pages/um_6_syntax_mode.html).
+Mode`](https://jamovi.readthedocs.io/en/latest/usermanual/um_6_syntax_mode.html).
 Afterwards, the syntax is shown at the top of the analysis and can be
 copied from there.
 
@@ -189,9 +189,9 @@ list.files(".", "Trial.omv");
 #> [1] "Trial.omv"
 file.info("Trial.omv");
 #>           size isdir mode               mtime               ctime
-#> Trial.omv 2199 FALSE  664 2022-02-13 23:30:16 2022-02-13 23:30:16
+#> Trial.omv 2199 FALSE  664 2022-02-28 15:47:07 2022-02-28 15:47:07
 #>                         atime  uid  gid    uname   grname
-#> Trial.omv 2022-02-13 23:30:16 1000 1000 sjentsch sjentsch
+#> Trial.omv 2022-02-28 15:47:07 1000 1000 sjentsch sjentsch
 unlink("Trial.omv");
 ```
 

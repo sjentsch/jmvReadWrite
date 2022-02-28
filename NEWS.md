@@ -1,3 +1,9 @@
+# jmvReadWrite 0.3.1
+
+## Bug fixes and enhancements:
+* fixed a "bug" in a testthat-condition that resulted in an error on several systems
+
+
 # jmvReadWrite 0.3.0
 
 ## Bug fixes and enhancements:

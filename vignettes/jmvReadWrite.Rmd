@@ -40,7 +40,7 @@ install.packages("jmvReadWrite")
 ```
 
 or you can install the development version of the `jmvReadWrite` package from
-[GitHub](https://github.com/sjentsch/jmvReadWrite):
+[GitHub](https://github.com/sjentsch/jmvReadWrite/):
 
 ```{r, eval=FALSE}
 if(!require(devtools)) install.packages("devtools")
@@ -69,7 +69,7 @@ The results should be identical apart from that the table output looks nicer in
 other cosmetic differences.
 
 If you want to copy the syntax generated in jamovi, you have to switch on the
-[`Syntax Mode`](https://jamovi.readthedocs.io/en/latest/_pages/um_6_syntax_mode.html).
+[`Syntax Mode`](https://jamovi.readthedocs.io/en/latest/usermanual/um_6_syntax_mode.html).
 Afterwards, the syntax is shown at the top of the analysis and can be copied
 from there.
 

@@ -46,7 +46,7 @@ test_that("read_omv works", {
     # (should start with "jmv::")
     dtaFrm <- read_omv(fleInp = nmeInp, useFlt = FALSE, rmMsVl = FALSE, sveAtt = FALSE, getSyn = TRUE, getHTM = FALSE);
     expect_equal(names(attributes(dtaFrm)), c("row.names", "names", "class", "fltLst", "syntax", "protobuf"))
-    # the next two command actually work in both cases: when a list with "syntax" is filled with command and if it's empty 
+    # the next two command actually work in both cases: when a list with "syntax" is filled with command and if it's empty
     expect_vector(attr(dtaFrm, "syntax"), list())
     expect_true(all(grepl("^jmv::", attr(dtaFrm, "syntax"))))
 
@@ -93,7 +93,9 @@ test_that("read_all works", {
     # empty file name
     expect_error(read_all());
     expect_error(read_all(""));
-    expect_error(rplStr(strMod = "\xfa\xb4\xbf\xbf\x9f", crrAtt = "Trial"));
+    if (l10n_info()$`UTF-8`) {
+        expect_error(rplStr(strMod = "\xc3\x28", crrAtt = "Trial"));
+    }
 
     # more than one object when using Rdata
     D1 <- data.frame(A = runif(n = 100));

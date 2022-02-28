@@ -44,6 +44,10 @@ doc/
 .Renviron
 .Rbuildignore
 
+# CRAN submission file
+CRAN-SUBMISSION
+
+# other files
 TrialSPSS
 TrialOMV
 TrialOther

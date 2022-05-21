@@ -169,9 +169,10 @@ read_omv <- function(fleInp = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = TRUE,
         savSyn <- list();
         savPBf <- list();
         if (length(anlLst) > 0) {
+            synPkg <- c("RProtoBuf", "jmvcore", "rlang")
             flePtB <- system.file("jamovi.proto", package = "jmvcore");
             # check whether all required packages and files are present
-            if (hasPkg(c("RProtoBuf", "jmvcore", "rlang")) && file.exists(flePtB)) {
+            if (hasPkg(synPkg) && file.exists(flePtB)) {
                 # try reading the protobuffer-file (if it can be read / parsed, tryCatch returns TRUE and the syntax can be extracted)
                 blnPtb <- tryCatch(expr  = {
                                              RProtoBuf::readProtoFiles(flePtB);
@@ -195,6 +196,9 @@ read_omv <- function(fleInp = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = TRUE,
                         savPBf <- c(savPBf, anlPBf);
                     }
                 }
+            } else {
+                cat(paste0("WARNING: For extracting syntax, the package(s) \"", paste0(synPkg[!sapply(synPkg, function(X) nzchar(system.file(package = X)))],
+                                                                                       collapse = "\", \""), "\" need(s) to be installed.\n\n"))
             }
         }
         attr(dtaFrm, "syntax")   <- savSyn;

@@ -1,3 +1,9 @@
+# jmvReadWrite 0.3.2
+
+## Bug fixes and enhancements:
+* added a warning about packages that are required when the extraction of syntax can't be carried out due to these missing dependencies
+
+
 # jmvReadWrite 0.3.1
 
 ## Bug fixes and enhancements:

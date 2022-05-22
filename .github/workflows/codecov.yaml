@@ -10,11 +10,10 @@ name: code-coverage
 
 jobs:
   code-coverage:
-    runs-on:
-      - macOS-latest
-      - ubuntu-latest
+    runs-on: ubuntu-latest}
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+
 
     steps:
       - uses: actions/checkout@v2
@@ -29,9 +28,7 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v1
         with:
-          extra-packages: |
-            covr
-            rcmdcheck
+          extra-packages: covr
 
       - name: Test coverage
         run: covr::codecov()

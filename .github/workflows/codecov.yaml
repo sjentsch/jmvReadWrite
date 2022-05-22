@@ -21,10 +21,9 @@ jobs:
         with:
           use-public-rspm: true
 
-      - name: Dependencies
+      - name: Install protobuf
         if: runner.os == 'Linux'
-        run: |
-          apt install libprotobuf-dev libprotobuf-c-dev libprotoc-dev
+        run: sudo apt-get update -y && sudo apt-get install -y libprotobuf-dev libprotobuf-c-dev libprotoc-dev
 
       - uses: r-lib/actions/setup-r-dependencies@v1
         with:

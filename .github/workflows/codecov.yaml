@@ -16,12 +16,19 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-        run: |
-          apt install protobuf-compiler        
 
       - uses: r-lib/actions/setup-r@v1
         with:
           use-public-rspm: true
+
+      - name: Dependencies
+        if: runner.os == "Linux"
+        run: |
+          curl -OLs https://eddelbuettel.github.io/r-ci/run.sh
+          chmod 0755 run.sh
+          ./run.sh bootstrap
+          ./run.sh install_deps
+          ./run.sh install_aptget libprotobuf-dev libprotobuf-c-dev libprotoc-dev
 
       - uses: r-lib/actions/setup-r-dependencies@v1
         with:

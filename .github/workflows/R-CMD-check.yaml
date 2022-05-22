@@ -40,11 +40,6 @@ jobs:
           use-public-rspm: true
 
       - uses: r-lib/actions/setup-r-dependencies@v1
-        with:
-          cache-version: 2
-          extra-packages: |
-            rcmdcheck
-            RProtoBuf
         if: runner.os == "Linux"
         run: |
           apt install protobuf-compiler        

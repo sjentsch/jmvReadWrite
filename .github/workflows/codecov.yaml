@@ -24,11 +24,7 @@ jobs:
       - name: Dependencies
         if: runner.os == 'Linux'
         run: |
-          curl -OLs https://eddelbuettel.github.io/r-ci/run.sh
-          chmod 0755 run.sh
-          ./run.sh bootstrap
-          ./run.sh install_deps
-          ./run.sh install_aptget libprotobuf-dev libprotobuf-c-dev libprotoc-dev
+          apt install libprotobuf-dev libprotobuf-c-dev libprotoc-dev
 
       - uses: r-lib/actions/setup-r-dependencies@v1
         with:

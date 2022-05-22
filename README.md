@@ -9,11 +9,13 @@
 [![License](https://img.shields.io/badge/License-AGPL%20v3-green.svg)](https://www.gnu.org/licenses/agpl-3.0.html)
 [![Downloads](https://cranlogs.r-pkg.org/badges/jmvReadWrite?color=brightgreen)](https://cran.r-project.org/package=jmvReadWrite)
 [![Dependencies](https://tinyverse.netlify.com/badge/jmvReadWrite)](https://cran.r-project.org/package=jmvReadWrite)
-[![Last commit](https://img.shields.io/github/last-commit/sjentsch/jmvReadWrite)](https://github.com/sjentsch/jmvReadWrite)
+[![Last
+commit](https://img.shields.io/github/last-commit/sjentsch/jmvReadWrite)](https://github.com/sjentsch/jmvReadWrite)
 [![CI](https://github.com/sjentsch/jmvReadWrite/actions/workflows/ci.yml/badge.svg)](https://github.com/sjentsch/jmvReadWrite/actions/workflows/ci.yml)
 [![R-CMD-check](https://github.com/sjentsch/jmvReadWrite/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/sjentsch/jmvReadWrite/actions/workflows/R-CMD-check.yaml)
 [![code-coverage](https://github.com/sjentsch/jmvReadWrite/actions/workflows/codecov.yaml/badge.svg)](https://github.com/sjentsch/jmvReadWrite/actions/workflows/codecov.yaml)
-[![Codecov coverage](https://codecov.io/gh/sjentsch/jmvReadWrite/branch/main/graph/badge.svg)](https://app.codecov.io/gh/sjentsch/jmvReadWrite?branch=main)
+[![Codecov
+coverage](https://codecov.io/gh/sjentsch/jmvReadWrite/branch/main/graph/badge.svg)](https://app.codecov.io/gh/sjentsch/jmvReadWrite?branch=main)
 [![Documentation](https://img.shields.io/badge/documentation-is_here-blue)](https://sjentsch.github.io/jmvReadWrite/)
 <!-- badges: end -->
 
@@ -46,6 +48,7 @@ devtools::install_github("sjentsch/jmvReadWrite")
 
 ## How to use the package?
 
+<br />
 [**read\_omv**](https://sjentsch.github.io/jmvReadWrite/reference/read_omv.html)
 
 The following code uses the ToothGrowth-data set that is part of the
@@ -188,9 +191,9 @@ list.files(".", "Trial.omv");
 #> [1] "Trial.omv"
 file.info("Trial.omv");
 #>           size isdir mode               mtime               ctime
-#> Trial.omv 1564 FALSE  664 2022-05-21 17:35:31 2022-05-21 17:35:31
+#> Trial.omv 1564 FALSE  664 2022-05-22 15:02:58 2022-05-22 15:02:58
 #>                         atime  uid  gid    uname   grname
-#> Trial.omv 2022-05-21 17:35:31 1000 1000 sjentsch sjentsch
+#> Trial.omv 2022-05-22 15:02:58 1000 1000 sjentsch sjentsch
 unlink("Trial.omv");
 ```
 

@@ -16,7 +16,6 @@ jobs:
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
 
-
     steps:
       - uses: actions/checkout@v2
 
@@ -30,7 +29,9 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v1
         with:
-          extra-packages: covr
+          extra-packages: |
+            covr
+            rcmdcheck
 
       - name: Test coverage
         run: covr::codecov()

@@ -45,6 +45,9 @@ jobs:
           extra-packages: |
             rcmdcheck
             RProtoBuf
+        if: runner.os == "Linux"
+        run: |
+          apt install protobuf-compiler        
 
       - uses: r-lib/actions/check-r-package@v1
 

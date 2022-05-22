@@ -25,14 +25,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-        with:
-          cache-version: 2
-          extra-packages: |
-            any::RProtoBuf
-#           any::rcmdcheck
-#         needs: |
-#           website
-#           coverage
+        if: runner.os == "Linux"
+        run: |
+          apt install protobuf-compiler        
 
       - uses: r-lib/actions/setup-r@v1
         with:

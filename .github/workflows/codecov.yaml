@@ -22,7 +22,7 @@ jobs:
           use-public-rspm: true
 
       - name: Dependencies
-        if: runner.os == "Linux"
+        if: runner.os == 'Linux'
         run: |
           curl -OLs https://eddelbuettel.github.io/r-ci/run.sh
           chmod 0755 run.sh

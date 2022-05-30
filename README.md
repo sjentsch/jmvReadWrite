@@ -47,6 +47,7 @@ devtools::install_github("sjentsch/jmvReadWrite")
 ```
 
 ## How to use the package?
+<br/>
 
 [**read\_omv**](https://sjentsch.github.io/jmvReadWrite/reference/read_omv.html)
 

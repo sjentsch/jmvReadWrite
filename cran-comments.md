@@ -17,4 +17,4 @@ updated / bug-fix release (0.3.2 -> 0.3.3)
   - no further notes, warnings or errors
 
 ## R CMD check results
-* same NOTE as above
+* no notes, warnings or errors

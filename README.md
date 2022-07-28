@@ -191,9 +191,9 @@ list.files(".", "Trial.omv");
 #> [1] "Trial.omv"
 file.info("Trial.omv");
 #>           size isdir mode               mtime               ctime
-#> Trial.omv 1564 FALSE  664 2022-05-22 15:02:58 2022-05-22 15:02:58
+#> Trial.omv 1563 FALSE  664 2022-07-28 13:45:19 2022-07-28 13:45:19
 #>                         atime  uid  gid    uname   grname
-#> Trial.omv 2022-05-22 15:02:58 1000 1000 sjentsch sjentsch
+#> Trial.omv 2022-07-28 13:45:19 1000 1000 sjentsch sjentsch
 unlink("Trial.omv");
 ```
 
@@ -214,7 +214,7 @@ data = read_omv(fleOMV, sveAtt = TRUE);
 # shows the names of the attributes for the whole data set (e.g., number of
 # rows and columns) and the names of the attributes of the first column
 names(attributes(data));
-#> [1] "row.names"   "names"       "class"       "fltLst"      "removedRows"
+#> [1] "names"       "row.names"   "class"       "fltLst"      "removedRows"
 #> [6] "addedRows"   "transforms"
 names(attributes(data[[1]]));
 #>  [1] "missingValues"  "name"           "id"             "columnType"    

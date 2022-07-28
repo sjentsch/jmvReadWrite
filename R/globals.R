@@ -1,14 +1,14 @@
 # binds the variable jamovi.coms.AnalysisResponse locally to the function,
 # otherwise devtools::check() - required before submitting to CRAN - throws an error
 if (getRversion() >= "2.15.1") {
-    utils::globalVariables(c("jamovi.coms.AnalysisResponse"));
+    utils::globalVariables(c("jamovi.coms.AnalysisResponse"))
 }
 
 # =================================================================================================
-# define unicode-characters and their respective replacements
-lstRpl <- rbind(c("\x84", "\x93", "\xc4", "\xd6", "\xdc", "\xdf", "\xe4", "\xf6", "\xfc"),
-                c("\"",   "\"",   "Ae",   "Oe",   "Ue",   "ss",   "ae",   "oe",   "ue"));
-                
+# define characters from latin1 (after enc2utf8) and their respective replacements
+lstRpl <- rbind(c("<84>",   "<93>",   "<c4>", "<d6>", "<dc>", "<df>", "<e4>", "<f6>", "<fc>"),
+                c("\u0084", "\u0093", "Ä",    "Ö",    "Ü",    "ß",    "ä",    "ö",    "ü"))
+
 # =================================================================================================
 # the next lines store the currently supported versions (stored in meta / MANIFEST.MF)
 # and the string that precedes the version number
@@ -20,12 +20,12 @@ lstMnf <- list(mnfVer = c("Manifest-Version",        "1.0"),
 # the next lines are dealing with storing the global and the data column attributes (that go into
 # metadata.json inside the .omv-file; the currently defined defaults are in accordance with
 # jamovi-Archive-Version: 11.0 (from jamovi 1.8)
-mtaGlb <- list(rowCount = NA, columnCount = NA, removedRows = list(), addedRows = list(), fields = list(), transforms = list());
+mtaGlb <- list(rowCount = NA, columnCount = NA, removedRows = list(), addedRows = list(), fields = list(), transforms = list())
 mtaFld <- list(name = "", id = NA, columnType = "Data", dataType = "Integer", measureType = "Nominal", formula = "", formulaMessage = "",
                parentId = 0, width = 100, type = "number", outputAnalysisId = NA, outputOptionName = "", outputName = "",
                outputDesiredColumnName = "", outputAssignedColumnName = "", importName = "", description = "", transform = 0,
                edits = list(), missingValues = list(), trimLevels = TRUE, filterNo = NA, active = FALSE)
-grpMta <- paste0("^", paste(c(names(mtaGlb), names(mtaFld)), collapse = "$|^"), "$");
+grpMta <- paste0("^", paste(c(names(mtaGlb), names(mtaFld)), collapse = "$|^"), "$")
 
 # =================================================================================================
 # functions for checking parameters (file and directory existence, correct file extension, correct
@@ -37,10 +37,10 @@ vldExt <- c("omv",  "csv", "tsv", "rdata", "rda", "rds", "sav", "zsav", "dta", "
 # REMEMBER: requires the full file name, NOT the directory
 chkDir <- function(fleNme = "", wrtPrm = TRUE) {
     if (! utils::file_test("-d", dirname(fleNme))) {
-        stop(sprintf("Directory (%s) doesn\'t exist.", dirname(fleNme)));
+        stop(sprintf("Directory (%s) doesn\'t exist.", dirname(fleNme)))
     }
     if (file.access(dirname(fleNme), mode = 2) != 0) {
-        stop(sprintf("The directory (%s) exists, but you don\'t have writing permissions in that directory.", dirname(fleNme)));
+        stop(sprintf("The directory (%s) exists, but you don\'t have writing permissions in that directory.", dirname(fleNme)))
     }
     TRUE
 }
@@ -48,17 +48,17 @@ chkDir <- function(fleNme = "", wrtPrm = TRUE) {
 chkDtF <- function(dtaFrm = NULL, minSze = c(1, 1)) {
     if (length(minSze) != 2) minSze <- rep(minSze[1], 2)
     if (is.null(dtaFrm) || ! is.data.frame(dtaFrm) || length(dim(dtaFrm)) != 2) {
-        stop("Input data are either not a data frame or have incorrect (only one or more than two) dimensions.");
+        stop("Input data are either not a data frame or have incorrect (only one or more than two) dimensions.")
     } else if (any(dim(dtaFrm) < minSze)) {
         stop(sprintf("The %s dimension of the input data frame has not the required size (%d < %d).",
-                     ifelse(which(dim(dtaFrm) < minSze)[1] == 1, "first", "second"), dim(dtaFrm)[dim(dtaFrm) < minSze][1], minSze[dim(dtaFrm) < minSze][1]));
+                     ifelse(which(dim(dtaFrm) < minSze)[1] == 1, "first", "second"), dim(dtaFrm)[dim(dtaFrm) < minSze][1], minSze[dim(dtaFrm) < minSze][1]))
     }
     TRUE
 }
 
 chkExt <- function(fleNme = "", extNme = c("")) {
     if (! hasExt(fleNme, extNme)) {
-        stop(sprintf("File name (%s) contains an unsupported file extension (%s).", basename(fleNme), paste(paste0(".", extNme[tools::file_ext(fleNme) != extNme]), collapse = ", ")));
+        stop(sprintf("File name (%s) contains an unsupported file extension (%s).", basename(fleNme), paste(paste0(".", extNme[tools::file_ext(fleNme) != extNme]), collapse = ", ")))
     }
     TRUE
 }
@@ -66,24 +66,24 @@ chkExt <- function(fleNme = "", extNme = c("")) {
 chkFle <- function(fleNme = "", fleCnt = "", isZIP = FALSE) {
     if (! utils::file_test("-f", fleNme)) {
         if (nchar(fleCnt) > 0) {
-            stop(sprintf("File \"%s\" doesn\'t contain the file \"%s\".", fleCnt, fleNme));
+            stop(sprintf("File \"%s\" doesn\'t contain the file \"%s\".", fleCnt, fleNme))
         } else {
-            stop(sprintf("File \"%s\" not found.", fleNme));
+            stop(sprintf("File \"%s\" not found.", fleNme))
         }
     } else if (isZIP) {
         hdrStr <- readBin(tmpHdl <- file(fleNme, "rb"), "character"); close(tmpHdl);
         # only "PK\003\004" is considered, not "PK\005\006" (empty ZIP) or "PK\007\008" (spanned [over several files])
         if (! hdrStr == "PK\003\004\024") {
-            stop(sprintf("File \"%s\" has not the correct file format (is not a ZIP archive).", basename(fleNme)));
+            stop(sprintf("File \"%s\" has not the correct file format (is not a ZIP archive).", basename(fleNme)))
         }
     }
     TRUE
 }
 
 chkVar <- function(dtaFrm = NULL, varNme = c()) {
-    if (is.null(varNme) || length(varNme) == 0 || !all(nzchar(varNme))) return(FALSE);
+    if (is.null(varNme) || length(varNme) == 0 || !all(nzchar(varNme))) return(FALSE)
     if (!all(varNme %in% names(dtaFrm))) {
-        stop(sprintf("The variable(s) %s are not contained in the current data set.", paste(varNme[! (varNme %in% names(dtaFrm))], collapse = ", ")));
+        stop(sprintf("The variable(s) %s are not contained in the current data set.", paste(varNme[! (varNme %in% names(dtaFrm))], collapse = ", ")))
     }
     TRUE
 }

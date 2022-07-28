@@ -1,8 +1,8 @@
 # CRAN Notes - jmvReadWrite
 
 ## Current version
-0.3.2
-updated / bug-fix release (0.3.1 -> 0.3.2).
+0.3.3
+updated / bug-fix release (0.3.2 -> 0.3.3)
 
 ## Test environments
 * ``devtools::check()`` - local: Ubuntu 22.04, R 4.2 (x86_64-pc-linux-gnu)

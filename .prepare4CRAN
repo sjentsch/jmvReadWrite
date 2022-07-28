@@ -15,6 +15,7 @@ for (blnAtt in c(TRUE, FALSE)) {
     }
     cat(sprintf('\n%s\n%s\n\n', strrep("=", 100), strrep("=", 100)));
 }
+rm('blnAtt', 'crrOMV')
 
 # checks the requirements (all dependencies up-to-date, etc.)
 # use devtools::update_packages("devtools") and devtools::install_dev_deps() if required
@@ -26,7 +27,6 @@ devtools::release_checks()
 # update man-pages and NAMESPACE
 devtools::spell_check()
 devtools::check_man()
-
 
 # check whether the examples and the unit tests run through and do some linting
 devtools::run_examples(run_dontrun = TRUE)

@@ -1,3 +1,12 @@
+# jmvReadWrite 0.3.3
+
+## Bug fixes and enhancements:
+* made replacements using regular expressions compatible with R >= 4.3 (changing occurrences of replacement pattern that included `\xNN`)
+* improvements to `wide2long_omv` and `long2wide_omv` (those can now handle several factors, not only one)
+* improvement to how `write_omv` handles / stores factors (those are now zero-based to be in accordance with most programming languages including Python and C++ used in the jamovi engine)
+* general bug fixes and improvements (simplifying the code)
+
+
 # jmvReadWrite 0.3.2
 
 ## Bug fixes and enhancements:
@@ -25,6 +34,7 @@
 * default for `sveAtt` in `read_omv` (now `TRUE`; it makes more sense to store this attributes be default since `write_omv` will give you an exact copy of the original data set if they are stored and the 
   helper functions above also respect and adjust them)
 
+---
 
 # jmvReadWrite 0.2.4
 

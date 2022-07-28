@@ -62,9 +62,18 @@ sort_omv <- function(fleInp = c(), fleOut = "", varSrt = c(), usePkg = c("foreig
 }
 
 srtFrm <- function(dtaFrm = NULL, varSrt = c()) {
+    # if the sorting variable(s) are found, generate an order according to them and afterwards remove / reset the rownames
     if (chkVar(dtaFrm, gsub("^-", "", varSrt))) {
-        dtaFrm[eval(parse(text = paste0("order(", gsub("dtaFrm[[\"-", "-dtaFrm[[\"", paste0("dtaFrm[[\"", varSrt, "\"]]", collapse = ", "), fixed = TRUE), ")"))), ]
-    } else {
-        dtaFrm
+#       srtOrd <- eval(parse(text = paste0("order(", paste0(gsub("dtaFrm[[\"-", "-dtaFrm[[\"", paste0("dtaFrm[[\"", varSrt, "\"]]"), fixed = TRUE), collapse = ", "), ")")))
+        srtOrd <- eval(parse(text = paste0("order(", paste0(sapply(varSrt, function(x) {
+            s <- ifelse(grepl("^-", x), "-", "");
+            ifelse(!any(is.na(suppressWarnings(as.numeric(dtaFrm[[x]])))), paste0(s, "as.numeric(dtaFrm[[\"", sub("^-", "", x), "\"]])"),
+            paste0(s, "dtaFrm[[\"", sub("^-", "", x), "\"]]")); }), collapse = ", "), ")")))
+        # sorting makes the data.frame lose it's attributes which are therefore stored and later restored
+        attMem <- sapply(dtaFrm, attributes)
+        dtaFrm <- dtaFrm[srtOrd, ]
+        rownames(dtaFrm) <- NULL
+        for (n in names(attMem)[!sapply(attMem, is.null)]) attributes(dtaFrm[[n]]) <- attMem[[n]]
     }
+    dtaFrm
 }

@@ -202,25 +202,25 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", retDbg = FALSE) {
 
         # write to data.bin according to type
         if        (chkFld(mtaDta$fields[[i]], "type", "integer")) {
-            colWrt <- as.integer(crrCol);
+            wrtCol <- as.integer(crrCol);
         } else if (chkFld(mtaDta$fields[[i]], "type", "number"))  {
-            colWrt <- as.double(crrCol);
+            wrtCol <- as.double(crrCol);
         } else if (chkFld(mtaDta$fields[[i]], "type", "string"))  {
             crrCol[is.na(crrCol)] <- "";
-            colWrt <- rep(0, length(crrCol));
+            wrtCol <- rep(0, length(crrCol));
             for (j in seq_along(crrCol)) {
                 writeBin(crrCol[j], strHdl);
-                colWrt[j] <- strPos;
+                wrtCol[j] <- strPos;
                 strPos <- strPos + nchar(crrCol[j]) + 1;
             }
-            colWrt <- as.integer(colWrt);
+            wrtCol <- as.integer(wrtCol);
         } else {
             stop(sprintf("Variable type %s not implemented. Please send the data file that caused this problem to sebastian.jentschke@uib.no", mtaDta$fields[[i]][["type"]]));
         }
-        writeBin(colWrt, binHdl, endian = "little");
+        writeBin(wrtCol, binHdl, endian = "little");
 
         # remove temporary variables for modifying and storing the current column from the data set
-        rm(crrCol, colWrt);
+        rm(crrCol, wrtCol);
     }
 
     # double check whether ID is unique

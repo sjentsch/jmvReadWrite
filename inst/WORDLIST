@@ -4,6 +4,7 @@ Changelog
 CMD
 codecov
 Codecov
+cond
 com
 CR
 csv
@@ -54,6 +55,7 @@ ToothGrowth
 TSV
 VAR
 varBy
+varExc
 varID
 varLst
 vars

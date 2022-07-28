@@ -47,7 +47,8 @@ devtools::install_github("sjentsch/jmvReadWrite")
 ```
 
 ## How to use the package?
-<br/>
+
+<br />
 
 [**read\_omv**](https://sjentsch.github.io/jmvReadWrite/reference/read_omv.html)
 
@@ -191,9 +192,9 @@ list.files(".", "Trial.omv");
 #> [1] "Trial.omv"
 file.info("Trial.omv");
 #>           size isdir mode               mtime               ctime
-#> Trial.omv 1563 FALSE  660 2022-07-28 17:44:33 2022-07-28 17:44:33
+#> Trial.omv 1563 FALSE  660 2022-07-28 19:10:40 2022-07-28 19:10:40
 #>                         atime  uid  gid    uname   grname
-#> Trial.omv 2022-07-28 17:44:33 1000 1000 sjentsch sjentsch
+#> Trial.omv 2022-07-28 19:10:40 1000 1000 sjentsch sjentsch
 unlink("Trial.omv");
 ```
 

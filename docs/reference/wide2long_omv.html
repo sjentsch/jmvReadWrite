@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">jmvReadWrite</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.3</span>
       </span>
     </div>
 
@@ -60,9 +60,10 @@
 <span>  fleInp <span class="op">=</span> <span class="st">""</span>,</span>
 <span>  fleOut <span class="op">=</span> <span class="st">""</span>,</span>
 <span>  varLst <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">)</span>,</span>
-<span>  varSep <span class="op">=</span> <span class="st">"."</span>,</span>
-<span>  varID <span class="op">=</span> <span class="st">""</span>,</span>
-<span>  varTme <span class="op">=</span> <span class="st">""</span>,</span>
+<span>  varExc <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  varID <span class="op">=</span> <span class="st">"ID"</span>,</span>
+<span>  varTme <span class="op">=</span> <span class="st">"cond"</span>,</span>
+<span>  varSep <span class="op">=</span> <span class="st">"_"</span>,</span>
 <span>  varSrt <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  usePkg <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"foreign"</span>, <span class="st">"haven"</span><span class="op">)</span>,</span>
 <span>  selSet <span class="op">=</span> <span class="st">""</span>,</span>
@@ -84,16 +85,20 @@
 <dd><p>List / set of variables that are to be transformed into single (time-varying) variables in long format (default: c())</p></dd>
 
 
-<dt>varSep</dt>
-<dd><p>Character that separates the variables in varLst into a time-varying part and a part that forms the variable name in long format ("." in "VAR.1", "VAR.2", default: ".")</p></dd>
+<dt>varExc</dt>
+<dd><p>List / set of variables to be excluded from the variable list (default: c())</p></dd>
 
 
 <dt>varID</dt>
-<dd><p>Name(s) of one or more variables that (is created to) identify the same group / individual (if empty, "id" is added with row numbers identifying cases; default: "")</p></dd>
+<dd><p>Name(s) of one or more variables that (is created to) identify the same group / individual (if empty, "ID" is added with row numbers identifying cases; default: "ID")</p></dd>
 
 
 <dt>varTme</dt>
-<dd><p>Name of the variable that (is created to) differentiate multiple records from the same group / individual (if empty, "time" is added with a marker for each time-varying part; default: "")</p></dd>
+<dd><p>Name of the variable that (is created to) differentiate multiple records from the same group / individual (default: "cond"; a counter is added for each time-varying part)</p></dd>
+
+
+<dt>varSep</dt>
+<dd><p>Character that separates the variables in varLst into a time-varying part and a part that forms the variable name in long format ("<em>" in "VAR_1", "VAR_2", default: "</em>")</p></dd>
 
 
 <dt>varSrt</dt>
@@ -114,8 +119,9 @@
 </dl></div>
     <div id="details">
     <h2>Details</h2>
-    <p>If varLst is empty, it is tried to generate it using all variables in the data frame except those defined by varID. For further arguments, see the help for reshape (where varLst ~ varying, varSep ~ sep,
-varID ~ idvar, varTme ~ timevar).
+    <p>If varLst is empty, it is tried to generate it using all variables in the data frame except those defined by varExc and varID. The variable(s) in varID have to be unique identifiers (in the original
+dataset), those in varExc don't have this requirement. It is generally recommended that the variable names in varExc and varID should not include the variable separator (defined in varSep; default: "_")
+For further arguments, see the help for reshape (where varLst ~ varying, varSep ~ sep, varID ~ idvar, varTme ~ timevar).
 varSrt is a character vector containing column names that are used to sort the data frame before it is written.
 The ellipsis-parameter (...) can be used to submit arguments / parameters to the functions that are used for transforming or reading the data. The transformation uses <code>reshape</code>. When reading the
 data, the functions are: <code>read_omv</code> (for jamovi-files), <code>read.table</code> (for CSV / TSV files; using similar defaults as <code>read.csv</code> for CSV and <code>read.delim</code> for TSV which both are based upon
@@ -127,30 +133,30 @@ to use "haven", it may be needed to install it manually (i.e., <code>install.pac
     <div id="ref-examples">
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://sjentsch.github.io/jmvReadWrite/" class="external-link">jmvReadWrite</a></span><span class="op">)</span>;</span></span>
+<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://sjentsch.github.io/jmvReadWrite/" class="external-link">jmvReadWrite</a></span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># generate a test dataframe with 100 (imaginary) participants / units of</span></span></span>
-<span class="r-in"><span><span class="co"># observation (ID), and 8 repeated measurements of variable (X.1, X.2, ...)</span></span></span>
+<span class="r-in"><span><span class="co"># observation (ID), and 8 repeated measurements of variable (X_1, X_2, ...)</span></span></span>
 <span class="r-in"><span><span class="va">dtaInp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>ID <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">100</span><span class="op">)</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                <span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>                <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>                    <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">800</span>, <span class="op">-</span><span class="fl">10</span>, <span class="fl">10</span><span class="op">)</span>, nrow <span class="op">=</span> <span class="fl">100</span><span class="op">)</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>                    <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"X."</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">8</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>;</span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">dtaInp</span><span class="op">)</span><span class="op">)</span>;</span></span>
+<span class="r-in"><span>                    <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"X_"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">8</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">dtaInp</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># 'data.frame':  100 obs. of  9 variables:</span></span></span>
 <span class="r-in"><span><span class="co">#  $ ID : int  1 2 3 4 5 6 7 8 9 10 ...</span></span></span>
-<span class="r-in"><span><span class="co">#  $ X.1: num  ...</span></span></span>
-<span class="r-in"><span><span class="co">#  $ X.2: num  ...</span></span></span>
-<span class="r-in"><span><span class="co">#  $ X.3: num  ...</span></span></span>
-<span class="r-in"><span><span class="co">#  $ X.4: num  ...</span></span></span>
-<span class="r-in"><span><span class="co">#  $ X.5: num  ...</span></span></span>
-<span class="r-in"><span><span class="co">#  $ X.6: num  ...</span></span></span>
-<span class="r-in"><span><span class="co">#  $ X.7: num  ...</span></span></span>
-<span class="r-in"><span><span class="co">#  $ X.8: num  ...</span></span></span>
+<span class="r-in"><span><span class="co">#  $ X_1: num  ...</span></span></span>
+<span class="r-in"><span><span class="co">#  $ X_2: num  ...</span></span></span>
+<span class="r-in"><span><span class="co">#  $ X_3: num  ...</span></span></span>
+<span class="r-in"><span><span class="co">#  $ X_4: num  ...</span></span></span>
+<span class="r-in"><span><span class="co">#  $ X_5: num  ...</span></span></span>
+<span class="r-in"><span><span class="co">#  $ X_6: num  ...</span></span></span>
+<span class="r-in"><span><span class="co">#  $ X_7: num  ...</span></span></span>
+<span class="r-in"><span><span class="co">#  $ X_8: num  ...</span></span></span>
 <span class="r-in"><span><span class="co"># this data set is stored as (temporary) RDS-file and later processed by wide2long</span></span></span>
-<span class="r-in"><span><span class="va">nmeInp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">".rds"</span><span class="op">)</span>;</span></span>
-<span class="r-in"><span><span class="va">nmeOut</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">".omv"</span><span class="op">)</span>;</span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="va">dtaInp</span>, <span class="va">nmeInp</span><span class="op">)</span>;</span></span>
-<span class="r-in"><span><span class="fu">wide2long_omv</span><span class="op">(</span>fleInp <span class="op">=</span> <span class="va">nmeInp</span>, fleOut <span class="op">=</span> <span class="va">nmeOut</span>, varID <span class="op">=</span> <span class="st">"ID"</span>, varTme <span class="op">=</span> <span class="st">"Meas"</span>,</span></span>
-<span class="r-in"><span>    varLst <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sets.html" class="external-link">setdiff</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">dtaInp</span><span class="op">)</span>, <span class="st">"ID"</span><span class="op">)</span>, varSrt <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ID"</span>, <span class="st">"Meas"</span><span class="op">)</span><span class="op">)</span>;</span></span>
+<span class="r-in"><span><span class="va">nmeInp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">".rds"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">nmeOut</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">".omv"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="va">dtaInp</span>, <span class="va">nmeInp</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">wide2long_omv</span><span class="op">(</span>fleInp <span class="op">=</span> <span class="va">nmeInp</span>, fleOut <span class="op">=</span> <span class="va">nmeOut</span>, varID <span class="op">=</span> <span class="st">"ID"</span>, varTme <span class="op">=</span> <span class="st">"measure"</span>,</span></span>
+<span class="r-in"><span>    varLst <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sets.html" class="external-link">setdiff</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">dtaInp</span><span class="op">)</span>, <span class="st">"ID"</span><span class="op">)</span>, varSrt <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ID"</span>, <span class="st">"measure"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># it is required to give at least the arguments fleInp and varID</span></span></span>
 <span class="r-in"><span><span class="co"># "reshape" then assigns all variables expect the variable defined by varID to</span></span></span>
 <span class="r-in"><span><span class="co"># varLst (but throws a warning)</span></span></span>
@@ -159,24 +165,24 @@ to use "haven", it may be needed to install it manually (i.e., <code>install.pac
 <span class="r-in"><span><span class="co"># for one repetition would come after another)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># check whether the file was created and its size</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/basename.html" class="external-link">dirname</a></span><span class="op">(</span><span class="va">nmeOut</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/basename.html" class="external-link">basename</a></span><span class="op">(</span><span class="va">nmeOut</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>;</span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/basename.html" class="external-link">dirname</a></span><span class="op">(</span><span class="va">nmeOut</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/basename.html" class="external-link">basename</a></span><span class="op">(</span><span class="va">nmeOut</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># -&gt; "file[...].omv" ([...] contains a random combination of numbers / characters</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.info.html" class="external-link">file.info</a></span><span class="op">(</span><span class="va">nmeOut</span><span class="op">)</span><span class="op">$</span><span class="va">size</span><span class="op">)</span>;</span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.info.html" class="external-link">file.info</a></span><span class="op">(</span><span class="va">nmeOut</span><span class="op">)</span><span class="op">$</span><span class="va">size</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># -&gt; 6286 (approximate size; size may differ in every run [in dependence of how</span></span></span>
 <span class="r-in"><span><span class="co">#          well the generated random data can be compressed])</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="fu"><a href="read_omv.html">read_omv</a></span><span class="op">(</span><span class="va">nmeOut</span>, sveAtt <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>;</span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="fu"><a href="read_omv.html">read_omv</a></span><span class="op">(</span><span class="va">nmeOut</span>, sveAtt <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># the data set is now transformed into long (and each the measurements is now</span></span></span>
-<span class="r-in"><span><span class="co"># indicated by the "Meas")</span></span></span>
+<span class="r-in"><span><span class="co"># indicated by the "measure")</span></span></span>
 <span class="r-in"><span><span class="co"># 'data.frame':  800 obs. of  3 variables:</span></span></span>
 <span class="r-in"><span><span class="co">#  $ ID  : int  1 1 1 1 1 1 1 1 2 2 ...</span></span></span>
 <span class="r-in"><span><span class="co">#   ..- attr(*, "missingValues")= list()</span></span></span>
-<span class="r-in"><span><span class="co">#  $ Meas: int  1 2 3 4 5 6 7 8 1 2 ...</span></span></span>
+<span class="r-in"><span><span class="co">#  $ measure: int  1 2 3 4 5 6 7 8 1 2 ...</span></span></span>
 <span class="r-in"><span><span class="co">#   ..- attr(*, "missingValues")= list()</span></span></span>
 <span class="r-in"><span><span class="co">#  $ X   : num  ...</span></span></span>
 <span class="r-in"><span><span class="co">#   ..- attr(*, "missingValues")= list()</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="va">nmeInp</span><span class="op">)</span>;</span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="va">nmeOut</span><span class="op">)</span>;</span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="va">nmeInp</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="va">nmeOut</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

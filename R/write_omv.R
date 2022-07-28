@@ -138,7 +138,7 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", retDbg = FALSE) {
                 xtdDta[[names(dtaFrm[i])]] <- list(labels = lapply(seq_along(facLvl), function(i) list(i - 1, facLvl[[i]], facLvl[[i]], FALSE)));
             }
             rm(facLvl, facOrd);
-        # [c] numerical (integer / decimals)facLvl <- unique(crrCol)
+        # [c] numerical (integer / decimals)
         } else if (is.numeric(crrCol)) {
             if (! all(is.na(crrCol)) && max(abs(crrCol), na.rm = TRUE) <= .Machine$integer.max && all(abs(crrCol - round(crrCol)) < sqrt(.Machine$double.eps), na.rm = TRUE)) {
                 crrCol <- as.integer(crrCol);

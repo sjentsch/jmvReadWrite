@@ -33,7 +33,7 @@
 #' nmeInp <- paste0(tempfile(), "_", 1:3, ".rds");
 #' nmeOut <- paste0(tempfile(), ".omv");
 #' for (i in seq_along(nmeInp)) {
-#'     saveRDS(setNames(dtaInp, c("ID", paste0(names(dtaInp)[-1], "_", i))), nmeInp[i]);
+#'     saveRDS(stats::setNames(dtaInp, c("ID", paste0(names(dtaInp)[-1], "_", i))), nmeInp[i]);
 #' }
 #' # save dtaInp three times (i.e., the length of nmeInp), adding "_" + 1 ... 3 as index
 #' # to the data variables (A1 ... O5, gender, age → A1_1, ...)

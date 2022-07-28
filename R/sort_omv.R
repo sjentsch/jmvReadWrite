@@ -75,5 +75,6 @@ srtFrm <- function(dtaFrm = NULL, varSrt = c()) {
         rownames(dtaFrm) <- NULL
         for (n in names(attMem)[!sapply(attMem, is.null)]) attributes(dtaFrm[[n]]) <- attMem[[n]]
     }
+
     dtaFrm
 }

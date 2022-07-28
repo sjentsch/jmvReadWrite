@@ -64,7 +64,9 @@ test_that("read_omv works", {
     # fleInp is not given or empty
     expect_error(read_omv());
     expect_error(read_omv(""));
-    # the manifest 
+    # the manifest must have a file name as second parameter and
+    # the file has to be a valid manifest file (which is not the
+    # case for "index.html" [exists, but isn't a manifest])
     expect_error(chkMnf(nmeInp, c()));
     expect_error(chkMnf(nmeInp, "index.html"));
 

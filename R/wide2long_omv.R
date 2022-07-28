@@ -29,7 +29,7 @@
 #' # generate a test dataframe with 100 (imaginary) participants / units of
 #' # observation (ID), and 8 repeated measurements of variable (X_1, X_2, ...)
 #' dtaInp <- cbind(data.frame(ID = seq(1:100)),
-#'                 setNames(
+#'                 stats::setNames(
 #'                     as.data.frame(matrix(runif(800, -10, 10), nrow = 100)),
 #'                     paste0("X_", 1:8)))
 #' cat(str(dtaInp))
@@ -157,7 +157,7 @@ wide2long_omv <- function(fleInp = "", fleOut = "", varLst = c(), varExc = c(), 
     varOrd <- c(varID[1], rep(strsplit(splNmV[1], "\\|")[[1]], length(splNmV) > 0), sort(varID[-1]),
                 setdiff(names(dtaFrm), c(varID, setdiff(dtaNmV, varLst))), rep(strsplit(splNmV[2], "\\|")[[1]], length(splNmV) > 1))
     if (length(c(setdiff(names(dtaFrm), varOrd), setdiff(varOrd, names(dtaFrm)))) != 0) {
-        stop(paste0("Mismatch between old and new variable order – old: ", paste0(names(dtaFrm), collapse = ", "), "; new: ", paste0(varOrd, collapse = ", "), "."))
+        stop(paste0("Mismatch between old and new variable order - old: ", paste0(names(dtaFrm), collapse = ", "), "; new: ", paste0(varOrd, collapse = ", "), "."))
     }
     dtaFrm <- dtaFrm[, varOrd]
     if ("jmv-id" %in% names(attributes(dtaFrm[, varID[1]]))) attr(dtaFrm[, varID[1]], "jmv-id") <- NULL
@@ -184,5 +184,6 @@ rplLbl <- function(dtaFrm = NULL) {
             attr(dtaFrm[[crrNme]], crrAtt) <- trimws(gsub("[[:punct:]]", "", trimws(gsub(varTme, "", attr(dtaFrm[[crrNme]], crrAtt)))))
         }
     }
+
     dtaFrm
 }

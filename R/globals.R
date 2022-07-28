@@ -4,6 +4,7 @@ if (getRversion() >= "2.15.1") {
     utils::globalVariables(c("jamovi.coms.AnalysisResponse"))
 }
 
+# =================================================================================================
 # define characters from latin1 (after enc2utf8) and their respective replacements
 lstRpl <- rbind(c("<84>",   "<93>",   "<c4>",   "<d6>",   "<dc>",   "<df>",   "<e4>",   "<f6>",   "<fc>"),
                 c("\u0084", "\u0093", "\u00c4", "\u00d6", "\u00dc", "\u00df", "\u00e4", "\u00f6", "\u00fc"))

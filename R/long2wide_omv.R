@@ -77,7 +77,7 @@
 #' @export long2wide_omv
 #'
 long2wide_omv <- function(fleInp = "", fleOut = "", varID = "ID", varTme = c(), varExc = c(), varTgt = c(), varSep = "_", varOrd = c("times", "vars"),
-                          varSrt = c(), varRpl = list(), usePkg = c("foreign", "haven"), selSet = "", ...) {
+                          varSrt = c(), usePkg = c("foreign", "haven"), selSet = "", ...) {
 
     # check and format input and output files
     fleInp <- fmtFlI(fleInp, maxLng = 1)
@@ -139,7 +139,6 @@ long2wide_omv <- function(fleInp = "", fleOut = "", varID = "ID", varTme = c(), 
 
     # write file
     write_omv(dtaFrm, fleOut)
-dtaFrm
 }
 
 chgVrO <- function(dtaFrm = NULL) {

@@ -31,6 +31,24 @@ test_that("wide2long_omv works", {
 #   expect_error(suppressWarnings(wide2long_omv(nmeInp, nmeOut, varSep = ".", varID = "Year")));
 #   expect_warning(wide2long_omv(nmeInp, nmeOut, varID = "Year", varTme = "Month", varSrt = c("Year", "Month")));
 
+    saveRDS(data.frame(Year = 1900:2020, X_1 = runif(121), X.2 = runif(121)), nmeInp);
+    expect_error(capture.output(wide2long_omv(nmeInp, nmeOut, varSep = "_", varID = "Year")));
+
+    saveRDS(data.frame(Year = 1900:2020, X_1 = runif(121), X_2 = runif(121), X_2_A = runif(121)), nmeInp);
+    expect_error(capture.output(wide2long_omv(nmeInp, nmeOut, varSep = "_", varID = "Year")));
+
+    dtaTmp <- data.frame(ID = as.character(1:121), A = runif(121), B = runif(121), C = runif(121));
+    attributes(dtaTmp[[1]]) <- list(`jmv-id` = TRUE, measureType = "ID")
+    saveRDS(dtaTmp, nmeInp);
+    expect_output(wide2long_omv(nmeInp, nmeOut, varSep = "", varID = "ID"),
+                  "Variable list \\(varLst\\) was generated using all variables in the data frame except those defined in varExc or varID \\(ID\\).");
+    dtaFrm <- read_omv(nmeOut);
+    expect_s3_class(dtaFrm, "data.frame");
+    expect_equal(dim(dtaFrm), c(363, 3));
+    expect_equal(names(dtaFrm), c("ID", "cond", "measure"));
+    expect_equal(as.vector(sapply(dtaFrm, class)), c("factor", "factor", "numeric"));
+    expect_equal(table(dtaFrm$cond), table(c(rep("A", 121), rep("B", 121), rep("C", 121))))
+
     unlink(nmeInp);
     unlink(nmeOut);
 })

@@ -96,7 +96,7 @@ test_that("read_all works", {
     expect_equal(unname(sapply(dtaFrm, typeof)),                c("integer", "integer", "integer", "double", "integer", "double", "double"));
     expect_equal(unname(sapply(sapply(dtaFrm, class), "[", 1)), c("integer", "factor", "factor", "numeric", "ordered", "numeric", "numeric"));
     expect_equal(names(attributes(dtaFrm)), c("names", "row.names", "class"));
-    expect_equal(names(attributes(dtaFrm[[3]])),  c("levels", "class", "values"));
+    expect_equal(names(attributes(dtaFrm[[3]])),  c("levels", "class", "description"));
     expect_equal(names(attributes(dtaFrm[[5]])),  c("levels", "class"));
 
     unlink(nmeTmp);
@@ -148,6 +148,11 @@ test_that("read_all works", {
     expect_type(dtaFrm$A, "double");
     unlink(nmeInp);
 
+    nmeInp <- paste0(tempfile(), ".csv");
+    writeBin("X1,X2\n1.2,2.2\n7.1,3.2", nmeInp);
+    expect_error(suppressMessages(read_all(nmeInp)));
+    unlink(nmeInp);
+
     fleInp <- paste0(tempfile(), ".sav");
     writeBin("$FL2@(#) IBM SPSS STATISTICS 64-bit Linux 25.0.0.0              \002", con = fleInp);
     expect_error(suppressMessages(read_all(fleInp, usePkg = "haven")));
@@ -173,13 +178,16 @@ test_that("read_all works", {
     expect_error(suppressMessages(read_all(fleInp, usePkg = "foreign")));
     unlink(fleInp);
 
-    expect_null(attributes(hvnDrp(jmvReadWrite::ToothGrowth, c("jmv-id", "jmv-desc"))[[1]]));
-    expect_null(attributes(hvnDrp(jmvReadWrite::ToothGrowth, c("jmv-id", "jmv-desc"))[[7]]));
+    dtaTmp <- jmvReadWrite::ToothGrowth;
+    expect_null(attributes(hvnAdj(dtaTmp, c("jmv-id", "jmv-desc"))[[1]]));
+    expect_null(attributes(hvnAdj(dtaTmp, c("jmv-id", "jmv-desc"))[[7]]));
+    attr(dtaTmp[[6]], "label") <- "Trial for label conversion"
+    expect_equal(attributes(hvnAdj(dtaTmp, jmvLbl = TRUE)[[6]]), list(`jmv-desc` = "Trial for label conversion"))
 
     dtaTmp <- jmvReadWrite::AlbumSales[-1];
     attr(dtaTmp, "variable.labels") <- c(Adverts = "Advertsing budget (thousands)",
                                          Airplay = "No. of plays on radio",
                                          Image = "Band image rating (0-10)",
                                          Sales = "Album sales (thousands)");
-    expect_identical(sapply(fgnLbl(dtaTmp), attr, "label"), attr(dtaTmp, "variable.labels"));
+    expect_identical(sapply(fgnLbl(dtaTmp), attr, "jmv-desc"), attr(dtaTmp, "variable.labels"));
 })

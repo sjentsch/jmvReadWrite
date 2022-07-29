@@ -102,7 +102,7 @@ wide2long_omv <- function(fleInp = "", fleOut = "", varLst = c(), varExc = c(), 
         chkVar(dtaFrm, varLst)
     }
     # check whether they all contain the separator
-    if (!nzchar(varSep) || !all(grepl(varSep, varLst, fixed = TRUE))) {
+    if (nzchar(varSep) && !all(grepl(varSep, varLst, fixed = TRUE))) {
         stop(sprintf("\n\nThe variable separator (varSep, \"%s\") must be contained in all variables in the variable list (varLst).\nDeviating variables: %s\n",
                      varSep, paste(varLst[!grepl(varSep, varLst, fixed = TRUE)], collapse = ", ")))
     }
@@ -149,17 +149,30 @@ wide2long_omv <- function(fleInp = "", fleOut = "", varLst = c(), varExc = c(), 
     } else {
         dtaFrm <- srtFrm(dtaFrm, varID[1])
     }
+    # correct the column order (ID should come first, otherwise the order is kept with the transformed variables inserted into
+    # were the respective original (i.e., before the transformation) variables were
+    dtaFrm <- dtaFrm[, ordCol(names(dtaFrm), dtaNmV, varID, varLst)]
 
-    # put the first ID variable (either given or defaulting to "ID" if not) in the first position, remove
-    # the jmv-id, and change the measurement type to "Nominal" (if it was ID; -> the ID variable may be used in
-    # analyses, e.g. as random-effects-variable, and this wouldn't be possible if it were still marked as "ID")
+    # remove the jmv-id, and change the measurement type to "Nominal" (if it was ID; -> the ID variable may be used
+    # in analyses, e.g. as random-effects-variable, and this wouldn't be possible if it were still marked as "ID")
+    dtaFrm <- rmvID(dtaFrm, varID, hasID)
+
+    # write file
+    write_omv(dtaFrm, fleOut)
+}
+
+ordCol <- function(varNme = c(), dtaNmV = c(), varID = c(), varLst = c()) {
     splNmV <- gsub("\\|$|^\\|", "", strsplit(paste0(setdiff(dtaNmV, varID), collapse = "|"), paste0(varLst, collapse = "\\|"))[[1]])
     varOrd <- c(varID[1], rep(strsplit(splNmV[1], "\\|")[[1]], length(splNmV) > 0), sort(varID[-1]),
-                setdiff(names(dtaFrm), c(varID, setdiff(dtaNmV, varLst))), rep(strsplit(splNmV[2], "\\|")[[1]], length(splNmV) > 1))
-    if (length(c(setdiff(names(dtaFrm), varOrd), setdiff(varOrd, names(dtaFrm)))) != 0) {
-        stop(paste0("Mismatch between old and new variable order - old: ", paste0(names(dtaFrm), collapse = ", "), "; new: ", paste0(varOrd, collapse = ", "), "."))
+                setdiff(varNme, c(varID, setdiff(dtaNmV, varLst))), rep(strsplit(splNmV[2], "\\|")[[1]], length(splNmV) > 1))
+    if (length(c(setdiff(varNme, varOrd), setdiff(varOrd, varNme))) != 0) {
+        stop(paste0("Mismatch between old and new variable order - old: ", paste0(varNme, collapse = ", "), "; new: ", paste0(varOrd, collapse = ", "), "."))
     }
-    dtaFrm <- dtaFrm[, varOrd]
+
+    varOrd
+}
+
+rmvID <- function(dtaFrm = NULL, varID = c(), hasID = TRUE) {
     if ("jmv-id" %in% names(attributes(dtaFrm[, varID[1]]))) attr(dtaFrm[, varID[1]], "jmv-id") <- NULL
     if (!hasID || ("measureType" %in% names(attributes(dtaFrm[, varID[1]])) && attr(dtaFrm[, varID[1]], "measureType") == "ID")) {
         dtaFrm[, varID[1]] <- as.factor(dtaFrm[, varID[1]])
@@ -167,8 +180,7 @@ wide2long_omv <- function(fleInp = "", fleOut = "", varLst = c(), varExc = c(), 
         attr(dtaFrm[, varID[1]], "dataType")    <- "Text"
     }
 
-    # write file
-    write_omv(dtaFrm, fleOut)
+    dtaFrm
 }
 
 rplLbl <- function(dtaFrm = NULL) {
@@ -176,13 +188,11 @@ rplLbl <- function(dtaFrm = NULL) {
     # return if the time-vector only contains consecutive numbers
     if (all(varTme == seq_along(varTme))) return(dtaFrm)
     varTme <- as.character(varTme[1])
-    for (crrAtt in c("jmv-desc", "label")) {
-        lstAtt <- sapply(dtaFrm, attr, crrAtt)
-        lstAtt <- lstAtt[!sapply(lstAtt, is.null)]
-        for (crrNme in names(lstAtt)) {
-            # removes the content of the first occurence of the time variable and any non alphanumeric characters at the end
-            attr(dtaFrm[[crrNme]], crrAtt) <- trimws(gsub("[[:punct:]]", "", trimws(gsub(varTme, "", attr(dtaFrm[[crrNme]], crrAtt)))))
-        }
+    lstAtt <- sapply(dtaFrm, attr, "jmv-desc")
+    lstAtt <- lstAtt[!sapply(lstAtt, is.null)]
+    for (crrNme in names(lstAtt)) {
+        # removes the content of the first occurence of the time variable and any non alphanumeric characters at the end
+        attr(dtaFrm[[crrNme]], "jmv-desc") <- trimws(gsub(paste0("[[:punct:]]", varTme, "[[:punct:]]|", varTme), "", attr(dtaFrm[[crrNme]], "jmv-desc")))
     }
 
     dtaFrm

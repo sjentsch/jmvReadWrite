@@ -245,7 +245,7 @@ read_all <- function(fleInp = "", usePkg = c("foreign", "haven"), selSet = "", .
         dtaFrm <- tryCatch({
                              if        (usePkg == "haven"   && hasPkg("haven"))   {
                                  hvnTmp <- haven::as_factor(do.call(haven::read_sav, adjArg("haven::read_sav", list(file = fleInp), varArg, "file")), only_labelled = TRUE);
-                                 hvnDrp(as.data.frame(hvnTmp@.Data, col.names = names(hvnTmp)), c("format.spss", "display_width"))
+                                 hvnAdj(as.data.frame(hvnTmp@.Data, col.names = names(hvnTmp)), c("format.spss", "display_width"), jmvLbl = TRUE)
                              } else if (usePkg == "foreign" && hasPkg("foreign")) {
                                  fgnLbl(do.call(foreign::read.spss, adjArg("foreign::read.spss", list(file = fleInp, to.data.frame = TRUE), varArg, c("file", "to.data.frame"))))
                              } else {
@@ -260,7 +260,7 @@ read_all <- function(fleInp = "", usePkg = c("foreign", "haven"), selSet = "", .
                              usePkg <- ifelse(grepl("^<stata_dta><header>", readBin(fleInp, character(), n = 1)), "haven", usePkg)
                              if        (usePkg == "haven"   && hasPkg("haven"))   {
                                  hvnTmp <- haven::as_factor(do.call(haven::read_dta, adjArg("haven::read_dta", list(file = fleInp), varArg, "file")), only_labelled = TRUE);
-                                 hvnDrp(as.data.frame(hvnTmp@.Data, col.names = names(hvnTmp)), c("format.stata", "display_width"))
+                                 hvnAdj(as.data.frame(hvnTmp@.Data, col.names = names(hvnTmp)), c("format.stata", "display_width"), jmvLbl = TRUE)
                              } else if (usePkg == "foreign" && hasPkg("foreign")) {
                                  fgnLbl(do.call(foreign::read.dta, adjArg("foreign::read.dta", list(file = fleInp), varArg, c("file"))))
                              } else {
@@ -273,7 +273,7 @@ read_all <- function(fleInp = "", usePkg = c("foreign", "haven"), selSet = "", .
         dtaFrm <- tryCatch({
                              if        (usePkg == "haven"   && hasPkg("haven"))   {
                                  hvnTmp <- haven::as_factor(do.call(haven::read_sas, adjArg("haven::read_sas", list(data_file = fleInp), varArg, "data_file")), only_labelled = TRUE);
-                                 hvnDrp(as.data.frame(hvnTmp@.Data, col.names = names(hvnTmp)), c("format.sas", "display_width"))
+                                 hvnAdj(as.data.frame(hvnTmp@.Data, col.names = names(hvnTmp)), c("format.sas", "display_width"), jmvLbl = TRUE)
                              } else {
                                  stop(sprintf("In order to read the SAS-file \"%s\" the R-packages \"haven\" needs to be installed.", basename(fleInp)));
                              }
@@ -284,7 +284,7 @@ read_all <- function(fleInp = "", usePkg = c("foreign", "haven"), selSet = "", .
         dtaFrm <- tryCatch({
                              if        (usePkg == "haven"   && hasPkg("haven"))   {
                                  hvnTmp <- haven::as_factor(do.call(haven::read_xpt, adjArg("haven::read_xpt", list(file = fleInp), varArg, "file")), only_labelled = TRUE);
-                                 hvnDrp(as.data.frame(hvnTmp@.Data, col.names = names(hvnTmp)), c("format.stata", "display_width"))
+                                 hvnAdj(as.data.frame(hvnTmp@.Data, col.names = names(hvnTmp)), c("format.stata", "display_width"), jmvLbl = TRUE)
                              } else if (usePkg == "foreign" && hasPkg("foreign")) {
                                  fgnLbl(do.call(foreign::read.xport, adjArg("foreign::read.xport", list(file = fleInp), varArg, c("file"))))
                              } else {
@@ -353,7 +353,7 @@ fgnLbl <- function(dtaFrm = NULL) {
         varLbl <- trimws(attr(dtaFrm, "variable.labels"));
         for (crrCol in names(dtaFrm)) {
             if (crrCol %in% names(varLbl) && varLbl[[crrCol]] != "") {
-                attr(dtaFrm[[crrCol]], "label") <- varLbl[[crrCol]];
+                attr(dtaFrm[[crrCol]], "jmv-desc") <- varLbl[[crrCol]];
             }
         }
         attr(dtaFrm, "variable.labels") <- NULL;
@@ -377,7 +377,7 @@ getHdl <- function(fleOMV = "", crrFle = "", crrMde = "r") {
     zip::unzip(fleOMV, crrFle, exdir = tempdir(), junkpaths = TRUE);
     crrFle <- file.path(tempdir(), list.files(path = tempdir(), pattern = basename(crrFle)));
     if (length(crrFle) == 0) {
-        stop(sprintf("The file \"%s\" could not be extracted from \"%s\". Please register an issue.", crrFle, fleOMV));
+        stop(sprintf("The file \"%s\" could not be extracted from \"%s\". Please send the file to sebastian.jentschke@uib.no!", crrFle, fleOMV));
     }
 
     file(crrFle, crrMde)
@@ -396,12 +396,16 @@ getTxt <- function(fleOMV = "", crrFle = "") {
     crrTxt
 }
 
-hvnDrp <- function(dtaFrm = NULL, rmvAtt = c()) {
+hvnAdj <- function(dtaFrm = NULL, rmvAtt = c(), jmvLbl = FALSE) {
    for (crrCol in names(dtaFrm)) {
        for (crrAtt in rmvAtt) {
              if (! is.null(attr(dtaFrm[[crrCol]], crrAtt))) {
                  attr(dtaFrm[[crrCol]], crrAtt) <- NULL
              }
+        }
+        if (jmvLbl && !is.null(attr(dtaFrm[[crrCol]], "label"))) {
+            attr(dtaFrm[[crrCol]], "jmv-desc") <- attr(dtaFrm[[crrCol]], "label")
+            attr(dtaFrm[[crrCol]], "label")    <- NULL
         }
     }
 

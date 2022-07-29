@@ -286,6 +286,7 @@ setAtt <- function(attLst = c(), inpObj = NULL, outObj = NULL) {
             stop("Error when storing or accessing meta-data information. Please send the file causing the error to sebastian.jentschke@uib.no");
         }
     }
+
     outObj
 }
 
@@ -293,6 +294,7 @@ rmvAtt <- function(attObj = NULL) {
     for (crrAtt in setdiff(names(attributes(attObj)), c("class", "comment", "dim", "jmv-id", "jmv-desc", "levels", "names", "row.names", "values"))) {
         attr(attObj, crrAtt) <- NULL;
     }
+
     attObj
 }
 

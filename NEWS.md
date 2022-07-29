@@ -4,6 +4,8 @@
 * made replacements using regular expressions compatible with R >= 4.3 (changing occurrences of replacement pattern that included `\xNN`)
 * improvements to `wide2long_omv` and `long2wide_omv` (those can now handle several factors, not only one)
 * improvement to how `write_omv` handles / stores factors (those are now zero-based to be in accordance with most programming languages including Python and C++ used in the jamovi engine)
+* simplify handling variable labels (now, the attribute "label", e.g., from importing files using haven, is converted to the jamovi-conforming "jmv-desc")
+* adding further the unit tests
 * general bug fixes and improvements (simplifying the code)
 
 

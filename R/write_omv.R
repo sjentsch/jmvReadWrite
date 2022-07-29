@@ -55,7 +55,7 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", retDbg = FALSE) {
     chkDtF(dtaFrm);
 
     # handle the attributes "variable.labels" and "value.labels" in the format provided by the R-package "foreign"
-    # the attribute "variable.labels" (attached to the data frame) is converted them to the format used by "haven" ("label" attached to the data column)
+    # the attribute "variable.labels" (attached to the data frame) is converted them to the format used by jamovi ("jmv-desc" attached to the data column)
     if (chkAtt(dtaFrm, "variable.labels")) dtaFrm <- fgnLbl(dtaFrm);
     if (chkAtt(dtaFrm, "label.table")) stop("R-foreign-style value labels need to be implemented. Please send the data file that caused this problem to sebastian.jentschke@uib.no");
 

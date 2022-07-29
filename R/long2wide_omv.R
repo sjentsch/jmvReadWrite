@@ -156,12 +156,12 @@ getLbl <- function(dtaFrm = NULL, varTme = "") {
     if (!is.null(dim(dtaFrm))) dtaFrm <- list(dtaFrm)
     lblLst <- tmeLst <- NULL
     for (i in seq_along(dtaFrm)) {
-        lblLst <- c(lblLst, sapply(dtaFrm[[i]], attr, "jmv-desc"), sapply(dtaFrm[[i]], attr, "label"))
+        lblLst <- c(lblLst, sapply(dtaFrm[[i]], attr, "jmv-desc"))
         tmeLst <- unique(c(tmeLst, dtaFrm[[i]][[varTme]]))
     }
     if (all(tmeLst == seq_along(tmeLst))) tmeLst <- NULL
 
-    list(label = lblLst[! sapply(lblLst, is.null)], times = tmeLst)
+    list(label = lblLst[!sapply(lblLst, is.null)], times = tmeLst)
 }
 
 rstLbl <- function(dtaFrm = NULL, crrLnT = list()) {

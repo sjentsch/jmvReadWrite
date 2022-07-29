@@ -66,7 +66,7 @@ for (i in seq_along(nmeInp)) {
 # to the data variables (A1 ... O5, gender, age → A1_1, ...)
 merge_cols_omv(fleInp = nmeInp, fleOut = nmeOut, varBy = "ID");
 cat(file.info(nmeOut)$size);
-# -> 12518 (size may differ on different OSes)
+# -> 17731 (size may differ on different OSes)
 dtaOut <- read_omv(nmeOut, sveAtt = FALSE);
 # read the data set where the three original datasets were added as columns and show
 # the variable names

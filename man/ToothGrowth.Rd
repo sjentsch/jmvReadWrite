@@ -7,7 +7,7 @@
 \format{
 A data.frame with 60 rows and 6 variables
 \describe{
-\item{ID}{integer}{ID of the guinea pig}
+\item{ID}{character}{ID of the guinea pig}
 \item{supp}{factor}{Supplement type (VC: Vitamin C or OJ: Orange juice)}
 \item{supp2}{factor}{Transformation of the supplement type (factor to numerical: VC = 1; OJ = 2)}
 \item{dose}{numeric}{Dose in grams / day}

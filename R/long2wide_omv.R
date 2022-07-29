@@ -31,7 +31,7 @@
 #' cat(str(dtaInp))
 #' # the output should look like this
 #' # 'data.frame': 800 obs. of  3 variables:
-#' #  $ ID     : chr  "1" "1" "1" "1" "1" "1" "1" "1" "2" "2" ...
+#' #  $ ID     : chr  "1" "1" "1" "1" ...
 #' #  $ measure: int  1 2 3 4 5 6 7 8 1 2 ...
 #' #  $ X      : num  ...
 #' # this data set is stored as (temporary) RDS-file and later processed by long2wide
@@ -44,7 +44,7 @@
 #' cat(list.files(dirname(nmeOut), basename(nmeOut)))
 #' # -> "file[...].omv" ([...] contains a random combination of numbers / characters
 #' cat(file.info(nmeOut)$size)
-#' # -> 6200 (approximate size; size may differ in every run [in dependence of
+#' # -> 6851 (approximate size; size may differ in every run [in dependence of
 #' #          how well the generated random data can be compressed])
 #' cat(str(read_omv(nmeOut, sveAtt = FALSE)))
 #' # the data set is now transformed into wide (and each the measurements is now
@@ -119,14 +119,6 @@ long2wide_omv <- function(fleInp = "", fleOut = "", varID = "ID", varTme = c(), 
     # select all variable(s) except those defined by varID and varExc and remove the prefix "measure", if present
     selVrN <- !grepl(paste0(c(varID, varExc), collapse = "|"), names(dtaFrm))
     if (all(grepl(paste0("^measure", varSep), names(dtaFrm)[selVrN]))) names(dtaFrm)[selVrN] <- gsub(paste0("^measure", varSep), "", names(dtaFrm)[selVrN])
-#    varSpl <- strsplit(names(dtaFrm)[selVrN], varSep)
-#    lngSpl <- unique(sapply(varSpl, length))
-#    rmvStr <- c()
-#    for (i in c(1, lngSpl)) {
-#        if (length(unique(sapply(varSpl, "[[", i))) == 1) {
-#            names(dtaFrm)[selVrN] <- gsub(paste0(ifelse(i == 1, "^", varSep), unique(sapply(varSpl, "[[", i)), ifelse(i == 1, varSep, "$")), "", names(dtaFrm)[selVrN])
-#        }
-#    }
 
     # change the order of column (if requested)
     if (varOrd == "vars") dtaFrm <- chgVrO(dtaFrm)

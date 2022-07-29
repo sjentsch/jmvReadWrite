@@ -90,7 +90,7 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", retDbg = FALSE) {
         # variable label: if available, choose "jmv-desc", "label", ...
         # the attributes are concatenated if available (otherwise they will be NULL and dropped), if several are available,
         # the first ("jmv-desc") takes precedence, if all are NULL, the content of mtaDta$fields serves as fallback-option
-        mtaDta$fields[[i]][["description"]] <- c(attr(dtaFrm[[i]], "jmv-desc"), attr(dtaFrm[[i]], "label"), mtaDta$fields[[i]][["description"]])[1];
+        mtaDta$fields[[i]][["description"]] <- c(attr(dtaFrm[[i]], "jmv-desc"), mtaDta$fields[[i]][["description"]], attr(dtaFrm[[i]], "label"))[1];
 
         # assign column from the original data frame to crrCol (so that modifications don't affect the original)
         crrCol <- dtaFrm[[i]]
@@ -99,7 +99,7 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", retDbg = FALSE) {
         # if the jmv-id marker is set or if the measureType is set to "ID" in the original data or if it is the first column with the values
         # being unique and being either a factor or an integer (rounded equals the original value; integers may be stored as doubles)
         if (chkAtt(dtaFrm[[i]], "jmv-id", TRUE) || chkAtt(dtaFrm[[i]], "measureType", "ID") ||
-            (i == 1 && length(unique(crrCol)) == length(crrCol)) && (is.factor(crrCol) || all(crrCol == round(crrCol)))) {
+            (i == 1 && length(unique(crrCol)) == length(crrCol)) && (is.factor(crrCol) || (is.double(crrCol) && all(crrCol %% 1 == 0)))) {
             if (!is.character(crrCol)) crrCol <- as.character(crrCol)
             mtaDta$fields[[i]][["dataType"]]    <- "Text";
             mtaDta$fields[[i]][["type"]]        <- "string";
@@ -116,7 +116,11 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", retDbg = FALSE) {
             #     however, using "0" and "1" instead of "FALSE" and "TRUE" seems to make more sense
         # [b] factors or characters / strings
         } else if (is.factor(crrCol) || is.character(crrCol)) {
-            if (is.character(crrCol)) crrCol <- as.factor(trimws(crrCol))
+            if (is.character(crrCol)) {
+                crrCol <- factor(trimws(crrCol), eval(parse(text = ifelse(!any(is.na(suppressWarnings(as.numeric(crrCol)))),
+                                                                          "as.character(sort(as.numeric(unique(trimws(crrCol)))))",
+                                                                          "sort(unique(trimws(crrCol)))"))))
+            }
             # NB: If jamovi imports RData / RDS-files, character variables are given "ID" (measureType) / "Text" (dataType);
             #     however, converting them to factors and exporting those seems to make more sense
             facLvl <- attr(crrCol, "levels");
@@ -130,10 +134,12 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", retDbg = FALSE) {
             mtaDta$fields[[i]][["dataType"]] <- ifelse(all(!is.na(suppressWarnings(as.integer(facLvl)))) && all(as.character(as.integer(facLvl)) == facLvl), "Integer", "Text");
             mtaDta$fields[[i]][["type"]]     <- "integer";
             # if "measureType" is already stored in the data frame, keep it, otherwise set it to "Ordinal" if the properties indicate it to be likely ("Nominal" is already the default)
-            if (facOrd || (chkFld(mtaDta$fields[[i]], "dataType", "Integer") && length(facLvl) > 5 && !any(is.na(c(as.integer(facLvl), crrCol))) &&
-                           stats::sd(diff(as.integer(facLvl))) < diff(range(crrCol)) / 10)) {
-                mtaDta$fields[[i]][["measureType"]] <- ifelse(chkAtt(dtaFrm[[i]], "measureType"), attr(dtaFrm[[i]], "measureType"), "Ordinal");
-            }
+            if (facOrd) mtaDta$fields[[i]][["measureType"]] <- ifelse(chkAtt(dtaFrm[[i]], "measureType"), attr(dtaFrm[[i]], "measureType"), "Ordinal"); 
+            # the code below permitted to "guess" whether a factor likely was ordered, but this lead to some problems when storing reshaped data
+#           if (facOrd || (chkFld(mtaDta$fields[[i]], "dataType", "Integer") && length(facLvl) > 5 && !any(is.na(c(as.integer(facLvl), crrCol))) &&
+#                          stats::sd(diff(as.integer(facLvl))) < diff(range(crrCol)) / 10)) {
+#               mtaDta$fields[[i]][["measureType"]] <- ifelse(chkAtt(dtaFrm[[i]], "measureType"), attr(dtaFrm[[i]], "measureType"), "Ordinal");
+#           }
             if (length(facLvl) > 0) {
                 xtdDta[[names(dtaFrm[i])]] <- list(labels = lapply(seq_along(facLvl), function(i) list(i - 1, facLvl[[i]], facLvl[[i]], FALSE)));
             }

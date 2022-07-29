@@ -60,13 +60,13 @@ to use "haven", it may be needed to install it manually (i.e., \code{install.pac
 library(jmvReadWrite)
 # generate a test dataframe with 100 (imaginary) participants / units of
 # observation (ID), and 8 repeated measurements of variable (X_1, X_2, ...)
-dtaInp <- cbind(data.frame(ID = seq(1:100)),
+dtaInp <- cbind(data.frame(ID = as.character(seq(1:100))),
                 stats::setNames(
                     as.data.frame(matrix(runif(800, -10, 10), nrow = 100)),
                     paste0("X_", 1:8)))
 cat(str(dtaInp))
 # 'data.frame':	100 obs. of  9 variables:
-#  $ ID : int  1 2 3 4 5 6 7 8 9 10 ...
+#  $ ID : chr  "1" "2" "3" "4" ...
 #  $ X_1: num  ...
 #  $ X_2: num  ...
 #  $ X_3: num  ...
@@ -92,17 +92,17 @@ wide2long_omv(fleInp = nmeInp, fleOut = nmeOut, varID = "ID", varTme = "measure"
 cat(list.files(dirname(nmeOut), basename(nmeOut)))
 # -> "file[...].omv" ([...] contains a random combination of numbers / characters
 cat(file.info(nmeOut)$size)
-# -> 6286 (approximate size; size may differ in every run [in dependence of how
+# -> 6939 (approximate size; size may differ in every run [in dependence of how
 #          well the generated random data can be compressed])
 cat(str(read_omv(nmeOut, sveAtt = FALSE)))
 # the data set is now transformed into long (and each the measurements is now
 # indicated by the "measure")
 # 'data.frame':	800 obs. of  3 variables:
-#  $ ID  : int  1 1 1 1 1 1 1 1 2 2 ...
+#  $ ID     : Factor w/ 100 levels "1","2","3","4",..: 1 1 1 1 1 1 1 1 2 2 ...
 #   ..- attr(*, "missingValues")= list()
-#  $ measure: int  1 2 3 4 5 6 7 8 1 2 ...
+#  $ measure: Factor w/ 8 levels "1","2","3","4",..: 1 2 3 4 5 6 7 8 1 2 ...
 #   ..- attr(*, "missingValues")= list()
-#  $ X   : num  ...
+#  $ X      : num  ...
 #   ..- attr(*, "missingValues")= list()
 
 unlink(nmeInp)

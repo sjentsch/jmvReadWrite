@@ -33,7 +33,7 @@
 #' # each data set (for demonstration purposes, A1 in the first, A2 in the second, ...)
 #' merge_rows_omv(fleInp = nmeInp, fleOut = nmeOut, colInd = TRUE);
 #' cat(file.info(nmeOut)$size);
-#' # -> 6768 (size may differ on different OSes)
+#' # -> 6800 (size may differ on different OSes)
 #' dtaOut <- read_omv(nmeOut, sveAtt = FALSE);
 #' # read the data set where the three original datasets were added as rows and show
 #' # the variable names

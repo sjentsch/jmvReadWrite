@@ -25,13 +25,13 @@
 #' library(jmvReadWrite)
 #' # generate a test dataframe with 100 (imaginary) participants / units of
 #' #  observation (ID), 8 measurement (measure) of one variable (X)
-#' dtaInp <- data.frame(ID = rep(seq(1, 100), each = 8),
+#' dtaInp <- data.frame(ID = rep(as.character(seq(1, 100)), each = 8),
 #'                      measure = rep(seq(1, 8), times = 100),
 #'                      X = runif(800, -10, 10))
 #' cat(str(dtaInp))
 #' # the output should look like this
 #' # 'data.frame': 800 obs. of  3 variables:
-#' #  $ ID     : int  1 1 1 1 1 1 1 1 2 2 ...
+#' #  $ ID     : chr  "1" "1" "1" "1" "1" "1" "1" "1" "2" "2" ...
 #' #  $ measure: int  1 2 3 4 5 6 7 8 1 2 ...
 #' #  $ X      : num  ...
 #' # this data set is stored as (temporary) RDS-file and later processed by long2wide
@@ -50,7 +50,7 @@
 #' # the data set is now transformed into wide (and each the measurements is now
 #' # indicated as a suffix to X; X_1, X_2, ...)
 #' # 'data.frame':	100 obs. of  9 variables:
-#' #  $ ID : int  1 2 3 4 5 6 7 8 9 10 ...
+#' #  $ ID : chr  "1" "2" "3" "4" "5" "6" "7" "8" "9" "10" ...
 #' #   ..- attr(*, "jmv-id")= logi TRUE
 #' #   ..- attr(*, "missingValues")= list()
 #' #  $ X_1: num  ...

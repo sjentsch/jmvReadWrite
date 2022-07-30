@@ -74,7 +74,16 @@ test_that("read_omv works", {
     nmeTmp <- paste0(tempfile(), ".omv");
     writeBin("", con = nmeTmp);
     expect_error(chkFle(fleNme = nmeTmp, isZIP = TRUE));
-    unlink(nmeTmp)
+    unlink(nmeTmp);
+
+    # invalid manifest (wrong version number)
+    nmeTmp <- paste0(tempfile(), ".omv");
+    mnfHdl <- file(file.path(tempdir(), "meta"), open = "wb");
+    add2ZIP(nmeTmp, mnfHdl, txtOut = gsub("jamovi-Archive-Version: 11.0", "jamovi-Archive-Version: 99.0", mnfTxt()), newFle = TRUE);
+    rm(mnfHdl);
+    suppressMessages(expect_warning(expect_error(read_omv(nmeTmp))));
+    suppressMessages(expect_null(getHdl(fleOMV = nmeTmp, crrFle = "MANIFEST.MF")));
+    unlink(nmeTmp);
 })
 
 test_that("read_all works", {
@@ -93,8 +102,8 @@ test_that("read_all works", {
     saveRDS(jmvReadWrite::ToothGrowth, nmeTmp);
     dtaFrm <- read_all(nmeTmp);
     expect_equal(dim(dtaFrm), c(60, 7));
-    expect_equal(unname(sapply(dtaFrm, typeof)),                c("integer", "integer", "integer", "double", "integer", "double", "double"));
-    expect_equal(unname(sapply(sapply(dtaFrm, class), "[", 1)), c("integer", "factor", "factor", "numeric", "ordered", "numeric", "numeric"));
+    expect_equal(unname(sapply(dtaFrm, typeof)),                c("character", "integer", "integer", "double", "integer", "double", "double"));
+    expect_equal(unname(sapply(sapply(dtaFrm, class), "[", 1)), c("character", "factor", "factor", "numeric", "ordered", "numeric", "numeric"));
     expect_equal(names(attributes(dtaFrm)), c("names", "row.names", "class"));
     expect_equal(names(attributes(dtaFrm[[3]])),  c("levels", "class", "description"));
     expect_equal(names(attributes(dtaFrm[[5]])),  c("levels", "class"));

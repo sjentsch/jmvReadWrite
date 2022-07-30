@@ -279,10 +279,10 @@ setAtt <- function(attLst = c(), inpObj = NULL, outObj = NULL) {
         # frames are both lists and data frames, and therefore an error is thrown if BOTH input
         # and output objects are lists but not data frames
         } else if (is.list(inpObj) && !is.data.frame(inpObj) && is.list(outObj) && !is.data.frame(outObj)) {
-            cat(attNme);
-            cat(attLst);
-            cat(utils::str(inpObj));
-            cat(utils::str(outObj));
+            cat(paste0("attNme: ", attNme, "\n"));
+            cat(paste0("attLst: ", paste0(attLst, collapse = ", "), "\n\n"));
+            cat("inpObj:\n"); cat(utils::str(inpObj)); cat("\n\n");
+            cat("outObj:\n"); cat(utils::str(outObj)); cat("\n\n");
             stop("Error when storing or accessing meta-data information. Please send the file causing the error to sebastian.jentschke@uib.no");
         }
     }

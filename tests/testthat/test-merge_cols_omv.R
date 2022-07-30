@@ -20,8 +20,8 @@ test_that("merge_cols_omv works", {
 
     dtaFrm <- merge_cols_omv(nmeInp, typMrg = "outer", varBy = "ID", varSrt = c("gender_3", "age_3"));
     expect_s3_class(dtaFrm, "data.frame");
-    expect_equal(dim(dtaFrm), c(250, 82));
-    expect_equal(as.vector(sapply(dtaFrm, typeof)), rep("integer", 82));
+    expect_equal(dim(dtaFrm), c(250, 85));
+    expect_equal(as.vector(sapply(dtaFrm, typeof)), c("character", rep(c(rep("integer", 27), "character"), 3)));
     expect_equal(names(dtaFrm), c("ID", paste0(paste0(varTmp, "_"), sort(rep(1:3, length(varTmp))))));
     expect_equal(unname(colSums(is.na(dtaFrm[, paste0("age_", 1:3)]))), c(5, 2, 0));
     expect_equal(as.integer(table(dtaFrm[["gender_3"]])), c(172, 78));
@@ -31,7 +31,7 @@ test_that("merge_cols_omv works", {
 
     dtaFrm <- merge_cols_omv(nmeInp[-2], typMrg = "inner", varBy = "ID", varSrt = c("gender_3", "age_3"));
     expect_s3_class(dtaFrm, "data.frame");
-    expect_equal(dim(dtaFrm), c(245, 55));
+    expect_equal(dim(dtaFrm), c(245, 57));
 
     unlink(nmeInp);
 

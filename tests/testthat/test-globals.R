@@ -28,4 +28,5 @@ test_that("globals work", {
     expect_equal(fmtFlO(fleOut = "", fleInp = "Trial.omv", rplExt = ".new"), "Trial.new");
     expect_error(fmtFlO(fleOut = "", fleInp = ""));
     expect_error(fcnArg(c("stats::sd", "stats::mean", "C")));
+    expect_error(capture.output(setAtt(attLst = "Trial", inpObj = list(), outObj = outObj)));
 })

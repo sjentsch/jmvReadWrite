@@ -57,6 +57,9 @@
 <ul><li>made replacements using regular expressions compatible with R &gt;= 4.3 (changing occurrences of replacement pattern that included <code>\xNN</code>)</li>
 <li>improvements to <code>wide2long_omv</code> and <code>long2wide_omv</code> (those can now handle several factors, not only one)</li>
 <li>improvement to how <code>write_omv</code> handles / stores factors (those are now zero-based to be in accordance with most programming languages including Python and C++ used in the jamovi engine)</li>
+<li>simplify handling variables with the measurement type “ID” (converted to / treated as character)</li>
+<li>simplify handling variable labels (now, the attribute <code>label</code>, e.g., from importing files using haven, is converted to the jamovi-conforming <code>jmv-desc</code>)</li>
+<li>adding further the unit tests</li>
 <li>general bug fixes and improvements (simplifying the code)</li>
 </ul></div>
 </div>

@@ -374,13 +374,15 @@ fndSyn <- function(resElm = NULL) {
 }
 
 getHdl <- function(fleOMV = "", crrFle = "", crrMde = "r") {
-    zip::unzip(fleOMV, crrFle, exdir = tempdir(), junkpaths = TRUE);
-    crrFle <- file.path(tempdir(), list.files(path = tempdir(), pattern = basename(crrFle)));
-    if (length(crrFle) == 0) {
-        stop(sprintf("The file \"%s\" could not be extracted from \"%s\". Please send the file to sebastian.jentschke@uib.no!", crrFle, fleOMV));
-    }
-
-    file(crrFle, crrMde)
+    tryCatch(expr  = {
+                 zip::unzip(fleOMV, crrFle, exdir = tempdir(), junkpaths = TRUE);
+                 file(file.path(tempdir(), list.files(path = tempdir(), pattern = basename(crrFle))), crrMde)
+             },
+             error = function(errMsg) { 
+                 message(sprintf("The file \"%s\" could not be extracted from \"%s\".\nPlease send the file to sebastian.jentschke@uib.no!\nError message: %s\n", crrFle, fleOMV, errMsg));
+                 NULL
+             }
+        )
 }
 
 

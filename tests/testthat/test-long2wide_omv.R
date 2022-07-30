@@ -10,14 +10,14 @@ test_that("long2wide_omv works", {
     dtaFrm <- read_omv(nmeOut);
     expect_s3_class(dtaFrm, "data.frame");
     expect_equal(dim(dtaFrm), c(121, 25));
-    expect_equal(as.vector(sapply(dtaFrm, typeof)), c("character", rep("double", 24)));
+    expect_equal(as.vector(sapply(dtaFrm, typeof)), c("integer", rep("double", 24)));
     expect_equal(names(dtaFrm), c("Year", paste0(c("X_", "Y_"), month.abb[sort(rep(1:12, 2))])));
 
     long2wide_omv(nmeInp, nmeOut, varID = "Year", varTme = "Month", varTgt = c("X"), varSep = "_");
     dtaFrm <- read_omv(nmeOut);
     expect_s3_class(dtaFrm, "data.frame");
     expect_equal(dim(dtaFrm), c(121, 13));
-    expect_equal(as.vector(sapply(dtaFrm, typeof)), c("character", rep("double", 12)));
+    expect_equal(as.vector(sapply(dtaFrm, typeof)), c("integer", rep("double", 12)));
     expect_equal(names(dtaFrm), c("Year", paste0("X_", month.abb[1:12])));
     expect_equal(unname(colMeans(dtaFrm[2:13])), c(51.05398, 51.52200, 50.90146, 47.98040, 46.28997, 53.70601, 49.47946, 49.24704, 49.92602, 44.93970, 49.37357, 47.55488), tolerance = 1e-4);
 
@@ -25,14 +25,14 @@ test_that("long2wide_omv works", {
     dtaFrm <- read_omv(nmeOut);
     expect_s3_class(dtaFrm, "data.frame");
     expect_equal(dim(dtaFrm), c(121, 13));
-    expect_equal(as.vector(sapply(dtaFrm, typeof)), c("character", rep("double", 12)));
+    expect_equal(as.vector(sapply(dtaFrm, typeof)), c("integer", rep("double", 12)));
     expect_equal(names(dtaFrm), c("Year", paste0("Y_", month.abb[1:12])));
 
     long2wide_omv(nmeInp, nmeOut, varID = "Year", varTme = "Month", varSep = "_", varOrd = "vars");
     dtaFrm <- read_omv(nmeOut);
     expect_s3_class(dtaFrm, "data.frame");
     expect_equal(dim(dtaFrm), c(121, 25));
-    expect_equal(as.vector(sapply(dtaFrm, typeof)), c("character", rep("double", 24)));
+    expect_equal(as.vector(sapply(dtaFrm, typeof)), c("integer", rep("double", 24)));
     expect_equal(names(dtaFrm), c("Year", paste0("X_", month.abb[1:12]), paste0("Y_", month.abb[1:12])));
     expect_equal(unname(colMeans(dtaFrm[2:25])), c(51.05398, 51.52200, 50.90146, 47.98040, 46.28997, 53.70601, 49.47946, 49.24704, 49.92602, 44.93970, 49.37357, 47.55488,
                                                    48.56846, 48.96117, 47.64545, 46.51572, 50.94652, 47.33624, 47.53437, 55.55701, 51.50431, 50.19580, 52.81145, 43.68338), tolerance = 1e-4);

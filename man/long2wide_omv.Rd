@@ -2,7 +2,7 @@
 % Please edit documentation in R/long2wide_omv.R
 \name{long2wide_omv}
 \alias{long2wide_omv}
-\title{Converts .omv-files for the statistical spreadsheet 'jamovi' (www.jamovi.org) from long to wide format}
+\title{Converts .omv-files for the statistical spreadsheet 'jamovi' (\url{https://www.jamovi.org}) from long to wide format}
 \usage{
 long2wide_omv(
   fleInp = "",
@@ -45,7 +45,7 @@ long2wide_omv(
 \item{...}{Additional arguments passed on to methods; see Details below}
 }
 \description{
-Converts .omv-files for the statistical spreadsheet 'jamovi' (www.jamovi.org) from long to wide format
+Converts .omv-files for the statistical spreadsheet 'jamovi' (\url{https://www.jamovi.org}) from long to wide format
 }
 \details{
 The ellipsis-parameter (...) can be used to submit arguments / parameters to the functions that are used for transforming or reading the data. The transformation uses \code{reshape}. When reading the

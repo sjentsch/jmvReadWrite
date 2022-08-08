@@ -1,4 +1,4 @@
-#' Converts .omv-files for the statistical spreadsheet 'jamovi' (www.jamovi.org) from wide to long format
+#' Converts .omv-files for the statistical spreadsheet 'jamovi' (<https://www.jamovi.org>) from wide to long format
 #'
 #' @param fleInp Name (including the path, if required) of the data file to be read ("FILENAME.omv"; default: ""); can be any supported file type, see Details below
 #' @param fleOut Name (including the path, if required) of the data file to be written ("FILENAME.omv"; default: ""); if empty, FILENAME from fleInp is extended with "_long(file extension -> .omv)"

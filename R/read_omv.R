@@ -1,4 +1,4 @@
-#' Read files created of the statistical spreadsheet 'jamovi' (www.jamovi.org)
+#' Read files created of the statistical spreadsheet 'jamovi' (<https://www.jamovi.org>)
 #'
 #' @param fleInp Name (including the path, if required) of the 'jamovi'-file to be read ("FILENAME.omv"; default: "")
 #' @param useFlt Apply filters (remove the lines where the filter is set to 0; default: FALSE)?
@@ -378,7 +378,7 @@ getHdl <- function(fleOMV = "", crrFle = "", crrMde = "r") {
                  zip::unzip(fleOMV, crrFle, exdir = tempdir(), junkpaths = TRUE);
                  file(file.path(tempdir(), list.files(path = tempdir(), pattern = basename(crrFle))), crrMde)
              },
-             error = function(errMsg) { 
+             error = function(errMsg) {
                  message(sprintf("The file \"%s\" could not be extracted from \"%s\".\nPlease send the file to sebastian.jentschke@uib.no!\nError message: %s\n", crrFle, fleOMV, errMsg));
                  NULL
              }

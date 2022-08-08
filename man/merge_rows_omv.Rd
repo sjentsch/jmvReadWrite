@@ -2,7 +2,7 @@
 % Please edit documentation in R/merge_rows_omv.R
 \name{merge_rows_omv}
 \alias{merge_rows_omv}
-\title{Merges two .omv-files for the statistical spreadsheet 'jamovi' (www.jamovi.org) by adding the content of the second, etc.  file(s) as rows to the first file}
+\title{Merges two .omv-files for the statistical spreadsheet 'jamovi' (\url{https://www.jamovi.org}) by adding the content of the second, etc.  file(s) as rows to the first file}
 \usage{
 merge_rows_omv(
   fleInp = c(),
@@ -42,7 +42,7 @@ merge_rows_omv(
 a data frame (if fleOut is empty) with where the rows of all input data sets (i.e., the files given in the fleInp-argument) are concatenated
 }
 \description{
-Merges two .omv-files for the statistical spreadsheet 'jamovi' (www.jamovi.org) by adding the content of the second, etc.  file(s) as rows to the first file
+Merges two .omv-files for the statistical spreadsheet 'jamovi' (\url{https://www.jamovi.org}) by adding the content of the second, etc.  file(s) as rows to the first file
 }
 \details{
 The different types of merging operations: "all" keeps all existing variables / columns that are contained in any of the input data sets and fills them up with NA where the variable / column doesn't

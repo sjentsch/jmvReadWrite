@@ -2,7 +2,7 @@
 % Please edit documentation in R/sort_omv.R
 \name{sort_omv}
 \alias{sort_omv}
-\title{Sort data (using one or more variables) in .omv-files for the statistical spreadsheet 'jamovi' (www.jamovi.org)}
+\title{Sort data (using one or more variables) in .omv-files for the statistical spreadsheet 'jamovi' (\url{https://www.jamovi.org})}
 \usage{
 sort_omv(
   fleInp = c(),
@@ -27,7 +27,7 @@ sort_omv(
 \item{...}{Additional arguments passed on to methods; see Details below}
 }
 \description{
-Sort data (using one or more variables) in .omv-files for the statistical spreadsheet 'jamovi' (www.jamovi.org)
+Sort data (using one or more variables) in .omv-files for the statistical spreadsheet 'jamovi' (\url{https://www.jamovi.org})
 }
 \details{
 varSrt can be either a character or a character vector (with one or more variables respectively). The sorting order for a particular variable can be inverted with preceding the variable name with

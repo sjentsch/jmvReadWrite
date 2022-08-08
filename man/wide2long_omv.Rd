@@ -2,7 +2,7 @@
 % Please edit documentation in R/wide2long_omv.R
 \name{wide2long_omv}
 \alias{wide2long_omv}
-\title{Converts .omv-files for the statistical spreadsheet 'jamovi' (www.jamovi.org) from wide to long format}
+\title{Converts .omv-files for the statistical spreadsheet 'jamovi' (\url{https://www.jamovi.org}) from wide to long format}
 \usage{
 wide2long_omv(
   fleInp = "",
@@ -42,7 +42,7 @@ wide2long_omv(
 \item{...}{Additional arguments passed on to methods; see Details below}
 }
 \description{
-Converts .omv-files for the statistical spreadsheet 'jamovi' (www.jamovi.org) from wide to long format
+Converts .omv-files for the statistical spreadsheet 'jamovi' (\url{https://www.jamovi.org}) from wide to long format
 }
 \details{
 If varLst is empty, it is tried to generate it using all variables in the data frame except those defined by varExc and varID. The variable(s) in varID have to be unique identifiers (in the original

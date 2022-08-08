@@ -2,7 +2,7 @@
 % Please edit documentation in R/read_omv.R
 \name{read_omv}
 \alias{read_omv}
-\title{Read files created of the statistical spreadsheet 'jamovi' (www.jamovi.org)}
+\title{Read files created of the statistical spreadsheet 'jamovi' (\url{https://www.jamovi.org})}
 \usage{
 read_omv(
   fleInp = "",
@@ -30,7 +30,7 @@ read_omv(
 data frame (can be directly used with functions included in the R-package 'jmv' and syntax from 'jamovi'; also compatible with the format of the R-package "foreign")
 }
 \description{
-Read files created of the statistical spreadsheet 'jamovi' (www.jamovi.org)
+Read files created of the statistical spreadsheet 'jamovi' (\url{https://www.jamovi.org})
 }
 \examples{
 \dontrun{

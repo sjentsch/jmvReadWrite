@@ -7,6 +7,7 @@
 * simplify handling variables with the measurement type "ID" (converted to / treated as character)
 * simplify handling variable labels (now, the attribute `label`, e.g., from importing files using haven, is converted to the jamovi-conforming `jmv-desc`)
 * adding further the unit tests
+* changed web-addresses into their canonical format (i.e., including protocol and angle brackets; for help, documentation, etc.)
 * general bug fixes and improvements (simplifying the code)
 
 

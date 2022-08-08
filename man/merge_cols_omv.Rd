@@ -2,7 +2,7 @@
 % Please edit documentation in R/merge_cols_omv.R
 \name{merge_cols_omv}
 \alias{merge_cols_omv}
-\title{Merges two or more data files by adding the content of other input files as columns to the first input file and outputs them as files for the statistical spreadsheet 'jamovi' (www.jamovi.org)}
+\title{Merges two or more data files by adding the content of other input files as columns to the first input file and outputs them as files for the statistical spreadsheet 'jamovi' (\url{https://www.jamovi.org})}
 \usage{
 merge_cols_omv(
   fleInp = c(),
@@ -36,7 +36,7 @@ merge_cols_omv(
 a data frame (if fleOut is empty) with where the columns of all input data sets (in the files given to fleInp) are concatenated
 }
 \description{
-Merges two or more data files by adding the content of other input files as columns to the first input file and outputs them as files for the statistical spreadsheet 'jamovi' (www.jamovi.org)
+Merges two or more data files by adding the content of other input files as columns to the first input file and outputs them as files for the statistical spreadsheet 'jamovi' (\url{https://www.jamovi.org})
 }
 \details{
 There are four different types of merging operations: "outer" keeps all cases (but columns in the resulting data set may be empty if they did not contain values in same input data sets), "inner" keeps

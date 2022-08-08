@@ -1,4 +1,4 @@
-#' Merges two or more data files by adding the content of other input files as columns to the first input file and outputs them as files for the statistical spreadsheet 'jamovi' (www.jamovi.org)
+#' Merges two or more data files by adding the content of other input files as columns to the first input file and outputs them as files for the statistical spreadsheet 'jamovi' (<https://www.jamovi.org>)
 #'
 #' @param fleInp vector with the file names of the input files (including the path, if required; c("FILE_IN1.omv", "FILE_IN2.omv"); default: c()); can be any supported file type, see Details below
 #' @param fleOut Name of the data file to be written (including the path, if required; "FILE_OUT.omv"; default: ""); if empty, the data frame with the added columns is returned as variable (but not written)

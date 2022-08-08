@@ -24,9 +24,9 @@ coverage](https://codecov.io/gh/sjentsch/jmvReadWrite/branch/main/graph/badge.sv
 --->
 
 The R-package `jmvReadWrite` reads and writes the .omv-files that are
-used by the statistical spreadsheet `jamovi` (www.jamovi.org). It is
-supposed to ease using syntax for statistical analyses created using the
-GUI in `jamovi` in connection with the R-library `jmv`.
+used by the statistical spreadsheet `jamovi` (<https://www.jamovi.org>).
+It is supposed to ease using syntax for statistical analyses created
+using the GUI in `jamovi` in connection with the R-library `jmv`.
 
 ## Installation
 
@@ -192,9 +192,9 @@ list.files(".", "Trial.omv");
 #> [1] "Trial.omv"
 file.info("Trial.omv");
 #>           size isdir mode               mtime               ctime
-#> Trial.omv 1563 FALSE  664 2022-07-30 13:41:02 2022-07-30 13:41:02
+#> Trial.omv 1563 FALSE  664 2022-08-08 08:15:51 2022-08-08 08:15:51
 #>                         atime  uid  gid    uname   grname
-#> Trial.omv 2022-07-30 13:41:02 1000 1000 sjentsch sjentsch
+#> Trial.omv 2022-08-08 08:15:51 1000 1000 sjentsch sjentsch
 unlink("Trial.omv");
 ```
 

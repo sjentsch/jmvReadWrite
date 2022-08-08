@@ -3,7 +3,7 @@
 \name{write_omv}
 \alias{write_omv}
 \title{Write files to be used with the statistical spreadsheet 'jamovi'
-(www.jamovi.org)}
+(\url{https://www.jamovi.org})}
 \usage{
 write_omv(dtaFrm = NULL, fleOut = "", retDbg = FALSE)
 }
@@ -19,7 +19,7 @@ a list (if retDbg == TRUE), containing the meta data (mtaDta, metadata.json in t
 }
 \description{
 Write files to be used with the statistical spreadsheet 'jamovi'
-(www.jamovi.org)
+(\url{https://www.jamovi.org})
 }
 \details{
 jamovi has a specific measurement level / type "ID" (in addition to the "standard" ones "Nominal", "Ordinal", and "Continuous"). "ID" is used for columns that contain some form of ID (e.g., a

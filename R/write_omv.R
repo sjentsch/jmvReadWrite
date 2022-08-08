@@ -1,5 +1,5 @@
 #' Write files to be used with the statistical spreadsheet 'jamovi'
-#' (www.jamovi.org)
+#' (<https://www.jamovi.org>)
 #'
 #' @param dtaFrm Data frame to be exported (default: NULL)
 #' @param fleOut Name / position of the output file to be generated ("FILENAME.omv"; default: "")

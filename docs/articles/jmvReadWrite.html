@@ -73,7 +73,7 @@
 </h1>
                         <h4 data-toc-skip class="author">Sebastian Jentschke</h4>
             
-            <h4 data-toc-skip class="date">2022-07-30</h4>
+            <h4 data-toc-skip class="date">2022-08-08</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/sjentsch/jmvReadWrite/blob/main/vignettes/jmvReadWrite.Rmd" class="external-link"><code>vignettes/jmvReadWrite.Rmd</code></a></small>
       <div class="hidden name"><code>jmvReadWrite.Rmd</code></div>
@@ -82,7 +82,7 @@
 
     
     
-<p>The R-package <code>jmvReadWrite</code> reads and writes the .omv-files that are used by the statistical spreadsheet <code>jamovi</code> (www.jamovi.org). It is supposed to ease using syntax for statistical analyses created using the GUI in <code>jamovi</code> in connection with the R-library <code>jmv</code>.</p>
+<p>The R-package <code>jmvReadWrite</code> reads and writes the .omv-files that are used by the statistical spreadsheet <code>jamovi</code> (<a href="https://www.jamovi.org" class="external-link uri">https://www.jamovi.org</a>). It is supposed to ease using syntax for statistical analyses created using the GUI in <code>jamovi</code> in connection with the R-library <code>jmv</code>.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
@@ -197,9 +197,9 @@
 <span><span class="co">#&gt; [1] "Trial.omv"</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/file.info.html" class="external-link">file.info</a></span><span class="op">(</span><span class="st">"Trial.omv"</span><span class="op">)</span>;</span>
 <span><span class="co">#&gt;           size isdir mode               mtime               ctime</span></span>
-<span><span class="co">#&gt; Trial.omv 1563 FALSE  664 2022-07-30 13:41:19 2022-07-30 13:41:19</span></span>
+<span><span class="co">#&gt; Trial.omv 1563 FALSE  664 2022-08-08 08:16:17 2022-08-08 08:16:17</span></span>
 <span><span class="co">#&gt;                         atime  uid  gid    uname   grname</span></span>
-<span><span class="co">#&gt; Trial.omv 2022-07-30 13:41:19 1000 1000 sjentsch sjentsch</span></span>
+<span><span class="co">#&gt; Trial.omv 2022-08-08 08:16:17 1000 1000 sjentsch sjentsch</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="st">"Trial.omv"</span><span class="op">)</span>;</span></code></pre></div>
 <p>Although jamovi reads R-data files (.RData, .rda, .rds) <a href="https://sjentsch.github.io/jmvReadWrite/reference/write_omv.html" class="external-link"><code>write_omv</code></a> permits to store <code>jamovi</code>-specific attributes (such as variable labels) in addition. Please note that if you are reading from an <code>.omv</code>-file in order to write back to an <code>.omv</code>-file (perhaps after some modifications), it is recommended to leave the <code>sveAtt</code>-attribute set to <code>TRUE</code> (which is the default).</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">

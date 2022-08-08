@@ -2,7 +2,7 @@
 % Please edit documentation in R/convert_to_omv.R
 \name{convert_to_omv}
 \alias{convert_to_omv}
-\title{Convert data files (CSV, R, other statistics packages) into .omv-files for the statistical spreadsheet 'jamovi' (www.jamovi.org)}
+\title{Convert data files (CSV, R, other statistics packages) into .omv-files for the statistical spreadsheet 'jamovi' (\url{https://www.jamovi.org})}
 \usage{
 convert_to_omv(
   fleInp = "",
@@ -27,7 +27,7 @@ convert_to_omv(
 \item{...}{Additional arguments passed on to methods; see Details below}
 }
 \description{
-Convert data files (CSV, R, other statistics packages) into .omv-files for the statistical spreadsheet 'jamovi' (www.jamovi.org)
+Convert data files (CSV, R, other statistics packages) into .omv-files for the statistical spreadsheet 'jamovi' (\url{https://www.jamovi.org})
 }
 \details{
 The ellipsis-parameter (...) can be used to submit arguments / parameters to the functions that are used for reading the data. These are: \code{read_omv} (for jamovi-files), \code{read.table} (for

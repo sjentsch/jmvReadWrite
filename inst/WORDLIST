@@ -1,8 +1,10 @@
 AGPL
 bfi
 Changelog
+CMD
 codecov
 Codecov
+cond
 com
 CR
 csv
@@ -17,7 +19,6 @@ fleInp
 fleOut
 fleSAV
 fleSPS
-https
 idvar
 incl
 ipip
@@ -53,12 +54,14 @@ SPPS
 sps
 spv
 Stata
+testthat
 th
 timevar
 ToothGrowth
 TSV
 VAR
 varBy
+varExc
 varID
 varLst
 VARNAME

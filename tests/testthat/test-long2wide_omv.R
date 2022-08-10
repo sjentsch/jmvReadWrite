@@ -6,19 +6,19 @@ test_that("long2wide_omv works", {
     nmeOut <- gsub(".rds", "_W.omv", nmeInp);
     saveRDS(dtaTmp, nmeInp);
 
-    long2wide_omv(nmeInp, nmeOut, varID = "Year", varTme = "Month");
+    long2wide_omv(nmeInp, nmeOut, varID = "Year", varTme = "Month", varSep = "_");
     dtaFrm <- read_omv(nmeOut);
     expect_s3_class(dtaFrm, "data.frame");
     expect_equal(dim(dtaFrm), c(121, 25));
     expect_equal(as.vector(sapply(dtaFrm, typeof)), c("integer", rep("double", 24)));
-    expect_equal(names(dtaFrm), c("Year", paste0(c("X.", "Y."), month.abb[sort(rep(1:12, 2))])));
+    expect_equal(names(dtaFrm), c("Year", paste0(c("X_", "Y_"), month.abb[sort(rep(1:12, 2))])));
 
-    long2wide_omv(nmeInp, nmeOut, varID = "Year", varTme = "Month", varTgt = c("X"));
+    long2wide_omv(nmeInp, nmeOut, varID = "Year", varTme = "Month", varTgt = c("X"), varSep = "_");
     dtaFrm <- read_omv(nmeOut);
     expect_s3_class(dtaFrm, "data.frame");
     expect_equal(dim(dtaFrm), c(121, 13));
     expect_equal(as.vector(sapply(dtaFrm, typeof)), c("integer", rep("double", 12)));
-    expect_equal(names(dtaFrm), c("Year", paste0("X.", month.abb[1:12])));
+    expect_equal(names(dtaFrm), c("Year", paste0("X_", month.abb[1:12])));
     expect_equal(unname(colMeans(dtaFrm[2:13])), c(51.05398, 51.52200, 50.90146, 47.98040, 46.28997, 53.70601, 49.47946, 49.24704, 49.92602, 44.93970, 49.37357, 47.55488), tolerance = 1e-4);
 
     long2wide_omv(nmeInp, nmeOut, varID = "Year", varTme = "Month", varTgt = c("Y"), varSep = "_");

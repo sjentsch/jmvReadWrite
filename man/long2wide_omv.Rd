@@ -2,15 +2,16 @@
 % Please edit documentation in R/long2wide_omv.R
 \name{long2wide_omv}
 \alias{long2wide_omv}
-\title{Converts .omv-files for the statistical spreadsheet 'jamovi' (www.jamovi.org) from long to wide format}
+\title{Converts .omv-files for the statistical spreadsheet 'jamovi' (\url{https://www.jamovi.org}) from long to wide format}
 \usage{
 long2wide_omv(
   fleInp = "",
   fleOut = "",
-  varID = "",
-  varTme = "",
+  varID = "ID",
+  varTme = c(),
+  varExc = c(),
   varTgt = c(),
-  varSep = ".",
+  varSep = "_",
   varOrd = c("times", "vars"),
   varSrt = c(),
   usePkg = c("foreign", "haven"),
@@ -25,11 +26,13 @@ long2wide_omv(
 
 \item{varID}{Names of one or more variables that identify the same group / individual (default: c())}
 
-\item{varTme}{Name of the variable that differentiates multiple records from the same group / individual (default: "")}
+\item{varTme}{Name of the variable(s) that differentiates multiple records from the same group / individual (default: c())}
 
-\item{varTgt}{Names of one or more variables to be transformed / reshaped (other variables are excluded, if empty(c()) all variables except varTme and varID are included; default: c())}
+\item{varExc}{Name of the variable(s) should be excluded from the transformation, typically this will be between-subject-variable(s) (default: c())}
 
-\item{varSep}{Separator character when concatenating the fixed and time-varying part of the variable name ("VAR1.1", "VAR1.2"; default: ".")}
+\item{varTgt}{Names of one or more variables to be transformed / reshaped (other variables are excluded, if empty(c()) all variables except varTme, varID and varExc are included; default: c())}
+
+\item{varSep}{Separator character when concatenating the fixed and time-varying part of the variable name ("VAR1_1", "VAR1_2"; default: "_")}
 
 \item{varOrd}{How variables / columns are organized: for "times" (default) the steps of the time varying variable are adjacent, for "vars" the steps of the original columns in the long dataset}
 
@@ -42,7 +45,7 @@ long2wide_omv(
 \item{...}{Additional arguments passed on to methods; see Details below}
 }
 \description{
-Converts .omv-files for the statistical spreadsheet 'jamovi' (www.jamovi.org) from long to wide format
+Converts .omv-files for the statistical spreadsheet 'jamovi' (\url{https://www.jamovi.org}) from long to wide format
 }
 \details{
 The ellipsis-parameter (...) can be used to submit arguments / parameters to the functions that are used for transforming or reading the data. The transformation uses \code{reshape}. When reading the
@@ -53,56 +56,56 @@ like to use "haven", it may be needed to install it manually (i.e., \code{instal
 }
 \examples{
 \dontrun{
-library(jmvReadWrite);
+library(jmvReadWrite)
 # generate a test dataframe with 100 (imaginary) participants / units of
-#  observation (ID), 8 measurement (Meas) of one variable (X)
-dtaInp <- data.frame(ID = sort(rep(seq(1:100), 8)),
-                     Meas = rep(seq(1, 8), 100),
-                     X = runif(800, -10, 10));
-cat(str(dtaInp));
+#  observation (ID), 8 measurement (measure) of one variable (X)
+dtaInp <- data.frame(ID = rep(as.character(seq(1, 100)), each = 8),
+                     measure = rep(seq(1, 8), times = 100),
+                     X = runif(800, -10, 10))
+cat(str(dtaInp))
 # the output should look like this
 # 'data.frame': 800 obs. of  3 variables:
-#  $ ID  : int  1 1 1 1 1 1 1 1 2 2 ...
-#  $ Meas: int  1 2 3 4 5 6 7 8 1 2 ...
-#  $ X   : num  ...
+#  $ ID     : chr  "1" "1" "1" "1" ...
+#  $ measure: int  1 2 3 4 5 6 7 8 1 2 ...
+#  $ X      : num  ...
 # this data set is stored as (temporary) RDS-file and later processed by long2wide
-nmeInp <- paste0(tempfile(), ".rds");
-nmeOut <- paste0(tempfile(), ".omv");
-saveRDS(dtaInp, nmeInp);
-long2wide_omv(fleInp = nmeInp, fleOut = nmeOut, varID = "ID", varTme = "Meas", varTgt = "X");
+nmeInp <- paste0(tempfile(), ".rds")
+nmeOut <- paste0(tempfile(), ".omv")
+saveRDS(dtaInp, nmeInp)
+long2wide_omv(fleInp = nmeInp, fleOut = nmeOut, varID = "ID", varTme = "measure", varTgt = "X")
 # it is required to give at least the arguments fleInp, varID and varTme
 # check whether the file was created and its size
-cat(list.files(dirname(nmeOut), basename(nmeOut)));
+cat(list.files(dirname(nmeOut), basename(nmeOut)))
 # -> "file[...].omv" ([...] contains a random combination of numbers / characters
-cat(file.info(nmeOut)$size);
-# -> 6200 (approximate size; size may differ in every run [in dependence of
+cat(file.info(nmeOut)$size)
+# -> 6851 (approximate size; size may differ in every run [in dependence of
 #          how well the generated random data can be compressed])
-cat(str(read_omv(nmeOut, sveAtt = FALSE)));
+cat(str(read_omv(nmeOut, sveAtt = FALSE)))
 # the data set is now transformed into wide (and each the measurements is now
-# indicated as a suffix to X; X.1, X.2, ...)
+# indicated as a suffix to X; X_1, X_2, ...)
 # 'data.frame':	100 obs. of  9 variables:
-#  $ ID : int  1 2 3 4 5 6 7 8 9 10 ...
+#  $ ID : chr  "1" "2" "3" "4" "5" "6" "7" "8" "9" "10" ...
 #   ..- attr(*, "jmv-id")= logi TRUE
 #   ..- attr(*, "missingValues")= list()
-#  $ X.1: num  ...
+#  $ X_1: num  ...
 #   ..- attr(*, "missingValues")= list()
-#  $ X.2: num  ...
+#  $ X_2: num  ...
 #   ..- attr(*, "missingValues")= list()
-#  $ X.3: num  ...
+#  $ X_3: num  ...
 #   ..- attr(*, "missingValues")= list()
-#  $ X.4: num  ...
+#  $ X_4: num  ...
 #   ..- attr(*, "missingValues")= list()
-#  $ X.5: num  ...
+#  $ X_5: num  ...
 #   ..- attr(*, "missingValues")= list()
-#  $ X.6: num  ...
+#  $ X_6: num  ...
 #   ..- attr(*, "missingValues")= list()
-#  $ X.7: num  ...
+#  $ X_7: num  ...
 #   ..- attr(*, "missingValues")= list()
-#  $ X.8: num  ...
+#  $ X_8: num  ...
 #   ..- attr(*, "missingValues")= list()
 
-unlink(nmeInp);
-unlink(nmeOut);
+unlink(nmeInp)
+unlink(nmeOut)
 }
 
 }

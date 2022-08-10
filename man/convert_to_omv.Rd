@@ -2,7 +2,7 @@
 % Please edit documentation in R/convert_to_omv.R
 \name{convert_to_omv}
 \alias{convert_to_omv}
-\title{Convert data files (CSV, R, other statistics packages) into .omv-files for the statistical spreadsheet 'jamovi' (www.jamovi.org)}
+\title{Convert data files (CSV, R, other statistics packages) into .omv-files for the statistical spreadsheet 'jamovi' (\url{https://www.jamovi.org})}
 \usage{
 convert_to_omv(
   fleInp = "",
@@ -27,7 +27,7 @@ convert_to_omv(
 \item{...}{Additional arguments passed on to methods; see Details below}
 }
 \description{
-Convert data files (CSV, R, other statistics packages) into .omv-files for the statistical spreadsheet 'jamovi' (www.jamovi.org)
+Convert data files (CSV, R, other statistics packages) into .omv-files for the statistical spreadsheet 'jamovi' (\url{https://www.jamovi.org})
 }
 \details{
 The ellipsis-parameter (...) can be used to submit arguments / parameters to the functions that are used for reading the data. These are: \code{read_omv} (for jamovi-files), \code{read.table} (for
@@ -49,7 +49,7 @@ convert_to_omv(fleInp = nmeInp, fleOut = nmeOut);
 cat(list.files(dirname(nmeOut), basename(nmeOut)));
 # -> "file[...].omv" ([...] contains a random combination of numbers / characters
 cat(file.info(nmeOut)$size);
-# -> 2199 (size may differ on different OSes)
+# -> 2448 (size may differ on different OSes)
 cat(str(read_omv(nmeOut, sveAtt = FALSE)));
 # gives a overview of the dataframe (all columns and some attributes,
 # sveAtt is intentionally set to FALSE to make the output not too overwhelming)
@@ -64,7 +64,7 @@ write.csv(jmvReadWrite::ToothGrowth, nmeInp);
 convert_to_omv(fleInp = nmeInp, fleOut = nmeOut);
 cat(list.files(dirname(nmeOut), basename(nmeOut)));
 cat(file.info(nmeOut)$size);
-# -> 2107 (size may differ acc. to OS; the size is smaller than for the RDS-file
+# -> 2104 (size may differ acc. to OS; the size is smaller than for the RDS-file
 # because CSV can store fewer attributes, e.g., labels)
 cat(str(read_omv(nmeOut, sveAtt = FALSE)));
 # gives a overview of the dataframe (all columns and some attributes)

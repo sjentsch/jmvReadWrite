@@ -1,21 +1,20 @@
 # CRAN Notes - jmvReadWrite
 
 ## Current version
-0.3.0
+0.3.3
+updated / bug-fix release (0.3.2 -> 0.3.3)
 
 ## Test environments
-* ``devtools::check()`` - local: Ubuntu 20.04, R 4.1 (x86_64-pc-linux-gnu)
-* ``devtools::check_rhub(pkg = ".", platforms = rhub::platforms()$name)``
-  compiles OK on Mac (High Sierra, R-release: CRAN / brew), Windows Server 2008 (R-patched, R-release, R-oldrel)
-  mail returns PREPERROR but in the log file "Status: OK": Debian (R-release, R-devel), Fedora (R-devel), Ubuntu 20.04 (R-release, R-devel)
-  compiles with NOTE on Windows Server 2022 (R-devel): file left in temp directory and Solaris (R-release, R-devel): pandoc not installed
-  compiles with WARNING on Mac M1 (High Sierra, R-release): missing qpdf / pandoc
-  compiles with PREPERROR on CentOS (LaTeX error when creating manual PDF)
+* one NOTE about the package being archived (check issues were not addressed in time) for all commands below
+* ``devtools::check()``
+  - local: Ubuntu 22.04, R 4.2 (x86_64-pc-linux-gnu)
+* ``devtools::check_rhub()``
+  - Ubuntu 20.04 R-release / Fedora R-devel: e-mail returns as PREPERROR, but when checking the log files installation / test ends with success (only the archive note)
+  - Windows 2022 Server R-devel: a further NOTE because of a leftover LaTeX-file
+* ``devtools::check_rhub(pkg = ".", platforms = c("solaris-x86-patched", "solaris-x86-patched-ods"), env_vars = c("_R_CHECK_FORCE_SUGGESTS_" = "false"))``
+  - compiles with NOTE on Solaris (R-release, R-devel): pandoc not installed, RProtoBuf and jmv (imports RProtoBuf) not available
 * ``devtools::check_win_devel()``
-  no notes, warnings or errors
+  - no further notes, warnings or errors
 
 ## R CMD check results
-
-0 errors | 0 warnings | 0 note
-
-* This is an updated release (0.2.4 -> 0.3.0).
+* no further notes, no warnings or errors

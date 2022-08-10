@@ -20,12 +20,12 @@ test_that("merge_rows_omv works", {
     expect_s3_class(dtaFrm, "data.frame");
     expect_equal(dim(dtaFrm), c(758, 33));
     expect_equal(names(attributes(dtaFrm)), c("names", "row.names", "class"));
-    expect_equal(names(attributes(dtaFrm[[2]])), c("levels", "class"));
-    expect_equal(attributes(dtaFrm[[28]]), NULL);
+    expect_equal(names(attributes(dtaFrm[[2]])), "jmv-desc");
+    expect_equal(names(attributes(dtaFrm[[30]])), c("levels", "class"));
 
     dtaFrm <- merge_rows_omv(fleInp = nmeInp, typMrg = "common");
     expect_s3_class(dtaFrm, "data.frame");
-    expect_equal(dim(dtaFrm), c(758, 28));
+    expect_equal(dim(dtaFrm), c(758, 29));
 
     dtaFrm <- merge_rows_omv(fleInp = nmeInp, colInd = TRUE);
     expect_s3_class(dtaFrm, "data.frame");

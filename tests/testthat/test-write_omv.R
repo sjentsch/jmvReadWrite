@@ -21,17 +21,24 @@ test_that("write_omv works", {
     expect_s3_class(dtaDbg$dtaFrm, "data.frame");
     expect_equal(dim(dtaDbg$dtaFrm), c(60, 7));
     expect_equal(names(attributes(dtaDbg$dtaFrm)), c("names", "row.names", "class"));
-    expect_equal(names(attributes(dtaDbg$dtaFrm[[3]])), c("levels", "class", "values"));
+    expect_equal(names(attributes(dtaDbg$dtaFrm[[3]])), c("levels", "class", "description"));
     expect_equal(names(attributes(dtaDbg$dtaFrm[[7]])), c("jmv-desc"));
     expect_equal(attributes(dtaDbg$dtaFrm[[4]]), NULL);
     expect_equal(sapply(jmvReadWrite::ToothGrowth, class), sapply(dtaDbg$dtaFrm, class));
 
     # test cases for code coverage ============================================================================================================================
-    attr(dtaDbg$dtaFrm, "label.table") <- c("A", "B", "C");
     expect_error(write_omv(NULL, nmeOut));
     expect_error(write_omv(dtaDbg$dtaFrm, ""));
-    expect_error(write_omv(dtaDbg$dtaFrm, nmeOut));
     expect_error(capture.output(add2ZIP(fleZIP = nmeOut, crrHdl = NULL)));
+
+    attr(dtaDbg$dtaFrm, "label.table") <- c("A", "B", "C");
+    expect_error(write_omv(dtaDbg$dtaFrm, nmeOut));
+    attr(dtaDbg$dtaFrm, "label.table") <- NULL;
+
+    attr(dtaDbg$dtaFrm, "variable.labels") <- setNames(c("Label for ID", "Label for supp", "Label for supp2"), c("ID", "supp", "supp2"));
+    dtaDbg$dtaFrm$supp <- as.character(dtaDbg$dtaFrm$supp)
+    expect_equal(sapply(c(1, 3), function(n) write_omv(dtaDbg$dtaFrm, nmeOut, retDbg = TRUE)[["mtaDta"]][["fields"]][[n]][["description"]]), c("Label for ID", "Label for supp2"))
+    expect_identical(sapply(c("dataType", "type"), function(f) write_omv(dtaDbg$dtaFrm, nmeOut, retDbg = TRUE)[["mtaDta"]][["fields"]][[2]][[f]], USE.NAMES = FALSE), c("Text", "integer"))
 
     set.seed(1);
     dtaOut <- cbind(dtaOut, data.frame(Bool = sample(c(TRUE, FALSE), colOut, TRUE),

@@ -131,10 +131,10 @@ spv2sps <- function(fleSPV = "", rmvInv = FALSE) {
                 }
                 if (any(grepl("\\.$", txtSPS[(rngErr:lneErr - 1)])) | (lneErr < length(txtSPS) && grepl("^$", txtSPS[lneErr + 1]))) {
                     stop("SJ: Check sequence");
-                    txtSPS <- txtSPS[-(rngErr:lneErr)];
-                } else if ((lneErr < length(txtSPS) && ! grepl("^$", txtSPS[lneErr + 1])) && any(grepl("\\.$", txtSPS[(lneErr + 1):length(txtSPS)]))) {
+                    txtSPS <- txtSPS[-seq(rngErr, lneErr)];
+                } else if ((lneErr < length(txtSPS) && ! grepl("^$", txtSPS[lneErr + 1])) && any(grepl("\\.$", txtSPS[seq(lneErr + 1, length(txtSPS))]))) {
                     stop("SJ: Check sequence");
-                    txtSPS <- txtSPS[-(rngErr:(lneErr + min(which(grepl("\\.$", txtSPS[(lneErr + 1):length(txtSPS)])))))];
+                    txtSPS <- txtSPS[-seq(rngErr, (lneErr + min(which(grepl("\\.$", txtSPS[seq(lneErr + 1, length(txtSPS))])))))];
                 } else {
                     stop(sprintf("\n\nError with execution stopped:\nfleSPV = \"%s\"\nfleLog = \"%s\"\n\n%s\n\n", fleSPV, fleLog, paste0(txtSPS[lneErr], collapse = "\n")));
                 }
@@ -279,9 +279,9 @@ clnSPS <- function(txtSPS = c()) {
         rngCmd <- lneCmd[! grepl("\\.$", txtSPS[lneCmd])];
         if (length(rngCmd) > 0) {
             stop("SJ: Check sequence");
-            rngCmd <- rngCmd[1]:min(c(which(grepl("\\.$", txtSPS[rngCmd[1] + 1:length(txtSPS)])) + rngCmd[1],
-                                      which(grepl("^$",   txtSPS[rngCmd[1] + 1:length(txtSPS)])) + rngCmd[1] - 1,
-                                      which(grepl("^>",   txtSPS[rngCmd[1] + 1:length(txtSPS)])) + rngCmd[1] - 1,
+            rngCmd <- rngCmd[1]:min(c(which(grepl("\\.$", txtSPS[seq(rngCmd[1] + 1, length(txtSPS))])) + rngCmd[1],
+                                      which(grepl("^$",   txtSPS[seq(rngCmd[1] + 1, length(txtSPS))])) + rngCmd[1] - 1,
+                                      which(grepl("^>",   txtSPS[seq(rngCmd[1] + 1, length(txtSPS))])) + rngCmd[1] - 1,
                                       length(txtSPS)));
 
             txtSPS[rngCmd[1]] <- paste(txtSPS[rngCmd], collapse = " ");

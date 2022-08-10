@@ -5,16 +5,18 @@
 
 <!-- badges: start -->
 
-[![CI](https://github.com/sjentsch/jmvReadWrite/actions/workflows/ci.yml/badge.svg)](https://github.com/sjentsch/jmvReadWrite/actions/workflows/ci.yml)
 [![CRAN](http://www.r-pkg.org/badges/version/jmvReadWrite)](https://cran.r-project.org/package=jmvReadWrite)
 [![License](https://img.shields.io/badge/License-AGPL%20v3-green.svg)](https://www.gnu.org/licenses/agpl-3.0.html)
 [![Downloads](https://cranlogs.r-pkg.org/badges/jmvReadWrite?color=brightgreen)](https://cran.r-project.org/package=jmvReadWrite)
 [![Dependencies](https://tinyverse.netlify.com/badge/jmvReadWrite)](https://cran.r-project.org/package=jmvReadWrite)
 [![Last
 commit](https://img.shields.io/github/last-commit/sjentsch/jmvReadWrite)](https://github.com/sjentsch/jmvReadWrite)
+[![CI](https://github.com/sjentsch/jmvReadWrite/actions/workflows/ci.yml/badge.svg)](https://github.com/sjentsch/jmvReadWrite/actions/workflows/ci.yml)
+[![R-CMD-check](https://github.com/sjentsch/jmvReadWrite/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/sjentsch/jmvReadWrite/actions/workflows/R-CMD-check.yaml)
+[![code-coverage](https://github.com/sjentsch/jmvReadWrite/actions/workflows/codecov.yaml/badge.svg)](https://github.com/sjentsch/jmvReadWrite/actions/workflows/codecov.yaml)
 [![Codecov
 coverage](https://codecov.io/gh/sjentsch/jmvReadWrite/branch/main/graph/badge.svg)](https://app.codecov.io/gh/sjentsch/jmvReadWrite?branch=main)
-[![Documentation](https://img.shields.io/badge/documentation-is_here-blue)](https://sjentsch.github.io/jmvReadWrite)
+[![Documentation](https://img.shields.io/badge/documentation-is_here-blue)](https://sjentsch.github.io/jmvReadWrite/)
 <!-- badges: end -->
 
 <!---
@@ -22,9 +24,9 @@ coverage](https://codecov.io/gh/sjentsch/jmvReadWrite/branch/main/graph/badge.sv
 --->
 
 The R-package `jmvReadWrite` reads and writes the .omv-files that are
-used by the statistical spreadsheet `jamovi` (www.jamovi.org). It is
-supposed to ease using syntax for statistical analyses created using the
-GUI in `jamovi` in connection with the R-library `jmv`.
+used by the statistical spreadsheet `jamovi` (<https://www.jamovi.org>).
+It is supposed to ease using syntax for statistical analyses created
+using the GUI in `jamovi` in connection with the R-library `jmv`.
 
 ## Installation
 
@@ -37,7 +39,7 @@ install.packages("jmvReadWrite")
 ```
 
 or you can install the development version of the `jmvReadWrite` package
-from [GitHub](https://github.com/sjentsch/jmvReadWrite):
+from [GitHub](https://github.com/sjentsch/jmvReadWrite/):
 
 ``` r
 if(!require(devtools)) install.packages("devtools")
@@ -47,6 +49,7 @@ devtools::install_github("sjentsch/jmvReadWrite")
 ## How to use the package?
 
 <br />
+
 [**read\_omv**](https://sjentsch.github.io/jmvReadWrite/reference/read_omv.html)
 
 The following code uses the ToothGrowth-data set that is part of the
@@ -68,7 +71,7 @@ differences.
 
 If you want to copy the syntax generated in jamovi, you have to switch
 on the [`Syntax
-Mode`](https://jamovi.readthedocs.io/en/latest/_pages/um_6_syntax_mode.html).
+Mode`](https://jamovi.readthedocs.io/en/latest/usermanual/um_6_syntax_mode.html).
 Afterwards, the syntax is shown at the top of the analysis and can be
 copied from there.
 
@@ -189,9 +192,9 @@ list.files(".", "Trial.omv");
 #> [1] "Trial.omv"
 file.info("Trial.omv");
 #>           size isdir mode               mtime               ctime
-#> Trial.omv 2199 FALSE  664 2022-02-13 23:53:21 2022-02-13 23:53:21
+#> Trial.omv 1563 FALSE  664 2022-08-08 08:15:51 2022-08-08 08:15:51
 #>                         atime  uid  gid    uname   grname
-#> Trial.omv 2022-02-13 23:53:21 1000 1000 sjentsch sjentsch
+#> Trial.omv 2022-08-08 08:15:51 1000 1000 sjentsch sjentsch
 unlink("Trial.omv");
 ```
 
@@ -212,7 +215,7 @@ data = read_omv(fleOMV, sveAtt = TRUE);
 # shows the names of the attributes for the whole data set (e.g., number of
 # rows and columns) and the names of the attributes of the first column
 names(attributes(data));
-#> [1] "row.names"   "names"       "class"       "fltLst"      "removedRows"
+#> [1] "names"       "row.names"   "class"       "fltLst"      "removedRows"
 #> [6] "addedRows"   "transforms"
 names(attributes(data[[1]]));
 #>  [1] "missingValues"  "name"           "id"             "columnType"    

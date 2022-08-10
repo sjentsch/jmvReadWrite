@@ -1,4 +1,4 @@
-#' Sort data (using one or more variables) in .omv-files for the statistical spreadsheet 'jamovi' (www.jamovi.org)
+#' Sort data (using one or more variables) in .omv-files for the statistical spreadsheet 'jamovi' (<https://www.jamovi.org>)
 #'
 #' @param fleInp Name (including the path, if required) of the data file to be read ("FILENAME.ext"; default: ""); can be any supported file type, see Details below
 #' @param fleOut Name (including the path, if required) of the data file to be written ("FILENAME.omv"; default: ""); if empty, the extension of fleInp is replaced with "_sorted(file extension -> .omv)"
@@ -62,9 +62,19 @@ sort_omv <- function(fleInp = c(), fleOut = "", varSrt = c(), usePkg = c("foreig
 }
 
 srtFrm <- function(dtaFrm = NULL, varSrt = c()) {
+    # if the sorting variable(s) are found, generate an order according to them and afterwards remove / reset the rownames
     if (chkVar(dtaFrm, gsub("^-", "", varSrt))) {
-        dtaFrm[eval(parse(text = paste0("order(", gsub("dtaFrm[[\"-", "-dtaFrm[[\"", paste0("dtaFrm[[\"", varSrt, "\"]]", collapse = ", "), fixed = TRUE), ")"))), ]
-    } else {
-        dtaFrm
+#       srtOrd <- eval(parse(text = paste0("order(", paste0(gsub("dtaFrm[[\"-", "-dtaFrm[[\"", paste0("dtaFrm[[\"", varSrt, "\"]]"), fixed = TRUE), collapse = ", "), ")")))
+        srtOrd <- eval(parse(text = paste0("order(", paste0(sapply(varSrt, function(x) {
+            s <- ifelse(grepl("^-", x), "-", "");
+            ifelse(!any(is.na(suppressWarnings(as.numeric(dtaFrm[[x]])))), paste0(s, "as.numeric(dtaFrm[[\"", sub("^-", "", x), "\"]])"),
+            paste0(s, "dtaFrm[[\"", sub("^-", "", x), "\"]]")); }), collapse = ", "), ")")))
+        # sorting makes the data.frame lose it's attributes which are therefore stored and later restored
+        attMem <- sapply(dtaFrm, attributes)
+        dtaFrm <- dtaFrm[srtOrd, ]
+        rownames(dtaFrm) <- NULL
+        for (n in names(attMem)[!sapply(attMem, is.null)]) attributes(dtaFrm[[n]]) <- attMem[[n]]
     }
+
+    dtaFrm
 }

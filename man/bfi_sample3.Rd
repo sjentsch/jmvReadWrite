@@ -8,7 +8,7 @@
 \format{
 A data.frame with 250 rows and 28 variables
 \describe{
-\item{ID}{integer}{Respondent ID}
+\item{ID}{character}{Respondent ID}
 \item{A1}{ordered factor}{Am indifferent to the feelings of others. (reversed)}
 \item{A2}{ordered factor}{Inquire about others' well-being.}
 \item{A3}{ordered factor}{Know how to comfort others.}

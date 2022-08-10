@@ -1,4 +1,4 @@
-#' Merges two or more data files by adding the content of other input files as columns to the first input file and outputs them as files for the statistical spreadsheet 'jamovi' (www.jamovi.org)
+#' Merges two or more data files by adding the content of other input files as columns to the first input file and outputs them as files for the statistical spreadsheet 'jamovi' (<https://www.jamovi.org>)
 #'
 #' @param fleInp vector with the file names of the input files (including the path, if required; c("FILE_IN1.omv", "FILE_IN2.omv"); default: c()); can be any supported file type, see Details below
 #' @param fleOut Name of the data file to be written (including the path, if required; "FILE_OUT.omv"; default: ""); if empty, the data frame with the added columns is returned as variable (but not written)
@@ -33,13 +33,13 @@
 #' nmeInp <- paste0(tempfile(), "_", 1:3, ".rds");
 #' nmeOut <- paste0(tempfile(), ".omv");
 #' for (i in seq_along(nmeInp)) {
-#'     saveRDS(setNames(dtaInp, c("ID", paste0(names(dtaInp)[-1], "_", i))), nmeInp[i]);
+#'     saveRDS(stats::setNames(dtaInp, c("ID", paste0(names(dtaInp)[-1], "_", i))), nmeInp[i]);
 #' }
 #' # save dtaInp three times (i.e., the length of nmeInp), adding "_" + 1 ... 3 as index
 #' # to the data variables (A1 ... O5, gender, age → A1_1, ...)
 #' merge_cols_omv(fleInp = nmeInp, fleOut = nmeOut, varBy = "ID");
 #' cat(file.info(nmeOut)$size);
-#' # -> 12518 (size may differ on different OSes)
+#' # -> 17731 (size may differ on different OSes)
 #' dtaOut <- read_omv(nmeOut, sveAtt = FALSE);
 #' # read the data set where the three original datasets were added as columns and show
 #' # the variable names

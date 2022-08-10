@@ -1,4 +1,4 @@
-#' Merges two .omv-files for the statistical spreadsheet 'jamovi' (www.jamovi.org) by adding the content of the second, etc.  file(s) as rows to the first file
+#' Merges two .omv-files for the statistical spreadsheet 'jamovi' (<https://www.jamovi.org>) by adding the content of the second, etc.  file(s) as rows to the first file
 #'
 #' @param fleInp Vector with file names (including the path, if required) of the data files to be read (c("FILE1.omv", "FILE2.omv"); default: c()); can be any supported file type, see Details below
 #' @param fleOut Name of the data file to be written (including the path, if required; "FILE_OUT.omv"; default: ""); if empty, the data frame with the added columns is returned as variable (but not written)
@@ -33,7 +33,7 @@
 #' # each data set (for demonstration purposes, A1 in the first, A2 in the second, ...)
 #' merge_rows_omv(fleInp = nmeInp, fleOut = nmeOut, colInd = TRUE);
 #' cat(file.info(nmeOut)$size);
-#' # -> 6768 (size may differ on different OSes)
+#' # -> 10767 (size may differ on different OSes)
 #' dtaOut <- read_omv(nmeOut, sveAtt = FALSE);
 #' # read the data set where the three original datasets were added as rows and show
 #' # the variable names

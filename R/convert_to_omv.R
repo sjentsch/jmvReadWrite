@@ -1,4 +1,4 @@
-#' Convert data files (CSV, R, other statistics packages) into .omv-files for the statistical spreadsheet 'jamovi' (www.jamovi.org)
+#' Convert data files (CSV, R, other statistics packages) into .omv-files for the statistical spreadsheet 'jamovi' (<https://www.jamovi.org>)
 #'
 #' @param fleInp Name (including the path, if required) of the data file to be read ("FILENAME.ext"; default: ""); supports CSV and R-files natively, or other file types if "foreign" or "haven" are installed
 #' @param fleOut Name (including the path, if required) of the data file to be written ("FILENAME.omv"; default: ""); if empty, the extension of fleInp is replaced with ".omv"
@@ -27,7 +27,7 @@
 #' cat(list.files(dirname(nmeOut), basename(nmeOut)));
 #' # -> "file[...].omv" ([...] contains a random combination of numbers / characters
 #' cat(file.info(nmeOut)$size);
-#' # -> 2199 (size may differ on different OSes)
+#' # -> 2448 (size may differ on different OSes)
 #' cat(str(read_omv(nmeOut, sveAtt = FALSE)));
 #' # gives a overview of the dataframe (all columns and some attributes,
 #' # sveAtt is intentionally set to FALSE to make the output not too overwhelming)
@@ -42,7 +42,7 @@
 #' convert_to_omv(fleInp = nmeInp, fleOut = nmeOut);
 #' cat(list.files(dirname(nmeOut), basename(nmeOut)));
 #' cat(file.info(nmeOut)$size);
-#' # -> 2107 (size may differ acc. to OS; the size is smaller than for the RDS-file
+#' # -> 2104 (size may differ acc. to OS; the size is smaller than for the RDS-file
 #' # because CSV can store fewer attributes, e.g., labels)
 #' cat(str(read_omv(nmeOut, sveAtt = FALSE)));
 #' # gives a overview of the dataframe (all columns and some attributes)

@@ -15,6 +15,7 @@ for (blnAtt in c(TRUE, FALSE)) {
     }
     cat(sprintf('\n%s\n%s\n\n', strrep("=", 100), strrep("=", 100)));
 }
+rm('blnAtt', 'crrOMV')
 
 # checks the requirements (all dependencies up-to-date, etc.)
 # use devtools::update_packages("devtools") and devtools::install_dev_deps() if required
@@ -39,6 +40,9 @@ covr::codecov(token = "2f521d97-d1e2-4baf-b05b-0b569a7c6f0f")
 # REMEMBER: error messages from R are not always pointing to the place where the error occurs - especially when using commands like build_readme()
 # ================================================================================================================================================
 
+# update version number in DESCRIPTION and NEWS.md (and changes in NEWS.md)
+system("gedit DESCRIPTION NEWS.md")
+
 # building / updating README, PDF manual, and the HTML documentation
 # add new functions to .pkgdown.yaml if required
 devtools::build_readme()
@@ -59,14 +63,14 @@ devtools::check_rhub()
 devtools::check_rhub(pkg = ".", platforms = rhub::platforms()$name, env_vars = c("_R_CHECK_FORCE_SUGGESTS_" = "false"))
 # or, if there are known errors (e.g., on rhub), exclude certain platforms explicitly
 crrPlt = rhub::platforms()
-crrPlt = crrPlt[-c(x, ...)]
+crrPlt = crrPlt[-c(x, ...), ]
 devtools::check_rhub(pkg = ".", platforms = crrPlt$name, env_vars = c("_R_CHECK_FORCE_SUGGESTS_" = "false"))
 
-# check on win-builder
+# check on win-builder (Rhub above may take a while, open a new terminal)
 devtools::check_win_devel()
 
-# update version number in: cran-comments.md, DESCRIPTION, NEWS.md
-system("gedit cran-comments.md DESCRIPTION NEWS.md")
+# update version number and comments in cran-comments.md (and perhaps NEWS.md)
+system("gedit cran-comments.md NEWS.md")
 
 # now, we are ready to release the package onto CRAN
 devtools::release()

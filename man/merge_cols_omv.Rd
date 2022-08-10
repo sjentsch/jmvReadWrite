@@ -2,7 +2,7 @@
 % Please edit documentation in R/merge_cols_omv.R
 \name{merge_cols_omv}
 \alias{merge_cols_omv}
-\title{Merges two or more data files by adding the content of other input files as columns to the first input file and outputs them as files for the statistical spreadsheet 'jamovi' (www.jamovi.org)}
+\title{Merges two or more data files by adding the content of other input files as columns to the first input file and outputs them as files for the statistical spreadsheet 'jamovi' (\url{https://www.jamovi.org})}
 \usage{
 merge_cols_omv(
   fleInp = c(),
@@ -36,7 +36,7 @@ merge_cols_omv(
 a data frame (if fleOut is empty) with where the columns of all input data sets (in the files given to fleInp) are concatenated
 }
 \description{
-Merges two or more data files by adding the content of other input files as columns to the first input file and outputs them as files for the statistical spreadsheet 'jamovi' (www.jamovi.org)
+Merges two or more data files by adding the content of other input files as columns to the first input file and outputs them as files for the statistical spreadsheet 'jamovi' (\url{https://www.jamovi.org})
 }
 \details{
 There are four different types of merging operations: "outer" keeps all cases (but columns in the resulting data set may be empty if they did not contain values in same input data sets), "inner" keeps
@@ -60,13 +60,13 @@ dtaInp <- bfi_sample2;
 nmeInp <- paste0(tempfile(), "_", 1:3, ".rds");
 nmeOut <- paste0(tempfile(), ".omv");
 for (i in seq_along(nmeInp)) {
-    saveRDS(setNames(dtaInp, c("ID", paste0(names(dtaInp)[-1], "_", i))), nmeInp[i]);
+    saveRDS(stats::setNames(dtaInp, c("ID", paste0(names(dtaInp)[-1], "_", i))), nmeInp[i]);
 }
 # save dtaInp three times (i.e., the length of nmeInp), adding "_" + 1 ... 3 as index
 # to the data variables (A1 ... O5, gender, age → A1_1, ...)
 merge_cols_omv(fleInp = nmeInp, fleOut = nmeOut, varBy = "ID");
 cat(file.info(nmeOut)$size);
-# -> 12518 (size may differ on different OSes)
+# -> 17731 (size may differ on different OSes)
 dtaOut <- read_omv(nmeOut, sveAtt = FALSE);
 # read the data set where the three original datasets were added as columns and show
 # the variable names

@@ -1,6 +1,4 @@
-# this file
-.gitignore
-
+### R ###
 # History files
 .Rhistory
 .Rapp.history
@@ -24,7 +22,7 @@
 .Rproj.user/
 *.Rproj
 
-# produced vignettes
+# produced vignettes and manual
 vignettes/*.html
 vignettes/*.pdf
 doc/
@@ -43,6 +41,20 @@ doc/
 # R Environment Variables
 .Renviron
 .Rbuildignore
+
+# pkgdown site
+docs/
+
+# translation temp files
+po/*~
+
+# R bookdown stack
+# R package: bookdown caching files
+/*_files/
+
+# knitr and R markdown default cache directories
+*_cache/
+/cache/
 
 # CRAN submission file
 CRAN-SUBMISSION

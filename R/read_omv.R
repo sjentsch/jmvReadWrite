@@ -176,9 +176,9 @@ read_omv <- function(fleInp = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = TRUE,
                     for (anlNme in anlLst) {
                         anlPBf <- RProtoBuf::read(jamovi.coms.AnalysisResponse, anlHdl <- getHdl(fleInp, anlNme, "rb"));
                         clsHdl(anlHdl); rm(anlHdl);
-                        # for (anlFld in names(anlPBf)) { print(paste(anlFld, anlPBf[[anlFld]])) }                 # helper function to show all fields
-                        # for (anlFld in names(anlPBf$options)) { print(paste(anlFld, anlPBf$options[[anlFld]])) } # helper function to show all fields in options
-                        # for (anlFld in names(anlPBf$results)) { print(paste(anlFld, anlPBf$results[[anlFld]])) } # helper function to show all fields in results
+                        # for (anlFld in names(anlPBf))         { print(paste0(anlFld, ": ", anlPBf[[anlFld]])) }         # helper function to show all fields
+                        # for (anlFld in names(anlPBf$options)) { print(paste0(anlFld, ": ", anlPBf$options[[anlFld]])) } # helper function to show all fields in options
+                        # for (anlFld in names(anlPBf$results)) { print(paste0(anlFld, ": ", anlPBf$results[[anlFld]])) } # helper function to show all fields in results
                         # ..$bytesize() - size of the protocol buffer (or any field contained in it)
                         savSyn <- c(savSyn, gsub("\\( ", "\\(", gsub("\\n\\s+", " ", fndSyn(anlPBf$results))));
                         anlPBf$results <- NULL;

@@ -1573,7 +1573,9 @@ getArg <- function(crrFnc = "", addDta = TRUE) {
         }
         updArg(getArg(crrFnc, FALSE), pairlist(data = as.symbol(paste0("data", ifelse(argFlt != "", paste0("[", argFlt, ", ]"), "")))))
     } else {
-        eval(parse(text = paste0("formals(", crrFnc, ")")))
+#       eval(parse(text = paste0("formals(", crrFnc, ")")))
+        crrArg <- as.list(eval(parse(text = paste0(gsub("ANOVA", "anova", gsub("::", ":::", crrFnc)), "Options$new()$values()"))))
+        crrArg[setdiff(names(crrArg), "levels")]
     }
 }
 

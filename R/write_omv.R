@@ -422,7 +422,7 @@ crtPB <- function(crrOpt = NULL) {
    
    for (n in nmePB) {
        if (n %in% names(crrOpt$options)) {
-           crrVal <- crrOpt$option(crrNme)$value
+           crrVal <- crrOpt$option(n)$value
        } else if () {
        
        } else if (crrNme %in% "data") {
@@ -433,7 +433,6 @@ crtPB <- function(crrOpt = NULL) {
    }
 
    paste0(txtPB, as.character(jamovi.coms.AnalysisOptions$new(hasNames = TRUE, names = nmePB))
-
 
 ## output variables
 #options {

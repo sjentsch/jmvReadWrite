@@ -3,6 +3,7 @@
 #'
 #' @param dtaFrm Data frame to be exported (default: NULL)
 #' @param fleOut Name / position of the output file to be generated ("FILENAME.omv"; default: "")
+#' @param wrtSyn Whether to write syntax, syntax must be attached to dtaFrm as attribute "syntax" (default: FALSE)
 #' @param retDbg Whether to return a list with debugging information (see Value; default: FALSE)
 #'
 #' @return a list (if retDbg == TRUE), containing the meta data (mtaDta, metadata.json in the OMV-file), the extended data (xtdDta, xdata.json in the OMV-file) and the original data frame (dtaFrm)
@@ -272,6 +273,36 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", retDbg = FALSE) {
     add2ZIP(fleOut, htmHdl, txtOut = htmTxt());
     rm(htmHdl);
 
+    if (wrtSyn) {
+        if (!requireNamespace(c("jmvcore", "jmv"), quietly = TRUE)) {
+            stop("Wrting syntax using write_omv requires jmv and jmvcore to be installed (restarting R may be required).")
+        }    
+        lstSyn <- attr(data, "syntax")
+        if (is.character(lstSyn)) lstSyn <- as.list(lstSyn)
+        if (length(lstSyn) > 0 && all(sapply(lstSyn, is.character)) && all(sapply(lstSyn, function(x) grepl("^jmv::", x)))) {
+            # add empty slots (for comments)
+            lstSyn <- c(lstSyn, as.list(rep("jmv::empty()", length(lstSyn) + 1)))[c(length(lstSyn) + 1, rep(seq_along(lstSyn), each = 2) + rep(c(0, length(lstSyn) + 1), 2))]
+            for (i in seq_along(lstSyn)) {
+                crrSyn <- strsplit(lstSyn[[i]], "\\(")[[1]]
+                crrFnc <- strsplit(crrSyn[1], "::")[[1]]
+                crrOpt <- do.call(eval(parse(text = paste0(crrFnc[1], ":::", gsub("^ANOVA$", "anova", crrFnc[2]), "Options")))$new, 
+                                  clnArg(eval(parse(text = paste0("list(", paste0(crrSyn[-1], collapse = "("))))))
+                if (!all(c("R6", "Options") %in% class(crrOpt)))
+                    stop(sprintf("Error when creating analysis options for %s.", crrFnc[2]))
+                crrAnl <- paste0(crrFnc[1], ":::", gsub("^ANOVA$", "anova", crrFnc[2]), "Class$new(options = crrOpt, data = NULL)")
+                
+                if        (grepl("^empty$", lstSyn[[i]])) {
+
+                } else if (grepl("^jmv::",  lstSyn[[i]])) {
+
+                }
+            }
+        } else {
+            warning(paste("The syntax needs to be attached to the data set via the attribute \"syntax\", it has to be either",
+                          "a list or a character vector, and the commands have to start with \"jmv\"."))
+        }
+    }
+
     if (retDbg) {
         list(mtaDta = mtaDta, xtdDta = xtdDta, dtaFrm = dtaFrm)
     }
@@ -361,4 +392,102 @@ add2ZIP <- function(fleZIP = "", crrHdl = NULL, newFle = FALSE, blnZIP = TRUE, t
         }
     }
     unlink(crrFle); rm(crrFle);
+}
+
+clnArg <- function(crrOpt = list(), fncNme = "") {
+    crrDta <- NULL
+    if (hasName(crrOpt, "data") && is.data.frame(crrOpt[["data"]]))
+        crrDta <- crrOpt[["data"]]
+        crrOpt["data"] <- NULL
+    if (hasName(crrOpt, "formula")) {
+        if (!hasName(crrOpt, "dep"))
+            crrOpt[["dep"]]        <- jmvcore::marshalFormula(formula = crrOpt[["formula"]], data = crrDta, from = "lhs", subset = "1", required = TRUE)
+        if (!hasName(crrOpt, "factors"))
+            crrOpt[["factors"]]    <- jmvcore::marshalFormula(formula = crrOpt[["formula"]], data = crrDta, from = "rhs", type = "vars")
+        if (!hasName(crrOpt, "modelTerms")) 
+            crrOpt[["modelTerms"]] <- jmvcore::marshalFormula(formula = crrOpt[["formula"]], data = crrDta, from = "rhs", type = "terms")
+        crrOpt["formula"] <- NULL
+    }
+    for (crrFld in c("emMeans", "modelTerms", "postHoc")) {
+        if (hasName(crrOpt, crrFld) && inherits(crrOpt[[crrFld]], "formula"))
+            crrOpt[[crrFld]] <- jmvcore::decomposeFormula(crrOpt[[crrFld]])     
+    }
+
+    crrOpt
+}
+
+crtPB <- function(crrOpt = NULL) {
+   nmePB <- c(names(crrOpt$options), ".ppi", "theme", "palette", "data")
+   txtPB <- as.character(c())
+   
+   for (n in nmePB) {
+       if (n %in% names(crrOpt$options)) {
+           crrVal <- crrOpt$option(crrNme)$value
+       } else if () {
+       
+       } else if (crrNme %in% "data") {
+       
+       } else {
+           stop("Error when converting to ProtoBuf.")
+       }
+   }
+
+   paste0(txtPB, as.character(jamovi.coms.AnalysisOptions$new(hasNames = TRUE, names = nmePB))
+
+
+## output variables
+#options {
+#  c {
+#    options {
+#      o: TRUE
+#    }
+#    options {
+#      c {
+#      }
+#    }
+#    options {
+#      c {
+#        options {
+#          s: "1"
+#        }
+#      }
+#    }
+#    hasNames: true
+#    names: "value"
+#    names: "vars"
+#    names: "synced"
+#  }
+#}
+#options {
+#  c {
+#    options {
+#      o: FALSE
+#    }
+#    options {
+#      c {
+#      }
+#    }
+#    options {
+#      c {
+#      }
+#    }
+#    hasNames: true
+#    names: "value"
+#    names: "vars"
+#    names: "synced"
+#  }
+#}
+
+       if        (is.character(crrVal)) {
+           newPB$options[[i]] <- crrVal
+       } else if (is.logical(crrVal)) {
+           newPB$options[[i]]$o <- jamovi.coms.AnalysisOption.Other[[as.character(crrVal)]]
+       } else if (is.null(crrVal)) {
+           newPB$options[[i]]$o <- jamovi.coms.AnalysisOption.Other[[as.character(crrVal)]]
+       } else if (is.numeric(crrVal) &&  all(crrVal %% 1 == 0)) {
+           
+       } else if (is.numeric(crrVal) && !all(crrVal %% 1 == 0)) {
+
+       }
+   }
 }

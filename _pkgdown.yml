@@ -1,19 +1,19 @@
+url: https://sjentsch.github.io/jmvReadWrite/
 repo:
   url:
     home: https://github.com/sjentsch/jmvReadWrite/
     source: https://github.com/sjentsch/jmvReadWrite/blob/main/
     issue: https://github.com/sjentsch/jmvReadWrite/issues/
   branch: main
-
 reference:
-- title: "Functions"
-  desc: >
+- title: Functions
+  desc: |
     Functions for reading and writing jamovi's omv-files
-- contents: 
+- contents:
   - read_omv
   - write_omv
-- title: "Helper functions"
-  desc: >
+- title: Helper functions
+  desc: |
     Functions for carrying out often required data management tasks for jamovi's omv-files
 - contents:
   - convert_to_omv
@@ -22,10 +22,11 @@ reference:
   - merge_cols_omv
   - merge_rows_omv
   - sort_omv
-- title: "Example datasets"
+- title: Example datasets
 - contents:
   - AlbumSales
   - ToothGrowth
   - bfi_sample
   - bfi_sample2
   - bfi_sample3
+

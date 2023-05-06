@@ -192,9 +192,9 @@ list.files(".", "Trial.omv")
 #> [1] "Trial.omv"
 file.info("Trial.omv")
 #>           size isdir mode               mtime               ctime
-#> Trial.omv 1564 FALSE  664 2023-05-06 18:12:44 2023-05-06 18:12:44
+#> Trial.omv 1564 FALSE  664 2023-05-06 23:10:46 2023-05-06 23:10:46
 #>                         atime  uid  gid    uname   grname
-#> Trial.omv 2023-05-06 18:12:44 1000 1000 sjentsch sjentsch
+#> Trial.omv 2023-05-06 23:10:46 1000 1000 sjentsch sjentsch
 unlink("Trial.omv")
 ```
 

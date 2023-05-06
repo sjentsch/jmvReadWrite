@@ -43,7 +43,7 @@
 #'
 #' @export write_omv
 
-write_omv <- function(dtaFrm = NULL, fleOut = "", retDbg = FALSE) {
+write_omv <- function(dtaFrm = NULL, fleOut = "", wrtSyn = FALSE, retDbg = FALSE) {
     if (is.null(dtaFrm))  stop("The data frame to be written needs to be given as parameter (dtaFrm = ...).");
     if (! nzchar(fleOut)) stop("Output file name needs to be given as parameter (fleOut = ...).");
 
@@ -416,23 +416,23 @@ clnArg <- function(crrOpt = list(), fncNme = "") {
     crrOpt
 }
 
-crtPB <- function(crrOpt = NULL) {
-   nmePB <- c(names(crrOpt$options), ".ppi", "theme", "palette", "data")
-   txtPB <- as.character(c())
-   
-   for (n in nmePB) {
-       if (n %in% names(crrOpt$options)) {
-           crrVal <- crrOpt$option(n)$value
-       } else if () {
-       
-       } else if (crrNme %in% "data") {
-       
-       } else {
-           stop("Error when converting to ProtoBuf.")
-       }
-   }
+#crtPB <- function(crrOpt = NULL) {
+#   nmePB <- c(names(crrOpt$options), ".ppi", "theme", "palette", "data")
+#   txtPB <- as.character(c())
+#   
+#   for (n in nmePB) {
+#       if (n %in% names(crrOpt$options)) {
+#           crrVal <- crrOpt$option(n)$value
+##      } else if () {
+#       
+#       } else if (crrNme %in% "data") {
+#           disp()
+#       } else {
+#           stop("Error when converting to ProtoBuf.")
+#       }
+#   }
 
-   paste0(txtPB, as.character(jamovi.coms.AnalysisOptions$new(hasNames = TRUE, names = nmePB))
+#   paste0(txtPB, as.character(jamovi.coms.AnalysisOptions$new(hasNames = TRUE, names = nmePB))
 
 ## output variables
 #options {
@@ -477,16 +477,15 @@ crtPB <- function(crrOpt = NULL) {
 #  }
 #}
 
-       if        (is.character(crrVal)) {
-           newPB$options[[i]] <- crrVal
-       } else if (is.logical(crrVal)) {
-           newPB$options[[i]]$o <- jamovi.coms.AnalysisOption.Other[[as.character(crrVal)]]
-       } else if (is.null(crrVal)) {
-           newPB$options[[i]]$o <- jamovi.coms.AnalysisOption.Other[[as.character(crrVal)]]
-       } else if (is.numeric(crrVal) &&  all(crrVal %% 1 == 0)) {
-           
-       } else if (is.numeric(crrVal) && !all(crrVal %% 1 == 0)) {
+#       if        (is.character(crrVal)) {
+#           newPB$options[[i]] <- crrVal
+#       } else if (is.logical(crrVal)) {
+#           newPB$options[[i]]$o <- jamovi.coms.AnalysisOption.Other[[as.character(crrVal)]]
+#       } else if (is.null(crrVal)) {
+#           newPB$options[[i]]$o <- jamovi.coms.AnalysisOption.Other[[as.character(crrVal)]]
+#       } else if (is.numeric(crrVal) &&  all(crrVal %% 1 == 0)) {
+#           
+#       } else if (is.numeric(crrVal) && !all(crrVal %% 1 == 0)) {
 
-       }
-   }
-}
+#       }
+#}

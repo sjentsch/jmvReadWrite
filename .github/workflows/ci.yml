@@ -35,4 +35,4 @@ jobs:
         run: ./run.sh install_all
 
       - name: Test
-        run: ./run.sh run_testsname: ci
+        run: ./run.sh run_tests

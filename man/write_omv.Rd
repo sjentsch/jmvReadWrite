@@ -27,16 +27,16 @@ participant code). In order to set a variable of your data frame to "ID", you ha
 }
 \examples{
 \dontrun{
-library(jmvReadWrite);
+library(jmvReadWrite)
 
 # use the data set "ToothGrowth" and, if it exists, write it as
 # jamovi-file using write_omv()
-data("ToothGrowth");
-fleOMV <- paste0(tempfile(), ".omv");
+data("ToothGrowth")
+fleOMV <- paste0(tempfile(), ".omv")
 # typically, one would use a "real" file name instead of tempfile(),
 # e.g., "Data1.omv"
-dtaDbg = write_omv(ToothGrowth, fleOMV, retDbg = TRUE);
-print(names(dtaDbg));
+dtaDbg = write_omv(ToothGrowth, fleOMV, retDbg = TRUE)
+print(names(dtaDbg))
 # the print-function is only used to force devtools::run_examples()
 # to show output
 # -> "mtaDta" "xtdDta" "dtaFrm"
@@ -47,11 +47,11 @@ print(names(dtaDbg));
 
 # check whether the file was written to the disk, get the file informa-
 # tion (size, etc.) and delete the file afterwards
-print(list.files(dirname(fleOMV), basename(fleOMV)));
+print(list.files(dirname(fleOMV), basename(fleOMV)))
 # -> "file[...].omv" ([...] is a combination of random numbers / characters
-print(file.info(fleOMV)$size);
+print(file.info(fleOMV)$size)
 # -> 2448 (size may differ on different OSes)
-unlink(fleOMV);
+unlink(fleOMV)
 }
 
 }

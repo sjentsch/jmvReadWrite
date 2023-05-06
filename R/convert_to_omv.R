@@ -16,38 +16,38 @@
 #'
 #' @examples
 #' \dontrun{
-#' library(jmvReadWrite);
+#' library(jmvReadWrite)
 #'
 #' # Example 1: Convert from RDS
 #' # (use ToothGrowth as example, save it as RDS)
-#' nmeInp <- paste0(tempfile(), ".rds");
-#' nmeOut <- paste0(tempfile(), ".omv");
-#' saveRDS(jmvReadWrite::ToothGrowth, nmeInp);
-#' convert_to_omv(fleInp = nmeInp, fleOut = nmeOut);
-#' cat(list.files(dirname(nmeOut), basename(nmeOut)));
+#' nmeInp <- paste0(tempfile(), ".rds")
+#' nmeOut <- paste0(tempfile(), ".omv")
+#' saveRDS(jmvReadWrite::ToothGrowth, nmeInp)
+#' convert_to_omv(fleInp = nmeInp, fleOut = nmeOut)
+#' cat(list.files(dirname(nmeOut), basename(nmeOut)))
 #' # -> "file[...].omv" ([...] contains a random combination of numbers / characters
-#' cat(file.info(nmeOut)$size);
+#' cat(file.info(nmeOut)$size)
 #' # -> 2448 (size may differ on different OSes)
-#' cat(str(read_omv(nmeOut, sveAtt = FALSE)));
+#' cat(str(read_omv(nmeOut, sveAtt = FALSE)))
 #' # gives a overview of the dataframe (all columns and some attributes,
 #' # sveAtt is intentionally set to FALSE to make the output not too overwhelming)
-#' unlink(nmeInp);
-#' unlink(nmeOut);
+#' unlink(nmeInp)
+#' unlink(nmeOut)
 #'
 #' # Example 2: Convert from CSV
 #' # (use ToothGrowth again as example, this time save it as CSV)
-#' nmeInp <- paste0(tempfile(), ".csv");
-#' nmeOut <- paste0(tempfile(), ".omv");
-#' write.csv(jmvReadWrite::ToothGrowth, nmeInp);
-#' convert_to_omv(fleInp = nmeInp, fleOut = nmeOut);
-#' cat(list.files(dirname(nmeOut), basename(nmeOut)));
-#' cat(file.info(nmeOut)$size);
+#' nmeInp <- paste0(tempfile(), ".csv")
+#' nmeOut <- paste0(tempfile(), ".omv")
+#' write.csv(jmvReadWrite::ToothGrowth, nmeInp)
+#' convert_to_omv(fleInp = nmeInp, fleOut = nmeOut)
+#' cat(list.files(dirname(nmeOut), basename(nmeOut)))
+#' cat(file.info(nmeOut)$size)
 #' # -> 2104 (size may differ acc. to OS; the size is smaller than for the RDS-file
 #' # because CSV can store fewer attributes, e.g., labels)
-#' cat(str(read_omv(nmeOut, sveAtt = FALSE)));
+#' cat(str(read_omv(nmeOut, sveAtt = FALSE)))
 #' # gives a overview of the dataframe (all columns and some attributes)
-#' unlink(nmeInp);
-#' unlink(nmeOut);
+#' unlink(nmeInp)
+#' unlink(nmeOut)
 #' }
 #'
 #' @export convert_to_omv
@@ -55,14 +55,14 @@
 convert_to_omv <- function(fleInp = "", fleOut = "", varSrt = c(), usePkg = c("foreign", "haven"), selSet = "", ...) {
 
     # check and format input and output files and handle / check further input arguments
-    fleInp <- fmtFlI(fleInp, maxLng = 1);
-    fleOut <- fmtFlO(fleOut, fleInp, rplExt = ".omv");
-    varArg <- list(...);
-    usePkg <- match.arg(usePkg);
+    fleInp <- fmtFlI(fleInp, maxLng = 1)
+    fleOut <- fmtFlO(fleOut, fleInp, rplExt = ".omv")
+    varArg <- list(...)
+    usePkg <- match.arg(usePkg)
 
     # read file and sort it (if varSrt is not empty)
     dtaFrm <- read_all(fleInp, usePkg, selSet, varArg)
-    dtaFrm <- srtFrm(dtaFrm, varSrt);
+    dtaFrm <- srtFrm(dtaFrm, varSrt)
 
     # write file
     write_omv(dtaFrm, fleOut)

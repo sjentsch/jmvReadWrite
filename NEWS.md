@@ -1,3 +1,10 @@
+# jmvReadWrite 0.3.4
+
+## Bug fixes and enhancements:
+* fixed an error that led to a crash when an ID variable contained empty values ("")
+* general bug fixes and improvements (removing ;s as suggested by lintr, etc.)
+
+
 # jmvReadWrite 0.3.3
 
 ## Bug fixes and enhancements:

@@ -55,37 +55,37 @@ with adjusted defaults for the respective file types), \code{readRDS} (for rds-f
 }
 \examples{
 \dontrun{
-library(jmvReadWrite);
-dtaInp <- bfi_sample2;
-nmeInp <- paste0(tempfile(), "_", 1:3, ".rds");
-nmeOut <- paste0(tempfile(), ".omv");
+library(jmvReadWrite)
+dtaInp <- bfi_sample2
+nmeInp <- paste0(tempfile(), "_", 1:3, ".rds")
+nmeOut <- paste0(tempfile(), ".omv")
 for (i in seq_along(nmeInp)) {
-    saveRDS(stats::setNames(dtaInp, c("ID", paste0(names(dtaInp)[-1], "_", i))), nmeInp[i]);
+    saveRDS(stats::setNames(dtaInp, c("ID", paste0(names(dtaInp)[-1], "_", i))), nmeInp[i])
 }
 # save dtaInp three times (i.e., the length of nmeInp), adding "_" + 1 ... 3 as index
 # to the data variables (A1 ... O5, gender, age → A1_1, ...)
-merge_cols_omv(fleInp = nmeInp, fleOut = nmeOut, varBy = "ID");
-cat(file.info(nmeOut)$size);
+merge_cols_omv(fleInp = nmeInp, fleOut = nmeOut, varBy = "ID")
+cat(file.info(nmeOut)$size)
 # -> 17731 (size may differ on different OSes)
-dtaOut <- read_omv(nmeOut, sveAtt = FALSE);
+dtaOut <- read_omv(nmeOut, sveAtt = FALSE)
 # read the data set where the three original datasets were added as columns and show
 # the variable names
-cat(names(dtaOut));
-cat(names(dtaInp));
+cat(names(dtaOut))
+cat(names(dtaInp))
 # compared to the input data set, we have the same names (expect for "ID" which was
 # used for matching and that each variable had added an indicator from which data
 # set they came)
-cat(dim(dtaInp), dim(dtaOut));
+cat(dim(dtaInp), dim(dtaOut))
 # the first dimension of the data sets (rows) stayed the same (250), whereas the
 # second dimension is now approx. three times as large (28 -> 82):
 # 28 - 1 (for "ID") = 27 * 3 + 1 (for "ID") = 82
-cat(colMeans(dtaInp[2:11]));
-cat(colMeans(dtaOut[2:11]));
+cat(colMeans(dtaInp[2:11]))
+cat(colMeans(dtaOut[2:11]))
 # it's therefore not much surprise that the values of the column means for the first
 # 10 variables of dtaInp and dtaOut are the same too
 
-unlink(nmeInp);
-unlink(nmeOut);
+unlink(nmeInp)
+unlink(nmeOut)
 }
 
 }

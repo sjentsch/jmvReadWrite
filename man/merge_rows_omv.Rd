@@ -55,48 +55,48 @@ to install it manually (i.e., \code{install.packages("haven", dep = TRUE)}).
 }
 \examples{
 \dontrun{
-library(jmvReadWrite);
-dtaInp <- bfi_sample2;
-nmeInp <- paste0(tempfile(), "_", 1:3, ".rds");
-nmeOut <- paste0(tempfile(), ".omv");
-for (i in seq_along(nmeInp)) saveRDS(dtaInp[-i - 1], nmeInp[i]);
+library(jmvReadWrite)
+dtaInp <- bfi_sample2
+nmeInp <- paste0(tempfile(), "_", 1:3, ".rds")
+nmeOut <- paste0(tempfile(), ".omv")
+for (i in seq_along(nmeInp)) saveRDS(dtaInp[-i - 1], nmeInp[i])
 # save dtaInp three times (i.e., the length of nmeInp), removing one data columns in
 # each data set (for demonstration purposes, A1 in the first, A2 in the second, ...)
-merge_rows_omv(fleInp = nmeInp, fleOut = nmeOut, colInd = TRUE);
-cat(file.info(nmeOut)$size);
+merge_rows_omv(fleInp = nmeInp, fleOut = nmeOut, colInd = TRUE)
+cat(file.info(nmeOut)$size)
 # -> 10767 (size may differ on different OSes)
-dtaOut <- read_omv(nmeOut, sveAtt = FALSE);
+dtaOut <- read_omv(nmeOut, sveAtt = FALSE)
 # read the data set where the three original datasets were added as rows and show
 # the variable names
-cat(names(dtaInp));
-cat(names(dtaOut));
+cat(names(dtaInp))
+cat(names(dtaOut))
 # compared to the input data set, we have the same variable names; fleInd (switched
 # on by colInd = TRUE and showing from which data set the rows are coming from) is
 # new and A1 is moved to the end of the list (the "original" order of variables may
 # not always be preserved and columns missing from at least one of the input data
 # sets may be added at the end)
-cat(dim(dtaInp), dim(dtaOut));
+cat(dim(dtaInp), dim(dtaOut))
 # the first dimension of the data sets (rows) is now three times of that of the input
 # data set (250 -> 750), the second dimension (columns / variables) is increased by 1
 # (for "fleInd")
 
-merge_rows_omv(fleInp = nmeInp, fleOut = nmeOut, typMrg = "common");
+merge_rows_omv(fleInp = nmeInp, fleOut = nmeOut, typMrg = "common")
 # the argument typMrg = "common" removes the columns that are not present in all of
 # the input data sets (i.e., A1, A2, A3)
-dtaOut <- read_omv(nmeOut, sveAtt = FALSE);
+dtaOut <- read_omv(nmeOut, sveAtt = FALSE)
 # read the data set where the three original datasets were added as rows and show
 # the variable names
-cat(names(dtaInp));
-cat(names(dtaOut));
+cat(names(dtaInp))
+cat(names(dtaOut))
 # compared to the input data set, the variables that were missing in at least one
 # data set (i.e., "A1", "A2" and "A3") are removed
-cat(dim(dtaInp), dim(dtaOut));
+cat(dim(dtaInp), dim(dtaOut))
 # the first dimension of the data sets (rows) is now three times of that of the
 # input data set (250 -> 750), the second dimension (columns / variables) is
 # reduced by 3 (i.e., "A1", "A2", "A3")
 
-unlink(nmeInp);
-unlink(nmeOut);
+unlink(nmeInp)
+unlink(nmeOut)
 }
 
 }

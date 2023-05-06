@@ -18,44 +18,44 @@
 #'
 #' @examples
 #' \dontrun{
-#' library(jmvReadWrite);
-#' fleOMV <- system.file("extdata", "AlbumSales.omv", package = "jmvReadWrite");
-#' fleTmp <- paste0(tempfile(), ".omv");
-#' sort_omv(fleInp = fleOMV, fleOut = fleTmp, varSrt = "Image");
-#' dtaFrm <- read_omv(fleInp = fleTmp);
-#' cat(dtaFrm$Image);
+#' library(jmvReadWrite)
+#' fleOMV <- system.file("extdata", "AlbumSales.omv", package = "jmvReadWrite")
+#' fleTmp <- paste0(tempfile(), ".omv")
+#' sort_omv(fleInp = fleOMV, fleOut = fleTmp, varSrt = "Image")
+#' dtaFrm <- read_omv(fleInp = fleTmp)
+#' cat(dtaFrm$Image)
 #' # shows that the variable "Image" is sorted in ascending order
-#' cat(is.unsorted(dtaFrm$Image));
+#' cat(is.unsorted(dtaFrm$Image))
 #' # is.unsorted (which checks for whether the variable is NOT sorted) returns FALSE
-#' sort_omv(fleInp = fleOMV, fleOut = fleTmp, varSrt = "-Image");
+#' sort_omv(fleInp = fleOMV, fleOut = fleTmp, varSrt = "-Image")
 #' # variables can also be sorted in descending order by preceding them with "-"
-#' dtaFrm <- read_omv(fleInp = fleTmp);
-#' cat(dtaFrm$Image);
+#' dtaFrm <- read_omv(fleInp = fleTmp)
+#' cat(dtaFrm$Image)
 #' # shows that the variable "Image" is now sorted in descending order
-#' cat(is.unsorted(dtaFrm$Image));
+#' cat(is.unsorted(dtaFrm$Image))
 #' # this first returns TRUE (the variable is not in ascending order, i.e., unsorted)
-#' cat(is.unsorted(-dtaFrm$Image));
+#' cat(is.unsorted(-dtaFrm$Image))
 #' # if the sign of the variable is changed, it returns FALSE (i.e., the variable is
 #' # NOT unsorted)
-#' unlink(fleTmp);
+#' unlink(fleTmp)
 #' }
 #'
 #' @export sort_omv
 #'
 sort_omv <- function(fleInp = c(), fleOut = "", varSrt = c(), usePkg = c("foreign", "haven"), selSet = "", ...) {
     if (length(varSrt) == 0 || !all(nzchar(varSrt))) {
-        stop("Calling sort_omv requires giving at least one variable to sort after.");
+        stop("Calling sort_omv requires giving at least one variable to sort after.")
     }
 
     # check and format input and output files, handle / check further input arguments
-    fleInp <- fmtFlI(fleInp, maxLng = 1);
-    fleOut <- fmtFlO(fleOut, fleInp, "_sort.omv");
-    varArg <- list(...);
-    usePkg <- match.arg(usePkg);
+    fleInp <- fmtFlI(fleInp, maxLng = 1)
+    fleOut <- fmtFlO(fleOut, fleInp, "_sort.omv")
+    varArg <- list(...)
+    usePkg <- match.arg(usePkg)
 
     # read file and sort it
     dtaFrm <- read_all(fleInp, usePkg, selSet, varArg)
-    dtaFrm <- srtFrm(dtaFrm, varSrt);
+    dtaFrm <- srtFrm(dtaFrm, varSrt)
 
     # write file
     write_omv(dtaFrm, fleOut)
@@ -66,9 +66,11 @@ srtFrm <- function(dtaFrm = NULL, varSrt = c()) {
     if (chkVar(dtaFrm, gsub("^-", "", varSrt))) {
 #       srtOrd <- eval(parse(text = paste0("order(", paste0(gsub("dtaFrm[[\"-", "-dtaFrm[[\"", paste0("dtaFrm[[\"", varSrt, "\"]]"), fixed = TRUE), collapse = ", "), ")")))
         srtOrd <- eval(parse(text = paste0("order(", paste0(sapply(varSrt, function(x) {
-            s <- ifelse(grepl("^-", x), "-", "");
-            ifelse(!any(is.na(suppressWarnings(as.numeric(dtaFrm[[x]])))), paste0(s, "as.numeric(dtaFrm[[\"", sub("^-", "", x), "\"]])"),
-            paste0(s, "dtaFrm[[\"", sub("^-", "", x), "\"]]")); }), collapse = ", "), ")")))
+            s <- ifelse(grepl("^-", x), "-", "")
+            ifelse(!any(is.na(suppressWarnings(as.numeric(dtaFrm[[x]])))),
+                paste0(s, "as.numeric(dtaFrm[[\"", sub("^-", "", x), "\"]])"),
+                paste0(s, "dtaFrm[[\"", sub("^-", "", x), "\"]]"))
+            }), collapse = ", "), ")")))
         # sorting makes the data.frame lose it's attributes which are therefore stored and later restored
         attMem <- sapply(dtaFrm, attributes)
         dtaFrm <- dtaFrm[srtOrd, ]

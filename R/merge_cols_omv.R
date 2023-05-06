@@ -28,37 +28,37 @@
 #'
 #' @examples
 #' \dontrun{
-#' library(jmvReadWrite);
-#' dtaInp <- bfi_sample2;
-#' nmeInp <- paste0(tempfile(), "_", 1:3, ".rds");
-#' nmeOut <- paste0(tempfile(), ".omv");
+#' library(jmvReadWrite)
+#' dtaInp <- bfi_sample2
+#' nmeInp <- paste0(tempfile(), "_", 1:3, ".rds")
+#' nmeOut <- paste0(tempfile(), ".omv")
 #' for (i in seq_along(nmeInp)) {
-#'     saveRDS(stats::setNames(dtaInp, c("ID", paste0(names(dtaInp)[-1], "_", i))), nmeInp[i]);
+#'     saveRDS(stats::setNames(dtaInp, c("ID", paste0(names(dtaInp)[-1], "_", i))), nmeInp[i])
 #' }
 #' # save dtaInp three times (i.e., the length of nmeInp), adding "_" + 1 ... 3 as index
 #' # to the data variables (A1 ... O5, gender, age → A1_1, ...)
-#' merge_cols_omv(fleInp = nmeInp, fleOut = nmeOut, varBy = "ID");
-#' cat(file.info(nmeOut)$size);
+#' merge_cols_omv(fleInp = nmeInp, fleOut = nmeOut, varBy = "ID")
+#' cat(file.info(nmeOut)$size)
 #' # -> 17731 (size may differ on different OSes)
-#' dtaOut <- read_omv(nmeOut, sveAtt = FALSE);
+#' dtaOut <- read_omv(nmeOut, sveAtt = FALSE)
 #' # read the data set where the three original datasets were added as columns and show
 #' # the variable names
-#' cat(names(dtaOut));
-#' cat(names(dtaInp));
+#' cat(names(dtaOut))
+#' cat(names(dtaInp))
 #' # compared to the input data set, we have the same names (expect for "ID" which was
 #' # used for matching and that each variable had added an indicator from which data
 #' # set they came)
-#' cat(dim(dtaInp), dim(dtaOut));
+#' cat(dim(dtaInp), dim(dtaOut))
 #' # the first dimension of the data sets (rows) stayed the same (250), whereas the
 #' # second dimension is now approx. three times as large (28 -> 82):
 #' # 28 - 1 (for "ID") = 27 * 3 + 1 (for "ID") = 82
-#' cat(colMeans(dtaInp[2:11]));
-#' cat(colMeans(dtaOut[2:11]));
+#' cat(colMeans(dtaInp[2:11]))
+#' cat(colMeans(dtaOut[2:11]))
 #' # it's therefore not much surprise that the values of the column means for the first
 #' # 10 variables of dtaInp and dtaOut are the same too
 #'
-#' unlink(nmeInp);
-#' unlink(nmeOut);
+#' unlink(nmeInp)
+#' unlink(nmeOut)
 #' }
 #'
 #' @export merge_cols_omv
@@ -66,39 +66,39 @@
 merge_cols_omv <- function(fleInp = c(), fleOut = "", typMrg = c("outer", "inner", "left", "right"), varBy = list(), varSrt = c(), usePkg = c("foreign", "haven"), selSet = "", ...) {
 
     # check and format input file names and handle / check further input arguments
-    fleInp <- fmtFlI(fleInp, minLng = 2);
-    typMrg <- match.arg(typMrg);
-    usePkg <- match.arg(usePkg);
-    varArg <- list(...);
+    fleInp <- fmtFlI(fleInp, minLng = 2)
+    typMrg <- match.arg(typMrg)
+    usePkg <- match.arg(usePkg)
+    varArg <- list(...)
 
     # read files
-    dtaInp <- vector(mode = "list", length = length(fleInp));
+    dtaInp <- vector(mode = "list", length = length(fleInp))
     for (i in seq_along(fleInp)) {
-        dtaInp[[i]] <- read_all(fleInp[i], usePkg, selSet, varArg);
+        dtaInp[[i]] <- read_all(fleInp[i], usePkg, selSet, varArg)
     }
 
     # check the matching variable(s)
-    varBy <- chkByV(varBy, dtaInp);
+    varBy <- chkByV(varBy, dtaInp)
 
     # merge files
-    crrArg <- list(x = NULL, y = NULL, by.x = "", by.y = "", all.x = ifelse(any(typMrg %in% c("outer", "left")), TRUE, FALSE), all.y = ifelse(any(typMrg %in% c("outer", "right")), TRUE, FALSE));
-    crrArg <- adjArg(c("merge", "data.frame"), crrArg, varArg, c("x", "y", "by.x", "by.y", "all.x", "all.y"));
+    crrArg <- list(x = NULL, y = NULL, by.x = "", by.y = "", all.x = ifelse(any(typMrg %in% c("outer", "left")), TRUE, FALSE), all.y = ifelse(any(typMrg %in% c("outer", "right")), TRUE, FALSE))
+    crrArg <- adjArg(c("merge", "data.frame"), crrArg, varArg, c("x", "y", "by.x", "by.y", "all.x", "all.y"))
     # store labels (getLbl: defined in long2wide_omv)
-    crrLnT <- getLbl(dtaInp, "");
-    dtaOut <- dtaInp[[1]];
+    crrLnT <- getLbl(dtaInp, "")
+    dtaOut <- dtaInp[[1]]
     for (i in setdiff(seq_along(fleInp), 1)) {
-        dtaOut <- do.call(merge, c(list(x = dtaOut, y = dtaInp[[i]], by.x = varBy[[1]], by.y = varBy[[i]]), crrArg[!grepl("^x$|^y$|^by.x$|^by.y$", names(crrArg))]));
+        dtaOut <- do.call(merge, c(list(x = dtaOut, y = dtaInp[[i]], by.x = varBy[[1]], by.y = varBy[[i]]), crrArg[!grepl("^x$|^y$|^by.x$|^by.y$", names(crrArg))]))
     }
 
     # restore labels (rstLbl: defined in long2wide_omv)
-    dtaOut <- rstLbl(dtaOut, crrLnT);
+    dtaOut <- rstLbl(dtaOut, crrLnT)
 
     # sort data frame (if varSrt not empty)
-    dtaOut <- srtFrm(dtaOut, varSrt);
+    dtaOut <- srtFrm(dtaOut, varSrt)
 
     # write files (if fleOut is not empty) or return resulting data frame
     if (nzchar(fleOut)) {
-        write_omv(dtaOut, nrmFle(fleOut));
+        write_omv(dtaOut, nrmFle(fleOut))
     } else {
         dtaOut
     }
@@ -110,30 +110,30 @@ chkByV <- function(varBy = list(), dtaFrm = NULL) {
         (is.vector(varBy)    && length(varBy) == 0) ||
         (is.character(varBy) && !nzchar(varBy)) ||
         is.null(varBy)) {
-        return(rep(list(mtcVar(dtaFrm)), length(dtaFrm)));
+        return(rep(list(mtcVar(dtaFrm)), length(dtaFrm)))
     # varBy is a list with the same length as dtaFrm
     } else if (is.list(varBy) && length(varBy) == length(dtaFrm)) {
         if (all(sapply(seq_along(dtaFrm), function(i) all(varBy[[i]] %in% names(dtaFrm[[i]]))))) {
-            return(varBy);
+            return(varBy)
         } else {
-            stop("Not all data sets given in fleInp contain the variable(s) / column(s) that shall be used for matching.");
+            stop("Not all data sets given in fleInp contain the variable(s) / column(s) that shall be used for matching.")
         }
     # varBy is a character vector (without empty elements) or a string
     } else if ((is.vector(varBy) && !is.list(varBy) && length(varBy) >= 1 && all(nzchar(varBy))) || is.character(varBy)) {
         if (all(sapply(dtaFrm, function(x) all(varBy %in% names(x))))) {
-            return(rep(list(varBy), length(dtaFrm)));
+            return(rep(list(varBy), length(dtaFrm)))
         } else {
-            stop("Not all data sets given in fleInp contain the variable(s) / column(s) that shall be used for matching.");
+            stop("Not all data sets given in fleInp contain the variable(s) / column(s) that shall be used for matching.")
         }
     } else {
-        stop("varBy must be either a list (with the same length as fleInp), a character vector, or a string.");
+        stop("varBy must be either a list (with the same length as fleInp), a character vector, or a string.")
     }
 }
 
 mtcVar <- function(dtaFrm = NULL) {
-    varCmm <- names(dtaFrm[[1]]);
+    varCmm <- names(dtaFrm[[1]])
     for (i in setdiff(seq_along(dtaFrm), 1)) {
-        varCmm <- intersect(varCmm, names(dtaFrm[[i]]));
+        varCmm <- intersect(varCmm, names(dtaFrm[[i]]))
     }
     varCmm
 }

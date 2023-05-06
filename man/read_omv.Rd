@@ -34,20 +34,20 @@ Read files created of the statistical spreadsheet 'jamovi' (\url{https://www.jam
 }
 \examples{
 \dontrun{
-library(jmvReadWrite);
-fleOMV <- system.file("extdata", "ToothGrowth.omv", package = "jmvReadWrite");
-data <- read_omv(fleInp = fleOMV, getSyn = TRUE);
+library(jmvReadWrite)
+fleOMV <- system.file("extdata", "ToothGrowth.omv", package = "jmvReadWrite")
+data <- read_omv(fleInp = fleOMV, getSyn = TRUE)
 # if the syntax couldn't be extracted, an empty list - length = 0 - is returned,
 # otherwise, the commands are shown and the first analysis is run, with the output
 # from the second analysis being assigned to the variable result
 if (length(attr(data, "syntax")) >= 1) {
-    print(attr(data, "syntax"));
+    print(attr(data, "syntax"))
     # the print-function is only used to force devtools::run_examples() to show output
-    eval(parse(text=paste0("result = ", attr(data, "syntax")[[1]])));
+    eval(parse(text=paste0("result = ", attr(data, "syntax")[[1]])))
     # without assigning the output to a variable, the command would be:
     # eval(parse(text=attr(data, "syntax")[[1]]))
-    print(names(result));
-    print(result$main);
+    print(names(result))
+    print(result$main)
     # -> "main"      "assump"    "contrasts" "postHoc"   "emm"       "residsOV"
     # (the names of the six output tables)
 }

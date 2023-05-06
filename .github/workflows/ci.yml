@@ -4,7 +4,9 @@ name: ci
 
 on:
   push:
+    branches: [main]
   pull_request:
+    branches: [main]
 
 env:
   USE_BSPM: "true"
@@ -15,7 +17,7 @@ jobs:
     strategy:
       matrix:
         include:
-          - {os: macOS-latest}
+          - {os: macos-latest}
           - {os: ubuntu-latest}
 
     runs-on: ${{ matrix.os }}
@@ -33,4 +35,4 @@ jobs:
         run: ./run.sh install_all
 
       - name: Test
-        run: ./run.sh run_tests
+        run: ./run.sh run_testsname: ci

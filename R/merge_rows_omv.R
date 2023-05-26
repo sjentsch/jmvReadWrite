@@ -88,15 +88,26 @@ merge_rows_omv <- function(fleInp = c(), fleOut = "", typMrg = c("all", "common"
     crrArg <- adjArg(c("rbind", "data.frame"), list(), varArg, c())
     # keeping all existing variables, filling the void columns with NA
     if      (typMrg == "all") {
-        # determine the variable names in all input data sets and remove duplicates
-        # (order ensures that the data set that contains most variables is prioritized,
-        # but yet, it is still impossible to preserve the whole order - i.e., variables
-        # missing in one data set may end up at the end)
-        varNme <- unlist(sapply(dtaInp[order(-sapply(sapply(dtaInp, dim, simplify = FALSE), "[[", 2))], names, simplify = FALSE))
+        # determine the variable names and types in all input data sets and remove
+        # duplicates(order ensures that the data set that contains most variables
+        # is prioritized, but yet, it is still impossible to preserve the whole
+        # order - i.e., variables missing in one data set may end up at the end)
+        varNme <- unlist(sapply(dtaInp[order(-sapply(sapply(dtaInp, dim, simplify = FALSE), "[[", 2))], names,                                                  simplify = FALSE))
+        varTyp <- unlist(sapply(dtaInp[order(-sapply(sapply(dtaInp, dim, simplify = FALSE), "[[", 2))], function(D) unlist(sapply(D, function(C) class(C)[1])), simplify = FALSE))
         varNme <- varNme[!duplicated(varNme)]
-        dtaOut <- addCol(dtaInp[[1]], varNme)
+        for (crrNme in varNme) {
+            if (sum(names(varTyp) == crrNme) <= 1) next
+            if (all(duplicated(varTyp[names(varTyp) == crrNme])[-1])) {
+                varTyp <- varTyp[-which(names(varTyp) == crrNme)[-1]]
+            } else {
+                stop(sprintf("Variable %s has different types:\n%s\n", crrNme, paste(paste0(basename(fleInp), rep(": ", sum(names(varTyp) == crrNme)), varTyp[names(varTyp) == crrNme]), collapse = "\n")))
+            }
+        }
+        if (length(varNme) != length(varTyp)) stop("Something went wrong when comparing the variable types of the input data files. Please send the data files to sebastian.jentschke@uib.no for debugging.")
+        dtaOut <- addCol(dtaInp[[1]], varNme, varTyp)
         for (i in setdiff(seq_along(fleInp), 1)) {
-            dtaOut <- do.call(rbind, c(list(dtaOut, addCol(dtaInp[[i]], varNme)), crrArg))
+            crrInp <- addCol(dtaInp[[i]], varNme, varTyp)
+            dtaOut <- do.call(rbind, c(list(dtaOut, crrInp), crrArg))
         }
     # keeping only variables that are common to all input data sets
     } else if (typMrg == "common") {
@@ -132,13 +143,12 @@ merge_rows_omv <- function(fleInp = c(), fleOut = "", typMrg = c("all", "common"
     }
 }
 
-addCol <- function(dtaFrm = NULL, varNme = c()) {
+addCol <- function(dtaFrm = NULL, varNme = c(), varTyp = c()) {
     varDff <- setdiff(varNme, names(dtaFrm))
-    if (length(varDff) > 0) {
-        cbind(dtaFrm, stats::setNames(data.frame(as.list(NA[seq_along(varDff)])), varDff))[, varNme]
-    } else {
-        dtaFrm
+    for (i in seq_along(varDff)) {
+        eval(parse(text = paste0("dtaFrm[varDff[i]] <- as.", varTyp[[varDff[i]]], "(NA)")))
     }
+    dtaFrm
 }
 
 addInd <- function(dtaFrm = NULL, fleNme = "") {

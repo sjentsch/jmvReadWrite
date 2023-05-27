@@ -11,7 +11,7 @@ Description: The free and open a statistical spreadsheet 'jamovi'
     intuitive. 'jamovi' produces syntax that can directly be used in R (in
     connection with the R-package 'jmv'). Having import / export routines for
     the data files 'jamovi' produces ('.omv') permits an easy transfer of
-    analyses between 'jamovi' and R.
+    data and analyses between 'jamovi' and R.
 License: AGPL-3
 Encoding: UTF-8
 LazyData: true

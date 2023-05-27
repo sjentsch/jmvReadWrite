@@ -41,7 +41,7 @@ covr::codecov(token = "2f521d97-d1e2-4baf-b05b-0b569a7c6f0f")
 # ================================================================================================================================================
 
 # update version number in DESCRIPTION and NEWS.md (and changes in NEWS.md)
-system("gedit DESCRIPTION NEWS.md")
+system("gedit DESCRIPTION NEWS.md inst/CITATION")
 
 # building / updating README, PDF manual, and the HTML documentation
 # add new functions to .pkgdown.yaml if required

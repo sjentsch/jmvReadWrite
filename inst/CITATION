@@ -1,0 +1,10 @@
+citHeader("To cite jmvReadWrite in publications use:")
+
+citEntry(
+  entry    = "Manual",
+  title    = "jmvReadWrite: Read and Write jamovi Files",
+  author   = "Sebastian Jentschke",
+  year     = 2023,
+  note     = "R package version 2.7.3",
+  url      = c("https://CRAN.R-project.org/package=jmvReadWrite", "https://sjentsch.github.io/jmvReadWrite/"),
+)

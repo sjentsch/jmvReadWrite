@@ -13,7 +13,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# jmvReadWrite
+# jmvReadWrite <a href="https://sjentsch.github.io/jmvReadWrite/"><img src="man/figures/logo.svg" align="right" height="139" /></a>
 
 <!-- badges: start -->
 [![CRAN](http://www.r-pkg.org/badges/version/jmvReadWrite)](https://cran.r-project.org/package=jmvReadWrite)
@@ -32,7 +32,6 @@ knitr::opts_chunk$set(
 <!---
 [//]: [![Build Status](https://app.travis-ci.com/sjentsch/jmvReadWrite.svg?branch=main)](https://app.travis-ci.com/sjentsch/jmvReadWrite)
 --->
-
 
 ```{r, child=c('vignettes/jmvReadWrite.Rmd')}
 ```

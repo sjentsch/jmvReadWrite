@@ -10,7 +10,9 @@
 [![Downloads](https://cranlogs.r-pkg.org/badges/jmvReadWrite?color=brightgreen)](https://cran.r-project.org/package=jmvReadWrite)
 [![Dependencies](https://tinyverse.netlify.com/badge/jmvReadWrite)](https://cran.r-project.org/package=jmvReadWrite)
 [![Last
-commit](https://img.shields.io/github/last-commit/sjentsch/jmvReadWrite)](https://github.com/sjentsch/jmvReadWrite)
+commit](https://img.shields.io/github/last-commit/sjentsch/jmvReadWrite?logo=GitHub)](https://github.com/sjentsch/jmvReadWrite)
+[![Register an
+issue](https://img.shields.io/github/issues/sjentsch/jmvReadWrite?color=%23fa251e&logo=GitHub)](https://github.com/sjentsch/jmvReadWrite/issues)
 [![CI](https://github.com/sjentsch/jmvReadWrite/actions/workflows/ci.yml/badge.svg)](https://github.com/sjentsch/jmvReadWrite/actions/workflows/ci.yml)
 [![R-CMD-check](https://github.com/sjentsch/jmvReadWrite/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/sjentsch/jmvReadWrite/actions/workflows/R-CMD-check.yaml)
 [![code-coverage](https://github.com/sjentsch/jmvReadWrite/actions/workflows/codecov.yaml/badge.svg)](https://github.com/sjentsch/jmvReadWrite/actions/workflows/codecov.yaml)
@@ -192,9 +194,9 @@ list.files(".", "Trial.omv")
 #> [1] "Trial.omv"
 file.info("Trial.omv")
 #>           size isdir mode               mtime               ctime
-#> Trial.omv 1564 FALSE  664 2023-05-06 23:10:46 2023-05-06 23:10:46
+#> Trial.omv 1564 FALSE  664 2023-05-27 14:26:12 2023-05-27 14:26:12
 #>                         atime  uid  gid    uname   grname
-#> Trial.omv 2023-05-06 23:10:46 1000 1000 sjentsch sjentsch
+#> Trial.omv 2023-05-27 14:26:12 1000 1000 sjentsch sjentsch
 unlink("Trial.omv")
 ```
 

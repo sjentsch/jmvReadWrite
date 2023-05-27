@@ -1,3 +1,9 @@
+# jmvReadWrite 0.3.5
+
+## Bug fixes and enhancements:
+* fixed an error that led to a warning when adding columns (to make different data frames have the same set of variables) in merge_cols_omv()
+
+
 # jmvReadWrite 0.3.4
 
 ## Bug fixes and enhancements:

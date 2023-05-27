@@ -1,8 +1,11 @@
 Package: jmvReadWrite
 Title: Read and Write 'jamovi' Files ('.omv')
-Version: 0.3.4
+Version: 0.3.5
+Author: Sebastian Jentschke [aut, cre]
+    (<https://orcid.org/0000-0003-2576-5432>)
 Authors@R:
     person(given = "Sebastian", family = "Jentschke", role = c("aut", "cre"), email = "sebastian.jentschke@uib.no", comment = c(ORCID = "0000-0003-2576-5432"))
+Maintainer: Sebastian Jentschke <sebastian.jentschke@uib.no>
 Description: The free and open a statistical spreadsheet 'jamovi'
     (<https://www.jamovi.org>) aims to make statistical analyses easy and
     intuitive. 'jamovi' produces syntax that can directly be used in R (in
@@ -32,7 +35,3 @@ Suggests: jmv,
           covr
 Config/testthat/edition: 3
 NeedsCompilation: no
-Packaged: 2022-07-28 15:45:08 UTC; sjentsch
-Author: Sebastian Jentschke [aut, cre]
-    (<https://orcid.org/0000-0003-2576-5432>)
-Maintainer: Sebastian Jentschke <sebastian.jentschke@uib.no>

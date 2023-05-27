@@ -1,7 +1,11 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# jmvReadWrite
+# jmvReadWrite <a href="https://sjentsch.github.io/jmvReadWrite/"><img src="man/figures/logo.svg" align="right" width="20%" /></a>
+
+<!---
+<br clear="all">
+--->
 
 <!-- badges: start -->
 
@@ -194,9 +198,9 @@ list.files(".", "Trial.omv")
 #> [1] "Trial.omv"
 file.info("Trial.omv")
 #>           size isdir mode               mtime               ctime
-#> Trial.omv 1564 FALSE  664 2023-05-27 14:26:12 2023-05-27 14:26:12
+#> Trial.omv 1564 FALSE  664 2023-05-27 17:09:45 2023-05-27 17:09:45
 #>                         atime  uid  gid    uname   grname
-#> Trial.omv 2023-05-27 14:26:12 1000 1000 sjentsch sjentsch
+#> Trial.omv 2023-05-27 17:09:45 1000 1000 sjentsch sjentsch
 unlink("Trial.omv")
 ```
 

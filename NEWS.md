@@ -2,7 +2,7 @@
 
 ## Bug fixes and enhancements:
 * fixed an error that led to a warning when adding columns (to make different data frames have the same set of variables) in merge_cols_omv()
-
+* added logo and citation
 
 # jmvReadWrite 0.3.4
 

@@ -14,13 +14,15 @@ compute <- function(crrCmd = c(), data = data.frame()) {
     # initialize calculation commands
     cmpJMV <- gsub(",\\s+", ", ", gsub(",", ", ", gsub("\\.$", "", paste0(strSpl(crrCmd, "=")[-1], collapse = "= "))))
     cmpRpR <- c()
+    cmpClR <- TRUE
     cmpDim <- 1
     cmpMnV <- NA
+    cmpGrp <- c()
     cmpVld <- TRUE
 
     # extract target variable (cmprT) and variables in the formula (cmprT; incl. removing further arguments, e.g., numbers)
     cmpVrT <- strSpl(crrCmd, "=")[1]
-    cmpVrF <- gsub("\\).*$", "", gsub("^[A-z\\.]+\\(", "", gsub("[A-z]+\\d+\\(", "", gsub("^\\(+", "", strSpl(cmpJMV, "\\+|-\\s+|\\*|/|&|\\||!\\s|<=|>=|!=")))))
+    cmpVrF <- gsub("\\).*$", "", gsub("^[A-z\\.]+\\(", "", gsub("[A-z\\.]+\\d+\\(", "", gsub("^\\(+", "", strSpl(cmpJMV, "\\+|-\\s+|\\*|/|&|\\||!\\s|<=|>=|!=")))))
     cmpVrF <- cmpVrF[is.na(suppressWarnings(as.numeric(cmpVrF)))]
     cmpJMV <- gsub(cmpVrF, "[VARNAMES]", cmpJMV)
     # check whether all variables are contained in the data
@@ -102,6 +104,7 @@ compute <- function(crrCmd = c(), data = data.frame()) {
     if (grepl("MEAN\\(|MEAN\\.\d+\\(", cmpJMV, ignore.case = TRUE)) {
 # to-do: SPSS to min_valid
 # , "[VARNAMES]", "[VARNAMES], na.rm = TRUE"
+# cmpMnV <- NA
         cmpJMV <- gsub("MEAN\\(|MEAN\\.\d+\\(", "MEAN(", cmpJMV, ignore.case = TRUE)
         cmpRpR <- c(cmpRpR, "MEAN\\(", "mean(")
     }
@@ -164,6 +167,7 @@ compute <- function(crrCmd = c(), data = data.frame()) {
     if (grepl("SUM\\(|SUM\\.\d+\\(", cmpJMV, ignore.case = TRUE)) {
 # to-do: SPSS to min_valid
 # , "[VARNAMES]", "[VARNAMES], na.rm = TRUE"
+# cmpMnV <- NA
         cmpJMV <- gsub("SUM\\(|SUM\\.\d+\\(", "SUM(", cmpJMV, ignore.case = TRUE)
         cmpRpR <- c(cmpRpR, "SUM\\(", "sum(")
     }
@@ -414,8 +418,12 @@ compute <- function(crrCmd = c(), data = data.frame()) {
     # add a data column (with the name of cmpVrT) and assign it to a temporary variable (which has the correct number of lines so that the filter is working)
     if (!any(grepl(cmpVrT, names(data)))) data[[cmpVrT]] <- NA
     # unname(apply(data[, cmpVrF], 1, eval(parse(text = "function(X) abs(-mean(X))"))))
-    data[[cmpVrT]] <- unname(apply(data[, cmpVrF], cmpDim, eval(parse())))
-    cmpTmp <- eval(parse(text = fmtClc(cmpJMV, cmpRpR, cmpVrF)))
+# to implement
+    # cmpMnV <- NA
+    # cmpGrp <- c()
+    # , ignore_missing=0 -> na.rm = TRUE if not 0
+    # fmtClc(cmpJMV, cmpRpR, cmpVrF)
+    data[[cmpVrT]] <- unname(apply(data[, cmpVrF], cmpDim, eval(parse(text = ""))))
 
     # if the command doesn't contain any commands, not available in jamovi, assign the required attributes to mark the variable as "Computed variable" in jamovi
     if (cmpVld) {

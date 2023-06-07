@@ -10,21 +10,20 @@ compute <- function(crrCmd = c(), data = data.frame()) {
 
     # get rid of the COMPUTE-command in case SPSS-syntax is submitted
     isSPSS <- grepl("^COMPUTE", crrCmd)
-    crrCmd <- trimws(gsub(".$", "", gsub("^COMPUTE", "", crrCmd)))
+    crrCmd <- trimws(gsub("\\.$", "", gsub("^COMPUTE", "", crrCmd)))
     # initialize calculation commands
-    cmpJMV <- gsub(",\\s+", ", ", gsub(",", ", ", gsub("\\.$", "", paste0(strSpl(crrCmd, "=")[-1], collapse = "= "))))
+    cmpJMV <- gsub(",\\s+", ", ", gsub(",", ", ", paste0(trimws(strSpl(crrCmd, "=")[-1]), collapse = " = ")))
     cmpRpR <- c()
     cmpClR <- TRUE
     cmpDim <- 1
     cmpMnV <- NA
-    cmpGrp <- c()
     cmpVld <- TRUE
 
     # extract target variable (cmprT) and variables in the formula (cmprT; incl. removing further arguments, e.g., numbers)
     cmpVrT <- strSpl(crrCmd, "=")[1]
     cmpVrF <- gsub("\\).*$", "", gsub("^[A-z\\.]+\\(", "", gsub("[A-z\\.]+\\d+\\(", "", gsub("^\\(+", "", strSpl(cmpJMV, "\\+|-\\s+|\\*|/|&|\\||!\\s|<=|>=|!=")))))
-    cmpVrF <- cmpVrF[is.na(suppressWarnings(as.numeric(cmpVrF)))]
-    cmpJMV <- gsub(cmpVrF, "[VARNAMES]", cmpJMV)
+    cmpVrF <- gsub(",\\s*group_by\\s*=\\s*\\w*", "", cmpVrF[is.na(suppressWarnings(as.numeric(cmpVrF)))])
+    cmpJMV <- gsub(paste0("\\(", cmpVrF), "([VARNAMES]", cmpJMV)
     # check whether all variables are contained in the data
     cmpVrF <- fixVar(strSpl(cmpVrF, "\\s*,\\s*|\\s* \\s*"), crrCmd, names(data))
     if (any(any(grepl("^#", cmpVrF)))) stop(sprintf("Variable \"%s\" is not contained in the data, formula can't be calculated:\n \"%s\"\n\n", cmpVrF[grepl("^#", cmpVrF)], crrCmd))
@@ -35,14 +34,22 @@ compute <- function(crrCmd = c(), data = data.frame()) {
         cmpRpR <- c(cmpRpR, "ABS\\(", "abs(")
     }
     # ABSIQR(variable): Convenience short-hand for ABS(IQR(variable))
+    if (grepl("ABSIQR\\(", cmpJMV, ignore.case = TRUE)) {
+        cmpJMV <- gsub("ABSIQR\\(", "ABSIQR(", cmpJMV, ignore.case = TRUE)
+        cmpRpR <- c(cmpRpR, "ABSIQR\\(", "abs(iqr(", "[VARNAMES]", "[VARNAMES])")
+    }    
     # ABSZ(variable): Convenience short-hand for ABS(Z(variable))
     if (grepl("ABSZ\\(", cmpJMV, ignore.case = TRUE)) {
         cmpJMV <- gsub("ABSZ\\(", "ABSZ(", cmpJMV, ignore.case = TRUE)
-        cmpRpR <- c(cmpRpR, "ABSZ\\(", "abs(scale(")
+        cmpRpR <- c(cmpRpR, "ABSZ\\(", "abs(scale(", "[VARNAMES]", "[VARNAMES])")
     }
     # BETA(alpha, beta): Draws samples from a Beta distribution.
-#   if (grepl("RV\\.BETA\\(",       cmpJMV, ignore.case = TRUE)) cmpRpR <- c(cmpRpR, "RV\\.BETA\\(",       "rbeta(")
+    if (grepl("BETA\\(|RV\\.BETA\\(", cmpJMV, ignore.case = TRUE)) {
+        cmpJMV <- gsub("BETA\\(|RV\\.BETA\\(", "BETA(", cmpJMV, ignore.case = TRUE)
+        cmpRpR <- c(cmpRpR, "BETA\\(", "rbeta([N], ")
+    }
     # BOXCOX(variable, lambda): Returns a Box Cox transformation of the variable.
+# to implement
     # CEILING(variable): Rounds each value to the integer above
     if (grepl("CEILING\\(", cmpJMV, ignore.case = TRUE)) {
         cmpJMV <- gsub("CEILING\\(", "CEILING(", cmpJMV, ignore.case = TRUE)
@@ -57,13 +64,17 @@ compute <- function(crrCmd = c(), data = data.frame()) {
         cmpRpR <- c(cmpRpR, "EXP\\(", "exp(")
     }    
     # FILTER(variable, filter_expression): Filters a variable using the filter expression.
+
     # FLOOR(variable): Rounds each value to the integer below
     if (grepl("FLOOR\\(", cmpJMV, ignore.case = TRUE)) {
         cmpJMV <- gsub("FLOOR\\(", "FLOOR(", cmpJMV, ignore.case = TRUE)
         cmpRpR <- c(cmpRpR, "FLOOR\\(", "floor(")
     }    
     # GAMMA(shape, scale): Draws samples from a Gamma distribution.
-#   if (grepl("RV\\.GAMMA\\(",      cmpJMV, ignore.case = TRUE)) cmpRpR <- c(cmpRpR, "RV\\.GAMMA\\(",      "rgamma(")
+    if (grepl("GAMMA\\(|RV\\.GAMMA\\(", cmpJMV, ignore.case = TRUE)) {
+        cmpJMV <- gsub("GAMMA\\(|RV\\.GAMMA\\(", "BETA(", cmpJMV, ignore.case = TRUE)
+        cmpRpR <- c(cmpRpR, "GAMMA\\(", "rgamma([N], ")
+    }
     # HLOOKUP(index, value 1, value 2, …): The value in the provided values at index.
     # IF(expression, value, else): If the expression resolves true, use the value, otherwise the else.
     if (grepl("IF\\(", cmpJMV, ignore.case = TRUE)) {
@@ -99,7 +110,15 @@ compute <- function(crrCmd = c(), data = data.frame()) {
         cmpRpR <- c(cmpRpR, "MAX\\(", "max(", "[VARNAMES]", "[VARNAMES], na.rm = TRUE")
     }
     # MAXABSIQR(variable 1, variable 2, …): Max. absolute IQR-value (i.e., how far outside the box an individual datapoint is in terms of IQR - Q1/Q3-distance)
+    if (grepl("MAXABSIQR\\(", cmpJMV, ignore.case = TRUE)) {
+        cmpJMV <- gsub("MAXABSIQR\\(", "MAXABSIQR(", cmpJMV, ignore.case = TRUE)
+        cmpRpR <- c(cmpRpR, "MAXABSIQR\\(", "abs(iqr(", "[VARNAMES]", "[VARNAMES])")
+    }
     # MAXABSZ(variable 1, variable 2, …, group_by=0): Max. absolute z-value / normalized value.
+    if (grepl("MAXABSZ\\(", cmpJMV, ignore.case = TRUE)) {
+        cmpJMV <- gsub("MAXABSZ\\(", "MAXABSZ(", cmpJMV, ignore.case = TRUE)
+        cmpRpR <- c(cmpRpR, "MAXABSZ\\(", "abs(scale(", "[VARNAMES]", "[VARNAMES])")
+    }
     # MEAN(number 1, number 2, …, ignore_missing=0, min_valid=0): Returns the mean of a set of numbers.
     if (grepl("MEAN\\(|MEAN\\.\d+\\(", cmpJMV, ignore.case = TRUE)) {
 # to-do: SPSS to min_valid
@@ -146,11 +165,13 @@ compute <- function(crrCmd = c(), data = data.frame()) {
     # ROW(NO ARGUMENTS): Returns the row numbers.
     if (grepl("ROW\\(", cmpJMV, ignore.case = TRUE)) {
         cmpJMV <- gsub("ROW\\(", "ROW(", cmpJMV, ignore.case = TRUE)
-        cmpRpR <- c(cmpRpR, "ROW\\(\\)", "")
+        cmpRpR <- c(cmpRpR, "ROW\\(\\)", "seq([N])")
     }
     # SAMPLE(variable, n, otherwise=NA): Draws a sample of n from the variable. i.e. SAMPLE(var, 20), i.e. SAMPLE(1, 20), i.e. SAMPLE(\"training\", 20, \"test\")
+
     # SCALE -> Z
     # SPLIT(variable, sep=",", piece): Splits text into pieces based on a separator. piece specifies the desired piece by index.
+
     # SQRT(number): Returns the square root of a number.
     if (grepl("SQRT\\(", cmpJMV, ignore.case = TRUE)) {
         cmpJMV <- gsub("SQRT\\(", "SQRT(", cmpJMV, ignore.case = TRUE)
@@ -223,7 +244,7 @@ compute <- function(crrCmd = c(), data = data.frame()) {
     # VN(variable, group_by=0): Returns the number of cases in a variable.
     if (grepl("VN\\(", cmpJMV, ignore.case = TRUE)) {
         cmpJMV <- gsub("VN\\(", "VN(", cmpJMV, ignore.case = TRUE)
-        cmpRpR <- c(cmpRpR, "VN\\(", "sum(!is.na(")
+        cmpRpR <- c(cmpRpR, "VN\\(", "sum(!is.na(", "[VARNAMES]", "[VARNAMES])")
         cmpDim <- 2
     }
     # VROWS(variable, group_by=0): Returns the number of rows of a variable.
@@ -235,7 +256,7 @@ compute <- function(crrCmd = c(), data = data.frame()) {
     # VSE(variable, group_by=0): Returns the standard error of the mean of a variable.
     if (grepl("VSE\\(", cmpJMV, ignore.case = TRUE)) {
         cmpJMV <- gsub("VSE\\(", "VSE(", cmpJMV, ignore.case = TRUE)
-#       cmpRpR <- c(cmpRpR, "VMAX\\(", "max(")
+#       cmpRpR <- c(cmpRpR, "VSE\\(", "jmvSE()")
 # currently no idea how to implement this
         cmpRpR <- c()
         cmpDim <- 2
@@ -381,19 +402,19 @@ compute <- function(crrCmd = c(), data = data.frame()) {
     # RV... - random number generation functions
     # RV.BETA, RV.GAMMA, RV.NORMAL/NORMAL, RV.UNIFORM/UNIFORM -> see jamovi-functions above
     if (grepl("RV\\.[BERNOULLI|BINOM|CAUCHY|CHISQ|EXP|F|GEOM|HYPER|LNORMAL|LOGISTIC|POISSON|T|WEIBULL]", cmpJMV, ignore.case = TRUE)) cmpVld <- FALSE
-    if (grepl("RV\\.BERNOULLI\\(",  cmpJMV, ignore.case = TRUE)) cmpRpR <- c(cmpRpR, "RV\\.BERNOULLI\\(",  "rbinom(", "[VARNAMES]", "[VARNAMES], 1")
-    if (grepl("RV\\.BINOM\\(",      cmpJMV, ignore.case = TRUE)) cmpRpR <- c(cmpRpR, "RV\\.BETA\\(",       "rbinom(")
-    if (grepl("RV\\.CAUCHY\\(",     cmpJMV, ignore.case = TRUE)) cmpRpR <- c(cmpRpR, "RV\\.CAUCHY\\(",     "rcauchy(")
-    if (grepl("RV\\.CHISQ\\(",      cmpJMV, ignore.case = TRUE)) cmpRpR <- c(cmpRpR, "RV\\.CHISQ\\(",      "rchisq(")
-    if (grepl("RV\\.EXP\\(",        cmpJMV, ignore.case = TRUE)) cmpRpR <- c(cmpRpR, "RV\\.EXP\\(",        "rexp(")
-    if (grepl("RV\\.F\\(",          cmpJMV, ignore.case = TRUE)) cmpRpR <- c(cmpRpR, "RV\\.F\\(",          "rf(")
-    if (grepl("RV\\.GEOM\\(",       cmpJMV, ignore.case = TRUE)) cmpRpR <- c(cmpRpR, "RV\\.GEOM\\(",       "rgeom(")
-    if (grepl("RV\\.HYPER\\(",      cmpJMV, ignore.case = TRUE)) cmpRpR <- c(cmpRpR, "RV\\.HYPER\\(",      "rhyper(")
-    if (grepl("RV\\.LNORMAL\\(",    cmpJMV, ignore.case = TRUE)) cmpRpR <- c(cmpRpR, "RV\\.LNORMAL\\(",    "rlnorm(")
-    if (grepl("RV\\.LOGISTIC\\(",   cmpJMV, ignore.case = TRUE)) cmpRpR <- c(cmpRpR, "RV\\.LOGISTIC\\(",   "rlogis(")
-    if (grepl("RV\\.POISSON\\(",    cmpJMV, ignore.case = TRUE)) cmpRpR <- c(cmpRpR, "RV\\.POISSON\\(",    "rpois(")
-    if (grepl("RV\\.T\\(",          cmpJMV, ignore.case = TRUE)) cmpRpR <- c(cmpRpR, "RV\\.T\\(",          "rt(")
-    if (grepl("RV\\.WEIBULL\\(",    cmpJMV, ignore.case = TRUE)) cmpRpR <- c(cmpRpR, "RV\\.WEIBULL\\(",    "rweibull(")
+    if (grepl("RV\\.BERNOULLI\\(",  cmpJMV, ignore.case = TRUE)) cmpRpR <- c(cmpRpR, "RV\\.BERNOULLI\\(",  "rbinom([N], 1, ")
+    if (grepl("RV\\.BINOM\\(",      cmpJMV, ignore.case = TRUE)) cmpRpR <- c(cmpRpR, "RV\\.BETA\\(",       "rbinom([N], ")
+    if (grepl("RV\\.CAUCHY\\(",     cmpJMV, ignore.case = TRUE)) cmpRpR <- c(cmpRpR, "RV\\.CAUCHY\\(",     "rcauchy([N], ")
+    if (grepl("RV\\.CHISQ\\(",      cmpJMV, ignore.case = TRUE)) cmpRpR <- c(cmpRpR, "RV\\.CHISQ\\(",      "rchisq([N], ")
+    if (grepl("RV\\.EXP\\(",        cmpJMV, ignore.case = TRUE)) cmpRpR <- c(cmpRpR, "RV\\.EXP\\(",        "rexp([N], ")
+    if (grepl("RV\\.F\\(",          cmpJMV, ignore.case = TRUE)) cmpRpR <- c(cmpRpR, "RV\\.F\\(",          "rf([N], ")
+    if (grepl("RV\\.GEOM\\(",       cmpJMV, ignore.case = TRUE)) cmpRpR <- c(cmpRpR, "RV\\.GEOM\\(",       "rgeom([N], ")
+    if (grepl("RV\\.HYPER\\(",      cmpJMV, ignore.case = TRUE)) cmpRpR <- c(cmpRpR, "RV\\.HYPER\\(",      "rhyper([N], ")
+    if (grepl("RV\\.LNORMAL\\(",    cmpJMV, ignore.case = TRUE)) cmpRpR <- c(cmpRpR, "RV\\.LNORMAL\\(",    "rlnorm([N], ")
+    if (grepl("RV\\.LOGISTIC\\(",   cmpJMV, ignore.case = TRUE)) cmpRpR <- c(cmpRpR, "RV\\.LOGISTIC\\(",   "rlogis([N], ")
+    if (grepl("RV\\.POISSON\\(",    cmpJMV, ignore.case = TRUE)) cmpRpR <- c(cmpRpR, "RV\\.POISSON\\(",    "rpois([N], ")
+    if (grepl("RV\\.T\\(",          cmpJMV, ignore.case = TRUE)) cmpRpR <- c(cmpRpR, "RV\\.T\\(",          "rt([N], ")
+    if (grepl("RV\\.WEIBULL\\(",    cmpJMV, ignore.case = TRUE)) cmpRpR <- c(cmpRpR, "RV\\.WEIBULL\\(",    "rweibull([N], ")
     if (grepl("RV\\.[HALFNRM|IGAUSS|LAPLACE|NEGBIN|PARETO]", cmpJMV, ignore.case = TRUE)) {
         stop("RV.HALFNRM, RV.IGAUSS, RV.LAPLACE, RV.NEGBIN, and RV.PARETO are not implemented.")
     }
@@ -415,17 +436,37 @@ compute <- function(crrCmd = c(), data = data.frame()) {
         stop()
     }
 
+    # calculate values in R ===================================================
     # add a data column (with the name of cmpVrT) and assign it to a temporary variable (which has the correct number of lines so that the filter is working)
     if (!any(grepl(cmpVrT, names(data)))) data[[cmpVrT]] <- NA
-    # unname(apply(data[, cmpVrF], 1, eval(parse(text = "function(X) abs(-mean(X))"))))
+    # determine the number of rows in the data frame
+    nRow <- dim(data)[1]
+    # deal with min_valid: either select all row numbers (if cmpMnV is NA; default) or select row numbers
+    # where the count of non-NA values is equal or exceeds the threshold set by cmpMnV
+    selRow <- ifelse(is.na(cmpMnV), seq(nRow), which(rowSums(!is.na(data[, cmpVrF])) >= cmpMnV))
 # to implement
-    # cmpMnV <- NA
-    # cmpGrp <- c()
     # , ignore_missing=0 -> na.rm = TRUE if not 0
+    # deal with [N]
     # fmtClc(cmpJMV, cmpRpR, cmpVrF)
-    data[[cmpVrT]] <- unname(apply(data[, cmpVrF], cmpDim, eval(parse(text = ""))))
+    
+    # deal with group_by: if no variable is set as grouping variable, all placeholder ([ALL]) is
+    # assigned to unqGrp, and in the loop below, all row numbers (selRow) are selected; if a group
+    # variable is set, the unique levels / values of the variable are determined and assigned to
+    # unqGrp and afterwards, the for-loop underneath sequentially selects those unique groups
+    if (grepl("group_by\s*=", cmpJMV)
+VVAR(A, group_by = Grp)
 
-    # if the command doesn't contain any commands, not available in jamovi, assign the required attributes to mark the variable as "Computed variable" in jamovi
+    unqGrp <- ifelse(is.null(cmpGrp), "[ALL]", unique(data[selRow, cmpGrp]))
+    for (crrGrp in unqGrp) {
+        selGrp <- ifelse(is.null(cmpGrp), rep(TRUE, length(selRow)), data[selRow, cmpGrp] == crrGrp)
+        if (grepl("MAXABSIQR\\(|MAXABSZ\\(", cmpJMV)) {
+            data[selRow[selGrp], cmpVrT] <- max(unname(apply(data[selRow[selGrp], cmpVrF], cmpDim, eval(parse(text = "")))))
+        } else {
+          # unname(apply(data[, cmpVrF], 1, eval(parse(text = "function(X) abs(-mean(X))"))))
+            data[selRow[selGrp], cmpVrT] <- unname(apply(data[selRow[selGrp], cmpVrF], cmpDim, eval(parse(text = ""))))
+        }
+    }
+    # if the command contains only commands that are available in jamovi, assign the required attributes to mark the variable as "Computed variable"
     if (cmpVld) {
         attr(data[[cmpVrT]], "columnType")     <- "Computed"
         attr(data[[cmpVrT]], "formula")        <- cmpJMV
@@ -433,10 +474,6 @@ compute <- function(crrCmd = c(), data = data.frame()) {
     }
 
     data
-}
-
-strSpl <- function(inpStr = "", dlmSpl = "") {
-    trimws(unlist(strsplit(trimws(inpStr), dlmSpl)))
 }
 
 fixVar <- function(vecVar = c(), crrSPS = c(), allVar = "") {
@@ -490,3 +527,17 @@ fixVar <- function(vecVar = c(), crrSPS = c(), allVar = "") {
         vecVar
     }
 }
+
+strSpl <- function(inpStr = "", dlmSpl = "") trimws(unlist(strsplit(trimws(inpStr), dlmSpl)))
+
+iqr <- function(X) {
+    Q1 <- quantile(X, 0.25)
+    Q3 <- quantile(X, 0.75)
+    IQR <- Q3 - Q1
+    Y <- rep(0, length(X))
+    Y[X <= Q1] <- (X[X <= Q1] - Q1) / IQR
+    Y[X >= Q3] <- (X[X >= Q3] - Q3) / IQR
+    Y
+}
+
+jmvSE <- function(X) sd(X, na.rm = TRUE) / sqrt(sum(!is.na(X)))

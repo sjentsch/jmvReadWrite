@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">jmvReadWrite</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.6</span>
       </span>
     </div>
 
@@ -51,6 +51,15 @@
     </div>
 
     <div class="section level2">
+<h2 class="page-header" data-toc-text="0.3.6" id="jmvreadwrite-036">jmvReadWrite 0.3.6<a class="anchor" aria-label="anchor" href="#jmvreadwrite-036"></a></h2>
+<div class="section level3">
+<h3 id="enhancements-and-bug-fixes-0-3-6">Enhancements and bug fixes:<a class="anchor" aria-label="anchor" href="#enhancements-and-bug-fixes-0-3-6"></a></h3>
+<ul><li>added <code>arrange_cols_omv</code> (to change the order of variables / columns in jamovi-files)</li>
+<li>added the parameter <code>psvAnl</code> to preserve the analyses in data files (only for <code>arrange_cols_omv</code>, <code>merge_cols_omv</code>, <code>sort_omv</code> where it makes sense – there the number of rows / participants / units doesn’t change)</li>
+<li>bug fixes: corrected an error in chkFle, removed duplicate functions from globals.R</li>
+</ul></div>
+</div>
+    <div class="section level2">
 <h2 class="page-header" data-toc-text="0.3.5" id="jmvreadwrite-035">jmvReadWrite 0.3.5<small>2023-05-27</small><a class="anchor" aria-label="anchor" href="#jmvreadwrite-035"></a></h2>
 <div class="section level3">
 <h3 id="bug-fixes-and-enhancements-0-3-5">Bug fixes and enhancements:<a class="anchor" aria-label="anchor" href="#bug-fixes-and-enhancements-0-3-5"></a></h3>
@@ -69,7 +78,7 @@
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.3.3" id="jmvreadwrite-033">jmvReadWrite 0.3.3<small>2022-08-09</small><a class="anchor" aria-label="anchor" href="#jmvreadwrite-033"></a></h2>
 <div class="section level3">
-<h3 id="bug-fixes-and-enhancements-0-3-3">Bug fixes and enhancements:<a class="anchor" aria-label="anchor" href="#bug-fixes-and-enhancements-0-3-3"></a></h3>
+<h3 id="enhancements-and-bug-fixes-0-3-3">Enhancements and bug fixes:<a class="anchor" aria-label="anchor" href="#enhancements-and-bug-fixes-0-3-3"></a></h3>
 <ul><li>made replacements using regular expressions compatible with R &gt;= 4.3 (changing occurrences of replacement pattern that included <code>\xNN</code>)</li>
 <li>improvements to <code>wide2long_omv</code> and <code>long2wide_omv</code> (those can now handle several factors, not only one)</li>
 <li>improvement to how <code>write_omv</code> handles / stores factors (those are now zero-based to be in accordance with most programming languages including Python and C++ used in the jamovi engine)</li>
@@ -97,8 +106,8 @@
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.3.0" id="jmvreadwrite-030">jmvReadWrite 0.3.0<small>2022-02-13</small><a class="anchor" aria-label="anchor" href="#jmvreadwrite-030"></a></h2>
 <div class="section level3">
-<h3 id="bug-fixes-and-enhancements-0-3-0">Bug fixes and enhancements:<a class="anchor" aria-label="anchor" href="#bug-fixes-and-enhancements-0-3-0"></a></h3>
-<ul><li>added a couple of helper functions: <code>convert_to_omv</code> (converts data sets from other formats - CSV, R, SPSS, SAS, Stata) to <code>.omv</code> <code>merge_cols_omv</code> (merges two or more data sets by concatenating columns) <code>merge_rows_omv</code> (merges two or more data sets by concatenating rows) <code>long2wide_omv</code> (converts data sets from long to wide, e.g., for running mixed-model-analyses in jamovi) <code>wide2long_omv</code> (converts data sets from wide to long, e.g., for running mixed-model-analyses in jamovi) <code>sort_omv</code> (sorts the dataset according to one or more variable)</li>
+<h3 id="enhancements-and-bug-fixes-0-3-0">Enhancements and bug fixes:<a class="anchor" aria-label="anchor" href="#enhancements-and-bug-fixes-0-3-0"></a></h3>
+<ul><li>added a couple of helper functions: <code>convert_to_omv</code> (converts data sets from other formats - CSV, R, SPSS, SAS, Stata - to <code>.omv</code>) <code>merge_cols_omv</code> (merges two or more data sets by concatenating columns) <code>merge_rows_omv</code> (merges two or more data sets by concatenating rows) <code>long2wide_omv</code> (converts data sets from long to wide, e.g., for running mixed-model-analyses in jamovi) <code>wide2long_omv</code> (converts data sets from wide to long, e.g., for running mixed-model-analyses in jamovi) <code>sort_omv</code> (sorts the dataset according to one or more variable)</li>
 <li>implemented unit tests and code coverage for <code>read_omv</code>, <code>write_omv</code>, <code>convert_to_omv</code>, <code>merge_cols_omv</code>, <code>merge_rows_omv</code>, <code>long2wide_omv</code>, <code>wide2long_omv</code>, <code>sort_omv</code>
 </li>
 <li>implemented treating variables in <code>read_omv</code> and <code>write_omv</code> as ordered factor if <code>measureType</code> has the value <code>Ordinal</code>

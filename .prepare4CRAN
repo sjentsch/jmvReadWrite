@@ -29,6 +29,7 @@ devtools::release_checks()
 # update man-pages and NAMESPACE
 devtools::spell_check()
 devtools::check_man()
+devtools::spell_check()
 
 # check whether the examples and the unit tests run through and do some linting
 devtools::run_examples(run_dontrun = TRUE)

@@ -24,7 +24,7 @@ arrange_cols_omv(
 
 \item{varMve}{Named list defining to how much a particular variable (name of a list entry) should be moved up (neg. value of a list entry) or down (pos. value) in the data frame (see Details; default: c())}
 
-\item{psvAnl}{Whether analyses that are contained in the imput file shall be transferred to the output file (TRUE / FALSE; default: FALSE)}
+\item{psvAnl}{Whether analyses that are contained in the input file shall be transferred to the output file (TRUE / FALSE; default: FALSE)}
 
 \item{usePkg}{Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata and SAS files; "foreign" is the default (it comes with base R), but "haven" is newer and more comprehensive}
 
@@ -61,8 +61,8 @@ names(read_omv(fleInp = fleOMV))
 arrange_cols_omv(fleInp = fleOMV, fleOut = fleTmp, varOrd = c("Sales", "Adverts", "Airplay", "Image"))
 names(read_omv(fleInp = fleTmp))
 # now, we move the variable "Sales" to the first place using the varMve-parameter
-arrange_cols_omv(fleInp = fleOMV, fleOut = fleTmp, varMve = list("Sales", -3))
-names(read_omv(fleInp = fleOMV))
+arrange_cols_omv(fleInp = fleOMV, fleOut = fleTmp, varMve = list(Sales = -3))
+names(read_omv(fleInp = fleTmp))
 unlink(fleTmp)
 }
 

@@ -73,7 +73,7 @@ test_that("read_omv works", {
     # .omv-file isn't a ZIP
     nmeTmp <- paste0(tempfile(), ".omv")
     writeBin("", con = nmeTmp)
-    expect_error(chkFle(fleNme = nmeTmp, isZIP = TRUE))
+    expect_error(chkFle(nmeTmp, isZIP = TRUE))
     unlink(nmeTmp)
 
     # invalid manifest (wrong version number)

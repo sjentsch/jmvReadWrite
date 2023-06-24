@@ -13,9 +13,9 @@ test_that("merge_cols_omv works", {
     expect_true(file.exists(nmeOut))
     expect_gt(file.info(nmeOut)$size, 1)
     expect_true(chkFle(nmeOut, isZIP = TRUE))
-    expect_true(chkFle(nmeOut, "meta"))
-    expect_true(chkFle(nmeOut, "metadata.json"))
-    expect_true(chkFle(nmeOut, "data.bin"))
+    expect_true(chkFle(nmeOut, fleCnt = "meta"))
+    expect_true(chkFle(nmeOut, fleCnt = "metadata.json"))
+    expect_true(chkFle(nmeOut, fleCnt = "data.bin"))
     unlink(nmeOut)
 
     dtaFrm <- merge_cols_omv(nmeInp, typMrg = "outer", varBy = "ID", varSrt = c("gender_3", "age_3"))

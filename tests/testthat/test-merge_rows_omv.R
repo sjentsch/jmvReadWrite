@@ -9,9 +9,9 @@ test_that("merge_rows_omv works", {
     expect_true(file.exists(nmeOut))
     expect_gt(file.info(nmeOut)$size, 1)
     expect_true(chkFle(nmeOut, isZIP = TRUE))
-    expect_true(chkFle(nmeOut, "meta"))
-    expect_true(chkFle(nmeOut, "metadata.json"))
-    expect_true(chkFle(nmeOut, "data.bin"))
+    expect_true(chkFle(nmeOut, fleCnt = "meta"))
+    expect_true(chkFle(nmeOut, fleCnt = "metadata.json"))
+    expect_true(chkFle(nmeOut, fleCnt = "data.bin"))
     unlink(nmeOut)
 
     # checking merging rows with returning the merged dataset as a variable

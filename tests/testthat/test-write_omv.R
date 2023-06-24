@@ -7,9 +7,9 @@ test_that("write_omv works", {
     expect_true(file.exists(nmeOut))
     expect_gt(file.info(nmeOut)$size, 1)
     expect_true(chkFle(nmeOut, isZIP = TRUE))
-    expect_true(chkFle(nmeOut, "meta"))
-    expect_true(chkFle(nmeOut, "metadata.json"))
-    expect_true(chkFle(nmeOut, "data.bin"))
+    expect_true(chkFle(nmeOut, fleCnt = "meta"))
+    expect_true(chkFle(nmeOut, fleCnt = "metadata.json"))
+    expect_true(chkFle(nmeOut, fleCnt = "data.bin"))
     unlink(nmeOut)
 
     # check the debugging information: name and type of the three parts that are returned, content of the metadata, whether all entries in xtdDta are labels, and

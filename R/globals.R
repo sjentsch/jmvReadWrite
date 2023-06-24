@@ -63,6 +63,29 @@ chkExt <- function(fleNme = "", extNme = c("")) {
     TRUE
 }
 
+chkFle <- function(fleNme = "", isZIP = FALSE, fleCnt = "") {
+    if (!is.character(fleNme) || !is.logical(isZIP) || !is.character(fleCnt)) {
+        stop("chkFle: Unsupported input parameter type.")
+    }
+    if (!utils::file_test("-f", fleNme)) {
+        stop(sprintf("File \"%s\" not found.", fleNme))
+    }
+    if (isZIP) {
+        hdrStr <- readBin(tmpHdl <- file(fleNme, "rb"), "character")
+        close(tmpHdl)
+        # only "PK\003\004" is considered, not "PK\005\006" (empty ZIP) or "PK\007\008" (spanned [over several files])
+        if (! hdrStr == "PK\003\004\024") {
+            stop(sprintf("chkFle: File \"%s\" has not the correct file format (is not a ZIP archive).", basename(fleNme)))
+        }
+    }
+    if (nchar(fleCnt) > 0) {
+        if (!any(grepl(fleCnt, zip::zip_list(fleNme)$filename))) {
+            stop(sprintf("chkFle: File \"%s\" doesn\'t contain the file \"%s\".", basename(fleNme), fleCnt))
+        }
+    }
+    TRUE
+}
+
 chkVar <- function(dtaFrm = NULL, varNme = c()) {
     if (is.null(varNme) || length(varNme) == 0 || !all(nzchar(varNme))) return(FALSE)
     if (!all(varNme %in% names(dtaFrm))) {

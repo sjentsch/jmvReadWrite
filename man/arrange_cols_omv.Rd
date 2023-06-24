@@ -58,7 +58,8 @@ fleTmp <- paste0(tempfile(), ".omv")
 # the original file has the variables in the order: "Adverts", "Airplay", "Image", "Sales"
 names(read_omv(fleInp = fleOMV))
 # first, we move the variable "Sales" to the first place using the varOrd-parameter
-arrange_cols_omv(fleInp = fleOMV, fleOut = fleTmp, varOrd = c("Sales", "Adverts", "Airplay", "Image"))
+arrange_cols_omv(fleInp = fleOMV, fleOut = fleTmp,
+  varOrd = c("Sales", "Adverts", "Airplay", "Image"))
 names(read_omv(fleInp = fleTmp))
 # now, we move the variable "Sales" to the first place using the varMve-parameter
 arrange_cols_omv(fleInp = fleOMV, fleOut = fleTmp, varMve = list(Sales = -3))

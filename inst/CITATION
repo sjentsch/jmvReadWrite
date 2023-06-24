@@ -6,6 +6,6 @@ bibentry(
   author = person("Sebastian", "Jentschke", role = c("aut", "cre"), email = "sebastian.jentschke@uib.no"),
   year = 2023,
   note = "R package version 0.3.6",
-  url = c("https://CRAN.R-project.org/package=jmvReadWrite", "https://sjentsch.github.io/jmvReadWrite/"),
+  url = "https://CRAN.R-project.org/package=jmvReadWrite",
   key = "jmvReadWrite"
 )

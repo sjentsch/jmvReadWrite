@@ -199,3 +199,31 @@ chkAtt <- function(attObj = NULL, attNme = "", attVal = NULL) {
 chkFld <- function(fldObj = NULL, fldNme = "", fldVal = NULL) {
    ((fldNme %in% names(fldObj))    && length(fldObj[[fldNme]])     > 0 && ifelse(!is.null(fldVal), grepl(fldVal, fldObj[[fldNme]]),     TRUE))
 }
+
+
+# =================================================================================================
+# function for copying analyses from one data file to another
+
+xfrAnl <- function(fleInp = "", fleOut = "") {
+    # check whether input and output files are valid and format input and output file names
+    chkExt(fleInp, "omv") && chkFle(fleInp, isZIP = TRUE) && chkFle(fleInp, fleCnt = "meta|MANIFEST.MF")
+    chkExt(fleOut, "omv") && chkFle(fleOut, isZIP = TRUE) && chkFle(fleOut, fleCnt = "meta|MANIFEST.MF")
+    fleInp <- fmtFlI(fleInp, maxLng = 1)
+    fleOut <- fmtFlI(fleOut, maxLng = 1)
+
+    # extract the list of files contained in the input file, assign tempdir()
+    fleLst <- zip::zip_list(fleInp)$filename
+    tmpDir <- tempdir()
+
+    # create a list of files to be copied, extract them from the input file and
+    # append them to the output file
+    fle2Cp <- fleLst[grepl("index.html|[0-9].*\\s[a-z].*?/", fleLst)]
+    zip::unzip(fleInp,      files = fle2Cp, exdir = tmpDir)
+    zip::zip_append(fleOut, files = fle2Cp, root  = tmpDir)
+    
+    # remove the files and directories from the list of files to be copied
+    unlink(setdiff(unique(dirname(file.path(tmpDir, fle2Cp))), tmpDir), recursive = TRUE)
+    unlink(file.path(tmpDir, fle2Cp[basename(fle2Cp) == fle2Cp]))
+
+    TRUE
+}

@@ -42,7 +42,7 @@
 #'
 #' @export sort_omv
 #'
-sort_omv <- function(fleInp = c(), fleOut = "", varSrt = c(), usePkg = c("foreign", "haven"), selSet = "", ...) {
+sort_omv <- function(fleInp = c(), fleOut = "", varSrt = c(), psvAnl = FALSE, usePkg = c("foreign", "haven"), selSet = "", ...) {
     if (length(varSrt) == 0 || !all(nzchar(varSrt))) {
         stop("Calling sort_omv requires giving at least one variable to sort after.")
     }
@@ -59,6 +59,9 @@ sort_omv <- function(fleInp = c(), fleOut = "", varSrt = c(), usePkg = c("foreig
 
     # write file
     write_omv(dtaFrm, fleOut)
+
+    # transfer analyses from input to output file
+    if (psvAnl) xfrAnl(fleInp, fleOut)
 }
 
 srtFrm <- function(dtaFrm = NULL, varSrt = c()) {

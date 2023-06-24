@@ -63,7 +63,7 @@
 #'
 #' @export merge_cols_omv
 #'
-merge_cols_omv <- function(fleInp = c(), fleOut = "", typMrg = c("outer", "inner", "left", "right"), varBy = list(), varSrt = c(), usePkg = c("foreign", "haven"), selSet = "", ...) {
+merge_cols_omv <- function(fleInp = c(), fleOut = "", typMrg = c("outer", "inner", "left", "right"), varBy = list(), varSrt = c(), psvAnl = FALSE, usePkg = c("foreign", "haven"), selSet = "", ...) {
 
     # check and format input file names and handle / check further input arguments
     fleInp <- fmtFlI(fleInp, minLng = 2)
@@ -96,9 +96,11 @@ merge_cols_omv <- function(fleInp = c(), fleOut = "", typMrg = c("outer", "inner
     # sort data frame (if varSrt not empty)
     dtaOut <- srtFrm(dtaOut, varSrt)
 
-    # write files (if fleOut is not empty) or return resulting data frame
+    # write files (if fleOut is not empty) and transfer analyses from input to output file (if psvAnl is TRUE)
     if (nzchar(fleOut)) {
         write_omv(dtaOut, nrmFle(fleOut))
+        if (psvAnl) xfrAnl(fleInp, fleOut)
+    # return resulting data frame (if fleOut is empty)
     } else {
         dtaOut
     }

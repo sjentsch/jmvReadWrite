@@ -46,7 +46,7 @@ arrange_cols_omv <- function(fleInp = "", fleOut = "", varOrd = c(), varMve = li
 
     # check the input parameters: either varOrd or varMve need to be given; if varOrd is given, the given character vectore and all of its elements need to be not empty;
     # if varMve is given, it needs to be a list, the names can't be empty, and the values need to be integers and can't be zero
-    if ((length(varOrd) < 1 || !is.character(varOrd) || !all(nzchar(varOrd))) && 
+    if ((length(varOrd) < 1 || !is.character(varOrd) || !all(nzchar(varOrd))) &&
         (length(varMve) < 1 || !is.list(varMve) || !is.character(names(varMve)) || !is.numeric(unlist(varMve)) || !all(unlist(varMve) != 0) || !all(unlist(varMve) %% 1 == 0))) {
         stop("Calling arrange_cols_omv requires either the parameter varOrd (a character vector) or the parameter varMve (a named list), using the correct format (see Details in help).")
     }
@@ -68,40 +68,39 @@ arrange_cols_omv <- function(fleInp = "", fleOut = "", varOrd = c(), varMve = li
         if (!all(names(dtaFrm) %in% varOrd)) {
             warning(sprintf("The following variable(s) from the original data set are not contained in varOrd: %s", paste(setdiff(names(dtaFrm), varOrd), collapse = ", ")))
         }
-    } else if (length(varMve) > 0) {
-        if (length(varOrd) > 0) {
-            warning("Both, varOrd and varMve given as input parameters. varOrd takes precedence.")
-        } else {
-            # [1] assign the original order of variables to varOrd
-            varOrd <- names(dtaFrm)
-            # [2] check whether all variables in varMve are not empty and exist in the data set
-            chkVar(dtaFrm, names(varMve))
-            for (crrVar in names(varMve)) {
-                crrPos <- which(varOrd == crrVar)
-                if (crrPos + varMve[[crrVar]] < 1 || crrPos + varMve[[crrVar]] > dim(dtaFrm)[2]) {
-                    stop("The value given in varMve must be chosen so that the element isn't moved before the first or after the last column")
-                }
-                allPos <- seq(dim(dtaFrm)[2])
-                if (varMve[[crrVar]] < 0) {
-                    rplPos <- seq(crrPos + varMve[[crrVar]], crrPos)
-                    allPos[allPos %in% rplPos] <- c(crrPos, setdiff(rplPos, crrPos))
-                } else {
-                    rplPos <- seq(crrPos, crrPos + varMve[[crrVar]])
-                    allPos[allPos %in% rplPos] <- c(setdiff(rplPos, crrPos), crrPos)
-                }
-                varOrd <- varOrd[allPos]
+    }
+    if (length(varMve) > 0 && length(varOrd) == 0) {
+        # [1] assign the original order of variables to varOrd
+        varOrd <- names(dtaFrm)
+        # [2] check whether all variables in varMve are not empty and exist in the data set
+        chkVar(dtaFrm, names(varMve))
+        for (crrVar in names(varMve)) {
+            crrPos <- which(varOrd == crrVar)
+            if (crrPos + varMve[[crrVar]] < 1 || crrPos + varMve[[crrVar]] > dim(dtaFrm)[2]) {
+                stop("The value given in varMve must be chosen so that the element isn't moved before the first or after the last column")
             }
+            allPos <- seq(dim(dtaFrm)[2])
+            if (varMve[[crrVar]] < 0) {
+                rplPos <- seq(crrPos + varMve[[crrVar]], crrPos)
+                allPos[allPos %in% rplPos] <- c(crrPos, setdiff(rplPos, crrPos))
+            } else {
+                rplPos <- seq(crrPos, crrPos + varMve[[crrVar]])
+                allPos[allPos %in% rplPos] <- c(setdiff(rplPos, crrPos), crrPos)
+            }
+            varOrd <- varOrd[allPos]
         }
+    } else if (length(varMve) > 0 && length(varOrd) > 0) {
+        warning("Both, varOrd and varMve given as input parameters. varOrd takes precedence.")
     }
 
-    # re-arrange to order of variables, while storing and restoring the attributes attached to the whole data frame (column attributes are not affected) 
+    # re-arrange to order of variables, while storing and restoring the attributes attached to the whole data frame (column attributes are not affected)
     attMem <- attributes(dtaFrm)
     dtaFrm <- dtaFrm[, varOrd]
     for (crrAtt in setdiff(names(attMem), c("names", "row.names", "class"))) attr(dtaFrm, crrAtt) <- attMem[[crrAtt]]
 
     # write the resulting data frame to the output file
     write_omv(dtaFrm, fleOut)
-    
+
     # transfer analyses from input to output file
     if (psvAnl) xfrAnl(fleInp, fleOut)
 }

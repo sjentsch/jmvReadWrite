@@ -3,7 +3,7 @@ test_that("arrange_cols_omv works", {
     nmeOut <- paste0(tempfile(), "_A.omv")
     saveRDS(jmvReadWrite::AlbumSales, nmeInp)
 
-    arrange_cols_omv(nmeInp, nmeOut, varOrd = c("selSbj", "Sales", "Adverts", "Airplay", "Image")
+    arrange_cols_omv(nmeInp, nmeOut, varOrd = c("selSbj", "Sales", "Adverts", "Airplay", "Image"))
     expect_true(chkFle(nmeOut))
     expect_gt(file.info(nmeOut)$size, 1)
     expect_true(chkFle(nmeOut, isZIP = TRUE))
@@ -27,7 +27,7 @@ test_that("arrange_cols_omv works", {
     dtaFrm <- read_omv(nmeOut, sveAtt = FALSE)
     expect_s3_class(dtaFrm, "data.frame")
     expect_equal(dim(dtaFrm), c(200, 5))
-    expect_equal(names(dtaFrm), c("selSbj", "Sales", "Adverts", "Airplay", "Image"))
+    expect_equal(names(dtaFrm), c("selSbj", "Sales", "Airplay", "Image", "Adverts"))
     expect_equal(as.vector(sapply(dtaFrm, typeof)), c("integer", "integer", "integer", "integer", "double"))
     unlink(nmeOut)
 
@@ -66,7 +66,7 @@ test_that("arrange_cols_omv works", {
     expect_warning(arrange_cols_omv(nmeInp, nmeOut, varOrd = c("Sales", "Adverts", "Airplay", "Image")))
     expect_true(file.exists(nmeOut))
     unlink(nmeOut)
-    expect_warning(arrange_cols_omv(nmeInp, nmeOut, varOrd = c("Sales", "Adverts", "Airplay", "Image"), varMve = list(Sales = -3)))
+    expect_warning(arrange_cols_omv(nmeInp, nmeOut, varOrd = c("selSbj", "Sales", "Adverts", "Airplay", "Image"), varMve = list(Sales = -3)))
     expect_true(file.exists(nmeOut))
     unlink(nmeOut)
     unlink(nmeInp)
@@ -79,7 +79,7 @@ test_that("arrange_cols_omv works", {
     expect_true(chkFle(nmeOut, isZIP = TRUE))
     expect_true(chkFle(nmeOut, fleCnt = "meta"))
     expect_true(chkFle(nmeOut, fleCnt = "metadata.json"))
-    expect_true(chkFle(nmeOut, fleCnt = "data.bin")) 
+    expect_true(chkFle(nmeOut, fleCnt = "data.bin"))
     dtaFrm <- read_omv(nmeOut, sveAtt = FALSE)
     expect_s3_class(dtaFrm, "data.frame")
     expect_equal(dim(dtaFrm), c(60, 13))
@@ -91,6 +91,5 @@ test_that("arrange_cols_omv works", {
         "04 ancova/analysis", "05 empty/analysis", "02 anova/resources/3b518ea3d44f095f.png", "02 anova/resources/07288f96c58ae68b.png"))
 
     unlink(nmeOut)
-    unlink(nmeInp)
-
+    # do not unlink nmeInp, this isn't a generated file, but a link
 })

@@ -16,6 +16,8 @@ test_that("globals work", {
 
     # test cases for code coverage ============================================================================================================================
     expect_error(chkDir(file.path(tempdir(), "not", "file")))
+    expect_error(chkFle(NA))
+    expect_error(chkFle("", isZIP = 1))
     expect_error(chkFle(tempfile()))
     expect_error(chkDtF(data.frame(A = runif(n = 100)), minSze = 2))
     expect_true(chkExt(tempfile(), ""))

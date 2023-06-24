@@ -19,6 +19,8 @@ rm('blnAtt', 'crrOMV')
 
 # checks the requirements (all dependencies up-to-date, etc.)
 # use devtools::update_packages("devtools") and devtools::install_dev_deps() if required
+# NB: there might be an error when updating the tidyverse-packages: remove the APA-style
+#     formatting in .Rprofile, restart R and put it back afterwards
 devtools::dev_sitrep()
 
 # do some initial checks

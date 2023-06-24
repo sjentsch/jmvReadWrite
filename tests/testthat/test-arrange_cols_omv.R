@@ -3,14 +3,13 @@ test_that("arrange_cols_omv works", {
     nmeOut <- paste0(tempfile(), "_A.omv")
     saveRDS(jmvReadWrite::AlbumSales, nmeInp)
 
-    arrange_cols_omv(nmeInp, nmeOut, varOrd = c("selSbj", "Sales", "Adverts", "Airplay", "Image"))
-    expect_true(file.exists(nmeOut))
+    arrange_cols_omv(nmeInp, nmeOut, varOrd = c("selSbj", "Sales", "Adverts", "Airplay", "Image")
+    expect_true(chkFle(nmeOut))
     expect_gt(file.info(nmeOut)$size, 1)
     expect_true(chkFle(nmeOut, isZIP = TRUE))
     expect_true(chkFle(nmeOut, fleCnt = "meta"))
     expect_true(chkFle(nmeOut, fleCnt = "metadata.json"))
     expect_true(chkFle(nmeOut, fleCnt = "data.bin"))
-
     dtaFrm <- read_omv(nmeOut, sveAtt = FALSE)
     expect_s3_class(dtaFrm, "data.frame")
     expect_equal(dim(dtaFrm), c(200, 5))
@@ -19,14 +18,18 @@ test_that("arrange_cols_omv works", {
     unlink(nmeOut)
 
     arrange_cols_omv(nmeInp, nmeOut, varMve = list(Sales = -3, Adverts = 2))
+    expect_true(chkFle(nmeOut))
+    expect_gt(file.info(nmeOut)$size, 1)
+    expect_true(chkFle(nmeOut, isZIP = TRUE))
+    expect_true(chkFle(nmeOut, fleCnt = "meta"))
+    expect_true(chkFle(nmeOut, fleCnt = "metadata.json"))
+    expect_true(chkFle(nmeOut, fleCnt = "data.bin"))
     dtaFrm <- read_omv(nmeOut, sveAtt = FALSE)
     expect_s3_class(dtaFrm, "data.frame")
     expect_equal(dim(dtaFrm), c(200, 5))
     expect_equal(names(dtaFrm), c("selSbj", "Sales", "Adverts", "Airplay", "Image"))
     expect_equal(as.vector(sapply(dtaFrm, typeof)), c("integer", "integer", "integer", "integer", "double"))
     unlink(nmeOut)
-
-# test cases for psvAnl
 
     # test cases for code coverage ============================================================================================================================
     expect_error(arrange_cols_omv(nmeInp, nmeOut))
@@ -66,6 +69,25 @@ test_that("arrange_cols_omv works", {
     expect_warning(arrange_cols_omv(nmeInp, nmeOut, varOrd = c("Sales", "Adverts", "Airplay", "Image"), varMve = list(Sales = -3)))
     expect_true(file.exists(nmeOut))
     unlink(nmeOut)
-
     unlink(nmeInp)
+
+    # test cases for the transfer of analyses =================================================================================================================
+    nmeInp <- file.path("..", "ToothGrowth.omv")
+    arrange_cols_omv(nmeInp, nmeOut, varOrd = c("Filter 1", "ID", "len", "logLen", "supp", "supp - Transform 1", "dose", "dose2", "Trial", "Residuals", "J", "K", "L"), psvAnl = TRUE)
+    expect_true(chkFle(nmeOut))
+    expect_gt(file.info(nmeOut)$size, 1)
+    expect_true(chkFle(nmeOut, isZIP = TRUE))
+    expect_true(chkFle(nmeOut, fleCnt = "meta"))
+    expect_true(chkFle(nmeOut, fleCnt = "metadata.json"))
+    expect_true(chkFle(nmeOut, fleCnt = "data.bin")) 
+    dtaFrm <- read_omv(nmeOut, sveAtt = FALSE)
+    expect_s3_class(dtaFrm, "data.frame")
+    expect_equal(dim(dtaFrm), c(60, 13))
+    expect_equal(names(dtaFrm), c("Filter 1", "ID", "len", "logLen", "supp", "supp - Transform 1", "dose", "dose2", "Trial", "Residuals", "J", "K", "L"))
+    expect_equal(as.vector(sapply(dtaFrm, typeof)),
+      c("logical", "character", "double", "double", "integer", "integer", "double", "integer", "integer", "double", "double", "double", "integer"))
+
+    unlink(nmeOut)
+    unlink(nmeInp)
+
 })

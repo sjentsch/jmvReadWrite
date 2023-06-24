@@ -108,8 +108,6 @@ nrmFle <- function(fleNme = "") {
 
 fmtFlI <- function(fleInp = c(), minLng = 1, maxLng = Inf, excExt = "") {
     # normalize the path of the input file and then check whether the file exists and whether it is of a supported file type
-    # ("omv" / "jamovi, " are excluded since it makes little sense to convert from jamovi to jamovi-files)
-    # if fleOut is empty, fleInp is used with its file extension replaced with ".omv"
     if (length(fleInp) < minLng || length(fleInp) > maxLng) {
         stop(sprintf("The fleInp-argument is supposed to be a character vector with a minimal length of %.0f and a maximal length of %.0f (current length is %.0f).%s",
                      minLng, maxLng, length(fleInp), ifelse(length(fleInp) > maxLng, "\n  If you would like to process several files, call the function individually for each.", "")))
@@ -204,26 +202,28 @@ chkFld <- function(fldObj = NULL, fldNme = "", fldVal = NULL) {
 # =================================================================================================
 # function for copying analyses from one data file to another
 
-xfrAnl <- function(fleInp = "", fleOut = "") {
+xfrAnl <- function(fleOrg = "", fleTgt = "") {
     # check whether input and output files are valid and format input and output file names
-    chkExt(fleInp, "omv") && chkFle(fleInp, isZIP = TRUE) && chkFle(fleInp, fleCnt = "meta|MANIFEST.MF")
-    chkExt(fleOut, "omv") && chkFle(fleOut, isZIP = TRUE) && chkFle(fleOut, fleCnt = "meta|MANIFEST.MF")
-    fleInp <- fmtFlI(fleInp, maxLng = 1)
-    fleOut <- fmtFlI(fleOut, maxLng = 1)
+    chkExt(fleOrg, "omv") && chkFle(fleOrg, isZIP = TRUE) && chkFle(fleOrg, fleCnt = "meta|MANIFEST.MF")
+    chkExt(fleTgt, "omv") && chkFle(fleTgt, isZIP = TRUE) && chkFle(fleTgt, fleCnt = "meta|MANIFEST.MF")
+    fleOrg <- fmtFlI(fleOrg, maxLng = 1)
+    fleTgt <- fmtFlI(fleTgt, maxLng = 1)
 
     # extract the list of files contained in the input file, assign tempdir()
-    fleLst <- zip::zip_list(fleInp)$filename
+    lstOrg <- zip::zip_list(fleOrg)$filename
+    lst2Cp <- lstOrg[grepl("index.html|[0-9].*\\s[a-z].*?/", lstOrg)]
+    lstCmb <- union(zip::zip_list(fleTgt)$filename, lst2Cp)
     tmpDir <- tempdir()
 
     # create a list of files to be copied, extract them from the input file and
     # append them to the output file
-    fle2Cp <- fleLst[grepl("index.html|[0-9].*\\s[a-z].*?/", fleLst)]
-    zip::unzip(fleInp,      files = fle2Cp, exdir = tmpDir)
-    zip::zip_append(fleOut, files = fle2Cp, root  = tmpDir)
+    zip::unzip(fleTgt,                 exdir = tmpDir)
+    zip::unzip(fleOrg, files = lst2Cp, exdir = tmpDir, overwrite = TRUE)
+    zip::zip(fleTgt,   files = lstCmb, root  = tmpDir)
     
     # remove the files and directories from the list of files to be copied
-    unlink(setdiff(unique(dirname(file.path(tmpDir, fle2Cp))), tmpDir), recursive = TRUE)
-    unlink(file.path(tmpDir, fle2Cp[basename(fle2Cp) == fle2Cp]))
+    unlink(setdiff(unique(dirname(file.path(tmpDir, lstCmb))), tmpDir), recursive = TRUE)
+    unlink(file.path(tmpDir, lstCmb[basename(lstCmb) == lstCmb]))
 
     TRUE
 }

@@ -60,6 +60,9 @@ devtools::build_manual(path="doc")
 devtools::build()
 devtools::check(force_suggests = TRUE, incoming = TRUE, remote = TRUE, env_vars = c(NOT_CRAN = "FALSE"))
 
+# check on win-builder (Rhub underneath may take a while, run check_win_devel first)
+devtools::check_win_devel()
+
 # the next stage of ping-pong, either build on the standard platforms
 devtools::check_rhub()
 # or builds it the package on rhub using all major platforms R is supported on
@@ -68,9 +71,6 @@ devtools::check_rhub(pkg = ".", platforms = rhub::platforms()$name, env_vars = c
 crrPlt = rhub::platforms()
 crrPlt = crrPlt[-c(x, ...), ]
 devtools::check_rhub(pkg = ".", platforms = crrPlt$name, env_vars = c("_R_CHECK_FORCE_SUGGESTS_" = "false"))
-
-# check on win-builder (Rhub above may take a while, open a new terminal)
-devtools::check_win_devel()
 
 # update version number and comments in cran-comments.md (and perhaps NEWS.md)
 system("gedit cran-comments.md NEWS.md")

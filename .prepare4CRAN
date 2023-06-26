@@ -84,16 +84,7 @@ git tag -a "${V}" $(git log | grep -m1 commit | sed 's/commit\s*//') -m "CRAN su
 # optional: Use the tag to create a release on GitHub
 
  
-# for later - implement tests: ====================================================================
-devtools::has_tests()
-devtools::test()
-devtools::test_active_file()
-devtools::test_coverage_active_file()
-devtools::test_coverage_file()
-devtools::test_coverage()
-
-
-# other helpful commands:
+# other helpful commands: =========================================================================
 devtools::revdep()                    # shows reverse imports of the package
 devtools::revdep_maintainers()        # ... and their maintainers
 usethis::use_vignette('jmvReadWrite') # assigns a vignette

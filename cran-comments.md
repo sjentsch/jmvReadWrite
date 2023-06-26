@@ -2,7 +2,7 @@
 
 ## Current version
 0.3.6
-arrange_cols_omv added, bug-fixes (0.3.5 -> 0.3.6)
+``arrange_cols_omv`` added, bug-fixes (0.3.5 -> 0.3.6)
 
 ## Test environments
 * ``devtools::check()``

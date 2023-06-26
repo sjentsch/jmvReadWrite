@@ -64,6 +64,8 @@ test_that("read_omv works", {
     # fleInp is not given or empty
     expect_error(read_omv())
     expect_error(read_omv(""))
+    # fleInp is not a jamovi-file (.omv)
+    expect_error(read_omv("Trial.rds"))
     # the manifest must have a file name as second parameter and
     # the file has to be a valid manifest file (which is not the
     # case for "index.html" [exists, but isn't a manifest])
@@ -73,7 +75,7 @@ test_that("read_omv works", {
     # .omv-file isn't a ZIP
     nmeTmp <- paste0(tempfile(), ".omv")
     writeBin("", con = nmeTmp)
-    expect_error(chkFle(fleNme = nmeTmp, isZIP = TRUE))
+    expect_error(chkFle(nmeTmp, isZIP = TRUE))
     unlink(nmeTmp)
 
     # invalid manifest (wrong version number)

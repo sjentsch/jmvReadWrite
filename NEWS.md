@@ -1,8 +1,18 @@
+# jmvReadWrite 0.3.6
+
+## Enhancements and bug fixes:
+* added `arrange_cols_omv` (to change the order of variables / columns in jamovi-files)
+* added the parameter `psvAnl` to preserve the analyses in data files
+  (only for `arrange_cols_omv`, `merge_cols_omv`, `sort_omv` where it makes sense – there the number of rows / participants / units doesn't change)
+* bug fixes: corrected an error in `chkFle`, removed duplicate functions from `globals.R`
+
+
 # jmvReadWrite 0.3.5
 
 ## Bug fixes and enhancements:
 * fixed an error that led to a warning when adding columns (to make different data frames have the same set of variables) in merge_cols_omv()
 * added logo and citation
+
 
 # jmvReadWrite 0.3.4
 
@@ -13,7 +23,7 @@
 
 # jmvReadWrite 0.3.3
 
-## Bug fixes and enhancements:
+## Enhancements and bug fixes:
 * made replacements using regular expressions compatible with R >= 4.3 (changing occurrences of replacement pattern that included `\xNN`)
 * improvements to `wide2long_omv` and `long2wide_omv` (those can now handle several factors, not only one)
 * improvement to how `write_omv` handles / stores factors (those are now zero-based to be in accordance with most programming languages including Python and C++ used in the jamovi engine)
@@ -38,9 +48,9 @@
 
 # jmvReadWrite 0.3.0
 
-## Bug fixes and enhancements:
+## Enhancements and bug fixes:
 * added a couple of helper functions:
-  `convert_to_omv` (converts data sets from other formats - CSV, R, SPSS, SAS, Stata) to `.omv` 
+  `convert_to_omv` (converts data sets from other formats - CSV, R, SPSS, SAS, Stata - to `.omv`)
   `merge_cols_omv` (merges two or more data sets by concatenating columns)
   `merge_rows_omv` (merges two or more data sets by concatenating rows)
   `long2wide_omv` (converts data sets from long to wide, e.g., for running mixed-model-analyses in jamovi)

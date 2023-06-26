@@ -8,6 +8,7 @@ sort_omv(
   fleInp = c(),
   fleOut = "",
   varSrt = c(),
+  psvAnl = FALSE,
   usePkg = c("foreign", "haven"),
   selSet = "",
   ...
@@ -19,6 +20,8 @@ sort_omv(
 \item{fleOut}{Name (including the path, if required) of the data file to be written ("FILENAME.omv"; default: ""); if empty, the extension of fleInp is replaced with "_sorted(file extension -> .omv)"}
 
 \item{varSrt}{Variable(s) that are used to sort the data frame (see Details; default: c())}
+
+\item{psvAnl}{Whether analyses that are contained in the input file shall be transferred to the output file (TRUE / FALSE; default: FALSE)}
 
 \item{usePkg}{Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata and SAS files; "foreign" is the default (it comes with base R), but "haven" is newer and more comprehensive}
 

@@ -198,9 +198,9 @@ list.files(".", "Trial.omv")
 #> [1] "Trial.omv"
 file.info("Trial.omv")
 #>           size isdir mode               mtime               ctime
-#> Trial.omv 1564 FALSE  664 2023-05-27 17:09:45 2023-05-27 17:09:45
+#> Trial.omv 1564 FALSE  664 2023-06-26 11:48:29 2023-06-26 11:48:29
 #>                         atime  uid  gid    uname   grname
-#> Trial.omv 2023-05-27 17:09:45 1000 1000 sjentsch sjentsch
+#> Trial.omv 2023-06-26 11:48:29 1000 1000 sjentsch sjentsch
 unlink("Trial.omv")
 ```
 
@@ -243,8 +243,11 @@ are stored for other columns. <br /><br />
 
 **Helper functions**
 
-Since version 0.3.0, `jmvReadWrite` contains a number of helper
-functions that support you with commonly required data management tasks:
+`jmvReadWrite` contains a number of helper functions that assist you
+with data management tasks that are frequently required:
+
+  - [`arrange_cols_omv`](https://sjentsch.github.io/jmvReadWrite/reference/arrange_cols_omv.html):
+    Re-arranges the columns of your data file in a requested order.
 
   - [`convert_to_omv`](https://sjentsch.github.io/jmvReadWrite/reference/convert_to_omv.html):
     Converts data sets from other file formats into jamovi-format (this
@@ -262,13 +265,13 @@ functions that support you with commonly required data management tasks:
     converted into rows).
 
   - [`merge_cols_omv`](https://sjentsch.github.io/jmvReadWrite/reference/merge_cols_omv.html):
-    Add cases from several data sets (i.e., the cases / rows in the
-    second, etc. data set are added as rows to the first data set).
-
-  - [`merge_rows_omv`](https://sjentsch.github.io/jmvReadWrite/reference/merge_rows_omv.html):
     Add variables from several data sets (i.e., the variables / columns
     in the second, etc. input data set are added as columns to the first
     data set).
+
+  - [`merge_rows_omv`](https://sjentsch.github.io/jmvReadWrite/reference/merge_rows_omv.html):
+    Add cases from several data sets (i.e., the cases / rows in the
+    second, etc. data set are added as rows to the first data set).
 
   - [`sort_omv`](https://sjentsch.github.io/jmvReadWrite/reference/sort_omv.html):
     Sort a data set according to one or more variable(s).

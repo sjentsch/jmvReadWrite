@@ -16,12 +16,14 @@ test_that("globals work", {
 
     # test cases for code coverage ============================================================================================================================
     expect_error(chkDir(file.path(tempdir(), "not", "file")))
+    expect_error(chkFle(NA))
+    expect_error(chkFle("", isZIP = 1))
     expect_error(chkFle(tempfile()))
     expect_error(chkDtF(data.frame(A = runif(n = 100)), minSze = 2))
     expect_true(chkExt(tempfile(), ""))
     expect_error(chkExt(tempfile(), ".chk"))
-    expect_error(chkFle("no_file", nmeOMV))
     expect_error(chkFle("no_file"))
+    expect_error(chkFle(nmeOMV, fleCnt = "no_file"))
     expect_error(chkVar(dtaFrm = data.frame(A = runif(100)), varNme = c("A", "B")))
     expect_error(fmtFlI(fleInp = tempfile(), minLng = 2))
     expect_error(fmtFlI(fleInp = c(tempfile(), tempfile()), maxLng = 1))

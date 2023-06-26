@@ -10,6 +10,7 @@ merge_cols_omv(
   typMrg = c("outer", "inner", "left", "right"),
   varBy = list(),
   varSrt = c(),
+  psvAnl = FALSE,
   usePkg = c("foreign", "haven"),
   selSet = "",
   ...
@@ -25,6 +26,8 @@ merge_cols_omv(
 \item{varBy}{Name of the variable by which the data sets are matched, can either be a string, a character or a list (see Details below; default: list())}
 
 \item{varSrt}{Variable(s) that are used to sort the data frame (see Details; if empty, the order after merging is kept; default: c())}
+
+\item{psvAnl}{Whether analyses that are contained in the input file shall be transferred to the output file (TRUE / FALSE; default: FALSE)}
 
 \item{usePkg}{Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata and SAS files; "foreign" is the default (it comes with base R), but "haven" is newer and more comprehensive}
 

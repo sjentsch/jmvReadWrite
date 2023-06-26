@@ -7,9 +7,9 @@ test_that("sort_omv works", {
     expect_true(file.exists(nmeOut))
     expect_gt(file.info(nmeOut)$size, 1)
     expect_true(chkFle(nmeOut, isZIP = TRUE))
-    expect_true(chkFle(nmeOut, "meta"))
-    expect_true(chkFle(nmeOut, "metadata.json"))
-    expect_true(chkFle(nmeOut, "data.bin"))
+    expect_true(chkFle(nmeOut, fleCnt = "meta"))
+    expect_true(chkFle(nmeOut, fleCnt = "metadata.json"))
+    expect_true(chkFle(nmeOut, fleCnt = "data.bin"))
 
     dtaFrm <- read_omv(nmeOut, sveAtt = FALSE)
     expect_s3_class(dtaFrm, "data.frame")

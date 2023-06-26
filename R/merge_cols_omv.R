@@ -5,6 +5,7 @@
 #' @param typMrg Type of merging operation: "outer" (default), "inner", "left" or "right"; see Details below
 #' @param varBy  Name of the variable by which the data sets are matched, can either be a string, a character or a list (see Details below; default: list())
 #' @param varSrt Variable(s) that are used to sort the data frame (see Details; if empty, the order after merging is kept; default: c())
+#' @param psvAnl Whether analyses that are contained in the input file shall be transferred to the output file (TRUE / FALSE; default: FALSE)
 #' @param usePkg Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata and SAS files; "foreign" is the default (it comes with base R), but "haven" is newer and more comprehensive
 #' @param selSet Name of the data set that is to be selected from the workspace (only applies when reading .RData-files)
 #' @param ... Additional arguments passed on to methods; see Details below
@@ -63,7 +64,7 @@
 #'
 #' @export merge_cols_omv
 #'
-merge_cols_omv <- function(fleInp = c(), fleOut = "", typMrg = c("outer", "inner", "left", "right"), varBy = list(), varSrt = c(), usePkg = c("foreign", "haven"), selSet = "", ...) {
+merge_cols_omv <- function(fleInp = c(), fleOut = "", typMrg = c("outer", "inner", "left", "right"), varBy = list(), varSrt = c(), psvAnl = FALSE, usePkg = c("foreign", "haven"), selSet = "", ...) {
 
     # check and format input file names and handle / check further input arguments
     fleInp <- fmtFlI(fleInp, minLng = 2)
@@ -96,9 +97,11 @@ merge_cols_omv <- function(fleInp = c(), fleOut = "", typMrg = c("outer", "inner
     # sort data frame (if varSrt not empty)
     dtaOut <- srtFrm(dtaOut, varSrt)
 
-    # write files (if fleOut is not empty) or return resulting data frame
+    # write files (if fleOut is not empty) and transfer analyses from input to output file (if psvAnl is TRUE)
     if (nzchar(fleOut)) {
         write_omv(dtaOut, nrmFle(fleOut))
+        if (psvAnl) xfrAnl(fleInp, fleOut)
+    # return resulting data frame (if fleOut is empty)
     } else {
         dtaOut
     }

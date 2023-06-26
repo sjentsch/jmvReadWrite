@@ -16,6 +16,7 @@ reference:
   desc: |
     Functions for carrying out often required data management tasks for jamovi's omv-files
 - contents:
+  - arrange_cols_omv
   - convert_to_omv
   - long2wide_omv
   - wide2long_omv

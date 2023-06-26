@@ -36,6 +36,7 @@ read_omv <- function(fleInp = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = TRUE,
     if (nchar(fleInp) == 0) stop("File name to the input data file needs to be given as parameter (fleInp = ...).")
 
     # check and format input file names
+    if (tolower(tools::file_ext(fleInp)) != "omv") stop("read_omv only reads jamovi files (.omv), use convert_to_omv first, if you want to read other files types.")
     fleInp <- fmtFlI(fleInp, maxLng = 1)
     fleLst <- zip::zip_list(fleInp)$filename
     # check whether the file list contains either the file "meta" (newer jamovi file format) or MANIFEST.MF (older format)
@@ -222,7 +223,6 @@ read_omv <- function(fleInp = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = TRUE,
 
 # =================================================================================================
 # read_all: for reading data files from various formats (incl. functions that are called)
-
 read_all <- function(fleInp = "", usePkg = c("foreign", "haven"), selSet = "", ...) {
     if (nchar(fleInp) == 0) stop("File name to the input data file needs to be given as parameter (fleInp = ...).")
 

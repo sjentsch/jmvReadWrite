@@ -50,7 +50,7 @@ print(names(dtaDbg))
 print(list.files(dirname(fleOMV), basename(fleOMV)))
 # -> "file[...].omv" ([...] is a combination of random numbers / characters
 print(file.info(fleOMV)$size)
-# -> 2448 (size may differ on different OSes)
+# -> approx. 2500 (size may differ on different OSes)
 unlink(fleOMV)
 }
 

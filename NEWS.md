@@ -3,7 +3,7 @@
 ## Enhancements and bug fixes:
 * added `arrange_cols_omv` (to change the order of variables / columns in jamovi-files)
 * added the parameter `psvAnl` to preserve the analyses in data files (only for `arrange_cols_omv`, `merge_cols_omv`, `sort_omv` where it makes sense – there the number of rows / participants / units doesn't change)
-* bug fixes: corrected an error in chkFle, removed duplicate functions from globals.R
+* bug fixes: corrected an error in `chkFle`, removed duplicate functions from `globals.R`
 
 
 # jmvReadWrite 0.3.5

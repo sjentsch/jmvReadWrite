@@ -47,7 +47,7 @@ chkDir <- function(fleNme = "", wrtPrm = TRUE) {
 
 chkDtF <- function(dtaFrm = NULL, minSze = c(1, 1)) {
     if (length(minSze) != 2) minSze <- rep(minSze[1], 2)
-    if (is.null(dtaFrm) || ! is.data.frame(dtaFrm) || length(dim(dtaFrm)) != 2) {
+    if (is.null(dtaFrm) || !is.data.frame(dtaFrm) || length(dim(dtaFrm)) != 2) {
         stop("Input data are either not a data frame or have incorrect (only one or more than two) dimensions.")
     } else if (any(dim(dtaFrm) < minSze)) {
         stop(sprintf("The %s dimension of the input data frame has not the required size (%d < %d).",
@@ -167,14 +167,10 @@ setAtt <- function(attLst = c(), inpObj = NULL, outObj = NULL) {
         # frames are both lists and data frames, and therefore an error is thrown if BOTH input
         # and output objects are lists but not data frames
         } else if (is.list(inpObj) && !is.data.frame(inpObj) && is.list(outObj) && !is.data.frame(outObj)) {
-            cat(paste0("attNme: ", attNme, "\n"))
-            cat(paste0("attLst: ", paste0(attLst, collapse = ", "), "\n\n"))
-            cat("inpObj:\n")
+            cat(paste0("attNme: ", attNme, "\n", "attLst: ", paste0(attLst, collapse = ", "), "\n\n", "inpObj:\n"))
             cat(utils::str(inpObj))
-            cat("\n\n")
-            cat("outObj:\n")
+            cat("\n\noutObj:\n")
             cat(utils::str(outObj))
-            cat("\n\n")
             stop("Error when storing or accessing meta-data information. Please send the file causing the error to sebastian.jentschke@uib.no")
         }
     }
@@ -198,6 +194,31 @@ chkFld <- function(fldObj = NULL, fldNme = "", fldVal = NULL) {
    ((fldNme %in% names(fldObj))    && length(fldObj[[fldNme]])     > 0 && ifelse(!is.null(fldVal), grepl(fldVal, fldObj[[fldNme]]),     TRUE))
 }
 
+# =================================================================================================
+# function handling to have either a data frame or a character (pointing to a file) as input   
+inp2DF <- function(dtaInp = NULL, fleOut = "", sfxOut = "_chgd.omv", usePkg = c("foreign", "haven"), selSet = "", ...) {
+    varArg = list(...)
+    # check and format input and output files, handle / check further input arguments
+    # (incl. catch if a named parameter according to the old convention (fleInp) is used)
+    if (is.null(dtaInp) && is.character(varArg[["fleInp"]])) dtaInp <- varArg[["fleInp"]]
+    if (is.data.frame(dtaInp) && chkDtF(dtaInp)) {
+        if (is.character(fleOut) && nzchar(fleOut)) {
+            attr(dtaInp, "fleOut") <- fmtFlO(fleOut)
+        } else if (chkAtt(dtaInp, "fleOut")) {
+            attr(dtaInp, "fleOut") <- fmtFlO(attr(dtaInp, "fleOut"))
+        } else {
+            stop("If a data frame is used for dtaInp, an output file name must be given either via the parameter fleOut or as aatribute attached to the data frame.")
+        }       
+        dtaInp
+    } else if (is.character(dtaInp)) {
+        fleInp <- fmtFlI(dtaInp, maxLng = 1)
+        crrDF  <- read_all(fleInp, match.arg(usePkg), selSet, varArg)
+        attr(crrDF, "fleOut") <- fmtFlO(fleOut, fleInp, sfxOut)
+        crrDF
+    } else {
+        stop("dtaInp must either be a data frame or a character (pointing to a location where the input file can be found).")
+    }
+}
 
 # =================================================================================================
 # function for copying analyses from one data file to another

@@ -14,7 +14,6 @@ test_that("globals work", {
     expect_true(chkFle(nmeOMV, fleCnt = "meta"))
     expect_true(chkVar(jmvReadWrite::ToothGrowth, c("len", "dose", "supp")))
 
-    # test cases for code coverage ============================================================================================================================
     expect_error(chkDir(file.path(tempdir(), "not", "file")))
     expect_error(chkFle(NA))
     expect_error(chkFle("", isZIP = 1))

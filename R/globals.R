@@ -119,10 +119,13 @@ fmtFlI <- function(fleInp = c(), minLng = 1, maxLng = Inf, excExt = "") {
 }
 
 fmtFlO <- function(fleOut = "", fleInp = "", rplExt = "") {
+    if ((nzchar(fleOut) && !hasExt(fleOut, "omv")) || (nzchar(rplExt) && !hasExt(rplExt, "omv"))) {
+        stop("The file extension for output files needs to be .omv.")
+    }
     if (nzchar(fleOut)) {
         nrmFle(fleOut)
     } else if (length(fleInp) == 1 && nzchar(fleInp[1])) {
-        sub(paste0(".", tools::file_ext(fleInp[1])), rplExt, fleInp[1])
+        sub(paste0("\\.", tools::file_ext(fleInp[1])), rplExt, fleInp[1])
     } else {
         stop(paste0("Either fleOut needs to be given as a valid non-empty file name or a single entry in fleInp where the extension is replaced with: \"", rplExt, "\"."))
     }

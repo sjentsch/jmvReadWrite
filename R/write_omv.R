@@ -281,7 +281,7 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", retDbg = FALSE) {
 }
 
 fmtJSON <- function(txtJSON = "") {
-    gsub("00: 00", "00:00", gsub("  ", " ", gsub(":", ": ", gsub(",", ", ", rjson::toJSON(txtJSON)))))
+    gsub("00: 00", "00:00", gsub("  ", " ", gsub(":", ": ", gsub(",", ", ", jsonlite::toJSON(txtJSON, auto_unbox = TRUE)))))
 }
 
 htmTxt <- function() {

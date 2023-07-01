@@ -409,7 +409,7 @@ getTxt <- function(fleOMV = "", crrFle = "") {
 
     # depending on whether the original was a JSON file or not, return the appropriate result
     if (hasExt(crrFle, "json")) {
-        crrTxt <- rjson::fromJSON(crrTxt, simplify = FALSE)
+        crrTxt <- jsonlite::fromJSON(crrTxt, simplifyVector = FALSE)
     }
 
     crrTxt

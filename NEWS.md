@@ -4,6 +4,7 @@
 * added `transpose_omv` (transpose data frames and write the resulting jamovi-files)
 * permit having either data frames or strings with a file name as input to the helper functions `arrange_cols_omv`, `long2wide_omv`, `wide2long_omv`, `sort_omv`, and `transpose_omv`
 * preserve attributes when merging columns (`merge_cols_omv`)
+* changed from `RJSON` to `jsonlite`
 * bug fixes: added a check in `fmtFlO` to ensure that the output files are in jamovi-format (.omv); removed typos, etc.
 
 

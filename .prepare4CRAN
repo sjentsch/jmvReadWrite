@@ -47,7 +47,7 @@ covr::codecov(token = "2f521d97-d1e2-4baf-b05b-0b569a7c6f0f")
 system("gedit DESCRIPTION NEWS.md inst/CITATION")
 
 # building / updating README, PDF manual, and the HTML documentation
-# add new functions to .pkgdown.yaml if required
+# add new functions to _pkgdown.yaml and to vignettes/jmvReadWrite.Rmd if required
 devtools::build_readme()
 pkgdown::clean_site()
 pkgdown::build_site()

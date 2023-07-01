@@ -219,3 +219,6 @@ management tasks that are frequently required:
 
 * [`sort_omv`](https://sjentsch.github.io/jmvReadWrite/reference/sort_omv.html):
   Sort a data set according to one or more variable(s).
+
+* [`transpose_omv`](https://sjentsch.github.io/jmvReadWrite/reference/transpose_omv.html):
+  Transpose a data set (make rows into columns and vice versa).

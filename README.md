@@ -198,9 +198,9 @@ list.files(".", "Trial.omv")
 #> [1] "Trial.omv"
 file.info("Trial.omv")
 #>           size isdir mode               mtime               ctime
-#> Trial.omv 1564 FALSE  664 2023-07-01 22:28:12 2023-07-01 22:28:12
+#> Trial.omv 1564 FALSE  664 2023-07-01 22:45:22 2023-07-01 22:45:22
 #>                         atime  uid  gid    uname   grname
-#> Trial.omv 2023-07-01 22:28:12 1000 1000 sjentsch sjentsch
+#> Trial.omv 2023-07-01 22:45:22 1000 1000 sjentsch sjentsch
 unlink("Trial.omv")
 ```
 
@@ -275,6 +275,9 @@ with data management tasks that are frequently required:
 
   - [`sort_omv`](https://sjentsch.github.io/jmvReadWrite/reference/sort_omv.html):
     Sort a data set according to one or more variable(s).
+
+  - [`transpose_omv`](https://sjentsch.github.io/jmvReadWrite/reference/transpose_omv.html):
+    Transpose a data set (make rows into columns and vice versa).
 
 -----
 

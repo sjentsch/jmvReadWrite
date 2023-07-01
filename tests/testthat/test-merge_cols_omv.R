@@ -43,4 +43,27 @@ test_that("merge_cols_omv works", {
     expect_equal(chkByV("ID", dtaFrm), rep(list("ID"), 4))
     expect_error(chkByV("ID2", dtaFrm))
     expect_error(chkByV(rep(list("ID"), 3), dtaFrm))
+
+    nmeInp <- paste0(tempfile(), ".rds")
+    saveRDS(data.frame(ID = seq(60), A = rnorm(60), B = rnorm(60)), nmeInp)
+    merge_cols_omv(c("../ToothGrowth.omv", nmeInp), fleOut = nmeOut, typMrg = "outer", varBy = "ID", psvAnl = TRUE)
+    expect_true(chkFle(nmeOut))
+    expect_gt(file.info(nmeOut)$size, 1)
+    expect_true(chkFle(nmeOut, isZIP = TRUE))
+    expect_true(chkFle(nmeOut, fleCnt = "meta"))
+    expect_true(chkFle(nmeOut, fleCnt = "metadata.json"))
+    expect_true(chkFle(nmeOut, fleCnt = "data.bin"))
+    df4Chk <- read_omv(nmeOut, sveAtt = FALSE, getSyn = TRUE)
+    expect_s3_class(df4Chk, "data.frame")
+    expect_equal(dim(df4Chk), c(60, 15))
+    expect_equal(names(df4Chk), c("ID", "Filter 1", "logLen", "supp - Transform 1", "len", "supp", "dose", "dose2", "Trial", "Residuals", "J", "K", "L", "A", "B"))
+    expect_equal(as.vector(sapply(df4Chk, typeof)),
+      c("character", "logical", "double", "integer", "double", "integer", "double", "integer", "integer", "double", "double", "double", "integer", "double", "double"))
+    expect_equal(zip::zip_list(nmeOut)$filename,
+      c("data.bin", "strings.bin", "meta", "metadata.json", "xdata.json", "index.html", "01 empty/analysis", "02 anova/analysis", "03 empty/analysis",
+        "04 ancova/analysis", "05 empty/analysis", "02 anova/resources/3b518ea3d44f095f.png", "02 anova/resources/07288f96c58ae68b.png"))
+    expect_equal(attr(df4Chk, "syntax"),
+      list(paste("jmv::ANOVA(formula = len ~ supp + dose2 + supp:dose2, data = data, effectSize = \"partEta\", modelTest = TRUE, qq = TRUE,",
+                 "contrasts = list(list(var=\"supp\", type=\"none\"), list(var=\"dose2\", type=\"polynomial\")), postHoc = ~ supp + dose2, emMeans = ~ dose2:supp)"),
+           "jmv::ancova(formula = len ~ supp + dose, data = data, effectSize = \"partEta\", modelTest = TRUE)"))
 })

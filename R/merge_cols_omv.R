@@ -72,11 +72,14 @@ merge_cols_omv <- function(fleInp = c(), fleOut = "", typMrg = c("outer", "inner
     usePkg <- match.arg(usePkg)
     varArg <- list(...)
 
-    # read files
+    # read files and store attributes
     dtaInp <- vector(mode = "list", length = length(fleInp))
+    attCol <- list()
     for (i in seq_along(fleInp)) {
         dtaInp[[i]] <- read_all(fleInp[i], usePkg, selSet, varArg)
+        attCol <- c(attCol, sapply(dtaInp[[i]][, setdiff(names(dtaInp[[i]]), names(attCol))], attributes))
     }
+    attDF <- attributes(dtaInp[[1]])
 
     # check the matching variable(s)
     varBy <- chkByV(varBy, dtaInp)
@@ -84,23 +87,24 @@ merge_cols_omv <- function(fleInp = c(), fleOut = "", typMrg = c("outer", "inner
     # merge files
     crrArg <- list(x = NULL, y = NULL, by.x = "", by.y = "", all.x = ifelse(any(typMrg %in% c("outer", "left")), TRUE, FALSE), all.y = ifelse(any(typMrg %in% c("outer", "right")), TRUE, FALSE))
     crrArg <- adjArg(c("merge", "data.frame"), crrArg, varArg, c("x", "y", "by.x", "by.y", "all.x", "all.y"))
-    # store labels (getLbl: defined in long2wide_omv)
-    crrLnT <- getLbl(dtaInp, "")
     dtaOut <- dtaInp[[1]]
     for (i in setdiff(seq_along(fleInp), 1)) {
         dtaOut <- do.call(merge, c(list(x = dtaOut, y = dtaInp[[i]], by.x = varBy[[1]], by.y = varBy[[i]]), crrArg[!grepl("^x$|^y$|^by.x$|^by.y$", names(crrArg))]))
     }
 
-    # restore labels (rstLbl: defined in long2wide_omv)
-    dtaOut <- rstLbl(dtaOut, crrLnT)
-
     # sort data frame (if varSrt not empty)
     dtaOut <- srtFrm(dtaOut, varSrt)
 
-    # write files (if fleOut is not empty) and transfer analyses from input to output file (if psvAnl is TRUE)
+    # restore attributes
+    for (crrAtt in setdiff(names(attDF), c("names", "row.names", "class"))) attr(dtaOut, crrAtt) <- attDF[[crrAtt]]
+    for (crrNme in names(dtaOut)) {
+        dtaOut[[crrNme]] <- setAtt(setdiff(names(attCol[[crrNme]]), names(attributes(dtaOut[[crrNme]]))), attCol[[crrNme]], dtaOut[[crrNme]])
+    }
+
+    # write files (if fleOut is not empty) and transfer analyses from the first input to output file (if psvAnl is TRUE)
     if (nzchar(fleOut)) {
         write_omv(dtaOut, nrmFle(fleOut))
-        if (psvAnl) xfrAnl(fleInp, fleOut)
+        if (psvAnl) xfrAnl(fleInp[1], fleOut)
     # return resulting data frame (if fleOut is empty)
     } else {
         dtaOut

@@ -57,7 +57,7 @@
 
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">long2wide_omv</span><span class="op">(</span></span>
-<span>  fleInp <span class="op">=</span> <span class="st">""</span>,</span>
+<span>  dtaInp <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  fleOut <span class="op">=</span> <span class="st">""</span>,</span>
 <span>  varID <span class="op">=</span> <span class="st">"ID"</span>,</span>
 <span>  varTme <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">)</span>,</span>
@@ -74,12 +74,12 @@
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>fleInp</dt>
-<dd><p>Name (including the path, if required) of the data file to be read (e.g., "FILE_IN.omv"; default: ""); can be any supported file type, see Details below</p></dd>
+    <dl><dt>dtaInp</dt>
+<dd><p>Either a data frame or the name (including the path, if required) of a data file to be read ("FILENAME.ext"; default: NULL); files can be of any supported file type, see Details below</p></dd>
 
 
 <dt>fleOut</dt>
-<dd><p>Name (including the path, if required) of the data file to be written (e.g., "FILE_OUT.omv"; default: ""); if empty, FILE_IN from fleInp is extended with "_wide(file extension -&gt; .omv)"</p></dd>
+<dd><p>Name (including the path, if required) of the data file to be written ("FILENAME.omv"; default: ""); if empty, and a file name is given as dtaInp, it is appended with "_wide.omv"</p></dd>
 
 
 <dt>varID</dt>
@@ -150,8 +150,8 @@ like to use "haven", it may be needed to install it manually (i.e., <code>instal
 <span class="r-in"><span><span class="va">nmeInp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">".rds"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">nmeOut</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">".omv"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="va">dtaInp</span>, <span class="va">nmeInp</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">long2wide_omv</span><span class="op">(</span>fleInp <span class="op">=</span> <span class="va">nmeInp</span>, fleOut <span class="op">=</span> <span class="va">nmeOut</span>, varID <span class="op">=</span> <span class="st">"ID"</span>, varTme <span class="op">=</span> <span class="st">"measure"</span>, varTgt <span class="op">=</span> <span class="st">"X"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="co"># it is required to give at least the arguments fleInp, varID and varTme</span></span></span>
+<span class="r-in"><span><span class="fu">long2wide_omv</span><span class="op">(</span>dtaInp <span class="op">=</span> <span class="va">nmeInp</span>, fleOut <span class="op">=</span> <span class="va">nmeOut</span>, varID <span class="op">=</span> <span class="st">"ID"</span>, varTme <span class="op">=</span> <span class="st">"measure"</span>, varTgt <span class="op">=</span> <span class="st">"X"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># it is required to give at least the arguments dtaInp, varID and varTme</span></span></span>
 <span class="r-in"><span><span class="co"># check whether the file was created and its size</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/basename.html" class="external-link">dirname</a></span><span class="op">(</span><span class="va">nmeOut</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/basename.html" class="external-link">basename</a></span><span class="op">(</span><span class="va">nmeOut</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># -&gt; "file[...].omv" ([...] contains a random combination of numbers / characters</span></span></span>

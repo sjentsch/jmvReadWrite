@@ -5,7 +5,7 @@
 \title{Converts .omv-files for the statistical spreadsheet 'jamovi' (\url{https://www.jamovi.org}) from wide to long format}
 \usage{
 wide2long_omv(
-  fleInp = "",
+  dtaInp = NULL,
   fleOut = "",
   varLst = c(),
   varExc = c(),
@@ -19,9 +19,9 @@ wide2long_omv(
 )
 }
 \arguments{
-\item{fleInp}{Name (including the path, if required) of the data file to be read ("FILENAME.omv"; default: ""); can be any supported file type, see Details below}
+\item{dtaInp}{Either a data frame or the name (including the path, if required) of a data file to be read ("FILENAME.ext"; default: NULL); files can be of any supported file type, see Details below}
 
-\item{fleOut}{Name (including the path, if required) of the data file to be written ("FILENAME.omv"; default: ""); if empty, FILENAME from fleInp is extended with "_long(file extension -> .omv)"}
+\item{fleOut}{Name (including the path, if required) of the data file to be written ("FILENAME.omv"; default: ""); if empty, and a file name is given as dtaInp, it is appended with "_long.omv"}
 
 \item{varLst}{List / set of variables that are to be transformed into single (time-varying) variables in long format (default: c())}
 
@@ -79,9 +79,10 @@ cat(str(dtaInp))
 nmeInp <- paste0(tempfile(), ".rds")
 nmeOut <- paste0(tempfile(), ".omv")
 saveRDS(dtaInp, nmeInp)
-wide2long_omv(fleInp = nmeInp, fleOut = nmeOut, varID = "ID", varTme = "measure",
+wide2long_omv(dtaInp = nmeInp, fleOut = nmeOut, varID = "ID", varTme = "measure",
     varLst = setdiff(names(dtaInp), "ID"), varSrt = c("ID", "measure"))
-# it is required to give at least the arguments fleInp and varID
+# it is required to give at least the arguments dtaInp (if dtaInp is a data frame,
+# fleOut needs to be provided too) and varID
 # "reshape" then assigns all variables expect the variable defined by varID to
 # varLst (but throws a warning)
 # varSrt enforces sorting the data set after the transformation (sorted, the

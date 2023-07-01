@@ -5,7 +5,7 @@
 \title{Re-arrange columns / variables in .omv-files for the statistical spreadsheet 'jamovi' (\url{https://www.jamovi.org})}
 \usage{
 arrange_cols_omv(
-  fleInp = "",
+  dtaInp = "",
   fleOut = "",
   varOrd = c(),
   varMve = list(),
@@ -16,9 +16,9 @@ arrange_cols_omv(
 )
 }
 \arguments{
-\item{fleInp}{Name (including the path, if required) of the data file to be read ("FILENAME.ext"; default: ""); can be any supported file type, see Details below}
+\item{dtaInp}{Either a data frame or the name (including the path, if required) of a data file to be read ("FILENAME.ext"; default: NULL); files can be of any supported file type, see Details below}
 
-\item{fleOut}{Name (including the path, if required) of the data file to be written ("FILENAME.omv"; default: ""); if empty, the extension of fleInp is replaced with "_arrCol(file extension -> .omv)"}
+\item{fleOut}{Name (including the path, if required) of the data file to be written ("FILENAME.omv"; default: ""); if empty, and a file name is given as dtaInp, it is appended with "_arrCol.omv"}
 
 \item{varOrd}{Character vector with the desired order of variable(s) in the data frame (see Details; default: c())}
 
@@ -56,14 +56,14 @@ library(jmvReadWrite)
 fleOMV <- system.file("extdata", "AlbumSales.omv", package = "jmvReadWrite")
 fleTmp <- paste0(tempfile(), ".omv")
 # the original file has the variables in the order: "Adverts", "Airplay", "Image", "Sales"
-names(read_omv(fleInp = fleOMV))
+names(read_omv(dtaInp = fleOMV))
 # first, we move the variable "Sales" to the first place using the varOrd-parameter
-arrange_cols_omv(fleInp = fleOMV, fleOut = fleTmp,
+arrange_cols_omv(dtaInp = fleOMV, fleOut = fleTmp,
   varOrd = c("Sales", "Adverts", "Airplay", "Image"))
-names(read_omv(fleInp = fleTmp))
+names(read_omv(dtaInp = fleTmp))
 # now, we move the variable "Sales" to the first place using the varMve-parameter
-arrange_cols_omv(fleInp = fleOMV, fleOut = fleTmp, varMve = list(Sales = -3))
-names(read_omv(fleInp = fleTmp))
+arrange_cols_omv(dtaInp = fleOMV, fleOut = fleTmp, varMve = list(Sales = -3))
+names(read_omv(dtaInp = fleTmp))
 unlink(fleTmp)
 }
 

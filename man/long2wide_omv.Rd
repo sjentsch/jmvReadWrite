@@ -5,7 +5,7 @@
 \title{Converts .omv-files for the statistical spreadsheet 'jamovi' (\url{https://www.jamovi.org}) from long to wide format}
 \usage{
 long2wide_omv(
-  fleInp = "",
+  dtaInp = NULL,
   fleOut = "",
   varID = "ID",
   varTme = c(),
@@ -20,9 +20,9 @@ long2wide_omv(
 )
 }
 \arguments{
-\item{fleInp}{Name (including the path, if required) of the data file to be read (e.g., "FILE_IN.omv"; default: ""); can be any supported file type, see Details below}
+\item{dtaInp}{Either a data frame or the name (including the path, if required) of a data file to be read ("FILENAME.ext"; default: NULL); files can be of any supported file type, see Details below}
 
-\item{fleOut}{Name (including the path, if required) of the data file to be written (e.g., "FILE_OUT.omv"; default: ""); if empty, FILE_IN from fleInp is extended with "_wide(file extension -> .omv)"}
+\item{fleOut}{Name (including the path, if required) of the data file to be written ("FILENAME.omv"; default: ""); if empty, and a file name is given as dtaInp, it is appended with "_wide.omv"}
 
 \item{varID}{Names of one or more variables that identify the same group / individual (default: c())}
 
@@ -72,8 +72,8 @@ cat(str(dtaInp))
 nmeInp <- paste0(tempfile(), ".rds")
 nmeOut <- paste0(tempfile(), ".omv")
 saveRDS(dtaInp, nmeInp)
-long2wide_omv(fleInp = nmeInp, fleOut = nmeOut, varID = "ID", varTme = "measure", varTgt = "X")
-# it is required to give at least the arguments fleInp, varID and varTme
+long2wide_omv(dtaInp = nmeInp, fleOut = nmeOut, varID = "ID", varTme = "measure", varTgt = "X")
+# it is required to give at least the arguments dtaInp, varID and varTme
 # check whether the file was created and its size
 cat(list.files(dirname(nmeOut), basename(nmeOut)))
 # -> "file[...].omv" ([...] contains a random combination of numbers / characters

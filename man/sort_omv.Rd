@@ -5,7 +5,7 @@
 \title{Sort data (using one or more variables) in .omv-files for the statistical spreadsheet 'jamovi' (\url{https://www.jamovi.org})}
 \usage{
 sort_omv(
-  fleInp = c(),
+  dtaInp = NULL,
   fleOut = "",
   varSrt = c(),
   psvAnl = FALSE,
@@ -15,9 +15,9 @@ sort_omv(
 )
 }
 \arguments{
-\item{fleInp}{Name (including the path, if required) of the data file to be read ("FILENAME.ext"; default: ""); can be any supported file type, see Details below}
+\item{dtaInp}{Either a data frame or the name (including the path, if required) of a data file to be read ("FILENAME.ext"; default: NULL); files can be of any supported file type, see Details below}
 
-\item{fleOut}{Name (including the path, if required) of the data file to be written ("FILENAME.omv"; default: ""); if empty, the extension of fleInp is replaced with "_sorted(file extension -> .omv)"}
+\item{fleOut}{Name (including the path, if required) of the data file to be written ("FILENAME.omv"; default: ""); if empty, and a file name is given as dtaInp, it is appended with "_sorted.omv"}
 
 \item{varSrt}{Variable(s) that are used to sort the data frame (see Details; default: c())}
 
@@ -46,15 +46,15 @@ SAS-data-files, and \code{read_xpt} ("haven") / \code{read.xport} ("foreign") fo
 library(jmvReadWrite)
 fleOMV <- system.file("extdata", "AlbumSales.omv", package = "jmvReadWrite")
 fleTmp <- paste0(tempfile(), ".omv")
-sort_omv(fleInp = fleOMV, fleOut = fleTmp, varSrt = "Image")
-dtaFrm <- read_omv(fleInp = fleTmp)
+sort_omv(dtaInp = fleOMV, fleOut = fleTmp, varSrt = "Image")
+dtaFrm <- read_omv(dtaInp = fleTmp)
 cat(dtaFrm$Image)
 # shows that the variable "Image" is sorted in ascending order
 cat(is.unsorted(dtaFrm$Image))
 # is.unsorted (which checks for whether the variable is NOT sorted) returns FALSE
-sort_omv(fleInp = fleOMV, fleOut = fleTmp, varSrt = "-Image")
+sort_omv(dtaInp = fleOMV, fleOut = fleTmp, varSrt = "-Image")
 # variables can also be sorted in descending order by preceding them with "-"
-dtaFrm <- read_omv(fleInp = fleTmp)
+dtaFrm <- read_omv(dtaInp = fleTmp)
 cat(dtaFrm$Image)
 # shows that the variable "Image" is now sorted in descending order
 cat(is.unsorted(dtaFrm$Image))

@@ -57,7 +57,7 @@ transpose_omv <- function(dtaInp = NULL, fleOut = "", nmeVar = "", usePkg = c("f
     }
 
     # transpose data frame
-    dtaFrm <- setNames(as.data.frame(t(dtaFrm)), varOut)
+    dtaFrm <- stats::setNames(as.data.frame(t(dtaFrm)), varOut)
     
     # transfer the former variable / column names into a variable called "ID", and reset
     # the row.names to numbers (those wouldn't be written to the output data set anyway)

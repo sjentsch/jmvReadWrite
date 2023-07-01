@@ -42,7 +42,8 @@ SAS-data-files, and \code{read_xpt} ("haven") / \code{read.xport} ("foreign") fo
 \dontrun{
 library(jmvReadWrite)
 set.seed(1)
-tmpDF <- stats::setNames(as.data.frame(matrix(sample(6, 1200, replace = TRUE), nrow = 16)), sprintf("sbj_\%03d", seq(75)))
+tmpDF <- stats::setNames(as.data.frame(matrix(sample(6, 1200, replace = TRUE), nrow = 16)),
+                         sprintf("sbj_\%03d", seq(75)))
 str(tmpDF)
 # Data sets that were extracted, e.g., from PsychoPy, may look like this (trials as rows
 # and participants as columns, one for each participant, manually assmebled / copy-and-pasted).

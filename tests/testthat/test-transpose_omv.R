@@ -1,6 +1,6 @@
 test_that("arrange_cols_omv works", {
-    set.seed(1234)
-    tmpDF <- setNames(as.data.frame(matrix(sample(6, 1200, replace = TRUE), nrow = 16)), sprintf("sbj_%03d", seq(75)))
+    set.seed(1)
+    tmpDF <- stats::setNames(as.data.frame(matrix(sample(6, 1200, replace = TRUE), nrow = 16)), sprintf("sbj_%03d", seq(75)))
     nmeInp <- paste0(tempfile(), ".rds")
     nmeOut <- paste0(tempfile(), "_T.omv")
     saveRDS(tmpDF, nmeInp)
@@ -19,7 +19,7 @@ test_that("arrange_cols_omv works", {
     expect_equal(as.vector(sapply(df4Chk, typeof)), c("character", rep("integer", 16)))
     unlink(nmeOut)
 
-    transpose_omv(dtaInp = cbind(tmpDF, list(qstItm = sprintf("Qst_%02d", seq(16)))), fleOut = nmeOut, nmeVar = "qstItm")
+    transpose_omv(dtaInp = cbind(list(qstItm = sprintf("Qst_%02d", seq(16))), tmpDF), fleOut = nmeOut, nmeVar = "qstItm")
     expect_true(chkFle(nmeOut))
     expect_gt(file.info(nmeOut)$size, 1)
     expect_true(chkFle(nmeOut, isZIP = TRUE))
@@ -61,7 +61,7 @@ test_that("arrange_cols_omv works", {
     expect_equal(as.vector(sapply(df4Chk, typeof)), c("character", rep("integer", 16)))
     unlink(nmeOut)
     unlink(nmeInp)
-    
+
     expect_error(transpose_omv(dtaInp = tmpDF, fleOut = nmeOut, nmeVar = "notExist"))
     expect_error(transpose_omv(dtaInp = tmpDF, fleOut = nmeOut, nmeVar = 1))
     expect_error(transpose_omv(dtaInp = tmpDF, fleOut = nmeOut, nmeVar = c("Qst_01", "Qst_02")))

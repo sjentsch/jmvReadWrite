@@ -46,7 +46,7 @@ test_that("merge_rows_omv works", {
 
     # test cases for code coverage ============================================================================================================================
     nmeInp <- paste0(tempfile(), "_", 1:4, ".rds")
-    for (i in seq_along(nmeInp)) saveRDS(setNames(data.frame(runif(n = 100)), LETTERS[i]), nmeInp[i])
+    for (i in seq_along(nmeInp)) saveRDS(stats::setNames(data.frame(runif(n = 100)), LETTERS[i]), nmeInp[i])
     expect_error(dtaFrm <- merge_rows_omv(fleInp = nmeInp, typMrg = "common"))
     unlink(nmeInp)
 })

@@ -9,6 +9,7 @@ cond
 com
 CR
 csv
+dtaInp
 delim
 dta
 dtaFrm
@@ -28,6 +29,7 @@ lintr
 MAgojam
 MinGW
 mtaDta
+nmeVar
 NC
 OMV
 omv
@@ -70,5 +72,6 @@ VC
 www
 xdata
 xport
+xpsd
 xpt
 xtdDta

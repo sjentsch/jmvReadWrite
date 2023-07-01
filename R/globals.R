@@ -198,9 +198,9 @@ chkFld <- function(fldObj = NULL, fldNme = "", fldVal = NULL) {
 }
 
 # =================================================================================================
-# function handling to have either a data frame or a character (pointing to a file) as input   
+# function handling to have either a data frame or a character (pointing to a file) as input
 inp2DF <- function(dtaInp = NULL, fleOut = "", sfxOut = "_chgd.omv", usePkg = c("foreign", "haven"), selSet = "", ...) {
-    varArg = list(...)
+    varArg <- list(...)
     # check and format input and output files, handle / check further input arguments
     # (incl. catch if a named parameter according to the old convention (fleInp) is used)
     if (is.null(dtaInp) && is.character(varArg[["fleInp"]])) dtaInp <- varArg[["fleInp"]]
@@ -211,7 +211,7 @@ inp2DF <- function(dtaInp = NULL, fleOut = "", sfxOut = "_chgd.omv", usePkg = c(
             attr(dtaInp, "fleOut") <- fmtFlO(attr(dtaInp, "fleOut"))
         } else {
             stop("If a data frame is used for dtaInp, an output file name must be given either via the parameter fleOut or as aatribute attached to the data frame.")
-        }       
+        }
         dtaInp
     } else if (is.character(dtaInp)) {
         fleInp <- fmtFlI(dtaInp, maxLng = 1)

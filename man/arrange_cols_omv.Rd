@@ -56,14 +56,14 @@ library(jmvReadWrite)
 fleOMV <- system.file("extdata", "AlbumSales.omv", package = "jmvReadWrite")
 fleTmp <- paste0(tempfile(), ".omv")
 # the original file has the variables in the order: "Adverts", "Airplay", "Image", "Sales"
-names(read_omv(dtaInp = fleOMV))
+names(read_omv(fleOMV))
 # first, we move the variable "Sales" to the first place using the varOrd-parameter
 arrange_cols_omv(dtaInp = fleOMV, fleOut = fleTmp,
   varOrd = c("Sales", "Adverts", "Airplay", "Image"))
-names(read_omv(dtaInp = fleTmp))
+names(read_omv(fleTmp))
 # now, we move the variable "Sales" to the first place using the varMve-parameter
 arrange_cols_omv(dtaInp = fleOMV, fleOut = fleTmp, varMve = list(Sales = -3))
-names(read_omv(dtaInp = fleTmp))
+names(read_omv(fleTmp))
 unlink(fleTmp)
 }
 

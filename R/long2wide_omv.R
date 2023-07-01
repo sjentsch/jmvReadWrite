@@ -86,7 +86,7 @@ long2wide_omv <- function(dtaInp = NULL, fleOut = "", varID = "ID", varTme = c()
     }
     varArg <- list(...)
     varOrd <- match.arg(varOrd)
- 
+
     # check and import input data set (either as data frame or from a file)
     dtaFrm <- inp2DF(dtaInp, fleOut, "_arrCol.omv", usePkg, selSet, varArg)
     fleOut <- attr(dtaFrm, "fleOut")

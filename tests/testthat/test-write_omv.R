@@ -35,7 +35,7 @@ test_that("write_omv works", {
     expect_error(write_omv(dtaDbg$dtaFrm, nmeOut))
     attr(dtaDbg$dtaFrm, "label.table") <- NULL
 
-    attr(dtaDbg$dtaFrm, "variable.labels") <- setNames(c("Label for ID", "Label for supp", "Label for supp2"), c("ID", "supp", "supp2"))
+    attr(dtaDbg$dtaFrm, "variable.labels") <- stats::setNames(c("Label for ID", "Label for supp", "Label for supp2"), c("ID", "supp", "supp2"))
     dtaDbg$dtaFrm$supp <- as.character(dtaDbg$dtaFrm$supp)
     expect_equal(sapply(c(1, 3), function(n) write_omv(dtaDbg$dtaFrm, nmeOut, retDbg = TRUE)[["mtaDta"]][["fields"]][[n]][["description"]]), c("Label for ID", "Label for supp2"))
     expect_identical(sapply(c("dataType", "type"), function(f) write_omv(dtaDbg$dtaFrm, nmeOut, retDbg = TRUE)[["mtaDta"]][["fields"]][[2]][[f]], USE.NAMES = FALSE), c("Text", "integer"))

@@ -1,7 +1,7 @@
 #' Sort data (using one or more variables) in .omv-files for the statistical spreadsheet 'jamovi' (<https://www.jamovi.org>)
 #'
-#' @param fleInp Name (including the path, if required) of the data file to be read ("FILENAME.ext"; default: ""); can be any supported file type, see Details below
-#' @param fleOut Name (including the path, if required) of the data file to be written ("FILENAME.omv"; default: ""); if empty, the extension of fleInp is replaced with "_sorted(file extension -> .omv)"
+#' @param dtaInp Either a data frame or the name (including the path, if required) of a data file to be read ("FILENAME.ext"; default: NULL); files can be of any supported file type, see Details below
+#' @param fleOut Name (including the path, if required) of the data file to be written ("FILENAME.omv"; default: ""); if empty, and a file name is given as dtaInp, it is appended with "_sorted.omv"
 #' @param varSrt Variable(s) that are used to sort the data frame (see Details; default: c())
 #' @param psvAnl Whether analyses that are contained in the input file shall be transferred to the output file (TRUE / FALSE; default: FALSE)
 #' @param usePkg Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata and SAS files; "foreign" is the default (it comes with base R), but "haven" is newer and more comprehensive
@@ -22,15 +22,15 @@
 #' library(jmvReadWrite)
 #' fleOMV <- system.file("extdata", "AlbumSales.omv", package = "jmvReadWrite")
 #' fleTmp <- paste0(tempfile(), ".omv")
-#' sort_omv(fleInp = fleOMV, fleOut = fleTmp, varSrt = "Image")
-#' dtaFrm <- read_omv(fleInp = fleTmp)
+#' sort_omv(dtaInp = fleOMV, fleOut = fleTmp, varSrt = "Image")
+#' dtaFrm <- read_omv(dtaInp = fleTmp)
 #' cat(dtaFrm$Image)
 #' # shows that the variable "Image" is sorted in ascending order
 #' cat(is.unsorted(dtaFrm$Image))
 #' # is.unsorted (which checks for whether the variable is NOT sorted) returns FALSE
-#' sort_omv(fleInp = fleOMV, fleOut = fleTmp, varSrt = "-Image")
+#' sort_omv(dtaInp = fleOMV, fleOut = fleTmp, varSrt = "-Image")
 #' # variables can also be sorted in descending order by preceding them with "-"
-#' dtaFrm <- read_omv(fleInp = fleTmp)
+#' dtaFrm <- read_omv(dtaInp = fleTmp)
 #' cat(dtaFrm$Image)
 #' # shows that the variable "Image" is now sorted in descending order
 #' cat(is.unsorted(dtaFrm$Image))
@@ -43,26 +43,29 @@
 #'
 #' @export sort_omv
 #'
-sort_omv <- function(fleInp = c(), fleOut = "", varSrt = c(), psvAnl = FALSE, usePkg = c("foreign", "haven"), selSet = "", ...) {
+sort_omv <- function(dtaInp = NULL, fleOut = "", varSrt = c(), psvAnl = FALSE, usePkg = c("foreign", "haven"), selSet = "", ...) {
     if (length(varSrt) == 0 || !all(nzchar(varSrt))) {
         stop("Calling sort_omv requires giving at least one variable to sort after.")
     }
 
-    # check and format input and output files, handle / check further input arguments
-    fleInp <- fmtFlI(fleInp, maxLng = 1)
-    fleOut <- fmtFlO(fleOut, fleInp, "_sort.omv")
-    varArg <- list(...)
-    usePkg <- match.arg(usePkg)
+    # check and import input data set (either as data frame or from a file)
+    dtaFrm <- inp2DF(dtaInp, fleOut, "_xpsd.omv", usePkg, selSet, list(...))
+    fleOut <- attr(dtaFrm, "fleOut")
 
-    # read file and sort it
-    dtaFrm <- read_all(fleInp, usePkg, selSet, varArg)
+    # sort data set
     dtaFrm <- srtFrm(dtaFrm, varSrt)
 
     # write file
     write_omv(dtaFrm, fleOut)
 
     # transfer analyses from input to output file
-    if (psvAnl) xfrAnl(fleInp, fleOut)
+    if (psvAnl) {
+        if (is.character(dtaInp)) {
+            xfrAnl(dtaInp, fleOut)
+        } else {
+            warning("psvAnl is only possible if dtaInp is a file name (analyses are not stored in data frames, only in the jamovi files).")
+        }
+    }
 }
 
 srtFrm <- function(dtaFrm = NULL, varSrt = c()) {

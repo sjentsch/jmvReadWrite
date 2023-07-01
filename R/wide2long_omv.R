@@ -1,7 +1,7 @@
 #' Converts .omv-files for the statistical spreadsheet 'jamovi' (<https://www.jamovi.org>) from wide to long format
 #'
-#' @param fleInp Name (including the path, if required) of the data file to be read ("FILENAME.omv"; default: ""); can be any supported file type, see Details below
-#' @param fleOut Name (including the path, if required) of the data file to be written ("FILENAME.omv"; default: ""); if empty, FILENAME from fleInp is extended with "_long(file extension -> .omv)"
+#' @param dtaInp Either a data frame or the name (including the path, if required) of a data file to be read ("FILENAME.ext"; default: NULL); files can be of any supported file type, see Details below
+#' @param fleOut Name (including the path, if required) of the data file to be written ("FILENAME.omv"; default: ""); if empty, and a file name is given as dtaInp, it is appended with "_long.omv"
 #' @param varLst List / set of variables that are to be transformed into single (time-varying) variables in long format (default: c())
 #' @param varExc List / set of variables to be excluded from the variable list (default: c())
 #' @param varID  Name(s) of one or more variables that (is created to) identify the same group / individual (if empty, "ID" is added with row numbers identifying cases; default: "ID")
@@ -47,9 +47,10 @@
 #' nmeInp <- paste0(tempfile(), ".rds")
 #' nmeOut <- paste0(tempfile(), ".omv")
 #' saveRDS(dtaInp, nmeInp)
-#' wide2long_omv(fleInp = nmeInp, fleOut = nmeOut, varID = "ID", varTme = "measure",
+#' wide2long_omv(dtaInp = nmeInp, fleOut = nmeOut, varID = "ID", varTme = "measure",
 #'     varLst = setdiff(names(dtaInp), "ID"), varSrt = c("ID", "measure"))
-#' # it is required to give at least the arguments fleInp and varID
+#' # it is required to give at least the arguments dtaInp (if dtaInp is a data frame,
+#' # fleOut needs to be provided too) and varID
 #' # "reshape" then assigns all variables expect the variable defined by varID to
 #' # varLst (but throws a warning)
 #' # varSrt enforces sorting the data set after the transformation (sorted, the
@@ -79,16 +80,12 @@
 #'
 #' @export wide2long_omv
 #'
-wide2long_omv <- function(fleInp = "", fleOut = "", varLst = c(), varExc = c(), varID = "ID", varTme = "cond", varSep = "_", varSrt = c(), usePkg = c("foreign", "haven"), selSet = "", ...) {
+wide2long_omv <- function(dtaInp = NULL, fleOut = "", varLst = c(), varExc = c(), varID = "ID", varTme = "cond", varSep = "_", varSrt = c(), usePkg = c("foreign", "haven"), selSet = "", ...) {
 
-    # check and format input and output files, handle / check further input arguments
-    fleInp <- fmtFlI(fleInp, maxLng = 1)
-    fleOut <- fmtFlO(fleOut, fleInp, rplExt = "_long.omv")
-    usePkg <- match.arg(usePkg)
+    # check and import input data set (either as data frame or from a file)
     varArg <- list(...)
-
-    # read file
-    dtaFrm <- read_all(fleInp, usePkg, selSet, varArg)
+    dtaFrm <- inp2DF(dtaInp, fleOut, "_arrCol.omv", usePkg, selSet, varArg)
+    fleOut <- attr(dtaFrm, "fleOut")
     dtaNmV <- names(dtaFrm)
     hasID  <- all(varID %in% dtaNmV)
 

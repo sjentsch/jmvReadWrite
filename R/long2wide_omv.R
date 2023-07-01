@@ -1,7 +1,7 @@
 #' Converts .omv-files for the statistical spreadsheet 'jamovi' (<https://www.jamovi.org>) from long to wide format
 #'
-#' @param fleInp Name (including the path, if required) of the data file to be read (e.g., "FILE_IN.omv"; default: ""); can be any supported file type, see Details below
-#' @param fleOut Name (including the path, if required) of the data file to be written (e.g., "FILE_OUT.omv"; default: ""); if empty, FILE_IN from fleInp is extended with "_wide(file extension -> .omv)"
+#' @param dtaInp Either a data frame or the name (including the path, if required) of a data file to be read ("FILENAME.ext"; default: NULL); files can be of any supported file type, see Details below
+#' @param fleOut Name (including the path, if required) of the data file to be written ("FILENAME.omv"; default: ""); if empty, and a file name is given as dtaInp, it is appended with "_wide.omv"
 #' @param varID  Names of one or more variables that identify the same group / individual (default: c())
 #' @param varTme Name of the variable(s) that differentiates multiple records from the same group / individual (default: c())
 #' @param varExc Name of the variable(s) should be excluded from the transformation, typically this will be between-subject-variable(s) (default: c())
@@ -38,8 +38,8 @@
 #' nmeInp <- paste0(tempfile(), ".rds")
 #' nmeOut <- paste0(tempfile(), ".omv")
 #' saveRDS(dtaInp, nmeInp)
-#' long2wide_omv(fleInp = nmeInp, fleOut = nmeOut, varID = "ID", varTme = "measure", varTgt = "X")
-#' # it is required to give at least the arguments fleInp, varID and varTme
+#' long2wide_omv(dtaInp = nmeInp, fleOut = nmeOut, varID = "ID", varTme = "measure", varTgt = "X")
+#' # it is required to give at least the arguments dtaInp, varID and varTme
 #' # check whether the file was created and its size
 #' cat(list.files(dirname(nmeOut), basename(nmeOut)))
 #' # -> "file[...].omv" ([...] contains a random combination of numbers / characters
@@ -76,24 +76,20 @@
 #'
 #' @export long2wide_omv
 #'
-long2wide_omv <- function(fleInp = "", fleOut = "", varID = "ID", varTme = c(), varExc = c(), varTgt = c(), varSep = "_", varOrd = c("times", "vars"),
+long2wide_omv <- function(dtaInp = NULL, fleOut = "", varID = "ID", varTme = c(), varExc = c(), varTgt = c(), varSep = "_", varOrd = c("times", "vars"),
                           varSrt = c(), usePkg = c("foreign", "haven"), selSet = "", ...) {
-
-    # check and format input and output files
-    fleInp <- fmtFlI(fleInp, maxLng = 1)
-    fleOut <- fmtFlO(fleOut, fleInp, rplExt = "_wide.omv")
 
     # handle / check further input arguments
     # check varID (can be several) and varTme (must be one), neither can be empty
     if (!all(nzchar(c(varID, varTme)))) {
         stop("Using the arguments varID and varTme is mandatory (i.e., they can\'t be empty).")
     }
-    varOrd <- match.arg(varOrd)
-    usePkg <- match.arg(usePkg)
     varArg <- list(...)
-
-    # read file
-    dtaFrm <- read_all(fleInp, usePkg, selSet, varArg)
+    varOrd <- match.arg(varOrd)
+ 
+    # check and import input data set (either as data frame or from a file)
+    dtaFrm <- inp2DF(dtaInp, fleOut, "_arrCol.omv", usePkg, selSet, varArg)
+    fleOut <- attr(dtaFrm, "fleOut")
 
     # transform data set
     # [1] check whether varID, varTme and varTgt are not empty and exist in the data set

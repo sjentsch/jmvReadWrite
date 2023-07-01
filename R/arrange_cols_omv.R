@@ -1,7 +1,7 @@
 #' Re-arrange columns / variables in .omv-files for the statistical spreadsheet 'jamovi' (<https://www.jamovi.org>)
 #'
-#' @param fleInp Name (including the path, if required) of the data file to be read ("FILENAME.ext"; default: ""); can be any supported file type, see Details below
-#' @param fleOut Name (including the path, if required) of the data file to be written ("FILENAME.omv"; default: ""); if empty, the extension of fleInp is replaced with "_arrCol(file extension -> .omv)"
+#' @param dtaInp Either a data frame or the name (including the path, if required) of a data file to be read ("FILENAME.ext"; default: NULL); files can be of any supported file type, see Details below
+#' @param fleOut Name (including the path, if required) of the data file to be written ("FILENAME.omv"; default: ""); if empty, and a file name is given as dtaInp, it is appended with "_arrCol.omv"
 #' @param varOrd Character vector with the desired order of variable(s) in the data frame (see Details; default: c())
 #' @param varMve Named list defining to how much a particular variable (name of a list entry) should be moved up (neg. value of a list entry) or down (pos. value) in the data frame (see Details; default: c())
 #' @param psvAnl Whether analyses that are contained in the input file shall be transferred to the output file (TRUE / FALSE; default: FALSE)
@@ -30,20 +30,20 @@
 #' fleOMV <- system.file("extdata", "AlbumSales.omv", package = "jmvReadWrite")
 #' fleTmp <- paste0(tempfile(), ".omv")
 #' # the original file has the variables in the order: "Adverts", "Airplay", "Image", "Sales"
-#' names(read_omv(fleInp = fleOMV))
+#' names(read_omv(dtaInp = fleOMV))
 #' # first, we move the variable "Sales" to the first place using the varOrd-parameter
-#' arrange_cols_omv(fleInp = fleOMV, fleOut = fleTmp,
+#' arrange_cols_omv(dtaInp = fleOMV, fleOut = fleTmp,
 #'   varOrd = c("Sales", "Adverts", "Airplay", "Image"))
-#' names(read_omv(fleInp = fleTmp))
+#' names(read_omv(dtaInp = fleTmp))
 #' # now, we move the variable "Sales" to the first place using the varMve-parameter
-#' arrange_cols_omv(fleInp = fleOMV, fleOut = fleTmp, varMve = list(Sales = -3))
-#' names(read_omv(fleInp = fleTmp))
+#' arrange_cols_omv(dtaInp = fleOMV, fleOut = fleTmp, varMve = list(Sales = -3))
+#' names(read_omv(dtaInp = fleTmp))
 #' unlink(fleTmp)
 #' }
 #'
 #' @export arrange_cols_omv
 #'
-arrange_cols_omv <- function(fleInp = "", fleOut = "", varOrd = c(), varMve = list(), psvAnl = FALSE, usePkg = c("foreign", "haven"), selSet = "", ...) {
+arrange_cols_omv <- function(dtaInp = "", fleOut = "", varOrd = c(), varMve = list(), psvAnl = FALSE, usePkg = c("foreign", "haven"), selSet = "", ...) {
 
     # check the input parameters: either varOrd or varMve need to be given; if varOrd is given, the given character vectore and all of its elements need to be not empty;
     # if varMve is given, it needs to be a list, the names can't be empty, and the values need to be integers and can't be zero
@@ -52,14 +52,9 @@ arrange_cols_omv <- function(fleInp = "", fleOut = "", varOrd = c(), varMve = li
         stop("Calling arrange_cols_omv requires either the parameter varOrd (a character vector) or the parameter varMve (a named list), using the correct format (see Details in help).")
     }
 
-    # check and format input and output files, handle / check further input arguments
-    fleInp <- fmtFlI(fleInp, maxLng = 1)
-    fleOut <- fmtFlO(fleOut, fleInp, "_arrCol.omv")
-    varArg <- list(...)
-    usePkg <- match.arg(usePkg)
-
-    # read file
-    dtaFrm <- read_all(fleInp, usePkg, selSet, varArg)
+    # check and import input data set (either as data frame or from a file)
+    dtaFrm <- inp2DF(dtaInp, fleOut, "_arrCol.omv", usePkg, selSet, list(...))
+    fleOut <- attr(dtaFrm, "fleOut")
 
     # re-arrange the order of variables in the data set (varOrd)
     if (length(varOrd) > 0) {
@@ -103,5 +98,11 @@ arrange_cols_omv <- function(fleInp = "", fleOut = "", varOrd = c(), varMve = li
     write_omv(dtaFrm, fleOut)
 
     # transfer analyses from input to output file
-    if (psvAnl) xfrAnl(fleInp, fleOut)
+    if (psvAnl) {
+        if (is.character(dtaInp)) {
+            xfrAnl(dtaInp, fleOut)
+        } else {
+            warning("psvAnl is only possible if dtaInp is a file name (analyses are not stored in data frames, only in the jamovi files).")
+        }
+    }
 }

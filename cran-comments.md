@@ -1,8 +1,8 @@
 # CRAN Notes - jmvReadWrite
 
 ## Current version
-0.3.6
-``arrange_cols_omv`` added, bug-fixes (0.3.5 -> 0.3.6)
+0.3.7
+``tramspose_omv`` added, input can be either data frame or file name, bug-fixes (0.3.6 -> 0.3.7)
 
 ## Test environments
 * ``devtools::check()``

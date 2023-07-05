@@ -128,14 +128,14 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", retDbg = FALSE) {
             facLvl <- ifelse(chkAtt(dtaFrm[[i]], "values"), attr(dtaFrm[[i]], "values"), attr(dtaFrm[[i]], "levels"))
             facOrd <- is.ordered(dtaFrm[[i]])
             if (chkAtt(dtaFrm[[i]], "values") && !identical(attr(dtaFrm[[i]], "values"), as.integer(attr(dtaFrm[[i]], "levels")))) {
-                stop(sprintf(paste("\"values\"-attribute with unexpected values found for column \"%s\"."
+                stop(sprintf(paste("\"values\"-attribute with unexpected values found for column \"%s\".",
                                    "Please send the file to sebastian.jentschke@uib.no for debugging."), names(dtaFrm[i])))
             }
             crrCol <- as.vector.factor(crrCol, mode = "integer") - 1
             # if "dataType" is already stored in the data frame, keep it, otherwise determine whether the factor levels are more likely to be "Integer" or "Text"
             mtaDta$fields[[i]][["dataType"]] <- ifelse(chkAtt(dtaFrm[[i]], "dataType"), attr(dtaFrm[[i]], "dataType"),
                 ifelse(chkAtt(dtaFrm[[i]], "values"), "Integer",
-                ifelse(all(!is.na(suppressWarnings(as.integer(facLvl)))) && all(as.character(as.integer(facLvl)) == facLvl), "Integer", "Text"))
+                ifelse(all(!is.na(suppressWarnings(as.integer(facLvl)))) && all(as.character(as.integer(facLvl)) == facLvl), "Integer", "Text")))
             mtaDta$fields[[i]][["type"]]     <- "integer"
             # if "measureType" is already stored in the data frame, keep it, otherwise set it to "Ordinal" if the properties indicate it to be likely
             # ("Nominal" is already the default)

@@ -250,3 +250,38 @@ xfrAnl <- function(fleOrg = "", fleTgt = "") {
 
     TRUE
 }
+
+# =================================================================================================
+# function for adding attributes to data frames (e.g., those opened in Rj or via jTransform)
+
+addAtt <- function(dtaFrm = NULL) {
+    for (crrNme in names(dtaFrm)) {
+         # jmv-id
+         if (!is.null(attr(dtaFrm[[crrNme]], "jmv-id")) && attr(dtaFrm[[crrNme]], "jmv-id")) {
+             # recognized, don't do anything
+         } else if (is.integer(dtaFrm[[crrNme]])) {
+             attr(dtaFrm[[crrNme]], "measureType") <- "Continuous"
+             attr(dtaFrm[[crrNme]], "dataType")    <- "Integer"
+         } else if (is.numeric(dtaFrm[[crrNme]])) {
+             attr(dtaFrm[[crrNme]], "measureType") <- "Continuous"
+             attr(dtaFrm[[crrNme]], "dataType")    <- "Decimal"
+         } else if (is.ordered(dtaFrm[[crrNme]]) &&  is.null(attr(dtaFrm[[crrNme]], "values"))) {
+             attr(dtaFrm[[crrNme]], "measureType") <- "Ordinal"
+             attr(dtaFrm[[crrNme]], "dataType")    <- "Text"
+         } else if (is.ordered(dtaFrm[[crrNme]]) && !is.null(attr(dtaFrm[[crrNme]], "values"))) {
+             attr(dtaFrm[[crrNme]], "measureType") <- "Ordinal"
+             attr(dtaFrm[[crrNme]], "dataType")    <- "Integer"
+         } else if (is.factor(dtaFrm[[crrNme]]) &&  is.null(attr(dtaFrm[[crrNme]], "values"))) {
+             attr(dtaFrm[[crrNme]], "measureType") <- "Nominal"
+             attr(dtaFrm[[crrNme]], "dataType")    <- "Text"
+         } else if (is.factor(dtaFrm[[crrNme]]) && !is.null(attr(dtaFrm[[crrNme]], "values"))) {
+             attr(dtaFrm[[crrNme]], "measureType") <- "Nominal"
+             attr(dtaFrm[[crrNme]], "dataType")    <- "Integer"
+         } else {
+             print(str(dtaFrm[[crrNme]]))
+             stop("Variable type not implemented.")
+         }
+    }
+
+    dtaFrm
+}

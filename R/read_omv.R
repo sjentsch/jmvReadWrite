@@ -122,7 +122,7 @@ read_omv <- function(fleInp = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = TRUE,
 
         if (chkFld(mtaDta$fields[[i]], "measureType", "ID")) attr(dtaFrm[[crrNme]], "jmv-id")   <- TRUE
         if (chkFld(mtaDta$fields[[i]], "description", ".+")) attr(dtaFrm[[crrNme]], "jmv-desc") <- mtaDta$fields[[i]][["description"]]
-        
+
         if (sveAtt) {
             dtaFrm[crrNme] <- setAtt(names(mtaFld),   mtaDta$fields[[i]], dtaFrm[crrNme])
         } else {

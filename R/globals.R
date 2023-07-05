@@ -157,7 +157,7 @@ setAtt <- function(attLst = c(), inpObj = NULL, outObj = NULL) {
     if (!is.character(attLst)) stop("setAtt: The parameter attLst is supposed to be a character vector.")
     if (!is.list(inpObj))      stop("setAtt: The parameter inpObj is supposed to be either a list or a data frame.")
     if (!is.list(outObj))      stop("setAtt: The parameter outObj is supposed to be either a list or a data frame.")
-    
+
     for (attNme in attLst) {
         # ensure that we have one data frame and one list; the problem is that data frames
         # frames are both lists and data frames, and therefore an error is thrown if BOTH

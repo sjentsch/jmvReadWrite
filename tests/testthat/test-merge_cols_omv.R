@@ -61,7 +61,7 @@ test_that("merge_cols_omv works", {
     expect_equal(as.vector(sapply(df4Chk, typeof)),
       c("integer", "logical", "double", "integer", "double", "integer", "double", "integer", "integer", "double", "double", "double", "integer", "integer", "double", "double"))
     expect_equal(sort(zip::zip_list(nmeOut)$filename),
-      c("01 empty/analysis", "02 anova/analysis", "02 anova/resources/61c33c657d5e31f1.png", "02 anova/resources/dd0ce025a00dad1b.png", "03 empty/analysis", 
+      c("01 empty/analysis", "02 anova/analysis", "02 anova/resources/61c33c657d5e31f1.png", "02 anova/resources/dd0ce025a00dad1b.png", "03 empty/analysis",
         "04 ancova/analysis", "05 empty/analysis", "data.bin", "index.html", "meta", "metadata.json", "xdata.json"))
     expect_equal(attr(df4Chk, "syntax"),
       list(paste("jmv::ANOVA(formula = len ~ supp + dose2 + supp:dose2, data = data, effectSize = \"partEta\", modelTest = TRUE, qq = TRUE,",

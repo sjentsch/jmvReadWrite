@@ -119,13 +119,15 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", retDbg = FALSE) {
         # [b] factors or characters / strings
         } else if (is.factor(crrCol) || is.character(crrCol)) {
             if (is.character(crrCol)) {
-                crrCol <- factor(trimws(crrCol), eval(parse(text = ifelse(!any(is.na(suppressWarnings(as.numeric(crrCol)))),
+                mtaDta$fields[[i]][["dataType"]] <- ifelse(!any(is.na(suppressWarnings(as.numeric(crrCol)))), "Integer", "Text")
+                crrCol <- factor(trimws(crrCol), eval(parse(text = ifelse(mtaDta$fields[[i]][["dataType"]] == "Integer",
                                                                           "as.character(sort(as.numeric(unique(trimws(crrCol)))))",
                                                                           "sort(unique(trimws(crrCol)))"))))
             }
             # NB: If jamovi imports RData / RDS-files, character variables are given "ID" (measureType) / "Text" (dataType)
             #     however, converting them to factors and exporting those seems to make more sense
-            facLvl <- ifelse(chkAtt(dtaFrm[[i]], "values"), attr(dtaFrm[[i]], "values"), attr(dtaFrm[[i]], "levels"))
+            facLvl <- attr(crrCol, "levels")
+            # above must be kept at crrCol as the original column might be character and was converted above
             facOrd <- is.ordered(dtaFrm[[i]])
             if (chkAtt(dtaFrm[[i]], "values") && !identical(attr(dtaFrm[[i]], "values"), as.integer(attr(dtaFrm[[i]], "levels")))) {
                 stop(sprintf(paste("\"values\"-attribute with unexpected values found for column \"%s\".",

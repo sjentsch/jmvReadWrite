@@ -35,7 +35,7 @@
 read_omv <- function(fleInp = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = TRUE, getSyn = FALSE, getHTM = FALSE) {
     if (nchar(fleInp) == 0) stop("File name to the input data file needs to be given as parameter (fleInp = ...).")
 
-    # check and format input file names
+    # check and format input file names - do not use chkExt here
     if (tolower(tools::file_ext(fleInp)) != "omv") stop("read_omv only reads jamovi files (.omv), use convert_to_omv first, if you want to read other files types.")
     fleInp <- fmtFlI(fleInp, maxLng = 1)
     fleLst <- zip::zip_list(fleInp)$filename

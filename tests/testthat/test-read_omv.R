@@ -62,20 +62,20 @@ test_that("read_omv works", {
 
     # test cases for code coverage ============================================================================================================================
     # fleInp is not given or empty
-    expect_error(read_omv())
-    expect_error(read_omv(""))
+    expect_error(read_omv(),   regexp = "File name to the input data file needs to be given as parameter \\(fleInp = \\.\\.\\.\\)\\.")
+    expect_error(read_omv(""), regexp = "File name to the input data file needs to be given as parameter \\(fleInp = \\.\\.\\.\\)\\.")
     # fleInp is not a jamovi-file (.omv)
-    expect_error(read_omv("Trial.rds"))
+    expect_error(read_omv("Trial.rds"), regexp = "read_omv only reads jamovi files \\(\\.omv\\), use convert_to_omv first, if you want to read other files types\\.")
     # the manifest must have a file name as second parameter and
     # the file has to be a valid manifest file (which is not the
     # case for "index.html" [exists, but isn't a manifest])
-    expect_error(chkMnf(nmeInp, c()))
-    expect_error(chkMnf(nmeInp, "index.html"))
+    expect_error(chkMnf(nmeInp, c()), regexp = "File \".*?\" has not the correct file format \\(is missing the jamovi-file-manifest\\)\\.")
+    expect_error(chkMnf(nmeInp, "index.html"), regexp = "The file you are trying to read \\(ToothGrowth\\.omv\\) has an improper manifest file \\(meta\\) and is likely corrupted\\.")
 
     # .omv-file isn't a ZIP
     nmeTmp <- paste0(tempfile(), ".omv")
     writeBin("", con = nmeTmp)
-    expect_error(chkFle(nmeTmp, isZIP = TRUE))
+    expect_error(chkFle(nmeTmp, isZIP = TRUE), regexp = "chkFle: File \".*\" has not the correct file format \\(is not a ZIP archive\\)\\.")
     unlink(nmeTmp)
 
     # invalid manifest (wrong version number)

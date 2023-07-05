@@ -59,9 +59,9 @@ test_that("merge_cols_omv works", {
     expect_equal(names(df4Chk), c("ID", "Filter 1", "logLen", "supp - Transform 1", "len", "supp", "dose", "dose2", "Trial", "Residuals", "J", "K", "L", "A", "B"))
     expect_equal(as.vector(sapply(df4Chk, typeof)),
       c("character", "logical", "double", "integer", "double", "integer", "double", "integer", "integer", "double", "double", "double", "integer", "double", "double"))
-    expect_equal(zip::zip_list(nmeOut)$filename,
-      c("data.bin", "strings.bin", "meta", "metadata.json", "xdata.json", "index.html", "01 empty/analysis", "02 anova/analysis", "03 empty/analysis",
-        "04 ancova/analysis", "05 empty/analysis", "02 anova/resources/3b518ea3d44f095f.png", "02 anova/resources/07288f96c58ae68b.png"))
+    expect_equal(sort(zip::zip_list(nmeOut)$filename),
+      c("01 empty/analysis", "02 anova/analysis", "02 anova/resources/07288f96c58ae68b.png", "02 anova/resources/3b518ea3d44f095f.png", "03 empty/analysis",
+        "04 ancova/analysis", "05 empty/analysis", "data.bin", "index.html", "meta", "metadata.json", "strings.bin", "xdata.json"))
     expect_equal(attr(df4Chk, "syntax"),
       list(paste("jmv::ANOVA(formula = len ~ supp + dose2 + supp:dose2, data = data, effectSize = \"partEta\", modelTest = TRUE, qq = TRUE,",
                  "contrasts = list(list(var=\"supp\", type=\"none\"), list(var=\"dose2\", type=\"polynomial\")), postHoc = ~ supp + dose2, emMeans = ~ dose2:supp)"),

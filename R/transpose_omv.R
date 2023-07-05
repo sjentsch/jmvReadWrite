@@ -45,7 +45,7 @@
 transpose_omv <- function(dtaInp = NULL, fleOut = "", nmeVar = "", usePkg = c("foreign", "haven"), selSet = "", ...) {
 
     # check and import input data set (either as data frame or from a file)
-    dtaFrm <- inp2DF(dtaInp, fleOut, "_xpsd.omv", usePkg, selSet, list(...))
+    dtaFrm <- inp2DF(dtaInp, fleOut, "_xpsd.omv", usePkg, selSet, ...)
     fleOut <- attr(dtaFrm, "fleOut")
 
     # create variable names for the output data frame: if nmeVar is empty (default), then the row names of the

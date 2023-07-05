@@ -53,7 +53,7 @@ arrange_cols_omv <- function(dtaInp = "", fleOut = "", varOrd = c(), varMve = li
     }
 
     # check and import input data set (either as data frame or from a file)
-    dtaFrm <- inp2DF(dtaInp, fleOut, "_arrCol.omv", usePkg, selSet, list(...))
+    dtaFrm <- inp2DF(dtaInp, fleOut, "_arrCol.omv", usePkg, selSet, ...)
     fleOut <- attr(dtaFrm, "fleOut")
 
     # re-arrange the order of variables in the data set (varOrd)

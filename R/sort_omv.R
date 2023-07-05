@@ -49,7 +49,7 @@ sort_omv <- function(dtaInp = NULL, fleOut = "", varSrt = c(), psvAnl = FALSE, u
     }
 
     # check and import input data set (either as data frame or from a file)
-    dtaFrm <- inp2DF(dtaInp, fleOut, "_xpsd.omv", usePkg, selSet, list(...))
+    dtaFrm <- inp2DF(dtaInp, fleOut, "_xpsd.omv", usePkg, selSet, ...)
     fleOut <- attr(dtaFrm, "fleOut")
 
     # sort data set

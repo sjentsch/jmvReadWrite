@@ -105,6 +105,8 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", retDbg = FALSE) {
             mtaDta$fields[[i]][["type"]]        <- "string"
             mtaDta$fields[[i]][["measureType"]] <- "ID"
         # afterwards, the different variable types for each column of the original data frame are tested
+        # an overview about how jamovi treats variable types internally and as which types they are written
+        # can be found in the function addAtt under globals.R
         # [a] logical
         } else if (is.logical(crrCol)) {
             crrCol <- as.integer(crrCol)
@@ -123,19 +125,20 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", retDbg = FALSE) {
             }
             # NB: If jamovi imports RData / RDS-files, character variables are given "ID" (measureType) / "Text" (dataType)
             #     however, converting them to factors and exporting those seems to make more sense
-            facLvl <- attr(crrCol, "levels")
-            facOrd <- is.ordered(crrCol)
-            if (!is.null(attr(crrCol, "values")) && !identical(attr(crrCol, "values")[as.integer(crrCol)], as.integer(crrCol))) {
-                stop(sprintf("\"values\"-attribute found for column \"%s\". Please send the file to sebastian.jentschke@uib.no for debugging.", names(dtaFrm[i])))
-#               crrCol <- facVal[as.integer(crrCol)]
-#               mtaDta$fields[[i]][["dataType"]] <- "Integer"
+            facLvl <- ifelse(chkAtt(dtaFrm[[i]], "values"), attr(dtaFrm[[i]], "values"), attr(dtaFrm[[i]], "levels"))
+            facOrd <- is.ordered(dtaFrm[[i]])
+            if (chkAtt(dtaFrm[[i]], "values") && !identical(attr(dtaFrm[[i]], "values"), as.integer(attr(dtaFrm[[i]], "levels")))) {
+                stop(sprintf(paste("\"values\"-attribute with unexpected values found for column \"%s\"."
+                                   "Please send the file to sebastian.jentschke@uib.no for debugging."), names(dtaFrm[i])))
             }
-            crrCol <- as.integer(crrCol) - 1
+            crrCol <- as.vector.factor(crrCol, mode = "integer") - 1
             # if "dataType" is already stored in the data frame, keep it, otherwise determine whether the factor levels are more likely to be "Integer" or "Text"
             mtaDta$fields[[i]][["dataType"]] <- ifelse(chkAtt(dtaFrm[[i]], "dataType"), attr(dtaFrm[[i]], "dataType"),
+                ifelse(chkAtt(dtaFrm[[i]], "values"), "Integer",
                 ifelse(all(!is.na(suppressWarnings(as.integer(facLvl)))) && all(as.character(as.integer(facLvl)) == facLvl), "Integer", "Text"))
             mtaDta$fields[[i]][["type"]]     <- "integer"
-            # if "measureType" is already stored in the data frame, keep it, otherwise set it to "Ordinal" if the properties indicate it to be likely ("Nominal" is already the default)
+            # if "measureType" is already stored in the data frame, keep it, otherwise set it to "Ordinal" if the properties indicate it to be likely
+            # ("Nominal" is already the default)
             if (facOrd) mtaDta$fields[[i]][["measureType"]] <- ifelse(chkAtt(dtaFrm[[i]], "measureType"), attr(dtaFrm[[i]], "measureType"), "Ordinal")
             # the code below permitted to "guess" whether a factor likely was ordered, but this lead to some problems when storing reshaped data
 #           if (facOrd || (chkFld(mtaDta$fields[[i]], "dataType", "Integer") && length(facLvl) > 5 && !any(is.na(c(as.integer(facLvl), crrCol))) &&

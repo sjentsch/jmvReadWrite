@@ -255,10 +255,13 @@ xfrAnl <- function(fleOrg = "", fleTgt = "") {
 # function for adding attributes to data frames (e.g., those opened in Rj or via jTransform)
 
 addAtt <- function(dtaFrm = NULL) {
+    chkDtF(dtaFrm)
+
     for (crrNme in names(dtaFrm)) {
          # jmv-id
          if (!is.null(attr(dtaFrm[[crrNme]], "jmv-id")) && attr(dtaFrm[[crrNme]], "jmv-id")) {
-             # recognized, don't do anything
+             attr(dtaFrm[[crrNme]], "measureType") <- "ID"
+             attr(dtaFrm[[crrNme]], "dataType")    <- ifelse(is.integer(dtaFrm[[crrNme]]), "Integer", "Text")
          } else if (is.integer(dtaFrm[[crrNme]])) {
              attr(dtaFrm[[crrNme]], "measureType") <- "Continuous"
              attr(dtaFrm[[crrNme]], "dataType")    <- "Integer"
@@ -278,8 +281,9 @@ addAtt <- function(dtaFrm = NULL) {
              attr(dtaFrm[[crrNme]], "measureType") <- "Nominal"
              attr(dtaFrm[[crrNme]], "dataType")    <- "Integer"
          } else {
-             print(str(dtaFrm[[crrNme]]))
-             stop("Variable type not implemented.")
+             cat("\n")
+             cat(utils::str(dtaFrm[[crrNme]]), "\n")
+             stop(sprintf("\n%s: Variable type %s not implemented.\n\n", crrNme, class(dtaFrm[[crrNme]])))
          }
     }
 

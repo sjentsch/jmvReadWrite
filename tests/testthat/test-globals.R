@@ -51,4 +51,27 @@ test_that("globals work", {
     expect_equal(basename(attr(inp2DF(fleInp = inpNme, sfxOut = "_trial.omv"), "fleOut")), "ToothGrowth_trial.omv")
     expect_equal(basename(attr(inp2DF(fleInp = inpNme, fleOut = "Trial.omv"), "fleOut")),  "Trial.omv")
     expect_equal(basename(attr(inp2DF(fleInp = inpNme, fleOut = "Trial.omv", sfxOut = "_trial.omv"), "fleOut")), "Trial.omv")
+
+    tmpDF <- data.frame(ID = sprintf("P_%04d", sample(9999, 100)), I = as.integer(sample(1e6, 100)), D = rnorm(100),
+                        OT = factor(sample(c("low", "middle", "high"), 100, replace = TRUE), levels = c("low", "middle", "high"), ordered = TRUE),
+                        ON = factor(sample(seq(7), 100, replace = TRUE), levels = seq(7), ordered = TRUE),
+                        NT = factor(sample(c("low", "middle", "high"), 100, replace = TRUE), levels = c("low", "middle", "high")),
+                        NN = factor(sample(seq(7), 100, replace = TRUE), levels = seq(7)))
+    attr(tmpDF[["ID"]], "jmv-id") <- TRUE
+    attr(tmpDF[["ON"]], "values") <- seq(7)
+    attr(tmpDF[["NN"]], "values") <- seq(7)
+    expect_equal(sapply(sapply(addAtt(tmpDF), attributes), names), list(ID = c("jmv-id", "measureType", "dataType"),
+        I = c("measureType", "dataType"), D = c("measureType", "dataType"),
+        OT = c("levels", "class", "measureType", "dataType"), ON = c("levels", "class", "values", "measureType", "dataType"),
+        NT = c("levels", "class", "measureType", "dataType"), NN = c("levels", "class", "values", "measureType", "dataType")))
+    expect_equal(unlist(attributes(addAtt(tmpDF)[["ID"]]), use.names = FALSE), c("TRUE", "ID", "Text"))
+    expect_equal(unlist(attributes(addAtt(tmpDF)[["I"]]),  use.names = FALSE), c("Continuous", "Integer"))
+    expect_equal(unlist(attributes(addAtt(tmpDF)[["D"]]),  use.names = FALSE), c("Continuous", "Decimal"))
+    expect_equal(unlist(attributes(addAtt(tmpDF)[["OT"]]), use.names = FALSE), c("low", "middle", "high", "ordered", "factor", "Ordinal", "Text"))
+    expect_equal(unlist(attributes(addAtt(tmpDF)[["ON"]]), use.names = FALSE), c(sprintf("%d", seq(1:7)), "ordered", "factor", sprintf("%d", seq(1:7)), "Ordinal", "Integer"))
+    expect_equal(unlist(attributes(addAtt(tmpDF)[["NT"]]), use.names = FALSE), c("low", "middle", "high", "factor", "Nominal", "Text"))
+    expect_equal(unlist(attributes(addAtt(tmpDF)[["NN"]]), use.names = FALSE), c(sprintf("%d", seq(1:7)), "factor", sprintf("%d", seq(1:7)), "Nominal", "Integer"))
+    expect_error(addAtt("Trial"))
+    expect_error(addAtt(data.frame()))
+    expect_error(capture.output(addAtt(cbind(tmpDF, data.frame(ER = sample(seq(as.Date("2000/01/01"), as.Date("2019/12/31"), by = "day"), 100))))))
 })

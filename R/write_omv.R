@@ -82,7 +82,7 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", retDbg = FALSE) {
 
     for (i in seq_along(dtaFrm)) {
         # assign the jamovi-specific-attributes that are stored in data frame for this data column (if available)
-        mtaDta$fields[[i]] <- setAtt(names(mtaDta$fields[[i]]), dtaFrm[[i]], mtaDta$fields[[i]])
+        mtaDta$fields[[i]] <- setAtt(names(mtaDta$fields[[i]]), dtaFrm[i], mtaDta$fields[[i]])
 
         # name
         mtaDta$fields[[i]][["name"]] <- names(dtaFrm[i])
@@ -99,14 +99,13 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", retDbg = FALSE) {
         # if the jmv-id marker is set or if the measureType is set to "ID" in the original data or if it is the first column with the values
         # being unique and being either a factor or an integer (rounded equals the original value; integers may be stored as doubles)
         if (chkAtt(dtaFrm[[i]], "jmv-id", TRUE) || chkAtt(dtaFrm[[i]], "measureType", "ID") ||
-            (i == 1 && length(unique(crrCol)) == length(crrCol)) && (is.factor(crrCol) || (is.double(crrCol) && all(crrCol %% 1 == 0)))) {
-            if (!is.character(crrCol)) crrCol <- as.character(crrCol)
-            mtaDta$fields[[i]][["dataType"]]    <- "Text"
-            mtaDta$fields[[i]][["type"]]        <- "string"
+          (i == 1 && length(unique(crrCol)) == length(crrCol)) && (is.factor(crrCol) || (is.double(crrCol) && all(crrCol %% 1 == 0)))) {
             mtaDta$fields[[i]][["measureType"]] <- "ID"
+            mtaDta$fields[[i]][["dataType"]]    <- ifelse(is.integer(crrCol), "Integer", "Text")
+            mtaDta$fields[[i]][["type"]]        <- ifelse(is.integer(crrCol), "integer", "string")
         # afterwards, the different variable types for each column of the original data frame are tested
         # an overview about how jamovi treats variable types internally and as which types they are written
-        # can be found in the function addAtt under globals.R
+        # can be found in the function jmvAtt under globals.R
         # [a] logical
         } else if (is.logical(crrCol)) {
             crrCol <- as.integer(crrCol)

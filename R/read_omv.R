@@ -59,8 +59,8 @@ read_omv <- function(fleInp = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = TRUE,
         strPos <- 0
     }
 
-    # process meta-data
-    if (!all(grepl(grpMta, names(mtaDta)))) stop("Unimplemeted field in the meta data")
+    # check meta-data
+    if (!all(grepl(grpMta, names(mtaDta)))) stop("Unimplemeted field in the meta data (data frame).")
 
     # determine rows and columns and create data frame
     rowNum <- mtaDta$rowCount
@@ -71,6 +71,9 @@ read_omv <- function(fleInp = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = TRUE,
 
     # iterate through fields
     for (i in seq_len(colNum)) {
+        # check meta-data
+        if (!all(grepl(grpMta, names(mtaDta$fields[[i]])))) stop("Unimplemeted field in the meta data (column).")
+
         # type: determines the format in the binary file
         if        (chkFld(mtaDta$fields[[i]], "type", "integer")) {
             crrCol <- readBin(binHdl, integer(), n = rowNum)
@@ -117,19 +120,19 @@ read_omv <- function(fleInp = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = TRUE,
 
         dtaFrm[[crrNme]] <- crrCol
 
-        if (chkFld(mtaDta$fields[[i]], "description", ".+")) attr(dtaFrm[[crrNme]], "jmv-desc") <- mtaDta$fields[[i]]$description
         if (chkFld(mtaDta$fields[[i]], "measureType", "ID")) attr(dtaFrm[[crrNme]], "jmv-id")   <- TRUE
-
-        dtaFrm[[crrNme]] <- setAtt("missingValues",   mtaDta$fields[[i]], dtaFrm[[crrNme]])
-
+        if (chkFld(mtaDta$fields[[i]], "description", ".+")) attr(dtaFrm[[crrNme]], "jmv-desc") <- mtaDta$fields[[i]][["description"]]
+        
         if (sveAtt) {
-            dtaFrm[[crrNme]] <- setAtt(names(mtaFld), mtaDta$fields[[i]], dtaFrm[[crrNme]])
+            dtaFrm[crrNme] <- setAtt(names(mtaFld),   mtaDta$fields[[i]], dtaFrm[crrNme])
+        } else {
+            dtaFrm[crrNme] <- setAtt("missingValues", mtaDta$fields[[i]], dtaFrm[crrNme])
         }
 
         if (rmMsVl) {
             mssLst <- attr(dtaFrm[[crrNme]], "missingValues")
             if (length(mssLst) > 0) {
-               crrAtt <- attributes(dtaFrm[[crrNme]])
+               crrAtt <- attributes(dtaFrm[crrNme])
                rmvLvl <- rep(FALSE, length(levels(dtaFrm[[crrNme]])))
                for (j in seq_along(mssLst)) {
                    dtaFrm[[crrNme]][eval(parse(text = paste0("dtaFrm[[\"", crrNme, "\"]]", mssLst[[j]])))] <- NA
@@ -138,7 +141,7 @@ read_omv <- function(fleInp = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = TRUE,
                dtaFrm[[crrNme]] <- dtaFrm[[crrNme]][, drop = TRUE]
                crrAtt$missingValues <- list()
                crrAtt$values <- crrAtt$values[!rmvLvl]
-               dtaFrm[[crrNme]] <- setAtt(setdiff(names(crrAtt), names(attributes(dtaFrm[[crrNme]]))), crrAtt, dtaFrm[[crrNme]])
+               dtaFrm[crrNme] <- setAtt(setdiff(names(crrAtt), names(attributes(dtaFrm[crrNme]))), crrAtt, dtaFrm[crrNme])
                rm(crrAtt, rmvLvl)
             }
         }
@@ -163,9 +166,10 @@ read_omv <- function(fleInp = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = TRUE,
         attr(dtaFrm, "fltLst") <- names(dtaFrm)[fltLst]
     }
 
-    # removedRows, addedRows, transforms
+    # store data frame attributes except rowCount, columnCount and fields (the first two available
+    # as data frame dimensions, the latter stored in the variables / columns)
     if (sveAtt) {
-        dtaFrm <- setAtt(c("removedRows", "addedRows", "transforms"), mtaDta, dtaFrm)
+        dtaFrm <- setAtt(setdiff(names(mtaGlb), c("rowCount", "columnCount", "fields")), mtaDta, dtaFrm)
     }
 
     # import and extract syntax from the analyses
@@ -442,11 +446,11 @@ rmvQtn <- function(dtaFrm = NULL) {
 rplAtt <- function(dtaFrm = NULL) {
     # extract the attributes from the dataset and its columns and determine which attributes are
     # character
-    setAtt <- setdiff(names(attributes(dtaFrm))[sapply(attributes(dtaFrm), is.character)], c("names", "row.names", "class"))
+    dfAtt  <- setdiff(names(attributes(dtaFrm))[sapply(attributes(dtaFrm), is.character)], c("names", "row.names", "class"))
     colAtt <- setdiff(unique(unlist(sapply(sapply(dtaFrm, attributes), names), use.names = FALSE)), c("class"))
 
-    # go through the data set attributes (except the attributes from R) and check their validity
-    for (crrAtt in setAtt) {
+    # go through the data frame attributes (except the attributes from R) and check their validity
+    for (crrAtt in dfAtt) {
         attr(dtaFrm, crrAtt) <- rplStr(attr(dtaFrm, crrAtt), crrAtt)
     }
 

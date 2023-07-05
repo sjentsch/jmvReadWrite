@@ -98,7 +98,9 @@ merge_cols_omv <- function(fleInp = c(), fleOut = "", typMrg = c("outer", "inner
     # restore attributes
     for (crrAtt in setdiff(names(attDF), c("names", "row.names", "class"))) attr(dtaOut, crrAtt) <- attDF[[crrAtt]]
     for (crrNme in names(dtaOut)) {
-        dtaOut[[crrNme]] <- setAtt(setdiff(names(attCol[[crrNme]]), names(attributes(dtaOut[[crrNme]]))), attCol[[crrNme]], dtaOut[[crrNme]])
+        if (!is.null(attCol[[crrNme]])) {
+            dtaOut[crrNme] <- setAtt(setdiff(names(attCol[[crrNme]]), names(attributes(dtaOut[crrNme]))), attCol[[crrNme]], dtaOut[crrNme])
+        }
     }
 
     # write files (if fleOut is not empty) and transfer analyses from the first input to output file (if psvAnl is TRUE)

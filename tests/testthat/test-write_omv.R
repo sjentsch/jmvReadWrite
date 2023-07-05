@@ -16,7 +16,7 @@ test_that("write_omv works", {
     # whether dtaFrm as a data frame with the correct sizes and attributes
     expect_equal(names(dtaDbg),                       c("mtaDta", "xtdDta", "dtaFrm"))
     expect_equal(as.character(sapply(dtaDbg, class)), c("list",   "list",   "data.frame"))
-    expect_equal(names(dtaDbg$mtaDta), c("rowCount", "columnCount", "removedRows", "addedRows", "fields", "transforms"))
+    expect_equal(names(dtaDbg$mtaDta), c("rowCount", "columnCount", "removedRows", "addedRows", "fields", "transforms", "weights"))
     expect_true(all(grepl("labels", sapply(dtaDbg$xtdDta, attributes))))
     expect_s3_class(dtaDbg$dtaFrm, "data.frame")
     expect_equal(dim(dtaDbg$dtaFrm), c(60, 7))
@@ -27,12 +27,13 @@ test_that("write_omv works", {
     expect_equal(sapply(jmvReadWrite::ToothGrowth, class), sapply(dtaDbg$dtaFrm, class))
 
     # test cases for code coverage ============================================================================================================================
-    expect_error(write_omv(NULL, nmeOut))
-    expect_error(write_omv(dtaDbg$dtaFrm, ""))
-    expect_error(capture.output(add2ZIP(fleZIP = nmeOut, crrHdl = NULL)))
+    expect_error(write_omv(NULL, nmeOut), regexp = "The data frame to be written needs to be given as parameter \\(dtaFrm = \\.\\.\\.\\)\\.")
+    expect_error(write_omv(dtaDbg$dtaFrm, "Output file name needs to be given as parameter \\(fleOut = \\.\\.\\.\\)\\."))
+    expect_error(capture.output(add2ZIP(fleZIP = nmeOut, crrHdl = NULL)), regexp = "Parameter isn't a file handle pointing to a file to be zipped\\.")
 
     attr(dtaDbg$dtaFrm, "label.table") <- c("A", "B", "C")
-    expect_error(write_omv(dtaDbg$dtaFrm, nmeOut))
+    expect_error(write_omv(dtaDbg$dtaFrm, nmeOut),
+      regexp = "R-foreign-style value labels need to be implemented\\. Please send the data file that caused this problem to sebastian\\.jentschke@uib\\.no")
     attr(dtaDbg$dtaFrm, "label.table") <- NULL
 
     attr(dtaDbg$dtaFrm, "variable.labels") <- stats::setNames(c("Label for ID", "Label for supp", "Label for supp2"), c("ID", "supp", "supp2"))

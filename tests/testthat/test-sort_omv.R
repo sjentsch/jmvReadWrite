@@ -45,13 +45,14 @@ test_that("sort_omv works", {
     expect_true(chkFle(nmeOut, fleCnt = "data.bin"))
     df4Chk <- read_omv(nmeOut, sveAtt = FALSE, getSyn = TRUE)
     expect_s3_class(df4Chk, "data.frame")
-    expect_equal(dim(df4Chk), c(60, 13))
-    expect_equal(names(df4Chk), c("Filter 1", "ID", "logLen", "supp - Transform 1", "len", "supp", "dose", "dose2", "Trial", "Residuals", "J", "K", "L"))
+    expect_equal(dim(df4Chk), c(60, 14))
+    expect_equal(names(df4Chk),
+      c("Filter 1", "ID", "logLen", "supp - Transform 1", "len", "supp", "dose", "dose2", "Trial", "Residuals", "J", "K", "L", "weights"))
     expect_equal(as.vector(sapply(df4Chk, typeof)),
-      c("logical", "character", "double", "integer", "double", "integer", "double", "integer", "integer", "double", "double", "double", "integer"))
+      c("logical", "integer", "double", "integer", "double", "integer", "double", "integer", "integer", "double", "double", "double", "integer", "integer"))
     expect_equal(sort(zip::zip_list(nmeOut)$filename),
-      c("01 empty/analysis", "02 anova/analysis", "02 anova/resources/07288f96c58ae68b.png", "02 anova/resources/3b518ea3d44f095f.png", "03 empty/analysis",
-        "04 ancova/analysis", "05 empty/analysis", "data.bin", "index.html", "meta", "metadata.json", "strings.bin", "xdata.json"))
+      c("01 empty/analysis", "02 anova/analysis", "02 anova/resources/61c33c657d5e31f1.png", "02 anova/resources/dd0ce025a00dad1b.png", "03 empty/analysis",
+        "04 ancova/analysis", "05 empty/analysis", "data.bin", "index.html", "meta", "metadata.json", "xdata.json"))
     expect_equal(attr(df4Chk, "syntax"),
       list(paste("jmv::ANOVA(formula = len ~ supp + dose2 + supp:dose2, data = data, effectSize = \"partEta\", modelTest = TRUE, qq = TRUE,",
                  "contrasts = list(list(var=\"supp\", type=\"none\"), list(var=\"dose2\", type=\"polynomial\")), postHoc = ~ supp + dose2, emMeans = ~ dose2:supp)"),

@@ -73,7 +73,7 @@ arrange_cols_omv <- function(dtaInp = "", fleOut = "", varOrd = c(), varMve = li
         for (crrVar in names(varMve)) {
             crrPos <- which(varOrd == crrVar)
             if (crrPos + varMve[[crrVar]] < 1 || crrPos + varMve[[crrVar]] > dim(dtaFrm)[2]) {
-                stop("The value given in varMve must be chosen so that the element isn't moved before the first or after the last column")
+                stop("The value given in varMve must be chosen so that the element isn't moved before the first or after the last column.")
             }
             allPos <- seq(dim(dtaFrm)[2])
             if (varMve[[crrVar]] < 0) {
@@ -92,7 +92,7 @@ arrange_cols_omv <- function(dtaInp = "", fleOut = "", varOrd = c(), varMve = li
     # re-arrange to order of variables, while storing and restoring the attributes attached to the whole data frame (column attributes are not affected)
     attMem <- attributes(dtaFrm)
     dtaFrm <- dtaFrm[, varOrd]
-    for (crrAtt in setdiff(names(attMem), c("names", "row.names", "class"))) attr(dtaFrm, crrAtt) <- attMem[[crrAtt]]
+    dtaFrm <- setAtt(setdiff(names(attMem), c("names", "row.names", "class", "fltLst", "fleOut")), attMem, dtaFrm)
 
     # write the resulting data frame to the output file
     write_omv(dtaFrm, fleOut)

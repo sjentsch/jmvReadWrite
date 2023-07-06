@@ -279,13 +279,20 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", retDbg = FALSE) {
     add2ZIP(fleOut, htmHdl, txtOut = htmTxt())
     rm(htmHdl)
 
+    # handle weights
+    if (is.character(mtaDta$weights) && nzchar(mtaDta$weights)) {
+        # TO-DO: this likely requires copying the protobuffers
+        warning("Handling of weights not yet implemented.")
+    }
+
     if (retDbg) {
         list(mtaDta = mtaDta, xtdDta = xtdDta, dtaFrm = dtaFrm)
     }
 }
 
 fmtJSON <- function(txtJSON = "") {
-    gsub("00: 00", "00:00", gsub("  ", " ", gsub(":", ": ", gsub(",", ", ", jsonlite::toJSON(txtJSON, auto_unbox = TRUE)))))
+    gsub("\"weights\": \\[\\]", "\"weights\": null", gsub("00: 00", "00:00", gsub("  ", " ", gsub(":", ": ", gsub(",", ", ",
+      jsonlite::toJSON(txtJSON, auto_unbox = TRUE))))))
 }
 
 htmTxt <- function() {

@@ -59,8 +59,9 @@ read_omv <- function(fleInp = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = TRUE,
         strPos <- 0
     }
 
-    # check meta-data
+    # check meta-data, change weights if NULL
     if (!all(grepl(grpMta, names(mtaDta)))) stop("Unimplemeted field in the meta data (data frame).")
+    if (is.null(mtaDta$weights)) mtaDta$weights <- list()
 
     # determine rows and columns and create data frame
     rowNum <- mtaDta$rowCount
@@ -170,6 +171,12 @@ read_omv <- function(fleInp = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = TRUE,
     # as data frame dimensions, the latter stored in the variables / columns)
     if (sveAtt) {
         dtaFrm <- setAtt(setdiff(names(mtaGlb), c("rowCount", "columnCount", "fields")), mtaDta, dtaFrm)
+    }
+
+    # handle weights
+    if (is.character(mtaDta$weights) && nzchar(mtaDta$weights)) {
+        # TO-DO: this likely requires copying the protobuffers
+        warning("Handling of weights not yet implemented.")
     }
 
     # import and extract syntax from the analyses

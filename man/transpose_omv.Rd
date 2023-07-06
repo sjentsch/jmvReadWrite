@@ -7,7 +7,7 @@
 transpose_omv(
   dtaInp = NULL,
   fleOut = "",
-  nmeVar = "",
+  varNme = "",
   usePkg = c("foreign", "haven"),
   selSet = "",
   ...
@@ -18,7 +18,7 @@ transpose_omv(
 
 \item{fleOut}{Name (including the path, if required) of the data file to be written ("FILENAME.omv"; default: ""); if empty, and a file name is given as dtaInp, it is appended with "_xpsd.omv"}
 
-\item{nmeVar}{Name of the variables in the output data frame; see Details below}
+\item{varNme}{Name of the variables in the output data frame; see Details below}
 
 \item{usePkg}{Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata and SAS files; "foreign" is the default (it comes with base R), but "haven" is newer and more comprehensive}
 
@@ -30,8 +30,8 @@ transpose_omv(
 Transpose .omv-files for the statistical spreadsheet 'jamovi' (\url{https://www.jamovi.org})
 }
 \details{
-If nmeVar empty, the row names of the input data set are used (preceded by "V_" if all row names are numbers); if nmeVar has the length 1 then it is supposed to point to a variable in the input
-data frame; if nmeVar has the same length as the number of rows in the input data frame, then the values in nmeVar are assigned as column names to the output data frame.
+If varNme empty, the row names of the input data set are used (preceded by "V_" if all row names are numbers); if varNme has the length 1 then it is supposed to point to a variable in the input
+data frame; if varNme has the same length as the number of rows in the input data frame, then the values in varNme are assigned as column names to the output data frame.
 The ellipsis-parameter can be used to submit arguments / parameters to the functions that are used for reading the data. These are: \code{read_omv} (for jamovi-files), \code{read.table} (for CSV / TSV
 files; using similar defaults as \code{read.csv} for CSV and \code{read.delim} for TSV which both are based upon \code{read.table} but with adjusted defaults for the respective file types), \code{readRDS} (for
 rds-files), \code{read_sav} (needs R-package "haven") or \code{read.spss} (needs R-package "foreign") for SPSS-files, \code{read_dta} ("haven") / \code{read.dta} ("foreign") for Stata-files, \code{read_sas} ("haven") for
@@ -52,8 +52,8 @@ fleTmp <- paste0(tempfile(), ".omv")
 transpose_omv(dtaInp = tmpDF, fleOut = fleTmp)
 dtaFrm <- read_omv(fleTmp)
 str(dtaFrm)
-# if no nmeVar-parameter is given, generic variable names are created (V_...)
-transpose_omv(dtaInp = tmpDF, fleOut = fleTmp, nmeVar = sprintf("Trl_\%02d", seq(16)))
+# if no varNme-parameter is given, generic variable names are created (V_...)
+transpose_omv(dtaInp = tmpDF, fleOut = fleTmp, varNme = sprintf("Trl_\%02d", seq(16)))
 dtaFrm <- read_omv(fleTmp)
 str(dtaFrm)
 # alternatively, the character vector with the desired variable names (of the same length as

@@ -198,9 +198,9 @@ list.files(".", "Trial.omv")
 #> [1] "Trial.omv"
 file.info("Trial.omv")
 #>           size isdir mode               mtime               ctime
-#> Trial.omv 1564 FALSE  664 2023-07-01 22:45:22 2023-07-01 22:45:22
+#> Trial.omv 1572 FALSE  664 2023-07-06 12:20:12 2023-07-06 12:20:12
 #>                         atime  uid  gid    uname   grname
-#> Trial.omv 2023-07-01 22:45:22 1000 1000 sjentsch sjentsch
+#> Trial.omv 2023-07-06 12:20:12 1000 1000 sjentsch sjentsch
 unlink("Trial.omv")
 ```
 
@@ -224,10 +224,10 @@ names(attributes(data))
 #> [1] "names"       "row.names"   "class"       "fltLst"      "removedRows"
 #> [6] "addedRows"   "transforms"
 names(attributes(data[[1]]))
-#>  [1] "missingValues"  "name"           "id"             "columnType"    
-#>  [5] "dataType"       "measureType"    "formula"        "formulaMessage"
-#>  [9] "parentId"       "width"          "type"           "importName"    
-#> [13] "description"    "transform"      "edits"          "filterNo"      
+#>  [1] "name"           "id"             "columnType"     "dataType"      
+#>  [5] "measureType"    "formula"        "formulaMessage" "parentId"      
+#>  [9] "width"          "type"           "importName"     "description"   
+#> [13] "transform"      "edits"          "missingValues"  "filterNo"      
 #> [17] "active"
 #
 # perhaps do some modifications to the file here and write it back afterwards

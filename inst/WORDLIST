@@ -29,7 +29,6 @@ lintr
 MAgojam
 MinGW
 mtaDta
-nmeVar
 NC
 OMV
 omv
@@ -63,6 +62,7 @@ varID
 varLst
 varMve
 VARNAME
+varNme
 varOrd
 vars
 varSep

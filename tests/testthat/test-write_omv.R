@@ -27,13 +27,14 @@ test_that("write_omv works", {
     expect_equal(sapply(jmvReadWrite::ToothGrowth, class), sapply(dtaDbg$dtaFrm, class))
 
     # test cases for code coverage ============================================================================================================================
-    expect_error(write_omv(NULL, nmeOut), regexp = "The data frame to be written needs to be given as parameter \\(dtaFrm = \\.\\.\\.\\)\\.")
-    expect_error(write_omv(dtaDbg$dtaFrm, "Output file name needs to be given as parameter \\(fleOut = \\.\\.\\.\\)\\."))
-    expect_error(capture.output(add2ZIP(fleZIP = nmeOut, crrHdl = NULL)), regexp = "Parameter isn't a file handle pointing to a file to be zipped\\.")
+    expect_error(write_omv(NULL, nmeOut), regexp = "^The data frame to be written needs to be given as parameter \\(dtaFrm = \\.\\.\\.\\)\\.")
+    expect_error(write_omv(dtaDbg$dtaFrm), regexp = "^Output file name needs to be given as parameter \\(fleOut = \\.\\.\\.\\)\\.")
+    suppressMessages(expect_error(capture_output(add2ZIP(fleZIP = nmeOut, crrHdl = NULL)),
+      regexp = "^Parameter isn't a file handle pointing to a file to be zipped\\."))
 
     attr(dtaDbg$dtaFrm, "label.table") <- c("A", "B", "C")
     expect_error(write_omv(dtaDbg$dtaFrm, nmeOut),
-      regexp = "R-foreign-style value labels need to be implemented\\. Please send the data file that caused this problem to sebastian\\.jentschke@uib\\.no")
+      regexp = "^R-foreign-style value labels need to be implemented\\. Please send the data file that caused this problem to sebastian\\.jentschke@uib\\.no")
     attr(dtaDbg$dtaFrm, "label.table") <- NULL
 
     attr(dtaDbg$dtaFrm, "variable.labels") <- stats::setNames(c("Label for ID", "Label for supp", "Label for supp2"), c("ID", "supp", "supp2"))

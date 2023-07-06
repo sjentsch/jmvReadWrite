@@ -40,15 +40,19 @@ test_that("wide2long_omv works", {
     unlink(nmeOut)
 
     # test cases for code coverage ============================================================================================================================
-    expect_error(capture.output(wide2long_omv(nmeInp, fleOut = nmeOut, varTme = "Month", varSep = "_", varSrt = c("Year", "Month"))))
-    expect_error(capture.output(wide2long_omv(nmeInp, fleOut = nmeOut, varSep = "x", varID = "Year")))
-#   expect_error(suppressWarnings(wide2long_omv(nmeInp, nmeOut, varSep = ".", varID = "Year")))
+    suppressMessages(expect_error(capture_output(wide2long_omv(nmeInp, fleOut = nmeOut, varTme = "Month", varSep = "_", varSrt = c("Year", "Month"))),
+      regexp = "^\\s+The variable separator \\(.*\\) must be contained in all variables in the variable list \\(varLst\\)\\."))
+    suppressMessages(expect_error(capture_output(wide2long_omv(nmeInp, fleOut = nmeOut, varSep = "x", varID = "Year")),
+      regexp = "^\\s+The variable separator \\(.*\\) must be contained in all variables in the variable list \\(varLst\\)\\."))
+#   suppressMessages(expect_error(wide2long_omv(nmeInp, nmeOut, varSep = ".", varID = "Year")))
 #   expect_warning(wide2long_omv(nmeInp, nmeOut, varID = "Year", varTme = "Month", varSrt = c("Year", "Month")))
 
-    expect_error(capture.output(wide2long_omv(dtaInp = data.frame(Year = 1900:2020, X_1 = runif(121), X.2 = runif(121)),
-                                              fleOut = nmeOut, varSep = "_", varID = "Year")))
-    expect_error(capture.output(wide2long_omv(dtaInp = data.frame(Year = 1900:2020, X_1 = runif(121), X_2 = runif(121), X_2_A = runif(121)),
-                                              fleOut = nmeOut, varSep = "_", varID = "Year")))
+    suppressMessages(expect_error(capture_output(wide2long_omv(dtaInp = data.frame(Year = 1900:2020, X_1 = runif(121), X.2 = runif(121)),
+      fleOut = nmeOut, varSep = "_", varID = "Year")),
+      regexp = "^\\s+The variable separator \\(.*\\) must be contained in all variables in the variable list \\(varLst\\)\\."))
+    suppressMessages(expect_error(capture_output(wide2long_omv(dtaInp = data.frame(Year = 1900:2020, X_1 = runif(121), X_2 = runif(121),
+      X_2_A = runif(121)), fleOut = nmeOut, varSep = "_", varID = "Year")),
+      regexp = "^The variable names in varLst need to have the same structure, i\\.e\\., the same number of separators within all variable names\\."))
 
     dtaTmp <- data.frame(ID = as.character(1:121), A = runif(121), B = runif(121), C = runif(121))
     attributes(dtaTmp[[1]]) <- list(`jmv-id` = TRUE, measureType = "ID")

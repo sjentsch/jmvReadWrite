@@ -47,6 +47,6 @@ test_that("merge_rows_omv works", {
     # test cases for code coverage ============================================================================================================================
     nmeInp <- paste0(tempfile(), "_", 1:4, ".rds")
     for (i in seq_along(nmeInp)) saveRDS(stats::setNames(data.frame(runif(n = 100)), LETTERS[i]), nmeInp[i])
-    expect_error(dtaFrm <- merge_rows_omv(fleInp = nmeInp, typMrg = "common"))
+    expect_error(dtaFrm <- merge_rows_omv(fleInp = nmeInp, typMrg = "common"), regexp = "^The data sets in the files that were given as fleInp-argument do not contain variables that are overlapping")
     unlink(nmeInp)
 })

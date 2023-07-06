@@ -68,21 +68,21 @@ test_that("read_omv works", {
 
     # test cases for code coverage ============================================================================================================================
     # fleInp is not given or empty
-    expect_error(read_omv(),   regexp = "File name to the input data file needs to be given as parameter \\(fleInp = \\.\\.\\.\\)\\.")
-    expect_error(read_omv(""), regexp = "File name to the input data file needs to be given as parameter \\(fleInp = \\.\\.\\.\\)\\.")
+    expect_error(read_omv(),   regexp = "^File name to the input data file needs to be given as parameter \\(fleInp = \\.\\.\\.\\)\\.")
+    expect_error(read_omv(""), regexp = "^File name to the input data file needs to be given as parameter \\(fleInp = \\.\\.\\.\\)\\.")
     # fleInp is not a jamovi-file (.omv)
-    expect_error(read_omv("Trial.rds"), regexp = "read_omv only reads jamovi files \\(\\.omv\\), use convert_to_omv first, if you want to read other files types\\.")
+    expect_error(read_omv("Trial.rds"), regexp = "^read_omv only reads jamovi files \\(\\.omv\\), use convert_to_omv first, if you want to read other files types\\.")
     # the manifest must have a file name as second parameter and
     # the file has to be a valid manifest file (which is not the
     # case for "index.html" [exists, but isn't a manifest])
-    expect_error(chkMnf(nmeInp, c()), regexp = "File \".*?\" has not the correct file format \\(is missing the jamovi-file-manifest\\)\\.")
+    expect_error(chkMnf(nmeInp, c()), regexp = "^File \".*?\" has not the correct file format \\(is missing the jamovi-file-manifest\\)\\.")
     expect_error(chkMnf(nmeInp, "index.html"),
-      regexp = "The file you are trying to read \\(ToothGrowth\\.omv\\) has an improper manifest file \\(meta\\) and is likely corrupted\\.")
+      regexp = "^The file you are trying to read \\(ToothGrowth\\.omv\\) has an improper manifest file \\(meta\\) and is likely corrupted\\.")
 
     # .omv-file isn't a ZIP
     nmeTmp <- paste0(tempfile(), ".omv")
     writeBin("", con = nmeTmp)
-    expect_error(chkFle(nmeTmp, isZIP = TRUE), regexp = "chkFle: File \".*\" has not the correct file format \\(is not a ZIP archive\\)\\.")
+    expect_error(chkFle(nmeTmp, isZIP = TRUE), regexp = "^chkFle: File \".*\" has not the correct file format \\(is not a ZIP archive\\)\\.")
     unlink(nmeTmp)
 
     # invalid manifest (wrong version number)
@@ -122,12 +122,12 @@ test_that("read_all works", {
 
     # test cases for code coverage ============================================================================================================================
     # empty file name
-    expect_error(read_all(),   regexp = "File name to the input data file needs to be given as parameter \\(fleInp = \\.\\.\\.\\)\\.")
-    expect_error(read_all(""), regexp = "File name to the input data file needs to be given as parameter \\(fleInp = \\.\\.\\.\\)\\.")
+    expect_error(read_all(),   regexp = "^File name to the input data file needs to be given as parameter \\(fleInp = \\.\\.\\.\\)\\.")
+    expect_error(read_all(""), regexp = "^File name to the input data file needs to be given as parameter \\(fleInp = \\.\\.\\.\\)\\.")
     # replace strings in attributes, etc.
     if (l10n_info()$`UTF-8`) {
         expect_error(rplStr(strMod = "<c3><28>", crrAtt = "Trial"),
-          regexp = "The current data set still contains an invalid character \\(\".*\"\\) in attribute: \".*\"\\.")
+          regexp = "^The current data set still contains an invalid character \\(\".*\"\\) in attribute: \".*\"\\.")
     }
 
     # more than one object when using Rdata
@@ -137,7 +137,7 @@ test_that("read_all works", {
     save(list = ls()[grepl("D[1-2]", ls())], file = nmeInp)
     # throw error when selSet is not sepcified
     suppressMessages(expect_error(read_all(nmeInp),
-      regexp = "Input data are either not a data frame or have incorrect \\(only one or more than two\\) dimensions\\."))
+      regexp = "^Input data are either not a data frame or have incorrect \\(only one or more than two\\) dimensions\\."))
     # check whether reading works correct with using selSet
     df4Chk <- read_all(nmeInp, selSet = "D1")
     expect_s3_class(df4Chk, class = "data.frame")
@@ -202,8 +202,10 @@ test_that("read_all works", {
 
     fleInp <- paste0(tempfile(), ".xpt")
     writeBin("HEADER RECORD*******LIBRARY HEADER RECORD!!!!!!!", con = fleInp)
-    suppressMessages(expect_error(read_all(fleInp, usePkg = "haven")))
-    suppressMessages(expect_error(read_all(fleInp, usePkg = "foreign")))
+    suppressMessages(expect_error(read_all(fleInp, usePkg = "haven"),
+      regexp = "^Input data are either not a data frame or have incorrect \\(only one or more than two\\) dimensions\\."))
+    suppressMessages(expect_error(read_all(fleInp, usePkg = "foreign"),
+      regexp = "^Input data are either not a data frame or have incorrect \\(only one or more than two\\) dimensions\\."))
     unlink(fleInp)
 
     dtaTmp <- jmvReadWrite::ToothGrowth

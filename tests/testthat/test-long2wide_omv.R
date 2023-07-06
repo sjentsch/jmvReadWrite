@@ -50,12 +50,18 @@ test_that("long2wide_omv works", {
     unlink(nmeOut)
 
     # test cases for code coverage ============================================================================================================================
-    expect_error(long2wide_omv(dtaInp = nmeInp, fleOut = nmeOut, varID = "Year", varTme = ""))
-    expect_error(long2wide_omv(dtaInp = nmeInp, fleOut = nmeOut, varID = "", varTme = "Month"))
-    expect_error(long2wide_omv(dtaInp = nmeInp, fleOut = nmeOut, varID = "Year", varTme = c("Month", "Month2")))
-    expect_error(long2wide_omv(dtaInp = dtaTmp, fleOut = nmeOut, varID = "Year", varTme = ""))
-    expect_error(long2wide_omv(dtaInp = dtaTmp, fleOut = nmeOut, varID = "", varTme = "Month"))
-    expect_error(long2wide_omv(dtaInp = dtaTmp, fleOut = nmeOut, varID = "Year", varTme = c("Month", "Month2")))
+    expect_error(long2wide_omv(dtaInp = nmeInp, fleOut = nmeOut, varID = "Year", varTme = ""),
+      regexp = "^Using the arguments varID and varTme is mandatory \\(i\\.e\\., they can't be empty\\)\\.")
+    expect_error(long2wide_omv(dtaInp = nmeInp, fleOut = nmeOut, varID = "", varTme = "Month"),
+      regexp = "^Using the arguments varID and varTme is mandatory \\(i\\.e\\., they can't be empty\\)\\.")
+    expect_error(long2wide_omv(dtaInp = nmeInp, fleOut = nmeOut, varID = "Year", varTme = c("Month", "Month2")),
+      regexp = "^The variable\\(s\\) .* are not contained in the current data set\\.")
+    expect_error(long2wide_omv(dtaInp = dtaTmp, fleOut = nmeOut, varID = "Year", varTme = ""),
+      regexp = "^Using the arguments varID and varTme is mandatory \\(i\\.e\\., they can't be empty\\)\\.")
+    expect_error(long2wide_omv(dtaInp = dtaTmp, fleOut = nmeOut, varID = "", varTme = "Month"),
+      regexp = "^Using the arguments varID and varTme is mandatory \\(i\\.e\\., they can't be empty\\)\\.")
+    expect_error(long2wide_omv(dtaInp = dtaTmp, fleOut = nmeOut, varID = "Year", varTme = c("Month", "Month2")),
+      regexp = "^The variable\\(s\\) .* are not contained in the current data set\\.")
 
     unlink(nmeInp)
 })

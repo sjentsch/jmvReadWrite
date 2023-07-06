@@ -35,7 +35,7 @@ test_that("sort_omv works", {
     unlink(nmeOut)
 
     # test cases for code coverage and for the transfer of analyses ===========================================================================================
-    expect_error(sort_omv(nmeInp, nmeOut, varSrt = c()))
+    expect_error(sort_omv(nmeInp, nmeOut, varSrt = c()), regexp = "^Calling sort_omv requires giving at least one variable to sort after\\.")
     sort_omv(dtaInp = file.path("..", "ToothGrowth.omv"), fleOut = nmeOut, varSrt = "len", psvAnl = TRUE)
     expect_true(chkFle(nmeOut))
     expect_gt(file.info(nmeOut)$size, 1)
@@ -57,6 +57,7 @@ test_that("sort_omv works", {
       list(paste("jmv::ANOVA(formula = len ~ supp + dose2 + supp:dose2, data = data, effectSize = \"partEta\", modelTest = TRUE, qq = TRUE,",
                  "contrasts = list(list(var=\"supp\", type=\"none\"), list(var=\"dose2\", type=\"polynomial\")), postHoc = ~ supp + dose2, emMeans = ~ dose2:supp)"),
            "jmv::ancova(formula = len ~ supp + dose, data = data, effectSize = \"partEta\", modelTest = TRUE)"))
-    expect_warning(sort_omv(dtaInp = jmvReadWrite::AlbumSales, fleOut = nmeOut, varSrt = "Sales", psvAnl = TRUE))
+    expect_warning(sort_omv(dtaInp = jmvReadWrite::AlbumSales, fleOut = nmeOut, varSrt = "Sales", psvAnl = TRUE),
+      regexp = "^psvAnl is only possible if dtaInp is a file name \\(analyses are not stored in data frames, only in the jamovi files\\)\\.")
     unlink(nmeOut)
 })

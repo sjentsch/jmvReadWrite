@@ -69,7 +69,7 @@ test_that("arrange_cols_omv works", {
       regexp = "^The variable\\(s\\) .* are not contained in the current data set\\.")
     expect_false(file.exists(nmeOut))
     expect_error(arrange_cols_omv(dtaInp = nmeInp, fleOut = nmeOut, varMve = list(Sale = -3)),
-      regexp = "^^The variable\\(s\\) .* are not contained in the current data set\\.")
+      regexp = "^The variable\\(s\\) .* are not contained in the current data set\\.")
     expect_false(file.exists(nmeOut))
     expect_error(arrange_cols_omv(dtaInp = nmeInp, fleOut = nmeOut, varMve = list(Sales = -5)),
       regexp = "^The value given in varMve must be chosen so that the element isn't moved before the first or after the last column.")
@@ -79,11 +79,11 @@ test_that("arrange_cols_omv works", {
     expect_false(file.exists(nmeOut))
 
     expect_warning(arrange_cols_omv(dtaInp = nmeInp, fleOut = nmeOut, varOrd = c("Sales", "Adverts", "Airplay", "Image")),
-      regexp = "The following variable\\(s\\) from the original data set are not contained in varOrd: .*")
+      regexp = "^The following variable\\(s\\) from the original data set are not contained in varOrd: .*")
     expect_true(file.exists(nmeOut))
     unlink(nmeOut)
     expect_warning(arrange_cols_omv(dtaInp = nmeInp, fleOut = nmeOut, varOrd = c("selSbj", "Sales", "Adverts", "Airplay", "Image"), varMve = list(Sales = -3)),
-      regexp = "Both, varOrd and varMve given as input parameters. varOrd takes precedence\\.")
+      regexp = "^Both, varOrd and varMve given as input parameters. varOrd takes precedence\\.")
     expect_true(file.exists(nmeOut))
     unlink(nmeOut)
     unlink(nmeInp)
@@ -111,7 +111,7 @@ test_that("arrange_cols_omv works", {
                  "contrasts = list(list(var=\"supp\", type=\"none\"), list(var=\"dose2\", type=\"polynomial\")), postHoc = ~ supp + dose2, emMeans = ~ dose2:supp)"),
            "jmv::ancova(formula = len ~ supp + dose, data = data, effectSize = \"partEta\", modelTest = TRUE)"))
     expect_warning(arrange_cols_omv(dtaInp = jmvReadWrite::AlbumSales, fleOut = nmeOut, varOrd = c("selSbj", "Sales", "Adverts", "Airplay", "Image"), psvAnl = TRUE),
-      regexp = "psvAnl is only possible if dtaInp is a file name \\(analyses are not stored in data frames, only in the jamovi files\\)\\.")
+      regexp = "^psvAnl is only possible if dtaInp is a file name \\(analyses are not stored in data frames, only in the jamovi files\\)\\.")
     unlink(nmeOut)
     # do not unlink nmeInp, this isn't a generated file, but a link
 })

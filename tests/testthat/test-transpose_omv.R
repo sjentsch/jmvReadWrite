@@ -62,7 +62,9 @@ test_that("arrange_cols_omv works", {
     unlink(nmeOut)
     unlink(nmeInp)
 
-    expect_error(transpose_omv(dtaInp = tmpDF, fleOut = nmeOut, nmeVar = "notExist"))
-    expect_error(transpose_omv(dtaInp = tmpDF, fleOut = nmeOut, nmeVar = 1))
-    expect_error(transpose_omv(dtaInp = tmpDF, fleOut = nmeOut, nmeVar = c("Qst_01", "Qst_02")))
+    expect_error(transpose_omv(dtaInp = tmpDF, fleOut = nmeOut, nmeVar = "notExist"),
+      regexp = "^.*\\(nmeVar\\) not contained in the input data frame\\.")
+    expect_error(transpose_omv(dtaInp = tmpDF, fleOut = nmeOut, nmeVar = 1), regexp = "^nmeVar must be a character variable\\.")
+    expect_error(transpose_omv(dtaInp = tmpDF, fleOut = nmeOut, nmeVar = c("Qst_01", "Qst_02")),
+      regexp = "^nmeVar must either be empty, have one element or as many elements as there are rows in the input data frame\\.")
 })

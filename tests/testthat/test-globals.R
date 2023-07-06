@@ -16,7 +16,7 @@ test_that("globals work", {
     expect_error(chkDir(file.path(tempdir(), "not", "file")), regexp = "^Directory \\(.*?\\) doesn't exist\\.")
     expect_error(chkFle(NA),            regexp = "^chkFle: Unsupported input parameter type\\.")
     expect_error(chkFle("", isZIP = 1), regexp = "^chkFle: Unsupported input parameter type\\.")
-    expect_error(chkFle(tempfile()), regexp = "File \".*?\" not found\\.")
+    expect_error(chkFle(tempfile()), regexp = "^File \".*?\" not found\\.")
     expect_error(chkDtF(data.frame(A = runif(n = 100)), minSze = 2), regexp = "^The \\w+ dimension of the input data frame has not the required size")
     expect_true(chkExt(tempfile(), ""))
     expect_error(chkExt(tempfile(), "chk"), regexp = "^File name \\(.*?\\) contains an unsupported file extension \\(.*?\\)\\.")
@@ -24,15 +24,18 @@ test_that("globals work", {
     expect_error(chkFle(nmeOMV, fleCnt = "no_file"), regexp = "^chkFle: File \".*?\" doesn't contain the file \".*?\"\\.")
     expect_error(chkVar(dtaFrm = data.frame(A = runif(100)), varNme = c("A", "B")), regexp = "^The variable\\(s\\) \\w+ are not contained in the current data set\\.")
     expect_error(fmtFlI(fleInp = tempfile(), minLng = 2), regexp = "^The fleInp-argument is supposed to be a character vector with a minimal length of \\d+ and a maximal length of")
-    expect_error(fmtFlI(fleInp = c(tempfile(), tempfile()), maxLng = 1), regexp = "^The fleInp-argument is supposed to be a character vector with a minimal length of \\d+ and a maximal length of")
+    expect_error(fmtFlI(fleInp = c(tempfile(), tempfile()), maxLng = 1),
+      regexp = "^The fleInp-argument is supposed to be a character vector with a minimal length of \\d+ and a maximal length of")
     expect_equal(fmtFlO(fleOut = "", fleInp = "Trial.omv", rplExt = "_adj.omv"), "Trial_adj.omv")
     expect_error(fmtFlO(fleOut = "", fleInp = ""), regexp = "^Either fleOut needs to be given as a valid non-empty file name or a single entry in fleInp")
     expect_error(fmtFlO(fleOut = "Trial"), regexp = "^The file extension for output files needs to be \\.omv\\.")
     expect_error(fmtFlO(fleOut = "Trial.rds"), regexp = "^The file extension for output files needs to be \\.omv\\.")
     expect_error(fmtFlO(fleOut = "", fleInp = "Trial.omv", rplExt = "_adj.csv"), regexp = "^The file extension for output files needs to be \\.omv\\.")
     expect_error(fcnArg(c("stats::sd", "stats::mean", "C")), regexp = "^The argument to fcnArg must be a character \\(vector\\) with 1 or 2 elements.")
-    expect_error(capture.output(setAtt(attLst = "Trial", inpObj = list(),       outObj = list())),       regexp = "^Error when storing or accessing meta-data information\\. Please send the file")
-    expect_error(capture.output(setAtt(attLst = "Trial", inpObj = data.frame(), outObj = data.frame())), regexp = "^Error when storing or accessing meta-data information\\. Please send the file")
+    suppressMessages(expect_error(capture_output(setAtt(attLst = "Trial", inpObj = list(),       outObj = list())),
+      regexp = "^Error when storing or accessing meta-data information\\. Please send the file"))
+    suppressMessages(expect_error(capture_output(setAtt(attLst = "Trial", inpObj = data.frame(), outObj = data.frame())),
+      regexp = "^Error when storing or accessing meta-data information\\. Please send the file"))
     expect_error(setAtt(attLst = NULL,    inpObj = data.frame(), outObj = data.frame()), regexp = "^setAtt: The parameter attLst is supposed to be a character vector\\.")
     expect_error(setAtt(attLst = "Trial", inpObj = NULL,         outObj = data.frame()), regexp = "^setAtt: The parameter inpObj is supposed to be either a list or a data frame\\.")
     expect_error(setAtt(attLst = "Trial", inpObj = data.frame(), outObj = NULL),         regexp = "^setAtt: The parameter outObj is supposed to be either a list or a data frame\\.")
@@ -77,6 +80,6 @@ test_that("globals work", {
     expect_equal(unlist(attributes(jmvAtt(tmpDF)[["NN"]]), use.names = FALSE), c(sprintf("%d", seq(1:7)), "factor", sprintf("%d", seq(1:7)), "Nominal", "Integer"))
     expect_error(jmvAtt("Trial"),      regexp = "^Input data are either not a data frame or have incorrect \\(only one or more than two\\) dimensions\\.")
     expect_error(jmvAtt(data.frame()), regexp = "^The first dimension of the input data frame has not the required size \\(0 < 1\\)\\.")
-    expect_error(capture.output(jmvAtt(cbind(tmpDF, data.frame(ER = sample(seq(as.Date("2000/01/01"), as.Date("2019/12/31"), by = "day"), 100))))),
-      regexp = "\\w+: Variable type Date not implemented\\.")
+    suppressMessages(expect_error(capture_output(jmvAtt(cbind(tmpDF, data.frame(ER = sample(seq(as.Date("2000/01/01"), as.Date("2019/12/31"), by = "day"), 100))))),
+      regexp = "^\\s+\\w+: Variable type Date not implemented\\."))
 })

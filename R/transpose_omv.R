@@ -2,14 +2,14 @@
 #'
 #' @param dtaInp Either a data frame or the name (including the path, if required) of a data file to be read ("FILENAME.ext"; default: NULL); files can be of any supported file type, see Details below
 #' @param fleOut Name (including the path, if required) of the data file to be written ("FILENAME.omv"; default: ""); if empty, and a file name is given as dtaInp, it is appended with "_xpsd.omv"
-#' @param nmeVar Name of the variables in the output data frame; see Details below
+#' @param varNme Name of the variables in the output data frame; see Details below
 #' @param usePkg Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata and SAS files; "foreign" is the default (it comes with base R), but "haven" is newer and more comprehensive
 #' @param selSet Name of the data set that is to be selected from the workspace (only applies when reading .RData-files)
 #' @param ... Additional arguments passed on to methods; see Details below
 #'
 #' @details
-#' If nmeVar empty, the row names of the input data set are used (preceded by "V_" if all row names are numbers); if nmeVar has the length 1 then it is supposed to point to a variable in the input
-#' data frame; if nmeVar has the same length as the number of rows in the input data frame, then the values in nmeVar are assigned as column names to the output data frame.
+#' If varNme empty, the row names of the input data set are used (preceded by "V_" if all row names are numbers); if varNme has the length 1 then it is supposed to point to a variable in the input
+#' data frame; if varNme has the same length as the number of rows in the input data frame, then the values in varNme are assigned as column names to the output data frame.
 #' The ellipsis-parameter can be used to submit arguments / parameters to the functions that are used for reading the data. These are: `read_omv` (for jamovi-files), `read.table` (for CSV / TSV
 #' files; using similar defaults as `read.csv` for CSV and `read.delim` for TSV which both are based upon `read.table` but with adjusted defaults for the respective file types), `readRDS` (for
 #' rds-files), `read_sav` (needs R-package "haven") or `read.spss` (needs R-package "foreign") for SPSS-files, `read_dta` ("haven") / `read.dta` ("foreign") for Stata-files, `read_sas` ("haven") for
@@ -30,8 +30,8 @@
 #' transpose_omv(dtaInp = tmpDF, fleOut = fleTmp)
 #' dtaFrm <- read_omv(fleTmp)
 #' str(dtaFrm)
-#' # if no nmeVar-parameter is given, generic variable names are created (V_...)
-#' transpose_omv(dtaInp = tmpDF, fleOut = fleTmp, nmeVar = sprintf("Trl_%02d", seq(16)))
+#' # if no varNme-parameter is given, generic variable names are created (V_...)
+#' transpose_omv(dtaInp = tmpDF, fleOut = fleTmp, varNme = sprintf("Trl_%02d", seq(16)))
 #' dtaFrm <- read_omv(fleTmp)
 #' str(dtaFrm)
 #' # alternatively, the character vector with the desired variable names (of the same length as
@@ -42,36 +42,36 @@
 #'
 #' @export transpose_omv
 #'
-transpose_omv <- function(dtaInp = NULL, fleOut = "", nmeVar = "", usePkg = c("foreign", "haven"), selSet = "", ...) {
+transpose_omv <- function(dtaInp = NULL, fleOut = "", varNme = "", usePkg = c("foreign", "haven"), selSet = "", ...) {
 
     # check and import input data set (either as data frame or from a file)
     dtaFrm <- inp2DF(dtaInp, fleOut, "_xpsd.omv", usePkg, selSet, ...)
     fleOut <- attr(dtaFrm, "fleOut")
 
-    # create variable names for the output data frame: if nmeVar is empty (default), then the row names of the
-    # original data frame are used (preceded by "V_" if they contain only numbers); if nmeVar has the length 1
+    # create variable names for the output data frame: if varNme is empty (default), then the row names of the
+    # original data frame are used (preceded by "V_" if they contain only numbers); if varNme has the length 1
     # then it is assumed that it points to
-    if (is.character(nmeVar)) {
-        # nmeVar is empty, use row names of the input data frame, if all names are numbers, precede them with "V_"
-        if        (length(nmeVar) == 1 && !nzchar(nmeVar)) {
+    if (is.character(varNme)) {
+        # varNme is empty, use row names of the input data frame, if all names are numbers, precede them with "V_"
+        if        (length(varNme) == 1 && !nzchar(varNme)) {
             varOut <- paste0(ifelse(all(grepl("^[0-9]*$", row.names(dtaFrm))), "V_", ""), row.names(dtaFrm))
-        # nmeVar has length 1, use the content of respective variable as column names
-        } else if (length(nmeVar) == 1 &&  nzchar(nmeVar)) {
-            selVar <- (names(dtaFrm) %in% nmeVar)
+        # varNme has length 1, use the content of respective variable as column names
+        } else if (length(varNme) == 1 &&  nzchar(varNme)) {
+            selVar <- (names(dtaFrm) %in% varNme)
             if (any(selVar)) {
                varOut <- dtaFrm[,  selVar]
                dtaFrm <- dtaFrm[, !selVar]
             } else {
-               stop(sprintf("%s (nmeVar) not contained in the input data frame.", nmeVar))
+               stop(sprintf("%s (varNme) not contained in the input data frame.", varNme))
             }
-        # nmeVar has the same length as there are rows in the input data frame
-        } else if (length(nmeVar) == dim(dtaFrm)[1]) {
-            varOut <- nmeVar
+        # varNme has the same length as there are rows in the input data frame
+        } else if (length(varNme) == dim(dtaFrm)[1]) {
+            varOut <- varNme
         } else {
-            stop("nmeVar must either be empty, have one element or as many elements as there are rows in the input data frame.")
+            stop("varNme must either be empty, have one element or as many elements as there are rows in the input data frame.")
         }
     } else {
-        stop("nmeVar must be a character variable.")
+        stop("varNme must be a character variable.")
     }
 
     # transpose data frame

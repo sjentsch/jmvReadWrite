@@ -19,7 +19,7 @@ test_that("arrange_cols_omv works", {
     expect_equal(as.vector(sapply(df4Chk, typeof)), c("character", rep("integer", 16)))
     unlink(nmeOut)
 
-    transpose_omv(dtaInp = cbind(list(qstItm = sprintf("Qst_%02d", seq(16))), tmpDF), fleOut = nmeOut, nmeVar = "qstItm")
+    transpose_omv(dtaInp = cbind(list(qstItm = sprintf("Qst_%02d", seq(16))), tmpDF), fleOut = nmeOut, varNme = "qstItm")
     expect_true(chkFle(nmeOut))
     expect_gt(file.info(nmeOut)$size, 1)
     expect_true(chkFle(nmeOut, isZIP = TRUE))
@@ -33,7 +33,7 @@ test_that("arrange_cols_omv works", {
     expect_equal(as.vector(sapply(df4Chk, typeof)), c("character", rep("integer", 16)))
     unlink(nmeOut)
 
-    transpose_omv(dtaInp = tmpDF, fleOut = nmeOut, nmeVar = sprintf("Trl_%02d", seq(16)))
+    transpose_omv(dtaInp = tmpDF, fleOut = nmeOut, varNme = sprintf("Trl_%02d", seq(16)))
     expect_true(chkFle(nmeOut))
     expect_gt(file.info(nmeOut)$size, 1)
     expect_true(chkFle(nmeOut, isZIP = TRUE))
@@ -62,9 +62,9 @@ test_that("arrange_cols_omv works", {
     unlink(nmeOut)
     unlink(nmeInp)
 
-    expect_error(transpose_omv(dtaInp = tmpDF, fleOut = nmeOut, nmeVar = "notExist"),
-      regexp = "^.*\\(nmeVar\\) not contained in the input data frame\\.")
-    expect_error(transpose_omv(dtaInp = tmpDF, fleOut = nmeOut, nmeVar = 1), regexp = "^nmeVar must be a character variable\\.")
-    expect_error(transpose_omv(dtaInp = tmpDF, fleOut = nmeOut, nmeVar = c("Qst_01", "Qst_02")),
-      regexp = "^nmeVar must either be empty, have one element or as many elements as there are rows in the input data frame\\.")
+    expect_error(transpose_omv(dtaInp = tmpDF, fleOut = nmeOut, varNme = "notExist"),
+      regexp = "^.*\\(varNme\\) not contained in the input data frame\\.")
+    expect_error(transpose_omv(dtaInp = tmpDF, fleOut = nmeOut, varNme = 1), regexp = "^varNme must be a character variable\\.")
+    expect_error(transpose_omv(dtaInp = tmpDF, fleOut = nmeOut, varNme = c("Qst_01", "Qst_02")),
+      regexp = "^varNme must either be empty, have one element or as many elements as there are rows in the input data frame\\.")
 })

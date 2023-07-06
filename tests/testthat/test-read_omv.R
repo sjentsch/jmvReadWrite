@@ -42,7 +42,7 @@ test_that("read_omv works", {
     expect_equal(dim(df4Chk), c(60, 14))
     expect_equal(as.vector(sapply(df4Chk, typeof)),
       c("logical", "integer", "double", "integer", "double", "integer", "double", "integer", "integer", "double", "double", "double", "integer", "integer"))
-    expect_equal(names(attributes(df4Chk)), c("names", "row.names", "class", "fltLst", "removedRows", "addedRows", "transforms"))
+    expect_equal(names(attributes(df4Chk)), c("names", "row.names", "class", "fltLst", "removedRows", "addedRows", "transforms", "weights"))
     expect_equal(names(attributes(df4Chk[[4]])),  c("levels", "class", "name", "id", "columnType", "dataType", "measureType", "formula", "formulaMessage",
                                                     "parentId", "width", "type", "importName", "description", "transform", "edits", "missingValues", "trimLevels"))
     expect_equal(names(attributes(df4Chk[[10]])), c("jmv-desc", "name", "id", "columnType", "dataType", "measureType", "formula", "formulaMessage", "parentId", "width",
@@ -104,7 +104,7 @@ test_that("read_all works", {
     expect_equal(dim(df4Chk), c(60, 14))
     expect_equal(as.vector(sapply(df4Chk, typeof)),
       c("logical", "integer", "double", "integer", "double", "integer", "double", "integer", "integer", "double", "double", "double", "integer", "integer"))
-    expect_equal(names(attributes(df4Chk)), c("names", "row.names", "class", "fltLst", "removedRows", "addedRows", "transforms"))
+    expect_equal(names(attributes(df4Chk)), c("names", "row.names", "class", "fltLst", "removedRows", "addedRows", "transforms", "weights"))
     expect_equal(names(attributes(df4Chk[[4]])),  c("levels", "class", "name", "id", "columnType", "dataType", "measureType", "formula", "formulaMessage",
                                                     "parentId", "width", "type", "importName", "description", "transform", "edits", "missingValues", "trimLevels"))
 

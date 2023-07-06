@@ -207,9 +207,9 @@
 <span><span class="co">#&gt; [1] "Trial.omv"</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/file.info.html" class="external-link">file.info</a></span><span class="op">(</span><span class="st">"Trial.omv"</span><span class="op">)</span></span>
 <span><span class="co">#&gt;           size isdir mode               mtime               ctime</span></span>
-<span><span class="co">#&gt; Trial.omv 1564 FALSE  664 2023-07-01 22:45:22 2023-07-01 22:45:22</span></span>
+<span><span class="co">#&gt; Trial.omv 1572 FALSE  664 2023-07-06 12:20:12 2023-07-06 12:20:12</span></span>
 <span><span class="co">#&gt;                         atime  uid  gid    uname   grname</span></span>
-<span><span class="co">#&gt; Trial.omv 2023-07-01 22:45:22 1000 1000 sjentsch sjentsch</span></span>
+<span><span class="co">#&gt; Trial.omv 2023-07-06 12:20:12 1000 1000 sjentsch sjentsch</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="st">"Trial.omv"</span><span class="op">)</span></span></code></pre></div>
 <p>Although jamovi reads R-data files (.RData, .rda, .rds) <a href="https://sjentsch.github.io/jmvReadWrite/reference/write_omv.html"><code>write_omv</code></a> permits to store <code>jamovi</code>-specific attributes (such as variable labels) in addition. Please note that if you are reading from an <code>.omv</code>-file in order to write back to an <code>.omv</code>-file (perhaps after some modifications), it is recommended to leave the <code>sveAtt</code>-attribute set to <code>TRUE</code> (which is the default).</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
@@ -224,10 +224,10 @@
 <span><span class="co">#&gt; [1] "names"       "row.names"   "class"       "fltLst"      "removedRows"</span></span>
 <span><span class="co">#&gt; [6] "addedRows"   "transforms"</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/attributes.html" class="external-link">attributes</a></span><span class="op">(</span><span class="va">data</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt;  [1] "missingValues"  "name"           "id"             "columnType"    </span></span>
-<span><span class="co">#&gt;  [5] "dataType"       "measureType"    "formula"        "formulaMessage"</span></span>
-<span><span class="co">#&gt;  [9] "parentId"       "width"          "type"           "importName"    </span></span>
-<span><span class="co">#&gt; [13] "description"    "transform"      "edits"          "filterNo"      </span></span>
+<span><span class="co">#&gt;  [1] "name"           "id"             "columnType"     "dataType"      </span></span>
+<span><span class="co">#&gt;  [5] "measureType"    "formula"        "formulaMessage" "parentId"      </span></span>
+<span><span class="co">#&gt;  [9] "width"          "type"           "importName"     "description"   </span></span>
+<span><span class="co">#&gt; [13] "transform"      "edits"          "missingValues"  "filterNo"      </span></span>
 <span><span class="co">#&gt; [17] "active"</span></span>
 <span><span class="co">#</span></span>
 <span><span class="co"># perhaps do some modifications to the file here and write it back afterwards</span></span>

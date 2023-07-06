@@ -76,7 +76,8 @@ test_that("read_omv works", {
     # the file has to be a valid manifest file (which is not the
     # case for "index.html" [exists, but isn't a manifest])
     expect_error(chkMnf(nmeInp, c()), regexp = "File \".*?\" has not the correct file format \\(is missing the jamovi-file-manifest\\)\\.")
-    expect_error(chkMnf(nmeInp, "index.html"), regexp = "The file you are trying to read \\(ToothGrowth\\.omv\\) has an improper manifest file \\(meta\\) and is likely corrupted\\.")
+    expect_error(chkMnf(nmeInp, "index.html"),
+      regexp = "The file you are trying to read \\(ToothGrowth\\.omv\\) has an improper manifest file \\(meta\\) and is likely corrupted\\.")
 
     # .omv-file isn't a ZIP
     nmeTmp <- paste0(tempfile(), ".omv")
@@ -89,7 +90,8 @@ test_that("read_omv works", {
     mnfHdl <- file(file.path(tempdir(), "meta"), open = "wb")
     add2ZIP(nmeTmp, mnfHdl, txtOut = gsub("jamovi-Archive-Version: 11.0", "jamovi-Archive-Version: 99.0", mnfTxt()), newFle = TRUE)
     rm(mnfHdl)
-    suppressMessages(expect_warning(expect_error(read_omv(nmeTmp))))
+    suppressMessages(expect_warning(expect_error(read_omv(nmeTmp), regexp = "^'con' is not a connection"),
+      regexp = "^The file that you are trying to read \\(.*\\) was written with a version of jamovi that currently is not implemented"))
     suppressMessages(expect_null(getHdl(fleOMV = nmeTmp, crrFle = "MANIFEST.MF")))
     unlink(nmeTmp)
 })
@@ -120,11 +122,12 @@ test_that("read_all works", {
 
     # test cases for code coverage ============================================================================================================================
     # empty file name
-    expect_error(read_all())
-    expect_error(read_all(""))
+    expect_error(read_all(),   regexp = "File name to the input data file needs to be given as parameter \\(fleInp = \\.\\.\\.\\)\\.")
+    expect_error(read_all(""), regexp = "File name to the input data file needs to be given as parameter \\(fleInp = \\.\\.\\.\\)\\.")
     # replace strings in attributes, etc.
     if (l10n_info()$`UTF-8`) {
-        expect_error(rplStr(strMod = "<c3><28>", crrAtt = "Trial"))
+        expect_error(rplStr(strMod = "<c3><28>", crrAtt = "Trial"),
+          regexp = "The current data set still contains an invalid character \\(\".*\"\\) in attribute: \".*\"\\.")
     }
 
     # more than one object when using Rdata
@@ -133,7 +136,8 @@ test_that("read_all works", {
     nmeInp <- paste0(tempfile(), ".rda")
     save(list = ls()[grepl("D[1-2]", ls())], file = nmeInp)
     # throw error when selSet is not sepcified
-    expect_error(suppressMessages(read_all(nmeInp)))
+    suppressMessages(expect_error(read_all(nmeInp),
+      regexp = "Input data are either not a data frame or have incorrect \\(only one or more than two\\) dimensions\\."))
     # check whether reading works correct with using selSet
     df4Chk <- read_all(nmeInp, selSet = "D1")
     expect_s3_class(df4Chk, class = "data.frame")
@@ -167,32 +171,39 @@ test_that("read_all works", {
 
     nmeInp <- paste0(tempfile(), ".csv")
     writeBin("X1,X2\n1.2,2.2\n7.1,3.2", nmeInp)
-    expect_error(suppressMessages(read_all(nmeInp)))
+    suppressMessages(expect_error(read_all(nmeInp),
+      regexp = "^Input data are either not a data frame or have incorrect \\(only one or more than two\\) dimensions\\."))
     unlink(nmeInp)
 
     fleInp <- paste0(tempfile(), ".sav")
     writeBin("$FL2@(#) IBM SPSS STATISTICS 64-bit Linux 25.0.0.0              \002", con = fleInp)
-    expect_error(suppressMessages(read_all(fleInp, usePkg = "haven")))
-    expect_error(suppressMessages(read_all(fleInp, usePkg = "foreign")))
+    suppressMessages(expect_error(read_all(fleInp, usePkg = "haven"),
+      regexp = "^Input data are either not a data frame or have incorrect \\(only one or more than two\\) dimensions\\."))
+    suppressMessages(expect_error(read_all(fleInp, usePkg = "foreign"),
+      regexp = "^Input data are either not a data frame or have incorrect \\(only one or more than two\\) dimensions\\."))
     unlink(fleInp)
 
     fleInp <- paste0(tempfile(), ".dta")
     writeBin("<stata_dta><header><release>117</release><byteorder>LSF</byteorder><K>\x8f", con = fleInp)
-    expect_error(suppressMessages(read_all(fleInp, usePkg = "haven")))
+    suppressMessages(expect_error(read_all(fleInp, usePkg = "haven"),
+      regexp = "^Input data are either not a data frame or have incorrect \\(only one or more than two\\) dimensions\\."))
     writeBin("", con = fleInp)
-    expect_error(suppressMessages(read_all(fleInp, usePkg = "foreign")))
+    suppressMessages(expect_error(read_all(fleInp, usePkg = "foreign"),
+      regexp = "^Input data are either not a data frame or have incorrect \\(only one or more than two\\) dimensions\\."))
     unlink(fleInp)
 
     fleInp <- paste0(tempfile(), ".sas7bdat")
     writeBin("", con = fleInp)
-    expect_error(suppressMessages(capture.output(read_all(fleInp, usePkg = "haven"))))
-    expect_error(suppressMessages(capture.output(read_all(fleInp, usePkg = "foreign"))))
+    suppressMessages(expect_error(capture_output(read_all(fleInp, usePkg = "haven")),
+      regexp = "^Input data are either not a data frame or have incorrect \\(only one or more than two\\) dimensions\\."))
+    suppressMessages(expect_error(read_all(fleInp, usePkg = "foreign"),
+      regexp = "^Input data are either not a data frame or have incorrect \\(only one or more than two\\) dimensions\\."))
     unlink(fleInp)
 
     fleInp <- paste0(tempfile(), ".xpt")
     writeBin("HEADER RECORD*******LIBRARY HEADER RECORD!!!!!!!", con = fleInp)
-    expect_error(suppressMessages(read_all(fleInp, usePkg = "haven")))
-    expect_error(suppressMessages(read_all(fleInp, usePkg = "foreign")))
+    suppressMessages(expect_error(read_all(fleInp, usePkg = "haven")))
+    suppressMessages(expect_error(read_all(fleInp, usePkg = "foreign")))
     unlink(fleInp)
 
     dtaTmp <- jmvReadWrite::ToothGrowth

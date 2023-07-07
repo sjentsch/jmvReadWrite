@@ -12,7 +12,7 @@ test_that("wide2long_omv works", {
     expect_s3_class(df4Chk, "data.frame")
     expect_equal(dim(df4Chk), c(1452, 3))
     expect_equal(as.vector(sapply(df4Chk, typeof)), c("integer", "integer", "double"))
-    expect_equal(names(attributes(df4Chk)), c("names", "row.names", "class", "removedRows", "addedRows", "transforms", "weights"))
+    expect_equal(names(attributes(df4Chk)), c("names", "row.names", "class", "removedRows", "addedRows", "transforms"))
     expect_equal(names(attributes(df4Chk[[3]])), c("jmv-desc", "name", "id", "columnType", "dataType", "measureType", "formula", "formulaMessage",
                                                    "parentId", "width", "type", "importName", "description", "transform", "edits", "missingValues"))
     expect_equal(attr(df4Chk[[3]], "jmv-desc"), "Test variable")
@@ -24,7 +24,7 @@ test_that("wide2long_omv works", {
     expect_s3_class(df4Chk, "data.frame")
     expect_equal(dim(df4Chk), c(1452, 3))
     expect_equal(as.vector(sapply(df4Chk, typeof)), c("integer", "integer", "double"))
-    expect_equal(names(attributes(df4Chk)), c("names", "row.names", "class", "removedRows", "addedRows", "transforms", "weights"))
+    expect_equal(names(attributes(df4Chk)), c("names", "row.names", "class", "removedRows", "addedRows", "transforms"))
     expect_equal(names(attributes(df4Chk[[3]])), c("jmv-desc", "name", "id", "columnType", "dataType", "measureType", "formula", "formulaMessage",
                                                    "parentId", "width", "type", "importName", "description", "transform", "edits", "missingValues"))
     expect_equal(attr(df4Chk[[3]], "jmv-desc"), "Test variable")

@@ -61,7 +61,6 @@ read_omv <- function(fleInp = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = TRUE,
 
     # check meta-data, change weights if NULL
     if (!all(grepl(grpMta, names(mtaDta)))) stop("Unimplemeted field in the meta data (data frame).")
-    if (is.null(mtaDta$weights)) mtaDta$weights <- list()
 
     # determine rows and columns and create data frame
     rowNum <- mtaDta$rowCount
@@ -175,8 +174,14 @@ read_omv <- function(fleInp = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = TRUE,
 
     # handle weights
     if (is.character(mtaDta$weights) && nzchar(mtaDta$weights)) {
-        # TO-DO: this likely requires copying the protobuffers
-        warning("Handling of weights not yet implemented.")
+        # TO-DO: check whether the protobuffers (.. weights) contain
+        # anything useful beyond that information
+        attr(dtaFrm, "jmv-weights-name") <- mtaDta$weights
+        attr(dtaFrm, "jmv-weights")      <- as.vector(dtaFrm[, mtaDta$weights])
+        # it would be possible to keep both jmv-weights-name and weights, but
+        # this might be rather confusing, so the version jamovi uses internally
+        # (jmv-weights-name) is chosen and the other (weights) disregarded 
+        attr(dtaFrm, "weights")          <- NULL
     }
 
     # import and extract syntax from the analyses

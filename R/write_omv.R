@@ -62,7 +62,13 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", retDbg = FALSE) {
     # initialize metadata.json
     mtaDta <- mtaGlb
     # use the attributes stored in the data frame (for the whole data set) to
-    # update the metadata
+    # update the metadata; jmv-weights-name are stored as weights, jmv-weights
+    # needs to be dropped
+    if (chkAtt(dtaFrm, "jmv-weights-name")) {
+        attr(dtaFrm, "weights") <- attr(dtaFrm, "jmv-weights-name")
+        attr(dtaFrm, "jmv-weights-name") <- NULL
+        attr(dtaFrm, "jmv-weights")      <- NULL
+    }
     mtaDta <- setAtt(names(mtaDta), dtaFrm, mtaDta)
     # the number of rows and columns has to be adjusted to the current data set
     mtaDta$rowCount    <- nrow(dtaFrm)
@@ -280,8 +286,8 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", retDbg = FALSE) {
     rm(htmHdl)
 
     # handle weights
-    if (is.character(mtaDta$weights) && nzchar(mtaDta$weights)) {
-        # TO-DO: this likely requires copying the protobuffers
+    if (chkAtt(dtaFrm, "weights", "\\w+")) {
+        # TO-DO: this likely requires creating protobuffers
         warning("Handling of weights not yet implemented.")
     }
 
@@ -291,7 +297,7 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", retDbg = FALSE) {
 }
 
 fmtJSON <- function(txtJSON = "") {
-    gsub("\"weights\": \\[\\]", "\"weights\": null", gsub("00: 00", "00:00", gsub("  ", " ", gsub(":", ": ", gsub(",", ", ",
+    gsub("\"weights\": \\{\\}", "\"weights\": null", gsub("00: 00", "00:00", gsub("  ", " ", gsub(":", ": ", gsub(",", ", ",
       jsonlite::toJSON(txtJSON, auto_unbox = TRUE))))))
 }
 

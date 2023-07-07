@@ -54,4 +54,14 @@ test_that("write_omv works", {
     expect_equal(attr(dtaInp[["Date"]], "jmv-desc"), "Date (date converted to numeric; days since 1970-01-01)")
     expect_equal(c(mean(dtaInp[["Time"]]), sd(dtaInp[["Time"]])), c(1538.367, 1041.579), tolerance = 1e-4)
     expect_equal(attr(dtaInp[["Time"]], "jmv-desc"), "Time (time converted to numeric; sec since 00:00)")
+    dtaOut <- read_omv(file.path("..", "ToothGrowth.omv"))
+    attr(dtaOut, "jmv-weights-name") <- "weights"
+    attr(dtaOut, "jmv-weights") <- as.vector(dtaOut[, "weights"])
+    expect_warning(dtaDbg <- write_omv(dtaOut, nmeOut, TRUE), regexp = "Handling of weights not yet implemented\\.")
+    expect_equal(dtaDbg$mtaDta$weights, "weights")
+    # this actually tests read_omv
+    dtaInp <- read_omv(nmeOut)
+    expect_equal(names(attributes(dtaInp)), c("names", "row.names", "class", "fltLst", "removedRows", "addedRows", "transforms", "jmv-weights-name", "jmv-weights"))
+    expect_equal(attr(dtaInp, "jmv-weights-name"), "weights")
+    expect_equal(attr(dtaInp, "jmv-weights"), rep(1, 60))
 })

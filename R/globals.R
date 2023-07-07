@@ -20,7 +20,7 @@ lstMnf <- list(mnfVer = c("Manifest-Version",        "1.0"),
 # the next lines are dealing with storing the global and the data column attributes (that go into
 # metadata.json inside the .omv-file; the currently defined defaults are in accordance with
 # jamovi-Archive-Version: 11.0 (from jamovi 1.8)
-mtaGlb <- list(rowCount = NA, columnCount = NA, removedRows = list(), addedRows = list(), fields = list(), transforms = list(), weights = list())
+mtaGlb <- list(rowCount = NA, columnCount = NA, removedRows = list(), addedRows = list(), fields = list(), transforms = list(), weights = NULL)
 mtaFld <- list(name = "", id = NA, columnType = "Data", dataType = "Integer", measureType = "Nominal", formula = "", formulaMessage = "",
                parentId = 0, width = 100, type = "number", outputAnalysisId = NA, outputOptionName = "", outputName = "",
                outputDesiredColumnName = "", outputAssignedColumnName = "", importName = "", description = "", transform = 0,
@@ -168,10 +168,8 @@ setAtt <- function(attLst = c(), inpObj = NULL, outObj = NULL) {
             # variable; the attribute might be empty (chkAtt == FALSE), and then the default is kept
             if        (is.data.frame(inpObj)) {
                 if        (dim(inpObj)[2] >  1 &&  chkAtt(inpObj,      attNme)) {
-                    if (is.null(attr(inpObj,      attNme))) next
                     outObj[[attNme]] <- attr(inpObj,      attNme)
                 } else if (dim(inpObj)[2] == 1 &&  chkAtt(inpObj[[1]], attNme)) {
-                    if (is.null(attr(inpObj[[1]], attNme))) next
                     outObj[[attNme]] <- attr(inpObj[[1]], attNme)
                 }
                 eval(parse(text = paste0("")))
@@ -179,7 +177,6 @@ setAtt <- function(attLst = c(), inpObj = NULL, outObj = NULL) {
             # in the output object unless the attribute already exists in the ouput object (!chkAtt -
             # it shouldn't be overwritten)
             } else if (is.data.frame(outObj)) {
-                if (is.null(inpObj[[attNme]])) next
                 if        (dim(outObj)[2] >  1 && !chkAtt(outObj,      attNme)) {
                     attr(outObj,      attNme) <- inpObj[[attNme]]
                 } else if (dim(outObj)[2] == 1 && !chkAtt(outObj[[1]], attNme)) {

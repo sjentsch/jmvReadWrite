@@ -1,12 +1,14 @@
 #' Sort data (using one or more variables) in .omv-files for the statistical spreadsheet 'jamovi' (<https://www.jamovi.org>)
 #'
-#' @param dtaInp Either a data frame or the name (including the path, if required) of a data file to be read ("FILENAME.ext"; default: NULL); files can be of any supported file type, see Details below
-#' @param fleOut Name (including the path, if required) of the data file to be written ("FILENAME.omv"; default: ""); if empty, and a file name is given as dtaInp, it is appended with "_sorted.omv"
+#' @param dtaInp Either a data frame or the name of a data file to be read (including the path, if required; "FILENAME.ext"; default: NULL); files can be of any supported file type, see Details below
+#' @param fleOut Name of the data file to be written (including the path, if required; "FILE_OUT.omv"; default: ""); if empty, the resulting data frame is returned instead
 #' @param varSrt Variable(s) that are used to sort the data frame (see Details; default: c())
 #' @param psvAnl Whether analyses that are contained in the input file shall be transferred to the output file (TRUE / FALSE; default: FALSE)
 #' @param usePkg Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata and SAS files; "foreign" is the default (it comes with base R), but "haven" is newer and more comprehensive
 #' @param selSet Name of the data set that is to be selected from the workspace (only applies when reading .RData-files)
 #' @param ... Additional arguments passed on to methods; see Details below
+#'
+#' @return a data frame (only returned if fleOut is empty) where the input data set is sorted (according to the variables in varSrt)
 #'
 #' @details
 #' varSrt can be either a character or a character vector (with one or more variables respectively). The sorting order for a particular variable can be inverted with preceding the variable name with
@@ -49,22 +51,29 @@ sort_omv <- function(dtaInp = NULL, fleOut = "", varSrt = c(), psvAnl = FALSE, u
     }
 
     # check and import input data set (either as data frame or from a file)
-    dtaFrm <- inp2DF(dtaInp, fleOut, "_xpsd.omv", usePkg, selSet, ...)
+    if (!is.null(list(...)[["fleInp"]])) stop("Please use the argument dtaInp instead of fleInp.")
+    dtaFrm <- inp2DF(dtaInp = dtaInp, fleOut = fleOut, usePkg = usePkg, selSet = selSet, ...)
     fleOut <- attr(dtaFrm, "fleOut")
 
     # sort data set
     dtaFrm <- srtFrm(dtaFrm, varSrt)
 
-    # write file
-    write_omv(dtaFrm, fleOut)
-
-    # transfer analyses from input to output file
-    if (psvAnl) {
-        if (is.character(dtaInp)) {
-            xfrAnl(dtaInp, fleOut)
-        } else {
-            warning("psvAnl is only possible if dtaInp is a file name (analyses are not stored in data frames, only in the jamovi files).")
+    # write the resulting data frame to the output file or, if no output file
+    # name was given, return the data frame
+    if (!is.null(fleOut) && nzchar(fleOut)) {
+        write_omv(dtaFrm, fleOut)
+        # transfer analyses from input to output file
+        if (psvAnl) {
+            if (is.character(dtaInp)) {
+                xfrAnl(dtaInp, fleOut)
+            } else {
+                warning("psvAnl is only possible if dtaInp is a file name (analyses are not stored in data frames, only in the jamovi files).")
+            }
         }
+        NULL
+    } else {
+        if (psvAnl) warning("psvAnl is only possible if fleOut is a file name (analyses are not stored in data frames, only in the jamovi files).")
+        dtaFrm
     }
 }
 

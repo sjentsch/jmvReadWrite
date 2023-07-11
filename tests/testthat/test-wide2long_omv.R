@@ -7,7 +7,7 @@ test_that("wide2long_omv works", {
     nmeOut <- gsub(".rds", "_L.omv", nmeInp)
     saveRDS(dtaTmp, nmeInp)
 
-    wide2long_omv(nmeInp, fleOut = nmeOut, varLst = setdiff(names(dtaTmp), "Year"), varID = "Year", varTme = "Month", varSep = "_")
+    expect_null(wide2long_omv(dtaInp = nmeInp, fleOut = nmeOut, varLst = setdiff(names(dtaTmp), "Year"), varID = "Year", varTme = "Month", varSep = "_"))
     df4Chk <- read_omv(nmeOut)
     expect_s3_class(df4Chk, "data.frame")
     expect_equal(dim(df4Chk), c(1452, 3))
@@ -19,7 +19,7 @@ test_that("wide2long_omv works", {
     expect_equal(c(mean(df4Chk[[3]]), sd(df4Chk[[3]])), c(49.33121, 28.93480), tolerance = 1e-4)
     unlink(nmeOut)
 
-    wide2long_omv(nmeInp, fleOut = nmeOut, varLst = setdiff(names(dtaTmp), "Year"), varID = "Year", varTme = "Month", varSep = "_")
+    expect_null(wide2long_omv(dtaInp = nmeInp, fleOut = nmeOut, varLst = setdiff(names(dtaTmp), "Year"), varID = "Year", varTme = "Month", varSep = "_"))
     df4Chk <- read_omv(nmeOut)
     expect_s3_class(df4Chk, "data.frame")
     expect_equal(dim(df4Chk), c(1452, 3))
@@ -31,7 +31,7 @@ test_that("wide2long_omv works", {
     expect_equal(c(mean(df4Chk[[3]]), sd(df4Chk[[3]])), c(49.33121, 28.93480), tolerance = 1e-4)
     unlink(nmeOut)
 
-    wide2long_omv(nmeInp, fleOut = nmeOut, varLst = setdiff(names(dtaTmp), "Year"), varID = "Year", varTme = "Month", varSrt = c("Year", "Month"))
+    expect_null(wide2long_omv(dtaInp = nmeInp, fleOut = nmeOut, varLst = setdiff(names(dtaTmp), "Year"), varID = "Year", varTme = "Month", varSrt = c("Year", "Month")))
     df4Chk <- read_omv(nmeOut)
     expect_s3_class(df4Chk, "data.frame")
     expect_equal(dim(df4Chk), c(1452, 3))
@@ -39,13 +39,21 @@ test_that("wide2long_omv works", {
     expect_true(all(df4Chk[["Month"]] == rep(sort(month.abb), length(unique(df4Chk[["Year"]])))))
     unlink(nmeOut)
 
+    df4Chk <- wide2long_omv(dtaInp = nmeInp, varLst = setdiff(names(dtaTmp), "Year"), varID = "Year", varTme = "Month", varSrt = c("Year", "Month"))
+    expect_s3_class(df4Chk, "data.frame")
+    expect_equal(dim(df4Chk), c(1452, 3))
+    expect_false(is.unsorted(df4Chk[["Year"]]))
+    expect_true(all(df4Chk[["Month"]] == rep(sort(month.abb), length(unique(df4Chk[["Year"]])))))
+
+
     # test cases for code coverage ============================================================================================================================
-    suppressMessages(expect_error(capture_output(wide2long_omv(nmeInp, fleOut = nmeOut, varTme = "Month", varSep = "_", varSrt = c("Year", "Month"))),
+    expect_error(wide2long_omv(fleInp = nmeInp, varID = "Year", varTme = "Month", varSep = "_"), regexp = "Please use the argument dtaInp instead of fleInp\\.")
+    suppressMessages(expect_error(capture_output(wide2long_omv(dtaInp = nmeInp, fleOut = nmeOut, varTme = "Month", varSep = "_", varSrt = c("Year", "Month"))),
       regexp = "^\\s+The variable separator \\(.*\\) must be contained in all variables in the variable list \\(varLst\\)\\."))
-    suppressMessages(expect_error(capture_output(wide2long_omv(nmeInp, fleOut = nmeOut, varSep = "x", varID = "Year")),
+    suppressMessages(expect_error(capture_output(wide2long_omv(dtaInp = nmeInp, fleOut = nmeOut, varSep = "x", varID = "Year")),
       regexp = "^\\s+The variable separator \\(.*\\) must be contained in all variables in the variable list \\(varLst\\)\\."))
-#   suppressMessages(expect_error(wide2long_omv(nmeInp, nmeOut, varSep = ".", varID = "Year")))
-#   expect_warning(wide2long_omv(nmeInp, nmeOut, varID = "Year", varTme = "Month", varSrt = c("Year", "Month")))
+#   suppressMessages(expect_error(wide2long_omv(dtaInp = nmeInp, nmeOut, varSep = ".", varID = "Year")))
+#   expect_warning(wide2long_omv(dtaInp = nmeInp, nmeOut, varID = "Year", varTme = "Month", varSrt = c("Year", "Month")))
 
     suppressMessages(expect_error(capture_output(wide2long_omv(dtaInp = data.frame(Year = 1900:2020, X_1 = runif(121), X.2 = runif(121)),
       fleOut = nmeOut, varSep = "_", varID = "Year")),

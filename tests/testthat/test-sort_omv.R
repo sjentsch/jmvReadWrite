@@ -3,7 +3,7 @@ test_that("sort_omv works", {
     nmeOut <- paste0(tempfile(), "_S.omv")
     saveRDS(jmvReadWrite::AlbumSales, nmeInp)
 
-    sort_omv(dtaInp = nmeInp, nmeOut, varSrt = "Image")
+    expect_null(sort_omv(dtaInp = nmeInp, fleOut = nmeOut, varSrt = "Image"))
     expect_true(file.exists(nmeOut))
     expect_gt(file.info(nmeOut)$size, 1)
     expect_true(chkFle(nmeOut, isZIP = TRUE))
@@ -20,7 +20,7 @@ test_that("sort_omv works", {
     unlink(nmeInp)
     unlink(nmeOut)
 
-    sort_omv(dtaInp = jmvReadWrite::AlbumSales, nmeOut, varSrt = "Image")
+    expect_null(sort_omv(dtaInp = jmvReadWrite::AlbumSales, fleOut = nmeOut, varSrt = "Image"))
     expect_true(file.exists(nmeOut))
     expect_gt(file.info(nmeOut)$size, 1)
     expect_true(chkFle(nmeOut, isZIP = TRUE))
@@ -34,8 +34,16 @@ test_that("sort_omv works", {
     expect_false(is.unsorted(df4Chk[["Image"]]))
     unlink(nmeOut)
 
+    df4Chk <- sort_omv(dtaInp = jmvReadWrite::AlbumSales, varSrt = "Image")
+    expect_s3_class(df4Chk, "data.frame")
+    expect_equal(dim(df4Chk), c(200, 5))
+    expect_equal(as.vector(sapply(df4Chk, typeof)), c("integer", "double", "integer", "integer", "integer"))
+    expect_false(is.unsorted(df4Chk[["Image"]]))
+
     # test cases for code coverage and for the transfer of analyses ===========================================================================================
-    expect_error(sort_omv(nmeInp, nmeOut, varSrt = c()), regexp = "^Calling sort_omv requires giving at least one variable to sort after\\.")
+    expect_error(sort_omv(fleInp = jmvReadWrite::AlbumSales, varSrt = "Image"), regexp = "Please use the argument dtaInp instead of fleInp\\.")
+
+    expect_error(sort_omv(dtaInp = nmeInp, fleOut = nmeOut, varSrt = c()), regexp = "^Calling sort_omv requires giving at least one variable to sort after\\.")
     sort_omv(dtaInp = file.path("..", "ToothGrowth.omv"), fleOut = nmeOut, varSrt = "len", psvAnl = TRUE)
     expect_true(chkFle(nmeOut))
     expect_gt(file.info(nmeOut)$size, 1)
@@ -60,4 +68,6 @@ test_that("sort_omv works", {
     expect_warning(sort_omv(dtaInp = jmvReadWrite::AlbumSales, fleOut = nmeOut, varSrt = "Sales", psvAnl = TRUE),
       regexp = "^psvAnl is only possible if dtaInp is a file name \\(analyses are not stored in data frames, only in the jamovi files\\)\\.")
     unlink(nmeOut)
+    expect_warning(sort_omv(dtaInp = jmvReadWrite::AlbumSales, varSrt = "Sales", psvAnl = TRUE),
+      regexp = "^psvAnl is only possible if fleOut is a file name \\(analyses are not stored in data frames, only in the jamovi files\\)\\.")
 })

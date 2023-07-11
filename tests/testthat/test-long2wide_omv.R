@@ -6,7 +6,7 @@ test_that("long2wide_omv works", {
     nmeOut <- gsub(".rds", "_W.omv", nmeInp)
     saveRDS(dtaTmp, nmeInp)
 
-    long2wide_omv(dtaInp = nmeInp, fleOut = nmeOut, varID = "Year", varTme = "Month", varSep = "_")
+    expect_null(long2wide_omv(dtaInp = nmeInp, fleOut = nmeOut, varID = "Year", varTme = "Month", varSep = "_"))
     df4Chk <- read_omv(nmeOut)
     expect_s3_class(df4Chk, "data.frame")
     expect_equal(dim(df4Chk), c(121, 25))
@@ -14,7 +14,7 @@ test_that("long2wide_omv works", {
     expect_equal(names(df4Chk), c("Year", paste0(c("X_", "Y_"), month.abb[sort(rep(1:12, 2))])))
     unlink(nmeOut)
 
-    long2wide_omv(dtaInp = dtaTmp, fleOut = nmeOut, varID = "Year", varTme = "Month", varSep = "_")
+    expect_null(long2wide_omv(dtaInp = dtaTmp, fleOut = nmeOut, varID = "Year", varTme = "Month", varSep = "_"))
     df4Chk <- read_omv(nmeOut)
     expect_s3_class(df4Chk, "data.frame")
     expect_equal(dim(df4Chk), c(121, 25))
@@ -22,7 +22,7 @@ test_that("long2wide_omv works", {
     expect_equal(names(df4Chk), c("Year", paste0(c("X_", "Y_"), month.abb[sort(rep(1:12, 2))])))
     unlink(nmeOut)
 
-    long2wide_omv(dtaInp = nmeInp, fleOut = nmeOut, varID = "Year", varTme = "Month", varTgt = c("X"), varSep = "_")
+    expect_null(long2wide_omv(dtaInp = nmeInp, fleOut = nmeOut, varID = "Year", varTme = "Month", varTgt = c("X"), varSep = "_"))
     df4Chk <- read_omv(nmeOut)
     expect_s3_class(df4Chk, "data.frame")
     expect_equal(dim(df4Chk), c(121, 13))
@@ -31,7 +31,7 @@ test_that("long2wide_omv works", {
     expect_equal(unname(colMeans(df4Chk[2:13])), c(51.05398, 51.52200, 50.90146, 47.98040, 46.28997, 53.70601, 49.47946, 49.24704, 49.92602, 44.93970, 49.37357, 47.55488), tolerance = 1e-4)
     unlink(nmeOut)
 
-    long2wide_omv(dtaInp = nmeInp, fleOut = nmeOut, varID = "Year", varTme = "Month", varTgt = c("Y"), varSep = "_")
+    expect_null(long2wide_omv(dtaInp = nmeInp, fleOut = nmeOut, varID = "Year", varTme = "Month", varTgt = c("Y"), varSep = "_"))
     df4Chk <- read_omv(nmeOut)
     expect_s3_class(df4Chk, "data.frame")
     expect_equal(dim(df4Chk), c(121, 13))
@@ -39,7 +39,7 @@ test_that("long2wide_omv works", {
     expect_equal(names(df4Chk), c("Year", paste0("Y_", month.abb[1:12])))
     unlink(nmeOut)
 
-    long2wide_omv(dtaInp = nmeInp, fleOut = nmeOut, varID = "Year", varTme = "Month", varSep = "_", varOrd = "vars")
+    expect_null(long2wide_omv(dtaInp = nmeInp, fleOut = nmeOut, varID = "Year", varTme = "Month", varSep = "_", varOrd = "vars"))
     df4Chk <- read_omv(nmeOut)
     expect_s3_class(df4Chk, "data.frame")
     expect_equal(dim(df4Chk), c(121, 25))
@@ -49,7 +49,15 @@ test_that("long2wide_omv works", {
                                                    48.56846, 48.96117, 47.64545, 46.51572, 50.94652, 47.33624, 47.53437, 55.55701, 51.50431, 50.19580, 52.81145, 43.68338), tolerance = 1e-4)
     unlink(nmeOut)
 
+    df4Chk <- long2wide_omv(dtaInp = nmeInp, varID = "Year", varTme = "Month", varSep = "_")
+    expect_s3_class(df4Chk, "data.frame")
+    expect_equal(dim(df4Chk), c(121, 25))
+    expect_equal(as.vector(sapply(df4Chk, typeof)), c("integer", rep("double", 24)))
+    expect_equal(names(df4Chk), c("Year", paste0(c("X_", "Y_"), month.abb[sort(rep(1:12, 2))])))
+
     # test cases for code coverage ============================================================================================================================
+    expect_error(long2wide_omv(fleInp = nmeInp, varID = "Year", varTme = "Month", varSep = "_"), regexp = "Please use the argument dtaInp instead of fleInp\\.")
+
     expect_error(long2wide_omv(dtaInp = nmeInp, fleOut = nmeOut, varID = "Year", varTme = ""),
       regexp = "^Using the arguments varID and varTme is mandatory \\(i\\.e\\., they can't be empty\\)\\.")
     expect_error(long2wide_omv(dtaInp = nmeInp, fleOut = nmeOut, varID = "", varTme = "Month"),

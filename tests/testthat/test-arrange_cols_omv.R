@@ -3,7 +3,7 @@ test_that("arrange_cols_omv works", {
     nmeOut <- paste0(tempfile(), "_A.omv")
     saveRDS(jmvReadWrite::AlbumSales, nmeInp)
 
-    arrange_cols_omv(dtaInp = nmeInp, fleOut = nmeOut, varOrd = c("selSbj", "Sales", "Adverts", "Airplay", "Image"))
+    expect_null(arrange_cols_omv(dtaInp = nmeInp, fleOut = nmeOut, varOrd = c("selSbj", "Sales", "Adverts", "Airplay", "Image")))
     expect_true(chkFle(nmeOut))
     expect_gt(file.info(nmeOut)$size, 1)
     expect_true(chkFle(nmeOut, isZIP = TRUE))
@@ -17,7 +17,7 @@ test_that("arrange_cols_omv works", {
     expect_equal(as.vector(sapply(df4Chk, typeof)), c("integer", "integer", "double", "integer", "integer"))
     unlink(nmeOut)
 
-    arrange_cols_omv(dtaInp = nmeInp, fleOut = nmeOut, varMve = list(Sales = -3, Adverts = 2))
+    expect_null(arrange_cols_omv(dtaInp = nmeInp, fleOut = nmeOut, varMve = list(Sales = -3, Adverts = 2)))
     expect_true(chkFle(nmeOut))
     expect_gt(file.info(nmeOut)$size, 1)
     expect_true(chkFle(nmeOut, isZIP = TRUE))
@@ -31,7 +31,14 @@ test_that("arrange_cols_omv works", {
     expect_equal(as.vector(sapply(df4Chk, typeof)), c("integer", "integer", "integer", "integer", "double"))
     unlink(nmeOut)
 
+    df4Chk <- arrange_cols_omv(dtaInp = nmeInp, varMve = list(Sales = -3, Adverts = 2))
+    expect_s3_class(df4Chk, "data.frame")
+    expect_equal(dim(df4Chk), c(200, 5))
+    expect_equal(names(df4Chk), c("selSbj", "Sales", "Airplay", "Image", "Adverts"))
+    expect_equal(as.vector(sapply(df4Chk, typeof)), c("integer", "integer", "integer", "integer", "double"))
+
     # test cases for code coverage ============================================================================================================================
+    expect_error(arrange_cols_omv(fleInp = nmeInp, varMve = list(len = -2, supp = -1)), regexp = "Please use the argument dtaInp instead of fleInp\\.")
     expect_error(arrange_cols_omv(dtaInp = nmeInp, fleOut = nmeOut),
       regexp = "^Calling arrange_cols_omv requires either the parameter varOrd \\(a character vector\\) or the parameter varMve \\(a named list\\), using the correct format")
     expect_false(file.exists(nmeOut))
@@ -112,6 +119,8 @@ test_that("arrange_cols_omv works", {
            "jmv::ancova(formula = len ~ supp + dose, data = data, effectSize = \"partEta\", modelTest = TRUE)"))
     expect_warning(arrange_cols_omv(dtaInp = jmvReadWrite::AlbumSales, fleOut = nmeOut, varOrd = c("selSbj", "Sales", "Adverts", "Airplay", "Image"), psvAnl = TRUE),
       regexp = "^psvAnl is only possible if dtaInp is a file name \\(analyses are not stored in data frames, only in the jamovi files\\)\\.")
+    expect_warning(arrange_cols_omv(dtaInp = jmvReadWrite::AlbumSales, varOrd = c("selSbj", "Sales", "Adverts", "Airplay", "Image"), psvAnl = TRUE),
+      regexp = "^psvAnl is only possible if fleOut is a file name \\(analyses are not stored in data frames, only in the jamovi files\\)\\.")
     unlink(nmeOut)
     # do not unlink nmeInp, this isn't a generated file, but a link
 })

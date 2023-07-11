@@ -1,7 +1,7 @@
 #' Merges two or more data files by adding the content of other input files as columns to the first input file and outputs them as files for the statistical spreadsheet 'jamovi' (<https://www.jamovi.org>)
 #'
-#' @param fleInp vector with the file names of the input files (including the path, if required; c("FILE_IN1.omv", "FILE_IN2.omv"); default: c()); can be any supported file type, see Details below
-#' @param fleOut Name of the data file to be written (including the path, if required; "FILE_OUT.omv"; default: ""); if empty, the data frame with the added columns is returned as variable (but not written)
+#' @param dtaInp Either a data frame (with the attribute "fleInp" containing the files to merge) or vector with the names of the input files (including the path, if required)
+#' @param fleOut Name of the data file to be written (including the path, if required; "FILE_OUT.omv"; default: ""); if empty, the resulting data frame is returned instead
 #' @param typMrg Type of merging operation: "outer" (default), "inner", "left" or "right"; see Details below
 #' @param varBy  Name of the variable by which the data sets are matched, can either be a string, a character or a list (see Details below; default: list())
 #' @param varSrt Variable(s) that are used to sort the data frame (see Details; if empty, the order after merging is kept; default: c())
@@ -10,16 +10,18 @@
 #' @param selSet Name of the data set that is to be selected from the workspace (only applies when reading .RData-files)
 #' @param ... Additional arguments passed on to methods; see Details below
 #'
-#' @return a data frame (if fleOut is empty) with where the columns of all input data sets (in the files given to fleInp) are concatenated
+#' @return a data frame (if fleOut is empty) where the columns of all input data sets (given in the dtaInp-argument) are concatenated
 #'
 #' @details
+#' Using data frames with the input paramter dtaInp is primarily thought to be used when calling merge_cols_omv from the jamovi-module jTransform. For the use in R, it is strongly recommended to use a
+#' character vector with the file names instead.
 #' There are four different types of merging operations: "outer" keeps all cases (but columns in the resulting data set may be empty if they did not contain values in same input data sets), "inner" keeps
-#' only those cases where all datasets contain the same value in the matching variable, for "left" all cases from the first data set in fleInp are kept (whereas cases that are only contained in input data
-#' set two or higher are dropped), for "right" all cases from the second (or any higher) data set in fleInp are kept. The behaviour of "left" and "right" may be somewhat difficult to predict in case of
+#' only those cases where all datasets contain the same value in the matching variable, for "left" all cases from the first data set in dtaInp are kept (whereas cases that are only contained in input data
+#' set two or higher are dropped), for "right" all cases from the second (or any higher) data set in dtaInp are kept. The behaviour of "left" and "right" may be somewhat difficult to predict in case of
 #' merging several data sets, therefore "outer" might be a safer choice if several data sets are merged.
 #' The variable that is used for matching (varBy) can either be a string (if all datasets contain a matching variable with the same name), a character vector (containing several matching variables that
-#' are the same for all data sets) or a list with the same length as fleInp. In the latter case, each cell of that list can again contain either a string (one matching variable for each data set in fleInp)
-#' or a character vector (several matching variables for each data set in fleInp; NB: all character vectors in the cells of the list must have the same length as it is necessary to always use the same
+#' are the same for all data sets) or a list with the same length as dtaInp. In the latter case, each cell of that list can again contain either a string (one matching variable for each data set in dtaInp)
+#' or a character vector (several matching variables for each data set in dtaInp; NB: all character vectors in the cells of the list must have the same length as it is necessary to always use the same
 #' number of matching variables when merging).
 #' The ellipsis-parameter (...) can be used to submit arguments / parameters to the functions that are used for merging or reading the data. Adding columns uses `merge`. When reading the data, the
 #' functions are: `read_omv` (for jamovi-files), `read.table` (for CSV / TSV files; using similar defaults as `read.csv` for CSV and `read.delim` for TSV which both are based upon `read.table` but
@@ -38,7 +40,7 @@
 #' }
 #' # save dtaInp three times (i.e., the length of nmeInp), adding "_" + 1 ... 3 as index
 #' # to the data variables (A1 ... O5, gender, age → A1_1, ...)
-#' merge_cols_omv(fleInp = nmeInp, fleOut = nmeOut, varBy = "ID")
+#' merge_cols_omv(dtaInp = nmeInp, fleOut = nmeOut, varBy = "ID")
 #' cat(file.info(nmeOut)$size)
 #' # -> 17731 (size may differ on different OSes)
 #' dtaOut <- read_omv(nmeOut, sveAtt = FALSE)
@@ -64,52 +66,58 @@
 #'
 #' @export merge_cols_omv
 #'
-merge_cols_omv <- function(fleInp = c(), fleOut = "", typMrg = c("outer", "inner", "left", "right"), varBy = list(), varSrt = c(), psvAnl = FALSE, usePkg = c("foreign", "haven"), selSet = "", ...) {
+merge_cols_omv <- function(dtaInp = NULL, fleOut = "", typMrg = c("outer", "inner", "left", "right"), varBy = list(), varSrt = c(), psvAnl = FALSE, usePkg = c("foreign", "haven"), selSet = "", ...) {
 
-    # check and format input file names and handle / check further input arguments
-    fleInp <- fmtFlI(fleInp, minLng = 2)
-    typMrg <- match.arg(typMrg)
-    usePkg <- match.arg(usePkg)
-    varArg <- list(...)
+    # check and import input data set (either as data frame or from a file)
+    if (!is.null(list(...)[["fleInp"]])) stop("Please use the argument dtaInp instead of fleInp.")
+    dtaFrm <- inp2DF(dtaInp = dtaInp, fleOut = fleOut, minDF = 2, maxDF = Inf, usePkg = usePkg, selSet = selSet, ...)
+    fleOut <- attr(dtaFrm[[1]], "fleOut")
 
-    # read files and store attributes
-    dtaInp <- vector(mode = "list", length = length(fleInp))
+    # store attributes
     attCol <- list()
-    for (i in seq_along(fleInp)) {
-        dtaInp[[i]] <- read_all(fleInp[i], usePkg, selSet, varArg)
-        attCol <- c(attCol, sapply(dtaInp[[i]][, setdiff(names(dtaInp[[i]]), names(attCol))], attributes))
-    }
-    attDF <- attributes(dtaInp[[1]])
+    for (i in seq_along(dtaFrm)) attCol <- c(attCol, sapply(dtaFrm[[i]][, setdiff(names(dtaFrm[[i]]), names(attCol))], attributes))
+    attDF <- attributes(dtaFrm[[1]])
 
     # check the matching variable(s)
-    varBy <- chkByV(varBy, dtaInp)
+    varBy <- chkByV(varBy, dtaFrm)
 
-    # merge files
+    # merge files ([1] determine arguments, [2] merge using a temporary variable which afterwards is written back)
+    typMrg <- match.arg(typMrg)
     crrArg <- list(x = NULL, y = NULL, by.x = "", by.y = "", all.x = ifelse(any(typMrg %in% c("outer", "left")), TRUE, FALSE), all.y = ifelse(any(typMrg %in% c("outer", "right")), TRUE, FALSE))
-    crrArg <- adjArg(c("merge", "data.frame"), crrArg, varArg, c("x", "y", "by.x", "by.y", "all.x", "all.y"))
-    dtaOut <- dtaInp[[1]]
-    for (i in setdiff(seq_along(fleInp), 1)) {
-        dtaOut <- do.call(merge, c(list(x = dtaOut, y = dtaInp[[i]], by.x = varBy[[1]], by.y = varBy[[i]]), crrArg[!grepl("^x$|^y$|^by.x$|^by.y$", names(crrArg))]))
+    crrArg <- adjArg(c("merge", "data.frame"), crrArg, list(...), c("x", "y", "by.x", "by.y", "all.x", "all.y"))
+    tmpMrg <- dtaFrm[[1]]
+    for (i in setdiff(seq_along(dtaFrm), 1)) {
+        tmpMrg <- do.call(merge, c(list(x = tmpMrg, y = dtaFrm[[i]], by.x = varBy[[1]], by.y = varBy[[i]]), crrArg[!grepl("^x$|^y$|^by.x$|^by.y$", names(crrArg))]))
     }
+    dtaFrm <- tmpMrg
 
     # sort data frame (if varSrt not empty)
-    dtaOut <- srtFrm(dtaOut, varSrt)
+    dtaFrm <- srtFrm(dtaFrm, varSrt)
 
     # restore attributes
-    for (crrAtt in setdiff(names(attDF), c("names", "row.names", "class"))) attr(dtaOut, crrAtt) <- attDF[[crrAtt]]
-    for (crrNme in names(dtaOut)) {
+    for (crrAtt in setdiff(names(attDF), c("names", "row.names", "class"))) attr(dtaFrm, crrAtt) <- attDF[[crrAtt]]
+    for (crrNme in names(dtaFrm)) {
         if (!is.null(attCol[[crrNme]])) {
-            dtaOut[crrNme] <- setAtt(setdiff(names(attCol[[crrNme]]), names(attributes(dtaOut[crrNme]))), attCol[[crrNme]], dtaOut[crrNme])
+            dtaFrm[crrNme] <- setAtt(setdiff(names(attCol[[crrNme]]), names(attributes(dtaFrm[crrNme]))), attCol[[crrNme]], dtaFrm[crrNme])
         }
     }
 
-    # write files (if fleOut is not empty) and transfer analyses from the first input to output file (if psvAnl is TRUE)
-    if (nzchar(fleOut)) {
-        write_omv(dtaOut, nrmFle(fleOut))
-        if (psvAnl) xfrAnl(fleInp[1], fleOut)
-    # return resulting data frame (if fleOut is empty)
+    # write the resulting data frame to the output file or, if no output file
+    # name was given, return the data frame
+    if (!is.null(fleOut) && nzchar(fleOut)) {
+        write_omv(dtaFrm, fleOut)
+        # transfer analyses from input to output file
+        if (psvAnl) {
+            if (is.character(dtaInp)) {
+                xfrAnl(dtaInp[[1]], fleOut)
+            } else {
+                warning("psvAnl is only possible if dtaInp is a file name (analyses are not stored in data frames, only in the jamovi files).")
+            }
+        }
+        NULL
     } else {
-        dtaOut
+        if (psvAnl) warning("psvAnl is only possible if fleOut is a file name (analyses are not stored in data frames, only in the jamovi files).")
+        dtaFrm
     }
 }
 
@@ -125,17 +133,17 @@ chkByV <- function(varBy = list(), dtaFrm = NULL) {
         if (all(sapply(seq_along(dtaFrm), function(i) all(varBy[[i]] %in% names(dtaFrm[[i]]))))) {
             return(varBy)
         } else {
-            stop("Not all data sets given in fleInp contain the variable(s) / column(s) that shall be used for matching.")
+            stop("Not all data sets given in dtaInp contain the variable(s) / column(s) that shall be used for matching.")
         }
     # varBy is a character vector (without empty elements) or a string
     } else if ((is.vector(varBy) && !is.list(varBy) && length(varBy) >= 1 && all(nzchar(varBy))) || is.character(varBy)) {
         if (all(sapply(dtaFrm, function(x) all(varBy %in% names(x))))) {
             return(rep(list(varBy), length(dtaFrm)))
         } else {
-            stop("Not all data sets given in fleInp contain the variable(s) / column(s) that shall be used for matching.")
+            stop("Not all data sets given in dtaInp contain the variable(s) / column(s) that shall be used for matching.")
         }
     } else {
-        stop("varBy must be either a list (with the same length as fleInp), a character vector, or a string.")
+        stop("varBy must be either a list (with the same length as dtaInp), a character vector, or a string.")
     }
 }
 

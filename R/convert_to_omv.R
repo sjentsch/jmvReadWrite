@@ -56,12 +56,10 @@ convert_to_omv <- function(fleInp = "", fleOut = "", varSrt = c(), usePkg = c("f
 
     # check and format input and output files and handle / check further input arguments
     fleInp <- fmtFlI(fleInp, maxLng = 1)
-    fleOut <- fmtFlO(fleOut, fleInp, rplExt = ".omv")
-    varArg <- list(...)
-    usePkg <- match.arg(usePkg)
+    fleOut <- ifelse(nzchar(fleOut), fmtFlO(fleOut), fmtFlO(sub(paste0("\\.", tools::file_ext(fleInp)), ".omv", fleInp)))
 
     # read file and sort it (if varSrt is not empty)
-    dtaFrm <- read_all(fleInp, usePkg, selSet, varArg)
+    dtaFrm <- read_all(fleInp = fleInp, usePkg = usePkg, selSet = selSet, ...)
     dtaFrm <- srtFrm(dtaFrm, varSrt)
 
     # write file

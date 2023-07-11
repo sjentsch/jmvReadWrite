@@ -118,17 +118,11 @@ fmtFlI <- function(fleInp = c(), minLng = 1, maxLng = Inf, excExt = "") {
     fleInp
 }
 
-fmtFlO <- function(fleOut = "", fleInp = "", rplExt = "") {
-    if ((nzchar(fleOut) && !hasExt(fleOut, "omv")) || (nzchar(rplExt) && !hasExt(rplExt, "omv"))) {
-        stop("The file extension for output files needs to be .omv.")
+fmtFlO <- function(fleOut = "") {
+    if (!nzchar(fleOut) || (nzchar(fleOut) && !hasExt(fleOut, "omv"))) {
+        stop("fleOut needs to be a valid non-empty file name (character), and the file extension for output file needs to be .omv.")
     }
-    if (nzchar(fleOut)) {
-        nrmFle(fleOut)
-    } else if (length(fleInp) == 1 && nzchar(fleInp[1])) {
-        sub(paste0("\\.", tools::file_ext(fleInp[1])), rplExt, fleInp[1])
-    } else {
-        stop(paste0("Either fleOut needs to be given as a valid non-empty file name or a single entry in fleInp where the extension is replaced with: \"", rplExt, "\"."))
-    }
+    nrmFle(fleOut)
 }
 
 # =================================================================================================
@@ -220,28 +214,35 @@ chkFld <- function(fldObj = NULL, fldNme = "", fldVal = NULL) {
 
 # =================================================================================================
 # function handling to have either a data frame or a character (pointing to a file) as input
-inp2DF <- function(dtaInp = NULL, fleOut = "", sfxOut = "_chgd.omv", usePkg = c("foreign", "haven"), selSet = "", ...) {
-    varArg <- list(...)
-    # check and format input and output files, handle / check further input arguments
-    # (incl. catch if a named parameter according to the old convention (fleInp) is used)
-    if (is.null(dtaInp) && is.character(varArg[["fleInp"]])) dtaInp <- varArg[["fleInp"]]
+inp2DF <- function(dtaInp = NULL, fleOut = "", minDF = 1, maxDF = 1, usePkg = c("foreign", "haven"), selSet = "", ...) {
+    usePkg <- match.arg(usePkg)
+    # check and format input and output files, handle / check further input arguments:
+    # if the input is a data frame, it is “embedded” in a list (in order to permit to read
+    # and to concatenate this data frame with further data frames given as fleInp-attribute
+    # and read via the lapply function)
     if (is.data.frame(dtaInp) && chkDtF(dtaInp)) {
-        if (is.character(fleOut) && nzchar(fleOut)) {
-            attr(dtaInp, "fleOut") <- fmtFlO(fleOut)
-        } else if (chkAtt(dtaInp, "fleOut")) {
-            attr(dtaInp, "fleOut") <- fmtFlO(attr(dtaInp, "fleOut"))
-        } else {
-            stop("If a data frame is used for dtaInp, an output file name must be given either via the parameter fleOut or as attribute attached to the data frame.")
+        lstDF <- list(dtaInp)
+        if (!is.null(attr(dtaInp, "fleInp"))) {
+            lstDF <- c(lstDF, lapply(fmtFlI(attr(dtaInp, "fleInp"), minLng = minDF - 1, maxLng = maxDF - 1), function(x) read_all(fleInp = x, usePkg = usePkg, selSet = selSet, ...)))
         }
-        dtaInp
+    # if the input is a character vector (with file names), all file names are read into
+    # data frames (using the lapply function)
     } else if (is.character(dtaInp)) {
-        fleInp <- fmtFlI(dtaInp, maxLng = 1)
-        crrDF  <- read_all(fleInp, match.arg(usePkg), selSet, varArg)
-        attr(crrDF, "fleOut") <- fmtFlO(fleOut, fleInp, sfxOut)
-        crrDF
+        lstDF <-              lapply(fmtFlI(dtaInp,                 minLng = minDF - 0, maxLng = maxDF - 0), function(x) read_all(fleInp = x, usePkg = usePkg, selSet = selSet, ...))
     } else {
         stop("dtaInp must either be a data frame or a character (pointing to a location where the input file can be found).")
     }
+    if (is.character(fleOut) && nzchar(fleOut)) {
+        attr(lstDF[[1]], "fleOut") <- fmtFlO(fleOut)
+    } else if (chkAtt(lstDF[[1]], "fleOut")) {
+        attr(lstDF[[1]], "fleOut") <- fmtFlO(attr(lstDF[[1]], "fleOut"))
+    } else if (!is.character(fleOut)) {
+        stop("The output file name must be a character (given either via the parameter fleOut or as attribute attached to the input data frame).")
+    }
+    # most functions expect only one data frame to be returned, thus, the list
+    # used for reading processing those data frames is unpacked if there is
+    # only one data frame to return
+    if (maxDF == 1) lstDF[[1]] else lstDF
 }
 
 # =================================================================================================

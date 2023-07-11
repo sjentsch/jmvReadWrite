@@ -180,7 +180,7 @@ read_omv <- function(fleInp = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = TRUE,
         attr(dtaFrm, "jmv-weights")      <- as.vector(dtaFrm[, mtaDta$weights])
         # it would be possible to keep both jmv-weights-name and weights, but
         # this might be rather confusing, so the version jamovi uses internally
-        # (jmv-weights-name) is chosen and the other (weights) disregarded 
+        # (jmv-weights-name) is chosen and the other (weights) disregarded
         attr(dtaFrm, "weights")          <- NULL
     }
 

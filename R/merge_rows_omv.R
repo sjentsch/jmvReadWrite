@@ -1,7 +1,7 @@
 #' Merges two .omv-files for the statistical spreadsheet 'jamovi' (<https://www.jamovi.org>) by adding the content of the second, etc.  file(s) as rows to the first file
 #'
-#' @param fleInp Vector with file names (including the path, if required) of the data files to be read (c("FILE1.omv", "FILE2.omv"); default: c()); can be any supported file type, see Details below
-#' @param fleOut Name of the data file to be written (including the path, if required; "FILE_OUT.omv"; default: ""); if empty, the data frame with the added columns is returned as variable (but not written)
+#' @param dtaInp Either a data frame (with the attribute "fleInp" containing the files to merge) or vector with the names of the input files (including the path, if required)
+#' @param fleOut Name of the data file to be written (including the path, if required; "FILE_OUT.omv"; default: ""); if empty, the resulting data frame is returned instead
 #' @param typMrg Type of merging operation: "all" (default) or  "common"; see also Details
 #' @param colInd Add a column with an indicator (the basename of the file minus the extension) marking from which input data set the respective rows are coming (default: FALSE)
 #' @param rstRwN Reset row names (i.e., do not keep the row names of the original input data sets but number them consecutively - one to the row number of all input data sets added up; default: TRUE)
@@ -11,9 +11,11 @@
 #' @param selSet Name of the data set that is to be selected from the workspace (only applies when reading .RData-files)
 #' @param ... Additional arguments passed on to methods; see Details below
 #'
-#' @return a data frame (if fleOut is empty) with where the rows of all input data sets (i.e., the files given in the fleInp-argument) are concatenated
+#' @return a data frame (if fleOut is empty) where the rows of all input data sets (given in the dtaInp-argument) are concatenated
 #'
 #' @details
+#' Using data frames with the input paramter dtaInp is primarily thought to be used when calling merge_rows_omv from the jamovi-module jTransform. For the use in R, it is strongly recommended to use a
+#' character vector with the file names instead.
 #' The different types of merging operations: "all" keeps all existing variables / columns that are contained in any of the input data sets and fills them up with NA where the variable / column doesn't
 #' exist in a input data set. "common" only keeps the variables / columns that are common to all input data sets (i.e., that are contained in all data sets).
 #' The ellipsis-parameter can be used to submit arguments / parameters to the functions that are used for merging or reading the data. The merging operation uses `rbind`. When reading the data, the
@@ -31,7 +33,7 @@
 #' for (i in seq_along(nmeInp)) saveRDS(dtaInp[-i - 1], nmeInp[i])
 #' # save dtaInp three times (i.e., the length of nmeInp), removing one data columns in
 #' # each data set (for demonstration purposes, A1 in the first, A2 in the second, ...)
-#' merge_rows_omv(fleInp = nmeInp, fleOut = nmeOut, colInd = TRUE)
+#' merge_rows_omv(dtaInp = nmeInp, fleOut = nmeOut, colInd = TRUE)
 #' cat(file.info(nmeOut)$size)
 #' # -> 10767 (size may differ on different OSes)
 #' dtaOut <- read_omv(nmeOut, sveAtt = FALSE)
@@ -49,7 +51,7 @@
 #' # data set (250 -> 750), the second dimension (columns / variables) is increased by 1
 #' # (for "fleInd")
 #'
-#' merge_rows_omv(fleInp = nmeInp, fleOut = nmeOut, typMrg = "common")
+#' merge_rows_omv(dtaInp = nmeInp, fleOut = nmeOut, typMrg = "common")
 #' # the argument typMrg = "common" removes the columns that are not present in all of
 #' # the input data sets (i.e., A1, A2, A3)
 #' dtaOut <- read_omv(nmeOut, sveAtt = FALSE)
@@ -70,76 +72,77 @@
 #'
 #' @export merge_rows_omv
 #'
-merge_rows_omv <- function(fleInp = c(), fleOut = "", typMrg = c("all", "common"), colInd = FALSE, rstRwN = TRUE, rmvDpl = FALSE, varSrt = c(), usePkg = c("foreign", "haven"), selSet = "", ...) {
+merge_rows_omv <- function(dtaInp = NULL, fleOut = "", typMrg = c("all", "common"), colInd = FALSE, rstRwN = TRUE, rmvDpl = FALSE, varSrt = c(), usePkg = c("foreign", "haven"), selSet = "", ...) {
 
-    # check and format input file names and handle / check further input arguments
-    fleInp <- fmtFlI(fleInp, minLng = 2)
-    typMrg <- match.arg(typMrg)
-    usePkg <- match.arg(usePkg)
-    varArg <- list(...)
-
-    # read files
-    dtaInp <- vector(mode = "list", length = length(fleInp))
-    for (i in seq_along(fleInp)) {
-        dtaInp[[i]] <- addInd(read_all(fleInp[i], usePkg, selSet, varArg), ifelse(colInd, fleInp[i], ""))
-    }
+    # check and import input data set (either as data frame or from a file)
+    if (!is.null(list(...)[["fleInp"]])) stop("Please use the argument dtaInp instead of fleInp.")
+    dtaFrm <- inp2DF(dtaInp = dtaInp, fleOut = fleOut, minDF = 2, maxDF = Inf, usePkg = usePkg, selSet = selSet, ...)
+    if (is.character(dtaInp)) fleInp <- dtaInp else fleInp <- c("input data frame", attr(dtaInp, "fleInp"))
+    fleOut <- attr(dtaFrm[[1]], "fleOut")
+    if (colInd) dtaFrm <- lapply(seq_along(dtaFrm), function(i) addIdx(dtaFrm[[i]], fleInp[i]))
 
     # merge files - the additional arguments are the same in either case
-    crrArg <- adjArg(c("rbind", "data.frame"), list(), varArg, c())
+    typMrg <- match.arg(typMrg)
+    crrArg <- adjArg(c("rbind", "data.frame"), list(), list(...), c())
     # keeping all existing variables, filling the void columns with NA
     if      (typMrg == "all") {
         # determine the variable names and types in all input data sets and remove
         # duplicates(order ensures that the data set that contains most variables
         # is prioritized, but yet, it is still impossible to preserve the whole
         # order - i.e., variables missing in one data set may end up at the end)
-        varNme <- unlist(sapply(dtaInp[order(-sapply(sapply(dtaInp, dim, simplify = FALSE), "[[", 2))], names,                                                  simplify = FALSE))
-        varTyp <- unlist(sapply(dtaInp[order(-sapply(sapply(dtaInp, dim, simplify = FALSE), "[[", 2))], function(D) unlist(sapply(D, function(C) class(C)[1])), simplify = FALSE))
+        varNme <- unlist(sapply(dtaFrm[order(-sapply(sapply(dtaFrm, dim, simplify = FALSE), "[[", 2))], names,                                                  simplify = FALSE))
+        varTyp <- unlist(sapply(dtaFrm[order(-sapply(sapply(dtaFrm, dim, simplify = FALSE), "[[", 2))], function(D) unlist(sapply(D, function(C) class(C)[1])), simplify = FALSE))
         varNme <- varNme[!duplicated(varNme)]
         for (crrNme in varNme) {
             if (sum(names(varTyp) == crrNme) <= 1) next
             if (all(duplicated(varTyp[names(varTyp) == crrNme])[-1])) {
                 varTyp <- varTyp[-which(names(varTyp) == crrNme)[-1]]
             } else {
-                stop(sprintf("Variable %s has different types:\n%s\n", crrNme, paste(paste0(basename(fleInp), rep(": ", sum(names(varTyp) == crrNme)), varTyp[names(varTyp) == crrNme]), collapse = "\n")))
+                stop(sprintf("Variable %s has different types:\n%s\n", crrNme, paste(paste0(basename(fleInp),
+                  rep(": ", sum(names(varTyp) == crrNme)), varTyp[names(varTyp) == crrNme]), collapse = "\n")))
             }
         }
         if (length(varNme) != length(varTyp)) stop("Something went wrong when comparing the variable types of the input data files. Please send the data files to sebastian.jentschke@uib.no for debugging.")
-        dtaOut <- addCol(dtaInp[[1]], varNme, varTyp)
-        for (i in setdiff(seq_along(fleInp), 1)) {
-            crrInp <- addCol(dtaInp[[i]], varNme, varTyp)
-            dtaOut <- do.call(rbind, c(list(dtaOut, crrInp), crrArg))
+        tmpMrg <- addCol(dtaFrm[[1]], varNme, varTyp)
+        for (i in setdiff(seq_along(dtaFrm), 1)) {
+            crrInp <- addCol(dtaFrm[[i]], varNme, varTyp)
+            tmpMrg <- do.call(rbind, c(list(tmpMrg, crrInp), crrArg))
         }
+        dtaFrm <- tmpMrg
     # keeping only variables that are common to all input data sets
     } else if (typMrg == "common") {
-        varNme <- Reduce(intersect, sapply(dtaInp, names, simplify = FALSE))
+        varNme <- Reduce(intersect, sapply(dtaFrm, names, simplify = FALSE))
         if (identical(varNme, character(0))) {
-            stop(paste("The data sets in the files that were given as fleInp-argument do not contain variables that are overlapping (i.e., contained in all data sets).",
-                       "You can either reduce the number of data sets given to fleInp or use \"outer\" as argument for \"typMrg\" (see Details in the help for this function)."))
+            stop(paste("The data sets in the files that were given as dtaInp-argument do not contain variables that are overlapping (i.e., contained in all data sets).",
+                       "You can either reduce the number of data sets given to dtaInp or use \"outer\" as argument for \"typMrg\" (see Details in the help for this function)."))
         }
-        dtaOut <- dtaInp[[1]][, varNme]
-        for (i in setdiff(seq_along(fleInp), 1)) {
-            dtaOut <- do.call(rbind, c(list(dtaOut, dtaInp[[i]][, varNme]), crrArg))
+        tmpMrg <- dtaFrm[[1]][, varNme]
+        for (i in setdiff(seq_along(dtaFrm), 1)) {
+            tmpMrg <- do.call(rbind, c(list(tmpMrg, dtaFrm[[i]][, varNme]), crrArg))
         }
+        dtaFrm <- tmpMrg
     }
 
     # remove row names
     if (rstRwN == TRUE) {
-        rownames(dtaOut) <- NULL
+        rownames(dtaFrm) <- NULL
     }
 
     # remove duplicate rows
     if (rmvDpl == TRUE) {
-        dtaOut <- dtaOut[!duplicated(dtaOut[, setdiff(varNme, "fleInd")]), ]
+        dtaFrm <- dtaFrm[!duplicated(dtaFrm[, setdiff(varNme, "fleInd")]), ]
     }
 
     # sort data frame (if varSrt not empty)
-    dtaOut <- srtFrm(dtaOut, varSrt)
+    dtaFrm <- srtFrm(dtaFrm, varSrt)
 
-    # write files (if fleOut is not empty) or return resulting data frame
-    if (nzchar(fleOut)) {
-        write_omv(dtaOut, nrmFle(fleOut))
+    # write the resulting data frame to the output file or, if no output file
+    # name was given, return the data frame
+    if (!is.null(fleOut) && nzchar(fleOut)) {
+        write_omv(dtaFrm, fleOut)
+        NULL
     } else {
-        dtaOut
+        dtaFrm
     }
 }
 
@@ -151,10 +154,10 @@ addCol <- function(dtaFrm = NULL, varNme = c(), varTyp = c()) {
     dtaFrm
 }
 
-addInd <- function(dtaFrm = NULL, fleNme = "") {
-    if (fleNme == "") {
-        dtaFrm
+addIdx <- function(dtaFrm = NULL, fleNme = "") {
+    if (nzchar(fleNme)) {
+        cbind(list(fleInd = rep(gsub(paste0("\\.", tools::file_ext(fleNme)), "", basename(fleNme)), dim(dtaFrm)[1])), dtaFrm)
     } else {
-        cbind(list(fleInd = rep(gsub(paste0(".", tools::file_ext(fleNme)), "", basename(fleNme)), dim(dtaFrm)[1])), dtaFrm)
+        dtaFrm
     }
 }

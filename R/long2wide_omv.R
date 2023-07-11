@@ -1,7 +1,7 @@
 #' Converts .omv-files for the statistical spreadsheet 'jamovi' (<https://www.jamovi.org>) from long to wide format
 #'
-#' @param dtaInp Either a data frame or the name (including the path, if required) of a data file to be read ("FILENAME.ext"; default: NULL); files can be of any supported file type, see Details below
-#' @param fleOut Name (including the path, if required) of the data file to be written ("FILENAME.omv"; default: ""); if empty, and a file name is given as dtaInp, it is appended with "_wide.omv"
+#' @param dtaInp Either a data frame or the name of a data file to be read (including the path, if required; "FILENAME.ext"; default: NULL); files can be of any supported file type, see Details below
+#' @param fleOut Name of the data file to be written (including the path, if required; "FILE_OUT.omv"; default: ""); if empty, the resulting data frame is returned instead
 #' @param varID  Names of one or more variables that identify the same group / individual (default: c())
 #' @param varTme Name of the variable(s) that differentiates multiple records from the same group / individual (default: c())
 #' @param varExc Name of the variable(s) should be excluded from the transformation, typically this will be between-subject-variable(s) (default: c())
@@ -12,6 +12,8 @@
 #' @param usePkg Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata and SAS files; "foreign" is the default (it comes with base R), but "haven" is newer and more comprehensive
 #' @param selSet Name of the data set that is to be selected from the workspace (only applies when reading .RData-files)
 #' @param ... Additional arguments passed on to methods; see Details below
+#'
+#' @return a data frame (only returned if fleOut is empty) where the input data set is converted from long to wide format
 #'
 #' @details
 #' The ellipsis-parameter (...) can be used to submit arguments / parameters to the functions that are used for transforming or reading the data. The transformation uses `reshape`. When reading the
@@ -84,11 +86,11 @@ long2wide_omv <- function(dtaInp = NULL, fleOut = "", varID = "ID", varTme = c()
     if (!all(nzchar(c(varID, varTme)))) {
         stop("Using the arguments varID and varTme is mandatory (i.e., they can\'t be empty).")
     }
-    varArg <- list(...)
     varOrd <- match.arg(varOrd)
 
     # check and import input data set (either as data frame or from a file)
-    dtaFrm <- inp2DF(dtaInp, fleOut, "_arrCol.omv", usePkg, selSet, varArg)
+    if (!is.null(list(...)[["fleInp"]])) stop("Please use the argument dtaInp instead of fleInp.")
+    dtaFrm <- inp2DF(dtaInp = dtaInp, fleOut = fleOut, usePkg = usePkg, selSet = selSet, ...)
     fleOut <- attr(dtaFrm, "fleOut")
 
     # transform data set
@@ -107,7 +109,7 @@ long2wide_omv <- function(dtaInp = NULL, fleOut = "", varID = "ID", varTme = c()
         # [3] call "reshape" with having the variable arguments limited to those valid when calling the function
         crrVrT <- unique(as.character(dtaFrm[[varTme[i]]]))
         crrArg <- list(data = dtaFrm, direction = "wide", v.names = varTgt, idvar = c(varID, varTme[seq_along(varTme)[seq_along(varTme) > i]]), timevar = varTme[i], sep = varSep)
-        dtaFrm <- do.call(stats::reshape, adjArg("reshape", crrArg, varArg, c("data", "direction", "v.names", "idvar", "timevar")))
+        dtaFrm <- do.call(stats::reshape, adjArg("reshape", crrArg, ..., c("data", "direction", "v.names", "idvar", "timevar")))
         varTgt <- paste0(varTgt, varSep, crrVrT)
 #       varTgt <- names(dtaFrm)[grepl(paste0(paste0(varTgt, varSep), collapse = "|"), names(dtaFrm))]
     }
@@ -125,8 +127,14 @@ long2wide_omv <- function(dtaInp = NULL, fleOut = "", varID = "ID", varTme = c()
     # sort data set (if varSrt is not empty)
     dtaFrm <- srtFrm(dtaFrm, varSrt)
 
-    # write file
-    write_omv(dtaFrm, fleOut)
+    # write the resulting data frame to the output file or, if no output file
+    # name was given, return the data frame
+    if (!is.null(fleOut) && nzchar(fleOut)) {
+        write_omv(dtaFrm, fleOut)
+        NULL
+    } else {
+        dtaFrm
+    }
 }
 
 chgVrO <- function(dtaFrm = NULL) {

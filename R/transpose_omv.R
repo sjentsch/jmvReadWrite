@@ -1,11 +1,13 @@
 #' Transpose .omv-files for the statistical spreadsheet 'jamovi' (<https://www.jamovi.org>)
 #'
-#' @param dtaInp Either a data frame or the name (including the path, if required) of a data file to be read ("FILENAME.ext"; default: NULL); files can be of any supported file type, see Details below
-#' @param fleOut Name (including the path, if required) of the data file to be written ("FILENAME.omv"; default: ""); if empty, and a file name is given as dtaInp, it is appended with "_xpsd.omv"
+#' @param dtaInp Either a data frame or the name of a data file to be read (including the path, if required; "FILENAME.ext"; default: NULL); files can be of any supported file type, see Details below
+#' @param fleOut Name of the data file to be written (including the path, if required; "FILE_OUT.omv"; default: ""); if empty, the resulting data frame is returned instead
 #' @param varNme Name of the variables in the output data frame; see Details below
 #' @param usePkg Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata and SAS files; "foreign" is the default (it comes with base R), but "haven" is newer and more comprehensive
 #' @param selSet Name of the data set that is to be selected from the workspace (only applies when reading .RData-files)
 #' @param ... Additional arguments passed on to methods; see Details below
+#'
+#' @return a data frame (only returned if fleOut is empty) where the input data set is transposed
 #'
 #' @details
 #' If varNme empty, the row names of the input data set are used (preceded by "V_" if all row names are numbers); if varNme has the length 1 then it is supposed to point to a variable in the input
@@ -45,7 +47,8 @@
 transpose_omv <- function(dtaInp = NULL, fleOut = "", varNme = "", usePkg = c("foreign", "haven"), selSet = "", ...) {
 
     # check and import input data set (either as data frame or from a file)
-    dtaFrm <- inp2DF(dtaInp, fleOut, "_xpsd.omv", usePkg, selSet, ...)
+    if (!is.null(list(...)[["fleInp"]])) stop("Please use the argument dtaInp instead of fleInp.")
+    dtaFrm <- inp2DF(dtaInp = dtaInp, fleOut = fleOut, usePkg = usePkg, selSet = selSet, ...)
     fleOut <- attr(dtaFrm, "fleOut")
 
     # create variable names for the output data frame: if varNme is empty (default), then the row names of the
@@ -83,6 +86,12 @@ transpose_omv <- function(dtaInp = NULL, fleOut = "", varNme = "", usePkg = c("f
     attr(dtaFrm[, "ID"], "jmv-id") <- TRUE
     row.names(dtaFrm) <- NULL
 
-    # write file
-    write_omv(dtaFrm, fleOut)
+    # write the resulting data frame to the output file or, if no output file
+    # name was given, return the data frame
+    if (!is.null(fleOut) && nzchar(fleOut)) {
+        write_omv(dtaFrm, fleOut)
+        NULL
+    } else {
+        dtaFrm
+    }
 }

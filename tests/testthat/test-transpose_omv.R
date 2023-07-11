@@ -5,7 +5,7 @@ test_that("arrange_cols_omv works", {
     nmeOut <- paste0(tempfile(), "_T.omv")
     saveRDS(tmpDF, nmeInp)
 
-    transpose_omv(dtaInp = tmpDF, fleOut = nmeOut)
+    expect_null(transpose_omv(dtaInp = tmpDF, fleOut = nmeOut))
     expect_true(chkFle(nmeOut))
     expect_gt(file.info(nmeOut)$size, 1)
     expect_true(chkFle(nmeOut, isZIP = TRUE))
@@ -19,7 +19,7 @@ test_that("arrange_cols_omv works", {
     expect_equal(as.vector(sapply(df4Chk, typeof)), c("character", rep("integer", 16)))
     unlink(nmeOut)
 
-    transpose_omv(dtaInp = cbind(list(qstItm = sprintf("Qst_%02d", seq(16))), tmpDF), fleOut = nmeOut, varNme = "qstItm")
+    expect_null(transpose_omv(dtaInp = cbind(list(qstItm = sprintf("Qst_%02d", seq(16))), tmpDF), fleOut = nmeOut, varNme = "qstItm"))
     expect_true(chkFle(nmeOut))
     expect_gt(file.info(nmeOut)$size, 1)
     expect_true(chkFle(nmeOut, isZIP = TRUE))
@@ -33,7 +33,7 @@ test_that("arrange_cols_omv works", {
     expect_equal(as.vector(sapply(df4Chk, typeof)), c("character", rep("integer", 16)))
     unlink(nmeOut)
 
-    transpose_omv(dtaInp = tmpDF, fleOut = nmeOut, varNme = sprintf("Trl_%02d", seq(16)))
+    expect_null(transpose_omv(dtaInp = tmpDF, fleOut = nmeOut, varNme = sprintf("Trl_%02d", seq(16))))
     expect_true(chkFle(nmeOut))
     expect_gt(file.info(nmeOut)$size, 1)
     expect_true(chkFle(nmeOut, isZIP = TRUE))
@@ -47,7 +47,7 @@ test_that("arrange_cols_omv works", {
     expect_equal(as.vector(sapply(df4Chk, typeof)), c("character", rep("integer", 16)))
     unlink(nmeOut)
 
-    transpose_omv(dtaInp = nmeInp, fleOut = nmeOut)
+    expect_null(transpose_omv(dtaInp = nmeInp, fleOut = nmeOut))
     expect_true(chkFle(nmeOut))
     expect_gt(file.info(nmeOut)$size, 1)
     expect_true(chkFle(nmeOut, isZIP = TRUE))
@@ -60,7 +60,16 @@ test_that("arrange_cols_omv works", {
     expect_equal(names(df4Chk), c("ID", sprintf("V_%d", seq(16))))
     expect_equal(as.vector(sapply(df4Chk, typeof)), c("character", rep("integer", 16)))
     unlink(nmeOut)
+  
+    df4Chk <- transpose_omv(dtaInp = tmpDF)
+    expect_s3_class(df4Chk, "data.frame")
+    expect_equal(dim(df4Chk), c(75, 17))
+    expect_equal(names(df4Chk), c("ID", sprintf("V_%d", seq(16))))
+    expect_equal(as.vector(sapply(df4Chk, typeof)), c("character", rep("integer", 16)))
+
+    expect_error(transpose_omv(fleInp = tmpDF, fleOut = nmeOut), regexp = "Please use the argument dtaInp instead of fleInp\\.")
     unlink(nmeInp)
+
 
     expect_error(transpose_omv(dtaInp = tmpDF, fleOut = nmeOut, varNme = "notExist"),
       regexp = "^.*\\(varNme\\) not contained in the input data frame\\.")

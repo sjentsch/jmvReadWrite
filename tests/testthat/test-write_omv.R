@@ -28,6 +28,8 @@ test_that("write_omv works", {
 
     # test cases for code coverage ============================================================================================================================
     expect_error(write_omv(NULL, nmeOut), regexp = "^The data frame to be written needs to be given as parameter \\(dtaFrm = \\.\\.\\.\\)\\.")
+    expect_error(write_omv(data.frame(T1 = sample(9999, 100), T2 = as.complex(rnorm(100))), nmeOut),
+      regexp = "Variable type complex not implemented\\. Please send the data file that caused this problem to sebastian\\.jentschke@uib\\.no")
     expect_error(write_omv(dtaDbg$dtaFrm), regexp = "^Output file name needs to be given as parameter \\(fleOut = \\.\\.\\.\\)\\.")
     suppressMessages(expect_error(capture_output(add2ZIP(fleZIP = nmeOut, crrHdl = NULL)),
       regexp = "^Parameter isn't a file handle pointing to a file to be zipped\\."))
@@ -42,6 +44,17 @@ test_that("write_omv works", {
     expect_equal(sapply(c(1, 3), function(n) write_omv(dtaDbg$dtaFrm, nmeOut, retDbg = TRUE)[["mtaDta"]][["fields"]][[n]][["description"]]), c("Label for ID", "Label for supp2"))
     expect_identical(sapply(c("dataType", "type"), function(f) write_omv(dtaDbg$dtaFrm, nmeOut, retDbg = TRUE)[["mtaDta"]][["fields"]][[2]][[f]], USE.NAMES = FALSE), c("Text", "integer"))
 
+    expect_error(write_omv(data.frame(T1 = sample(9999, 100), T2 = as.complex(rnorm(100))), paste0(tempfile(), ".omv")),
+      regexp = "Variable type complex not implemented\\. Please send the data file that caused this problem to sebastian\\.jentschke@uib\\.no")
+
+    tmpDF <- read_omv(file.path("..", "ToothGrowth.omv"))
+    attr(tmpDF[[4]], "values") <- as.integer(c(0, 1))
+    expect_error(write_omv(tmpDF, nmeOut),
+      regexp = "\"values\"-attribute with unexpected values found for column \"supp - Transform 1\"\\. Please send the file to sebastian\\.jentschke@uib\\.no for debugging\\.")
+    attr(tmpDF[[4]], "values") <- as.integer(c(1, 2))
+    expect_null(write_omv(tmpDF, nmeOut))
+    unlink(nmeOut)
+     
     set.seed(1)
     dtaOut <- cbind(dtaOut, data.frame(Bool = sample(c(TRUE, FALSE), colOut, TRUE),
                                        Date = sample(seq(as.Date("1999/01/01"), as.Date("2000/01/01"), by = "day"), colOut),

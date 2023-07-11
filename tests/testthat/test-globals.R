@@ -33,11 +33,9 @@ test_that("globals work", {
     expect_error(fmtFlI(fleInp = tempfile(), minLng = 2), regexp = "^The fleInp-argument is supposed to be a character vector with a minimal length of \\d+ and a maximal length of")
     expect_error(fmtFlI(fleInp = c(tempfile(), tempfile()), maxLng = 1),
       regexp = "^The fleInp-argument is supposed to be a character vector with a minimal length of \\d+ and a maximal length of")
-    expect_equal(fmtFlO(fleOut = "", fleInp = "Trial.omv", rplExt = "_adj.omv"), "Trial_adj.omv")
-    expect_error(fmtFlO(fleOut = "", fleInp = ""), regexp = "^Either fleOut needs to be given as a valid non-empty file name or a single entry in fleInp")
-    expect_error(fmtFlO(fleOut = "Trial"), regexp = "^The file extension for output files needs to be \\.omv\\.")
-    expect_error(fmtFlO(fleOut = "Trial.rds"), regexp = "^The file extension for output files needs to be \\.omv\\.")
-    expect_error(fmtFlO(fleOut = "", fleInp = "Trial.omv", rplExt = "_adj.csv"), regexp = "^The file extension for output files needs to be \\.omv\\.")
+    expect_error(fmtFlO(fleOut = ""),          regexp = "^fleOut needs to be a valid non-empty file name \\(character\\), and the file extension for output file needs to be \\.omv\\.")
+    expect_error(fmtFlO(fleOut = "Trial"),     regexp = "^fleOut needs to be a valid non-empty file name \\(character\\), and the file extension for output file needs to be \\.omv\\.")
+    expect_error(fmtFlO(fleOut = "Trial.rds"), regexp = "^fleOut needs to be a valid non-empty file name \\(character\\), and the file extension for output file needs to be \\.omv\\.")
     expect_error(fcnArg(c("stats::sd", "stats::mean", "C")), regexp = "^The argument to fcnArg must be a character \\(vector\\) with 1 or 2 elements.")
     suppressMessages(expect_error(capture_output(setAtt(attLst = "Trial", inpObj = list(),       outObj = list())),
       regexp = "^Error when storing or accessing meta-data information\\. Please send the file"))
@@ -52,19 +50,30 @@ test_that("globals work", {
 
     expect_error(inp2DF(dtaInp = 1), regexp = "^dtaInp must either be a data frame or a character \\(pointing to a location where the input file can be found\\)\\.")
     inpDF <- jmvReadWrite::AlbumSales
-    expect_error(inp2DF(dtaInp = inpDF),             regexp = "^If a data frame is used for dtaInp, an output file name must be given either via the parameter fleOut or as attribute")
-    expect_error(inp2DF(dtaInp = inpDF, fleOut = 1), regexp = "^If a data frame is used for dtaInp, an output file name must be given either via the parameter fleOut or as attribute")
+    expect_error(inp2DF(dtaInp = inpDF, fleOut = 1),
+      regexp = "^The output file name must be a character \\(given either via the parameter fleOut or as attribute attached to the input data frame\\)\\.")
     attr(inpDF, "fleOut") <- "Trial1.omv"
     expect_equal(basename(attr(inp2DF(dtaInp = inpDF),                        "fleOut")), "Trial1.omv")
     expect_equal(basename(attr(inp2DF(dtaInp = inpDF, fleOut = "Trial2.omv"), "fleOut")), "Trial2.omv")
     inpNme <- file.path("..", "ToothGrowth.omv")
-    expect_s3_class(inp2DF(fleInp = inpNme), "data.frame")
-    expect_equal(dim(inp2DF(fleInp = inpNme)), c(60, 14))
-    expect_equal(basename(attr(inp2DF(dtaInp = inpNme), "fleOut")), "ToothGrowth_chgd.omv")
-    expect_equal(basename(attr(inp2DF(fleInp = inpNme), "fleOut")), "ToothGrowth_chgd.omv")
-    expect_equal(basename(attr(inp2DF(fleInp = inpNme, sfxOut = "_trial.omv"), "fleOut")), "ToothGrowth_trial.omv")
-    expect_equal(basename(attr(inp2DF(fleInp = inpNme, fleOut = "Trial.omv"), "fleOut")),  "Trial.omv")
-    expect_equal(basename(attr(inp2DF(fleInp = inpNme, fleOut = "Trial.omv", sfxOut = "_trial.omv"), "fleOut")), "Trial.omv")
+    expect_s3_class(inp2DF(dtaInp = inpNme), "data.frame")
+    expect_equal(dim(inp2DF(dtaInp = inpNme)), c(60, 14))
+    expect_equal(basename(attr(inp2DF(dtaInp = inpNme, fleOut = "Trial.omv"), "fleOut")),  "Trial.omv")
+    
+    inpDF <- jmvReadWrite::AlbumSales
+    attr(inpDF, "fleInp") <- file.path("..", "ToothGrowth.omv")
+    expect_error(inp2DF(dtaInp = inpDF), regexp = "")
+    df4Chk <- inp2DF(dtaInp = inpDF, minDF = 2, maxDF = 2)
+    expect_type(df4Chk, "list")
+    expect_length(df4Chk, 2)
+    expect_s3_class(df4Chk[[1]], "data.frame")
+    expect_s3_class(df4Chk[[2]], "data.frame")
+    expect_equal(dim(df4Chk[[1]]), c(200, 5))
+    expect_equal(dim(df4Chk[[2]]), c(60, 14))
+    expect_equal(names(df4Chk[[1]]), c("selSbj", "Adverts", "Airplay", "Image", "Sales"))  
+    expect_equal(names(df4Chk[[2]]), c("Filter 1", "ID", "logLen", "supp - Transform 1", "len", "supp", "dose", "dose2", "Trial", "Residuals", "J", "K", "L", "weights"))
+    expect_equal(names(attributes(df4Chk[[1]])), c("datalabel", "names", "var.labels", "class", "row.names", "fleInp"))
+    expect_equal(attr(df4Chk[[1]], "fleInp"), file.path("..", "ToothGrowth.omv"))
 
     tmpDF <- data.frame(ID = sprintf("P_%04d", sample(9999, 100)), I = as.integer(sample(1e6, 100)), D = rnorm(100),
                         OT = factor(sample(c("low", "middle", "high"), 100, replace = TRUE), levels = c("low", "middle", "high"), ordered = TRUE),

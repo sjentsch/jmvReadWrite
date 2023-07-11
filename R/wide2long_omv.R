@@ -1,7 +1,7 @@
 #' Converts .omv-files for the statistical spreadsheet 'jamovi' (<https://www.jamovi.org>) from wide to long format
 #'
-#' @param dtaInp Either a data frame or the name (including the path, if required) of a data file to be read ("FILENAME.ext"; default: NULL); files can be of any supported file type, see Details below
-#' @param fleOut Name (including the path, if required) of the data file to be written ("FILENAME.omv"; default: ""); if empty, and a file name is given as dtaInp, it is appended with "_long.omv"
+#' @param dtaInp Either a data frame or the name of a data file to be read (including the path, if required; "FILENAME.ext"; default: NULL); files can be of any supported file type, see Details below
+#' @param fleOut Name of the data file to be written (including the path, if required; "FILE_OUT.omv"; default: ""); if empty, the resulting data frame is returned instead
 #' @param varLst List / set of variables that are to be transformed into single (time-varying) variables in long format (default: c())
 #' @param varExc List / set of variables to be excluded from the variable list (default: c())
 #' @param varID  Name(s) of one or more variables that (is created to) identify the same group / individual (if empty, "ID" is added with row numbers identifying cases; default: "ID")
@@ -11,6 +11,8 @@
 #' @param usePkg Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata and SAS files; "foreign" is the default (it comes with base R), but "haven" is newer and more comprehensive
 #' @param selSet Name of the data set that is to be selected from the workspace (only applies when reading .RData-files)
 #' @param ... Additional arguments passed on to methods; see Details below
+#'
+#' @return a data frame (only returned if fleOut is empty) where the input data set is converted from wide to long format
 #'
 #' @details
 #' If varLst is empty, it is tried to generate it using all variables in the data frame except those defined by varExc and varID. The variable(s) in varID have to be unique identifiers (in the original
@@ -83,8 +85,8 @@
 wide2long_omv <- function(dtaInp = NULL, fleOut = "", varLst = c(), varExc = c(), varID = "ID", varTme = "cond", varSep = "_", varSrt = c(), usePkg = c("foreign", "haven"), selSet = "", ...) {
 
     # check and import input data set (either as data frame or from a file)
-    varArg <- list(...)
-    dtaFrm <- inp2DF(dtaInp, fleOut, "_arrCol.omv", usePkg, selSet, varArg)
+    if (!is.null(list(...)[["fleInp"]])) stop("Please use the argument dtaInp instead of fleInp.")
+    dtaFrm <- inp2DF(dtaInp, fleOut = fleOut, usePkg = usePkg, selSet = selSet, ...)
     fleOut <- attr(dtaFrm, "fleOut")
     dtaNmV <- names(dtaFrm)
     hasID  <- all(varID %in% dtaNmV)
@@ -119,7 +121,7 @@ wide2long_omv <- function(dtaInp = NULL, fleOut = "", varLst = c(), varExc = c()
     for (i in seq_len(lngSpl)) unqSpl <- c(unqSpl, rep(i, length(unique(sapply(varSpl, "[[", i))) == 1))
     cntTme <- (lngSpl - length(unqSpl))
 
-    # carry out the transformation (limiting the variable arguments - varArg - to those permitted by "reshape")
+    # carry out the transformation (limiting the variable arguments - ... - to those permitted by "reshape")
     # the transformation also corrects labels (if available)
     for (i in setdiff(seq(lngSpl, 1), unqSpl)) {
         crrTms <- unique(sapply(varSpl, "[[", i))
@@ -131,7 +133,7 @@ wide2long_omv <- function(dtaInp = NULL, fleOut = "", varLst = c(), varExc = c()
         } else {
             crrArg <- c(crrArg, list(v.names = unique(sub(paste0(c(paste0("_", crrTms), paste0(crrTms, "_")), collapse = "|"), "", crrArg$varying))))
         }
-        dtaFrm <- rplLbl(do.call(stats::reshape, adjArg("stats::reshape", crrArg, varArg,
+        dtaFrm <- rplLbl(do.call(stats::reshape, adjArg("stats::reshape", crrArg, ...,
                                                         c("data", "direction", "idvar", "sep", "varying", "times", "timevar", "v.names"))))
         dtaFrm[[crrArg$timevar]] <- as.factor(dtaFrm[[crrArg$timevar]])
         varID  <- c(varID, crrArg$timevar)
@@ -154,8 +156,14 @@ wide2long_omv <- function(dtaInp = NULL, fleOut = "", varLst = c(), varExc = c()
     # in analyses, e.g. as random-effects-variable, and this wouldn't be possible if it were still marked as "ID")
     dtaFrm <- rmvID(dtaFrm, varID, hasID)
 
-    # write file
-    write_omv(dtaFrm, fleOut)
+    # write the resulting data frame to the output file or, if no output file
+    # name was given, return the data frame
+    if (!is.null(fleOut) && nzchar(fleOut)) {
+        write_omv(dtaFrm, fleOut)
+        NULL
+    } else {
+        dtaFrm
+    }
 }
 
 ordCol <- function(varNme = c(), dtaNmV = c(), varID = c(), varLst = c()) {

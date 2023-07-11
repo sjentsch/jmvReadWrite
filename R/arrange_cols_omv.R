@@ -1,13 +1,15 @@
 #' Re-arrange columns / variables in .omv-files for the statistical spreadsheet 'jamovi' (<https://www.jamovi.org>)
 #'
-#' @param dtaInp Either a data frame or the name (including the path, if required) of a data file to be read ("FILENAME.ext"; default: NULL); files can be of any supported file type, see Details below
-#' @param fleOut Name (including the path, if required) of the data file to be written ("FILENAME.omv"; default: ""); if empty, and a file name is given as dtaInp, it is appended with "_arrCol.omv"
+#' @param dtaInp Either a data frame or the name of a data file to be read (including the path, if required; "FILENAME.ext"; default: NULL); files can be of any supported file type, see Details below
+#' @param fleOut Name of the data file to be written (including the path, if required; "FILE_OUT.omv"; default: ""); if empty, the resulting data frame is returned instead
 #' @param varOrd Character vector with the desired order of variable(s) in the data frame (see Details; default: c())
 #' @param varMve Named list defining to how much a particular variable (name of a list entry) should be moved up (neg. value of a list entry) or down (pos. value) in the data frame (see Details; default: c())
 #' @param psvAnl Whether analyses that are contained in the input file shall be transferred to the output file (TRUE / FALSE; default: FALSE)
 #' @param usePkg Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata and SAS files; "foreign" is the default (it comes with base R), but "haven" is newer and more comprehensive
 #' @param selSet Name of the data set that is to be selected from the workspace (only applies when reading .RData-files)
 #' @param ... Additional arguments passed on to methods; see Details below
+#'
+#' @return a data frame (only returned if fleOut is empty) where the variables / columns of the input data set are re-arranged
 #'
 #' @details
 #' varOrd is a character vector. If not all variables of the original data set are contained in varOrd, a warning is issued but otherwise the list of variables defined in varOrd is used (removing
@@ -53,7 +55,8 @@ arrange_cols_omv <- function(dtaInp = "", fleOut = "", varOrd = c(), varMve = li
     }
 
     # check and import input data set (either as data frame or from a file)
-    dtaFrm <- inp2DF(dtaInp, fleOut, "_arrCol.omv", usePkg, selSet, ...)
+    if (!is.null(list(...)[["fleInp"]])) stop("Please use the argument dtaInp instead of fleInp.")
+    dtaFrm <- inp2DF(dtaInp = dtaInp, fleOut = fleOut, usePkg = usePkg, selSet = selSet, ...)
     fleOut <- attr(dtaFrm, "fleOut")
 
     # re-arrange the order of variables in the data set (varOrd)
@@ -94,15 +97,21 @@ arrange_cols_omv <- function(dtaInp = "", fleOut = "", varOrd = c(), varMve = li
     dtaFrm <- dtaFrm[, varOrd]
     dtaFrm <- setAtt(setdiff(names(attMem), c("names", "row.names", "class", "fltLst", "fleOut")), attMem, dtaFrm)
 
-    # write the resulting data frame to the output file
-    write_omv(dtaFrm, fleOut)
-
-    # transfer analyses from input to output file
-    if (psvAnl) {
-        if (is.character(dtaInp)) {
-            xfrAnl(dtaInp, fleOut)
-        } else {
-            warning("psvAnl is only possible if dtaInp is a file name (analyses are not stored in data frames, only in the jamovi files).")
+    # write the resulting data frame to the output file or, if no output file
+    # name was given, return the data frame
+    if (!is.null(fleOut) && nzchar(fleOut)) {
+        write_omv(dtaFrm, fleOut)
+        # transfer analyses from input to output file
+        if (psvAnl) {
+            if (is.character(dtaInp)) {
+                xfrAnl(dtaInp, fleOut)
+            } else {
+                warning("psvAnl is only possible if dtaInp is a file name (analyses are not stored in data frames, only in the jamovi files).")
+            }
         }
+        NULL
+    } else {
+        if (psvAnl) warning("psvAnl is only possible if fleOut is a file name (analyses are not stored in data frames, only in the jamovi files).")
+        dtaFrm
     }
 }

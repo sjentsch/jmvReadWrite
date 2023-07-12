@@ -5,7 +5,7 @@
 \title{Merges two or more data files by adding the content of other input files as columns to the first input file and outputs them as files for the statistical spreadsheet 'jamovi' (\url{https://www.jamovi.org})}
 \usage{
 merge_cols_omv(
-  fleInp = c(),
+  dtaInp = NULL,
   fleOut = "",
   typMrg = c("outer", "inner", "left", "right"),
   varBy = list(),
@@ -17,9 +17,9 @@ merge_cols_omv(
 )
 }
 \arguments{
-\item{fleInp}{vector with the file names of the input files (including the path, if required; c("FILE_IN1.omv", "FILE_IN2.omv"); default: c()); can be any supported file type, see Details below}
+\item{dtaInp}{Either a data frame (with the attribute "fleInp" containing the files to merge) or vector with the names of the input files (including the path, if required)}
 
-\item{fleOut}{Name of the data file to be written (including the path, if required; "FILE_OUT.omv"; default: ""); if empty, the data frame with the added columns is returned as variable (but not written)}
+\item{fleOut}{Name of the data file to be written (including the path, if required; "FILE_OUT.omv"; default: ""); if empty, the resulting data frame is returned instead}
 
 \item{typMrg}{Type of merging operation: "outer" (default), "inner", "left" or "right"; see Details below}
 
@@ -36,19 +36,21 @@ merge_cols_omv(
 \item{...}{Additional arguments passed on to methods; see Details below}
 }
 \value{
-a data frame (if fleOut is empty) with where the columns of all input data sets (in the files given to fleInp) are concatenated
+a data frame (if fleOut is empty) where the columns of all input data sets (given in the dtaInp-argument) are concatenated
 }
 \description{
 Merges two or more data files by adding the content of other input files as columns to the first input file and outputs them as files for the statistical spreadsheet 'jamovi' (\url{https://www.jamovi.org})
 }
 \details{
+Using data frames with the input parameter dtaInp is primarily thought to be used when calling merge_cols_omv from the jamovi-module jTransform. For the use in R, it is strongly recommended to use a
+character vector with the file names instead.
 There are four different types of merging operations: "outer" keeps all cases (but columns in the resulting data set may be empty if they did not contain values in same input data sets), "inner" keeps
-only those cases where all datasets contain the same value in the matching variable, for "left" all cases from the first data set in fleInp are kept (whereas cases that are only contained in input data
-set two or higher are dropped), for "right" all cases from the second (or any higher) data set in fleInp are kept. The behaviour of "left" and "right" may be somewhat difficult to predict in case of
+only those cases where all datasets contain the same value in the matching variable, for "left" all cases from the first data set in dtaInp are kept (whereas cases that are only contained in input data
+set two or higher are dropped), for "right" all cases from the second (or any higher) data set in dtaInp are kept. The behaviour of "left" and "right" may be somewhat difficult to predict in case of
 merging several data sets, therefore "outer" might be a safer choice if several data sets are merged.
 The variable that is used for matching (varBy) can either be a string (if all datasets contain a matching variable with the same name), a character vector (containing several matching variables that
-are the same for all data sets) or a list with the same length as fleInp. In the latter case, each cell of that list can again contain either a string (one matching variable for each data set in fleInp)
-or a character vector (several matching variables for each data set in fleInp; NB: all character vectors in the cells of the list must have the same length as it is necessary to always use the same
+are the same for all data sets) or a list with the same length as dtaInp. In the latter case, each cell of that list can again contain either a string (one matching variable for each data set in dtaInp)
+or a character vector (several matching variables for each data set in dtaInp; NB: all character vectors in the cells of the list must have the same length as it is necessary to always use the same
 number of matching variables when merging).
 The ellipsis-parameter (...) can be used to submit arguments / parameters to the functions that are used for merging or reading the data. Adding columns uses \code{merge}. When reading the data, the
 functions are: \code{read_omv} (for jamovi-files), \code{read.table} (for CSV / TSV files; using similar defaults as \code{read.csv} for CSV and \code{read.delim} for TSV which both are based upon \code{read.table} but
@@ -67,7 +69,7 @@ for (i in seq_along(nmeInp)) {
 }
 # save dtaInp three times (i.e., the length of nmeInp), adding "_" + 1 ... 3 as index
 # to the data variables (A1 ... O5, gender, age → A1_1, ...)
-merge_cols_omv(fleInp = nmeInp, fleOut = nmeOut, varBy = "ID")
+merge_cols_omv(dtaInp = nmeInp, fleOut = nmeOut, varBy = "ID")
 cat(file.info(nmeOut)$size)
 # -> 17731 (size may differ on different OSes)
 dtaOut <- read_omv(nmeOut, sveAtt = FALSE)

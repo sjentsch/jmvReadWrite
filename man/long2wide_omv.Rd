@@ -20,9 +20,9 @@ long2wide_omv(
 )
 }
 \arguments{
-\item{dtaInp}{Either a data frame or the name (including the path, if required) of a data file to be read ("FILENAME.ext"; default: NULL); files can be of any supported file type, see Details below}
+\item{dtaInp}{Either a data frame or the name of a data file to be read (including the path, if required; "FILENAME.ext"; default: NULL); files can be of any supported file type, see Details below}
 
-\item{fleOut}{Name (including the path, if required) of the data file to be written ("FILENAME.omv"; default: ""); if empty, and a file name is given as dtaInp, it is appended with "_wide.omv"}
+\item{fleOut}{Name of the data file to be written (including the path, if required; "FILE_OUT.omv"; default: ""); if empty, the resulting data frame is returned instead}
 
 \item{varID}{Names of one or more variables that identify the same group / individual (default: c())}
 
@@ -43,6 +43,9 @@ long2wide_omv(
 \item{selSet}{Name of the data set that is to be selected from the workspace (only applies when reading .RData-files)}
 
 \item{...}{Additional arguments passed on to methods; see Details below}
+}
+\value{
+a data frame (only returned if fleOut is empty) where the input data set is converted from long to wide format
 }
 \description{
 Converts .omv-files for the statistical spreadsheet 'jamovi' (\url{https://www.jamovi.org}) from long to wide format

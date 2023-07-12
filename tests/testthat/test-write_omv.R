@@ -54,7 +54,7 @@ test_that("write_omv works", {
     attr(tmpDF[[4]], "values") <- as.integer(c(1, 2))
     expect_null(write_omv(tmpDF, nmeOut))
     unlink(nmeOut)
-     
+
     set.seed(1)
     dtaOut <- cbind(dtaOut, data.frame(Bool = sample(c(TRUE, FALSE), colOut, TRUE),
                                        Date = sample(seq(as.Date("1999/01/01"), as.Date("2000/01/01"), by = "day"), colOut),

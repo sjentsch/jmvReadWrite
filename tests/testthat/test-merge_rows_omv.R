@@ -48,7 +48,7 @@ test_that("merge_rows_omv works", {
     expect_s3_class(dtaFrm, "data.frame")
     expect_equal(dim(dtaFrm), c(504, 34))
     expect_true(all(table(dtaFrm$fleInd) == setNames(254, "input data frame") | table(dtaFrm$fleInd) == setNames(250, nmeInp[2])))
-   
+
     tmpDF$age <- as.numeric(tmpDF$age)
     expect_error(merge_rows_omv(dtaInp = tmpDF, colInd = TRUE), regexp = "^Variable age has different types:\\s+input data frame: numeric")
     unlink(nmeInp)

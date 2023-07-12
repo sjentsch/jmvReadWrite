@@ -131,7 +131,7 @@ long2wide_omv <- function(dtaInp = NULL, fleOut = "", varID = "ID", varTme = c()
     # name was given, return the data frame
     if (!is.null(fleOut) && nzchar(fleOut)) {
         write_omv(dtaFrm, fleOut)
-        NULL
+        return(invisible(NULL))
     } else {
         dtaFrm
     }

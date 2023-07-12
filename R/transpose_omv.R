@@ -90,7 +90,7 @@ transpose_omv <- function(dtaInp = NULL, fleOut = "", varNme = "", usePkg = c("f
     # name was given, return the data frame
     if (!is.null(fleOut) && nzchar(fleOut)) {
         write_omv(dtaFrm, fleOut)
-        NULL
+        return(invisible(NULL))
     } else {
         dtaFrm
     }

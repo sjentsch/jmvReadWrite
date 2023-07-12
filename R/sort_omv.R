@@ -70,7 +70,7 @@ sort_omv <- function(dtaInp = NULL, fleOut = "", varSrt = c(), psvAnl = FALSE, u
                 warning("psvAnl is only possible if dtaInp is a file name (analyses are not stored in data frames, only in the jamovi files).")
             }
         }
-        NULL
+        return(invisible(NULL))
     } else {
         if (psvAnl) warning("psvAnl is only possible if fleOut is a file name (analyses are not stored in data frames, only in the jamovi files).")
         dtaFrm

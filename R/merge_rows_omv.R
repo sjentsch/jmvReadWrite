@@ -14,7 +14,7 @@
 #' @return a data frame (if fleOut is empty) where the rows of all input data sets (given in the dtaInp-argument) are concatenated
 #'
 #' @details
-#' Using data frames with the input paramter dtaInp is primarily thought to be used when calling merge_rows_omv from the jamovi-module jTransform. For the use in R, it is strongly recommended to use a
+#' Using data frames with the input parameter dtaInp is primarily thought to be used when calling merge_rows_omv from the jamovi-module jTransform. For the use in R, it is strongly recommended to use a
 #' character vector with the file names instead.
 #' The different types of merging operations: "all" keeps all existing variables / columns that are contained in any of the input data sets and fills them up with NA where the variable / column doesn't
 #' exist in a input data set. "common" only keeps the variables / columns that are common to all input data sets (i.e., that are contained in all data sets).
@@ -140,7 +140,7 @@ merge_rows_omv <- function(dtaInp = NULL, fleOut = "", typMrg = c("all", "common
     # name was given, return the data frame
     if (!is.null(fleOut) && nzchar(fleOut)) {
         write_omv(dtaFrm, fleOut)
-        NULL
+        return(invisible(NULL))
     } else {
         dtaFrm
     }

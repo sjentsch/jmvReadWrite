@@ -16,9 +16,9 @@ arrange_cols_omv(
 )
 }
 \arguments{
-\item{dtaInp}{Either a data frame or the name (including the path, if required) of a data file to be read ("FILENAME.ext"; default: NULL); files can be of any supported file type, see Details below}
+\item{dtaInp}{Either a data frame or the name of a data file to be read (including the path, if required; "FILENAME.ext"; default: NULL); files can be of any supported file type, see Details below}
 
-\item{fleOut}{Name (including the path, if required) of the data file to be written ("FILENAME.omv"; default: ""); if empty, and a file name is given as dtaInp, it is appended with "_arrCol.omv"}
+\item{fleOut}{Name of the data file to be written (including the path, if required; "FILE_OUT.omv"; default: ""); if empty, the resulting data frame is returned instead}
 
 \item{varOrd}{Character vector with the desired order of variable(s) in the data frame (see Details; default: c())}
 
@@ -31,6 +31,9 @@ arrange_cols_omv(
 \item{selSet}{Name of the data set that is to be selected from the workspace (only applies when reading .RData-files)}
 
 \item{...}{Additional arguments passed on to methods; see Details below}
+}
+\value{
+a data frame (only returned if fleOut is empty) where the variables / columns of the input data set are re-arranged
 }
 \description{
 Re-arrange columns / variables in .omv-files for the statistical spreadsheet 'jamovi' (\url{https://www.jamovi.org})

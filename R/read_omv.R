@@ -412,7 +412,7 @@ getHdl <- function(fleOMV = "", crrFle = "", crrMde = "r") {
              },
              error = function(errMsg) {
                  message(sprintf("The file \"%s\" could not be extracted from \"%s\".\nPlease send the file to sebastian.jentschke@uib.no!\nError message: %s\n", crrFle, fleOMV, errMsg))
-                 NULL
+                 return(invisible(NULL))
              }
         )
 }
@@ -499,10 +499,10 @@ rplStr <- function(strMod = "", crrAtt = "") {
 
 tryErr <- function(fleInp = "", errMsg = NULL) {
     message(sprintf("File \"%s\" couldn\'t be read.\nThe error message was: %s\n", basename(fleInp), conditionMessage(errMsg)))
-    return(NULL)
+    return(invisible(NULL))
 }
 
 tryWrn <- function(fleInp = "", wrnMsg = NULL) {
     message(sprintf("Warnings were issued when reading the file \"%s\".\nThe warning was: %s\n", basename(fleInp), conditionMessage(wrnMsg)))
-    return(NULL)
+    return(invisible(NULL))
 }

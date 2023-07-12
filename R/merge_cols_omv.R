@@ -13,7 +13,7 @@
 #' @return a data frame (if fleOut is empty) where the columns of all input data sets (given in the dtaInp-argument) are concatenated
 #'
 #' @details
-#' Using data frames with the input paramter dtaInp is primarily thought to be used when calling merge_cols_omv from the jamovi-module jTransform. For the use in R, it is strongly recommended to use a
+#' Using data frames with the input parameter dtaInp is primarily thought to be used when calling merge_cols_omv from the jamovi-module jTransform. For the use in R, it is strongly recommended to use a
 #' character vector with the file names instead.
 #' There are four different types of merging operations: "outer" keeps all cases (but columns in the resulting data set may be empty if they did not contain values in same input data sets), "inner" keeps
 #' only those cases where all datasets contain the same value in the matching variable, for "left" all cases from the first data set in dtaInp are kept (whereas cases that are only contained in input data
@@ -114,7 +114,7 @@ merge_cols_omv <- function(dtaInp = NULL, fleOut = "", typMrg = c("outer", "inne
                 warning("psvAnl is only possible if dtaInp is a file name (analyses are not stored in data frames, only in the jamovi files).")
             }
         }
-        NULL
+        return(invisible(NULL))
     } else {
         if (psvAnl) warning("psvAnl is only possible if fleOut is a file name (analyses are not stored in data frames, only in the jamovi files).")
         dtaFrm

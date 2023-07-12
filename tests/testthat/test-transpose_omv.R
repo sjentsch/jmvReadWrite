@@ -60,7 +60,7 @@ test_that("arrange_cols_omv works", {
     expect_equal(names(df4Chk), c("ID", sprintf("V_%d", seq(16))))
     expect_equal(as.vector(sapply(df4Chk, typeof)), c("character", rep("integer", 16)))
     unlink(nmeOut)
-  
+
     df4Chk <- transpose_omv(dtaInp = tmpDF)
     expect_s3_class(df4Chk, "data.frame")
     expect_equal(dim(df4Chk), c(75, 17))

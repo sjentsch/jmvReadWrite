@@ -5,7 +5,7 @@
 \title{Merges two .omv-files for the statistical spreadsheet 'jamovi' (\url{https://www.jamovi.org}) by adding the content of the second, etc.  file(s) as rows to the first file}
 \usage{
 merge_rows_omv(
-  fleInp = c(),
+  dtaInp = NULL,
   fleOut = "",
   typMrg = c("all", "common"),
   colInd = FALSE,
@@ -18,9 +18,9 @@ merge_rows_omv(
 )
 }
 \arguments{
-\item{fleInp}{Vector with file names (including the path, if required) of the data files to be read (c("FILE1.omv", "FILE2.omv"); default: c()); can be any supported file type, see Details below}
+\item{dtaInp}{Either a data frame (with the attribute "fleInp" containing the files to merge) or vector with the names of the input files (including the path, if required)}
 
-\item{fleOut}{Name of the data file to be written (including the path, if required; "FILE_OUT.omv"; default: ""); if empty, the data frame with the added columns is returned as variable (but not written)}
+\item{fleOut}{Name of the data file to be written (including the path, if required; "FILE_OUT.omv"; default: ""); if empty, the resulting data frame is returned instead}
 
 \item{typMrg}{Type of merging operation: "all" (default) or  "common"; see also Details}
 
@@ -39,12 +39,14 @@ merge_rows_omv(
 \item{...}{Additional arguments passed on to methods; see Details below}
 }
 \value{
-a data frame (if fleOut is empty) with where the rows of all input data sets (i.e., the files given in the fleInp-argument) are concatenated
+a data frame (if fleOut is empty) where the rows of all input data sets (given in the dtaInp-argument) are concatenated
 }
 \description{
 Merges two .omv-files for the statistical spreadsheet 'jamovi' (\url{https://www.jamovi.org}) by adding the content of the second, etc.  file(s) as rows to the first file
 }
 \details{
+Using data frames with the input parameter dtaInp is primarily thought to be used when calling merge_rows_omv from the jamovi-module jTransform. For the use in R, it is strongly recommended to use a
+character vector with the file names instead.
 The different types of merging operations: "all" keeps all existing variables / columns that are contained in any of the input data sets and fills them up with NA where the variable / column doesn't
 exist in a input data set. "common" only keeps the variables / columns that are common to all input data sets (i.e., that are contained in all data sets).
 The ellipsis-parameter can be used to submit arguments / parameters to the functions that are used for merging or reading the data. The merging operation uses \code{rbind}. When reading the data, the
@@ -62,7 +64,7 @@ nmeOut <- paste0(tempfile(), ".omv")
 for (i in seq_along(nmeInp)) saveRDS(dtaInp[-i - 1], nmeInp[i])
 # save dtaInp three times (i.e., the length of nmeInp), removing one data columns in
 # each data set (for demonstration purposes, A1 in the first, A2 in the second, ...)
-merge_rows_omv(fleInp = nmeInp, fleOut = nmeOut, colInd = TRUE)
+merge_rows_omv(dtaInp = nmeInp, fleOut = nmeOut, colInd = TRUE)
 cat(file.info(nmeOut)$size)
 # -> 10767 (size may differ on different OSes)
 dtaOut <- read_omv(nmeOut, sveAtt = FALSE)
@@ -80,7 +82,7 @@ cat(dim(dtaInp), dim(dtaOut))
 # data set (250 -> 750), the second dimension (columns / variables) is increased by 1
 # (for "fleInd")
 
-merge_rows_omv(fleInp = nmeInp, fleOut = nmeOut, typMrg = "common")
+merge_rows_omv(dtaInp = nmeInp, fleOut = nmeOut, typMrg = "common")
 # the argument typMrg = "common" removes the columns that are not present in all of
 # the input data sets (i.e., A1, A2, A3)
 dtaOut <- read_omv(nmeOut, sveAtt = FALSE)

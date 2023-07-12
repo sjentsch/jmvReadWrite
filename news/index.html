@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">jmvReadWrite</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.7</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.8</span>
       </span>
     </div>
 
@@ -50,6 +50,21 @@
       <small>Source: <a href="https://github.com/sjentsch/jmvReadWrite/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.3.8" id="jmvreadwrite-038">jmvReadWrite 0.3.8<a class="anchor" aria-label="anchor" href="#jmvreadwrite-038"></a></h2>
+<div class="section level3">
+<h3 id="enhancements-and-bug-fixes-0-3-8">Enhancements and bug fixes:<a class="anchor" aria-label="anchor" href="#enhancements-and-bug-fixes-0-3-8"></a></h3>
+<ul><li>adjustments to make <code>jmvReadWrite</code> more suited for using it together with the jamovi-module <code>jTransform</code> (<a href="https://github.com/sjentsch/jTransform" class="external-link uri">https://github.com/sjentsch/jTransform</a>)</li>
+<li>implement reading both data frames or file names for merge_cols_omv and merge_rows_omv (incl. phasing out fleInp as parameter for the helper functions: it now throws an error to prevent using it)</li>
+<li>initial handling of weights in <code>read_omv</code> and <code>write_omv</code>
+</li>
+<li>improved unit tests (implementation of regexp for expect_error and expect_warning, bug-fixes and additional coverage)</li>
+<li>improvements to setting attributes (<code>setAtt</code>, e.g., from the metadata to the data frame and vice versa)</li>
+<li>improved handling of factors with numerical values (measureType Nominal or Ordinal and dataType Integer)</li>
+<li>added function <code>jmvAtt</code> to attach the attributes <code>measureType</code> and <code>dataType</code> to data frames coming from inside jamovi (i.e., when <code>jmvReadWrite</code> is used in modules, e.g., <code>Rj</code>) OBS: rather for internal use and thus not exported, use <code>jmvReadWrite:::jmvAtt()</code> to call it</li>
+<li>smaller bug fixes (typos, to ensure consistency in naming, etc.)</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.3.7" id="jmvreadwrite-037">jmvReadWrite 0.3.7<small>2023-07-03</small><a class="anchor" aria-label="anchor" href="#jmvreadwrite-037"></a></h2>
 <div class="section level3">

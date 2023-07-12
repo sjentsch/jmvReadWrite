@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">jmvReadWrite</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.7</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.8</span>
       </span>
     </div>
 
@@ -57,7 +57,7 @@
 
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">merge_cols_omv</span><span class="op">(</span></span>
-<span>  fleInp <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  dtaInp <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  fleOut <span class="op">=</span> <span class="st">""</span>,</span>
 <span>  typMrg <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"outer"</span>, <span class="st">"inner"</span>, <span class="st">"left"</span>, <span class="st">"right"</span><span class="op">)</span>,</span>
 <span>  varBy <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
@@ -71,12 +71,12 @@
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>fleInp</dt>
-<dd><p>vector with the file names of the input files (including the path, if required; c("FILE_IN1.omv", "FILE_IN2.omv"); default: c()); can be any supported file type, see Details below</p></dd>
+    <dl><dt>dtaInp</dt>
+<dd><p>Either a data frame (with the attribute "fleInp" containing the files to merge) or vector with the names of the input files (including the path, if required)</p></dd>
 
 
 <dt>fleOut</dt>
-<dd><p>Name of the data file to be written (including the path, if required; "FILE_OUT.omv"; default: ""); if empty, the data frame with the added columns is returned as variable (but not written)</p></dd>
+<dd><p>Name of the data file to be written (including the path, if required; "FILE_OUT.omv"; default: ""); if empty, the resulting data frame is returned instead</p></dd>
 
 
 <dt>typMrg</dt>
@@ -111,17 +111,19 @@
     <h2>Value</h2>
     
 
-<p>a data frame (if fleOut is empty) with where the columns of all input data sets (in the files given to fleInp) are concatenated</p>
+<p>a data frame (if fleOut is empty) where the columns of all input data sets (given in the dtaInp-argument) are concatenated</p>
     </div>
     <div id="details">
     <h2>Details</h2>
-    <p>There are four different types of merging operations: "outer" keeps all cases (but columns in the resulting data set may be empty if they did not contain values in same input data sets), "inner" keeps
-only those cases where all datasets contain the same value in the matching variable, for "left" all cases from the first data set in fleInp are kept (whereas cases that are only contained in input data
-set two or higher are dropped), for "right" all cases from the second (or any higher) data set in fleInp are kept. The behaviour of "left" and "right" may be somewhat difficult to predict in case of
+    <p>Using data frames with the input parameter dtaInp is primarily thought to be used when calling merge_cols_omv from the jamovi-module jTransform. For the use in R, it is strongly recommended to use a
+character vector with the file names instead.
+There are four different types of merging operations: "outer" keeps all cases (but columns in the resulting data set may be empty if they did not contain values in same input data sets), "inner" keeps
+only those cases where all datasets contain the same value in the matching variable, for "left" all cases from the first data set in dtaInp are kept (whereas cases that are only contained in input data
+set two or higher are dropped), for "right" all cases from the second (or any higher) data set in dtaInp are kept. The behaviour of "left" and "right" may be somewhat difficult to predict in case of
 merging several data sets, therefore "outer" might be a safer choice if several data sets are merged.
 The variable that is used for matching (varBy) can either be a string (if all datasets contain a matching variable with the same name), a character vector (containing several matching variables that
-are the same for all data sets) or a list with the same length as fleInp. In the latter case, each cell of that list can again contain either a string (one matching variable for each data set in fleInp)
-or a character vector (several matching variables for each data set in fleInp; NB: all character vectors in the cells of the list must have the same length as it is necessary to always use the same
+are the same for all data sets) or a list with the same length as dtaInp. In the latter case, each cell of that list can again contain either a string (one matching variable for each data set in dtaInp)
+or a character vector (several matching variables for each data set in dtaInp; NB: all character vectors in the cells of the list must have the same length as it is necessary to always use the same
 number of matching variables when merging).
 The ellipsis-parameter (...) can be used to submit arguments / parameters to the functions that are used for merging or reading the data. Adding columns uses <code>merge</code>. When reading the data, the
 functions are: <code>read_omv</code> (for jamovi-files), <code>read.table</code> (for CSV / TSV files; using similar defaults as <code>read.csv</code> for CSV and <code>read.delim</code> for TSV which both are based upon <code>read.table</code> but
@@ -142,7 +144,7 @@ with adjusted defaults for the respective file types), <code>readRDS</code> (for
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-in"><span><span class="co"># save dtaInp three times (i.e., the length of nmeInp), adding "_" + 1 ... 3 as index</span></span></span>
 <span class="r-in"><span><span class="co"># to the data variables (A1 ... O5, gender, age → A1_1, ...)</span></span></span>
-<span class="r-in"><span><span class="fu">merge_cols_omv</span><span class="op">(</span>fleInp <span class="op">=</span> <span class="va">nmeInp</span>, fleOut <span class="op">=</span> <span class="va">nmeOut</span>, varBy <span class="op">=</span> <span class="st">"ID"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">merge_cols_omv</span><span class="op">(</span>dtaInp <span class="op">=</span> <span class="va">nmeInp</span>, fleOut <span class="op">=</span> <span class="va">nmeOut</span>, varBy <span class="op">=</span> <span class="st">"ID"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.info.html" class="external-link">file.info</a></span><span class="op">(</span><span class="va">nmeOut</span><span class="op">)</span><span class="op">$</span><span class="va">size</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># -&gt; 17731 (size may differ on different OSes)</span></span></span>
 <span class="r-in"><span><span class="va">dtaOut</span> <span class="op">&lt;-</span> <span class="fu"><a href="read_omv.html">read_omv</a></span><span class="op">(</span><span class="va">nmeOut</span>, sveAtt <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>

@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">jmvReadWrite</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.7</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.8</span>
       </span>
     </div>
 
@@ -69,11 +69,11 @@
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>dtaInp</dt>
-<dd><p>Either a data frame or the name (including the path, if required) of a data file to be read ("FILENAME.ext"; default: NULL); files can be of any supported file type, see Details below</p></dd>
+<dd><p>Either a data frame or the name of a data file to be read (including the path, if required; "FILENAME.ext"; default: NULL); files can be of any supported file type, see Details below</p></dd>
 
 
 <dt>fleOut</dt>
-<dd><p>Name (including the path, if required) of the data file to be written ("FILENAME.omv"; default: ""); if empty, and a file name is given as dtaInp, it is appended with "_xpsd.omv"</p></dd>
+<dd><p>Name of the data file to be written (including the path, if required; "FILE_OUT.omv"; default: ""); if empty, the resulting data frame is returned instead</p></dd>
 
 
 <dt>varNme</dt>
@@ -92,6 +92,12 @@
 <dd><p>Additional arguments passed on to methods; see Details below</p></dd>
 
 </dl></div>
+    <div id="value">
+    <h2>Value</h2>
+    
+
+<p>a data frame (only returned if fleOut is empty) where the input data set is transposed</p>
+    </div>
     <div id="details">
     <h2>Details</h2>
     <p>If varNme empty, the row names of the input data set are used (preceded by "V_" if all row names are numbers); if varNme has the length 1 then it is supposed to point to a variable in the input

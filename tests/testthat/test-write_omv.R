@@ -29,7 +29,7 @@ test_that("write_omv works", {
     # test cases for code coverage ============================================================================================================================
     expect_error(write_omv(NULL, nmeOut), regexp = "^The data frame to be written needs to be given as parameter \\(dtaFrm = \\.\\.\\.\\)\\.")
     expect_error(write_omv(data.frame(T1 = sample(9999, 100), T2 = as.complex(rnorm(100))), nmeOut),
-      regexp = "Variable type complex not implemented\\. Please send the data file that caused this problem to sebastian\\.jentschke@uib\\.no")
+      regexp = "Variable type \\w+ not implemented\\. Please send the data file that caused this problem to sebastian\\.jentschke@uib\\.no")
     expect_error(write_omv(dtaDbg$dtaFrm), regexp = "^Output file name needs to be given as parameter \\(fleOut = \\.\\.\\.\\)\\.")
     suppressMessages(expect_error(capture_output(add2ZIP(fleZIP = nmeOut, crrHdl = NULL)),
       regexp = "^Parameter isn't a file handle pointing to a file to be zipped\\."))

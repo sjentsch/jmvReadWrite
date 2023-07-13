@@ -110,7 +110,7 @@ long2wide_omv <- function(dtaInp = NULL, fleOut = "", varID = "ID", varTme = c()
         crrVrT <- unique(as.character(dtaFrm[[varTme[i]]]))
         crrArg <- list(data = dtaFrm, direction = "wide", v.names = varTgt, idvar = c(varID, varTme[seq_along(varTme)[seq_along(varTme) > i]]), timevar = varTme[i], sep = varSep)
         dtaFrm <- do.call(stats::reshape, adjArg("reshape", crrArg, ..., c("data", "direction", "v.names", "idvar", "timevar")))
-        varTgt <- paste0(varTgt, varSep, crrVrT)
+        varTgt <- apply(expand.grid(varTgt, crrVrT), 1, paste0, collapse = "_")
 #       varTgt <- names(dtaFrm)[grepl(paste0(paste0(varTgt, varSep), collapse = "|"), names(dtaFrm))]
     }
 
@@ -126,6 +126,9 @@ long2wide_omv <- function(dtaInp = NULL, fleOut = "", varID = "ID", varTme = c()
 
     # sort data set (if varSrt is not empty)
     dtaFrm <- srtFrm(dtaFrm, varSrt)
+
+    # remove the reshapeWide-attribute
+    attr(dtaFrm, "reshapeWide") <- NULL
 
     # write the resulting data frame to the output file or, if no output file
     # name was given, return the data frame

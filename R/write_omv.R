@@ -43,7 +43,7 @@
 #' @export write_omv
 
 write_omv <- function(dtaFrm = NULL, fleOut = "", retDbg = FALSE) {
-    if (is.null(dtaFrm))  stop("The data frame to be written needs to be given as parameter (dtaFrm = ...).")
+    if (is.null(dtaFrm)) stop("The data frame to be written needs to be given as parameter (dtaFrm = ...).")
     if (!nzchar(fleOut)) stop("Output file name needs to be given as parameter (fleOut = ...).")
 
     # check that the file name isn't empty, that the destination directory exists and that it ends in .omv
@@ -135,6 +135,7 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", retDbg = FALSE) {
             # above must be kept at crrCol as the original column might be character and was converted above
             facOrd <- is.ordered(dtaFrm[[i]])
             if (chkAtt(dtaFrm[[i]], "values") && !identical(attr(dtaFrm[[i]], "values"), as.integer(attr(dtaFrm[[i]], "levels")))) {
+                clsRmv(list(binHdl, strHdl))
                 stop(sprintf(paste("\"values\"-attribute with unexpected values found for column \"%s\".",
                                    "Please send the file to sebastian.jentschke@uib.no for debugging."), names(dtaFrm[i])))
             }
@@ -190,6 +191,7 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", retDbg = FALSE) {
             mtaDta$fields[[i]][["description"]] <- paste(c(ifelse(nzchar(mtaDta$fields[[i]][["description"]]), mtaDta$fields[[i]][["description"]], names(dtaFrm[i])),
                                                          "(time converted to numeric; sec since 00:00)"), collapse = " ")
         } else {
+            clsRmv(list(binHdl, strHdl))
             stop(sprintf("Variable type %s not implemented. Please send the data file that caused this problem to sebastian.jentschke@uib.no", class(crrCol)))
         }
 
@@ -234,6 +236,7 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", retDbg = FALSE) {
             }
             wrtCol <- as.integer(wrtCol)
         } else {
+            clsRmv(list(binHdl, strHdl))
             stop(sprintf("Variable type %s not implemented. Please send the data file that caused this problem to sebastian.jentschke@uib.no", mtaDta$fields[[i]][["type"]]))
         }
         writeBin(wrtCol, binHdl, endian = "little")
@@ -293,6 +296,15 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", retDbg = FALSE) {
 
     if (retDbg) {
         list(mtaDta = mtaDta, xtdDta = xtdDta, dtaFrm = dtaFrm)
+    }
+}
+
+clsRmv <- function(fleHdl = NULL) {
+    for (crrHdl in fleHdl) {
+        crrFle <- summary(crrHdl)[["description"]]
+        close(crrHdl)
+        unlink(crrFle)
+        rm(crrFle)        
     }
 }
 
@@ -359,7 +371,7 @@ mnfTxt <- function() {
 
 add2ZIP <- function(fleZIP = "", crrHdl = NULL, newFle = FALSE, blnZIP = TRUE, txtOut = "") {
 
-    if (! all(class(crrHdl) == c("file", "connection"))) {
+    if (!all(class(crrHdl) == c("file", "connection"))) {
         cat(utils::str(crrHdl))
         stop("Parameter isn\'t a file handle pointing to a file to be zipped.")
     }
@@ -370,7 +382,8 @@ add2ZIP <- function(fleZIP = "", crrHdl = NULL, newFle = FALSE, blnZIP = TRUE, t
         # for the other files (metadata.json, xdata.json, index.html), it doesn't matter, therefore sep = "\n" is added for all
         writeLines(txtOut, crrHdl, sep = "\n")
     }
-    crrFle <- summary(crrHdl)$description
+
+    crrFle <- summary(crrHdl)[["description"]]
     close(crrHdl)
 
     if (blnZIP) {
@@ -380,6 +393,7 @@ add2ZIP <- function(fleZIP = "", crrHdl = NULL, newFle = FALSE, blnZIP = TRUE, t
             zip::zip_append(fleZIP, basename(crrFle), root = dirname(crrFle))
         }
     }
+
     unlink(crrFle)
     rm(crrFle)
 }

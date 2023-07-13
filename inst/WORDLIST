@@ -9,6 +9,7 @@ cond
 com
 CR
 csv
+dataType
 dtaInp
 delim
 dta
@@ -19,6 +20,7 @@ extdata
 fleInp
 fleOut
 idvar
+incl
 ipip
 jamovi
 jmv
@@ -28,9 +30,11 @@ len
 LF
 lintr
 MAgojam
+measureType
 MinGW
 mtaDta
 NC
+OBS
 OMV
 omv
 org

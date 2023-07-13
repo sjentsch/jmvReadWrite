@@ -107,28 +107,27 @@ long2wide_omv <- function(dtaInp = NULL, fleOut = "", varID = "ID", varTme = c()
     dtaFrm <- dtaFrm[, c(varID, varTme, varExc, varTgt)]
     for (i in seq_along(varTme)) {
         # [3] call "reshape" with having the variable arguments limited to those valid when calling the function
-        crrVrT <- unique(as.character(dtaFrm[[varTme[i]]]))
         crrArg <- list(data = dtaFrm, direction = "wide", v.names = varTgt, idvar = c(varID, varTme[seq_along(varTme)[seq_along(varTme) > i]]), timevar = varTme[i], sep = varSep)
         dtaFrm <- do.call(stats::reshape, adjArg("reshape", crrArg, ..., c("data", "direction", "v.names", "idvar", "timevar")))
-        varTgt <- apply(expand.grid(varTgt, crrVrT), 1, paste0, collapse = "_")
-#       varTgt <- names(dtaFrm)[grepl(paste0(paste0(varTgt, varSep), collapse = "|"), names(dtaFrm))]
+        # [1] varVry contains the variable names with varTgt / v.names as rows, and the steps of varTme[i] / timevar
+        # as columns; [2] when generating an updated varTgt for the next step, this matrix is transformed to a vector
+        # either not transposed (in this case, the original variables are adjacent), or transposed (in this case, the
+        # different steps of the time-varying variable are adjacent); [3] afterwards the reshapeWide-attribute is removed
+        varVry <- attr(dtaFrm, "reshapeWide")$varying
+        varTgt <- eval(parse(text = paste0("as.vector(", ifelse(varOrd == "vars", "t(varVry)", "varVry"), ")")))
+        attr(dtaFrm, "reshapeWide") <- NULL
     }
+    if (varOrd == "vars") dtaFrm <- dtaFrm[, c(setdiff(names(dtaFrm), as.vector(varVry)), varTgt)]
 
     # select all variable(s) except those defined by varID and varExc and remove the prefix "measure", if present
     selVrN <- !grepl(paste0(c(varID, varExc), collapse = "|"), names(dtaFrm))
     if (all(grepl(paste0("^measure", varSep), names(dtaFrm)[selVrN]))) names(dtaFrm)[selVrN] <- gsub(paste0("^measure", varSep), "", names(dtaFrm)[selVrN])
-
-    # change the order of column (if requested)
-    if (varOrd == "vars") dtaFrm <- chgVrO(dtaFrm)
 
     # restore the original labels
     dtaFrm <- rstLbl(dtaFrm, crrLnT)
 
     # sort data set (if varSrt is not empty)
     dtaFrm <- srtFrm(dtaFrm, varSrt)
-
-    # remove the reshapeWide-attribute
-    attr(dtaFrm, "reshapeWide") <- NULL
 
     # write the resulting data frame to the output file or, if no output file
     # name was given, return the data frame
@@ -141,8 +140,7 @@ long2wide_omv <- function(dtaInp = NULL, fleOut = "", varID = "ID", varTme = c()
 }
 
 chgVrO <- function(dtaFrm = NULL) {
-    varVry <- attr(dtaFrm, "reshapeWide")$varying
-    varLst <- setdiff(names(dtaFrm), varVry)
+    
     for (i in seq_len(dim(varVry)[1])) {
         varLst <- c(varLst, varVry[i, ])
     }

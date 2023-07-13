@@ -304,7 +304,7 @@ clsRmv <- function(fleHdl = NULL) {
         crrFle <- summary(crrHdl)[["description"]]
         close(crrHdl)
         unlink(crrFle)
-        rm(crrFle)        
+        rm(crrFle)
     }
 }
 

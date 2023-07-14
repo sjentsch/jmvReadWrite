@@ -79,7 +79,7 @@
 #' @export long2wide_omv
 #'
 long2wide_omv <- function(dtaInp = NULL, fleOut = "", varID = "ID", varTme = c(), varExc = c(), varTgt = c(), varSep = "_", varOrd = c("times", "vars"),
-                          varSrt = c(), usePkg = c("foreign", "haven"), selSet = "", ...) {
+                          varAgg = c("mean", "first"), varSrt = c(), usePkg = c("foreign", "haven"), selSet = "", ...) {
 
     # handle / check further input arguments
     # check varID (can be several) and varTme (must be one), neither can be empty
@@ -87,6 +87,7 @@ long2wide_omv <- function(dtaInp = NULL, fleOut = "", varID = "ID", varTme = c()
         stop("Using the arguments varID and varTme is mandatory (i.e., they can\'t be empty).")
     }
     varOrd <- match.arg(varOrd)
+    varAgg <- match.arg(varAgg)
 
     # check and import input data set (either as data frame or from a file)
     if (!is.null(list(...)[["fleInp"]])) stop("Please use the argument dtaInp instead of fleInp.")
@@ -94,21 +95,25 @@ long2wide_omv <- function(dtaInp = NULL, fleOut = "", varID = "ID", varTme = c()
     fleOut <- attr(dtaFrm, "fleOut")
 
     # transform data set
-    # [1] check whether varID, varTme and varTgt are not empty and exist in the data set
+    # [a] check whether varID, varTme and varTgt are not empty and exist in the data set
     chkVar(dtaFrm, varID)
     chkVar(dtaFrm, varTme)
     chkVar(dtaFrm, varExc)
     if (!chkVar(dtaFrm, varTgt)) {
         varTgt <- setdiff(names(dtaFrm), c(varID, varTme, varExc))
     }
-    # [2] store the original variable labels and the steps of the time-varying variable in crrLnT
-    crrLnT <- getLbl(dtaFrm, varTme[1])
+    # [b] store the original variable labels, the original time-varying / target variable,
+    # and an empty vector for storing labels
+    lstLbl <- list(orgLbl = sapply(dtaFrm, attr, "jmv-desc"), orgTgt = varTgt)
+    
+    # [c] there might be several occurrences for each combination of varID and varTme; aggregate them
+    dtaFrm <- aggDta(dtaFrm = dtaFrm, varAgg = varAgg, varID = varID, varTme = varTme, varExc = varExc, varTgt = varTgt)
 
-    dtaFrm <- dtaFrm[, c(varID, varTme, varExc, varTgt)]
+    # do the actual work, iterating through the different time-varying variables in varTme
     for (i in seq_along(varTme)) {
-        # [3] call "reshape" with having the variable arguments limited to those valid when calling the function
+        # [d] call "reshape" with having the variable arguments limited to those valid when calling the function
         crrArg <- list(data = dtaFrm, direction = "wide", v.names = varTgt, idvar = c(varID, varTme[seq_along(varTme)[seq_along(varTme) > i]]), timevar = varTme[i], sep = varSep)
-        dtaFrm <- do.call(stats::reshape, adjArg("reshape", crrArg, ..., c("data", "direction", "v.names", "idvar", "timevar")))
+        dtaFrm <- do.call(stats::reshape, adjArg("reshape", crrArg, list(), c("data", "direction", "v.names", "idvar", "timevar")))
         # [1] varVry contains the variable names with varTgt / v.names as rows, and the steps of varTme[i] / timevar
         # as columns; [2] when generating an updated varTgt for the next step, this matrix is transformed to a vector
         # either not transposed (in this case, the original variables are adjacent), or transposed (in this case, the
@@ -120,11 +125,11 @@ long2wide_omv <- function(dtaInp = NULL, fleOut = "", varID = "ID", varTme = c()
     if (varOrd == "times") dtaFrm <- dtaFrm[, c(setdiff(names(dtaFrm), as.vector(varVry)), varTgt)]
 
     # select all variable(s) except those defined by varID and varExc and remove the prefix "measure", if present
-    selVrN <- !grepl(paste0(c(varID, varExc), collapse = "|"), names(dtaFrm))
-    if (all(grepl(paste0("^measure", varSep), names(dtaFrm)[selVrN]))) names(dtaFrm)[selVrN] <- gsub(paste0("^measure", varSep), "", names(dtaFrm)[selVrN])
+#   selVrN <- !grepl(paste0(c(varID, varExc), collapse = "|"), names(dtaFrm))
+#   if (all(grepl(paste0("^measure", varSep), names(dtaFrm)[selVrN]))) names(dtaFrm)[selVrN] <- gsub(paste0("^measure", varSep), "", names(dtaFrm)[selVrN])
 
     # restore the original labels
-    dtaFrm <- rstLbl(dtaFrm, crrLnT)
+    dtaFrm <- rstLbl(dtaFrm, lstLbl, varTgt, varTme, varSep)
 
     # sort data set (if varSrt is not empty)
     dtaFrm <- srtFrm(dtaFrm, varSrt)
@@ -139,37 +144,54 @@ long2wide_omv <- function(dtaInp = NULL, fleOut = "", varID = "ID", varTme = c()
     }
 }
 
-chgVrO <- function(dtaFrm = NULL) {
-    
-    for (i in seq_len(dim(varVry)[1])) {
-        varLst <- c(varLst, varVry[i, ])
+aggDta <- function(dtaFrm = NULL, varAgg = "", varID = c(), varTme = c(), varExc = c(), varTgt = c()) {
+    # if there exists only one occurence of each possible combination of the variables in varID and
+    # varTme, the data don't need to be aggregated, just return the data frame with the relevant
+    # columns selected
+    if (!any(aggregate(dtaFrm[, varTgt[1]], by = dtaFrm[, c(varID, varTme)], FUN = length)[["x"]] > 1)) {
+        dtaFrm[, c(varID, varTme, varExc, varTgt)]
+    # otherwise (with more than one occurence), values are aggregate at each possible combination of the
+    # variables in varID and varTme
+    } else if (varAgg == "first") {
+        # [1] if "first" is chosen as aggregation function, the first occurence at each step is returned
+        aggregate(x = dtaFrm[, c(varTgt, varExc), drop = FALSE], by = dtaFrm[, c(varID, varTme), drop = FALSE], FUN = "[[", 1)
+    } else if (varAgg == "mean")  {
+        # [2] if "mean" is chosen as aggregation function, it becomes (a little) more complicated
+        # [a] the target variables (for which the mean is calculated) should be numeric 
+        if (!all(sapply(dtaFrm[, varTgt], is.numeric))) {
+            stop(paste("In order to calculate the mean when aggregating the data, all target variables (varTgt) need to be numeric. Use varAgg = \"first\" instead",
+                       "(to use the first occuring value) or convert the target variables to numeric."))
+        }
+        # [b] if there are both target and “excluded” variables, the mean is calculated for the target
+        # variables at each possible combination of the variables varID and varTme (first aggregate
+        # within merge); afterwards, for the “excluded” variables (i.e., variables not to be
+        # transformed to wide, the first occurrence is chosen (second aggregate; variables in
+        # varExc, e.g. sex, should be the same for each step of the ID variables, e.g., each
+        # participant [ID]); finally the results from the two aggregate-functions are merged again
+        # to return the complete data set
+        if (length(varExc) > 0) {
+            merge(aggregate(x = dtaFrm[, c(varTgt), drop = FALSE], by = dtaFrm[, c(varID, varTme), drop = FALSE], FUN = mean),
+                  aggregate(x = dtaFrm[, c(varExc), drop = FALSE], by = dtaFrm[, c(varID, varTme), drop = FALSE], FUN = "[[", 1))
+        # [c] if there is no “excluded” variable, the mean is calculated for the target variables
+        # at each possible combination of the variables varID and varTme
+        } else {
+            aggregate(x = dtaFrm[, c(varTgt), drop = FALSE], by = dtaFrm[, c(varID, varTme), drop = FALSE], FUN = mean)
+        }
     }
-
-    dtaFrm[, varLst]
 }
 
-getLbl <- function(dtaFrm = NULL, varTme = "") {
-    # if only one data frame is given (not a list of them) it needs to be wrapped as list
-    if (!is.null(dim(dtaFrm))) dtaFrm <- list(dtaFrm)
-    lblLst <- tmeLst <- NULL
-    for (i in seq_along(dtaFrm)) {
-        lblLst <- c(lblLst, sapply(dtaFrm[[i]], attr, "jmv-desc"))
-        tmeLst <- unique(c(tmeLst, dtaFrm[[i]][[varTme]]))
-    }
-    if (all(tmeLst == seq_along(tmeLst))) tmeLst <- NULL
-
-    list(label = lblLst[!sapply(lblLst, is.null)], times = tmeLst)
-}
-
-rstLbl <- function(dtaFrm = NULL, crrLnT = list()) {
-    for (i in seq_along(dtaFrm)) {
-        varNme <- names(dtaFrm)
-        for (crrNme in names(crrLnT$label)) {
-            crrLbl <- crrLnT$label[[crrNme]]
-            crrCol <- grep(paste0("^", crrNme), varNme)
-            for (i in seq_along(crrCol)) {
-                attr(dtaFrm[[crrCol[i]]], "jmv-desc") <- ifelse(is.null(crrLnT$times), crrLbl, paste0(crrLbl, " (", as.character(crrLnT$times[i]), ")"))
-            }
+rstLbl <- function(dtaFrm = NULL, lstLbl = list(), varTgt = c(), varTme = c(), varSep = "_") {
+    for (crrNme in names(lstLbl$orgLbl)) {
+        if (crrNme %in% names(dtaFrm)) {
+            attr(dtaFrm[[crrNme]], "jmv-desc") <- lstLbl$orgLbl[[crrNme]]
+        } else if (crrNme %in% lstLbl$orgTgt) {
+            splTgt <- strsplit(varTgt, varSep)
+            for (i in seq_along(splTgt)) {
+                if (crrNme %in% splTgt[[i]]) {
+                    attr(dtaFrm[[varTgt[i]]], "jmv-desc") <-
+                      sprintf("%s (%s)", lstLbl$orgLbl[[crrNme]], paste0(apply(rbind(varTme, splTgt[[i]][-1]), 2, paste0, collapse = ": "), collapse = ", "))
+                }
+            }        
         }
     }
 

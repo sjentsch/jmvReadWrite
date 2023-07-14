@@ -11,15 +11,19 @@ test_that("long2wide_omv works", {
     expect_s3_class(df4Chk, "data.frame")
     expect_equal(dim(df4Chk), c(121, 25))
     expect_equal(as.vector(sapply(df4Chk, typeof)), c("integer", rep("double", 24)))
-    expect_equal(names(df4Chk), c("Year", paste0(c("X_", "Y_"), month.abb[sort(rep(1:12, 2))])))
+    expect_equal(names(df4Chk), c("Year", paste0(rep(c("X_", "Y_"), each = 12), month.abb[rep(1:12, 2)])))
+    expect_equal(unname(colMeans(df4Chk[-1])), c(51.05398, 51.52200, 50.90146, 47.98040, 46.28997, 53.70601, 49.47946, 49.24704, 49.92602, 44.93970, 49.37357, 47.55488,
+                                                 48.56846, 48.96117, 47.64545, 46.51572, 50.94652, 47.33624, 47.53437, 55.55701, 51.50431, 50.19580, 52.81145, 43.68338), tolerance = 1e-4)
     unlink(nmeOut)
 
-    expect_null(long2wide_omv(dtaInp = dtaTmp, fleOut = nmeOut, varID = "Year", varTme = "Month", varSep = "_"))
+    expect_null(long2wide_omv(dtaInp = dtaTmp, fleOut = nmeOut, varID = "Year", varTme = "Month", varSep = "_", varOrd = "vars"))
     df4Chk <- read_omv(nmeOut)
     expect_s3_class(df4Chk, "data.frame")
     expect_equal(dim(df4Chk), c(121, 25))
     expect_equal(as.vector(sapply(df4Chk, typeof)), c("integer", rep("double", 24)))
-    expect_equal(names(df4Chk), c("Year", paste0(c("X_", "Y_"), month.abb[sort(rep(1:12, 2))])))
+    expect_equal(names(df4Chk), c("Year", paste0(rep(c("X_", "Y_"), 12), month.abb[rep(1:12, each = 2)])))
+    expect_equal(unname(colMeans(df4Chk[-1])), c(51.05398, 48.56846, 51.52200, 48.96117, 50.90146, 47.64545, 47.98040, 46.51572, 46.28997, 50.94652, 53.70601, 47.33624,
+                                                 49.47946, 47.53437, 49.24704, 55.55701, 49.92602, 51.50431, 44.93970, 50.19580, 49.37357, 52.81145, 47.55488, 43.68338), tolerance = 1e-4)
     unlink(nmeOut)
 
     expect_null(long2wide_omv(dtaInp = nmeInp, fleOut = nmeOut, varID = "Year", varTme = "Month", varTgt = c("X"), varSep = "_"))
@@ -28,7 +32,7 @@ test_that("long2wide_omv works", {
     expect_equal(dim(df4Chk), c(121, 13))
     expect_equal(as.vector(sapply(df4Chk, typeof)), c("integer", rep("double", 12)))
     expect_equal(names(df4Chk), c("Year", paste0("X_", month.abb[1:12])))
-    expect_equal(unname(colMeans(df4Chk[2:13])), c(51.05398, 51.52200, 50.90146, 47.98040, 46.28997, 53.70601, 49.47946, 49.24704, 49.92602, 44.93970, 49.37357, 47.55488), tolerance = 1e-4)
+    expect_equal(unname(colMeans(df4Chk[-1])), c(51.05398, 51.52200, 50.90146, 47.98040, 46.28997, 53.70601, 49.47946, 49.24704, 49.92602, 44.93970, 49.37357, 47.55488), tolerance = 1e-4)
     unlink(nmeOut)
 
     expect_null(long2wide_omv(dtaInp = nmeInp, fleOut = nmeOut, varID = "Year", varTme = "Month", varTgt = c("Y"), varSep = "_"))
@@ -37,23 +41,16 @@ test_that("long2wide_omv works", {
     expect_equal(dim(df4Chk), c(121, 13))
     expect_equal(as.vector(sapply(df4Chk, typeof)), c("integer", rep("double", 12)))
     expect_equal(names(df4Chk), c("Year", paste0("Y_", month.abb[1:12])))
+    expect_equal(unname(colMeans(df4Chk[-1])), c(48.56846, 48.96117, 47.64545, 46.51572, 50.94652, 47.33624, 47.53437, 55.55701, 51.50431, 50.19580, 52.81145, 43.68338), tolerance = 1e-4)
     unlink(nmeOut)
 
-    expect_null(long2wide_omv(dtaInp = nmeInp, fleOut = nmeOut, varID = "Year", varTme = "Month", varSep = "_", varOrd = "vars"))
-    df4Chk <- read_omv(nmeOut)
+    df4Chk <- long2wide_omv(dtaInp = dtaTmp, varID = "Year", varTme = "Month", varSep = "_")
     expect_s3_class(df4Chk, "data.frame")
     expect_equal(dim(df4Chk), c(121, 25))
     expect_equal(as.vector(sapply(df4Chk, typeof)), c("integer", rep("double", 24)))
-    expect_equal(names(df4Chk), c("Year", paste0("X_", month.abb[1:12]), paste0("Y_", month.abb[1:12])))
-    expect_equal(unname(colMeans(df4Chk[2:25])), c(51.05398, 51.52200, 50.90146, 47.98040, 46.28997, 53.70601, 49.47946, 49.24704, 49.92602, 44.93970, 49.37357, 47.55488,
-                                                   48.56846, 48.96117, 47.64545, 46.51572, 50.94652, 47.33624, 47.53437, 55.55701, 51.50431, 50.19580, 52.81145, 43.68338), tolerance = 1e-4)
-    unlink(nmeOut)
-
-    df4Chk <- long2wide_omv(dtaInp = nmeInp, varID = "Year", varTme = "Month", varSep = "_")
-    expect_s3_class(df4Chk, "data.frame")
-    expect_equal(dim(df4Chk), c(121, 25))
-    expect_equal(as.vector(sapply(df4Chk, typeof)), c("integer", rep("double", 24)))
-    expect_equal(names(df4Chk), c("Year", paste0(c("X_", "Y_"), month.abb[sort(rep(1:12, 2))])))
+    expect_equal(names(df4Chk), c("Year", paste0(rep(c("X_", "Y_"), each = 12), month.abb[rep(1:12, 2)])))
+    expect_equal(unname(colMeans(df4Chk[-1])), c(51.05398, 51.52200, 50.90146, 47.98040, 46.28997, 53.70601, 49.47946, 49.24704, 49.92602, 44.93970, 49.37357, 47.55488,
+                                                 48.56846, 48.96117, 47.64545, 46.51572, 50.94652, 47.33624, 47.53437, 55.55701, 51.50431, 50.19580, 52.81145, 43.68338), tolerance = 1e-4)
 
     set.seed(1)
     dtaTmp <- data.frame(ID = rep(sprintf("sbj_%03d", seq(1, 100)), each = 24), sex = rep(sample(rep(c("male", "female"), each = 50)), each = 24),
@@ -64,10 +61,10 @@ test_that("long2wide_omv works", {
     df4Chk <- long2wide_omv(dtaInp = dtaTmp, varID = "ID", varTme = c("cond", "color", "rep"), varTgt = c("rspCrr", "rspTme"), varExc = "sex", varSep = "_")
     expect_s3_class(df4Chk, "data.frame")
     expect_equal(dim(df4Chk), c(100, 50))
-    expect_equal(names(df4Chk), c("ID", "sex", sprintf("%s_%s_%s_%d", c("rspCrr", "rspTme"), rep(rep(c("neutral", "cong", "incong"), each = 2), times = 8),
-                                                       rep(c("RED", "BLUE", "GREEN", "YELLOW"), each = 6), rep(1:2, each = 24))))
-    expect_equal(unname(colMeans(df4Chk[, seq(3, 50, 2)])),
-      c(0.97, 1.00, 0.96, 0.97, 1.00, 0.97, 1.00, 1.00, 0.95, 0.98, 1.00, 0.98, 0.97, 0.99, 0.95, 0.98, 0.99, 0.98, 1.00, 1.00, 0.95, 0.99, 1.00, 0.97))
+    expect_equal(names(df4Chk), c("ID", "sex", sprintf("%s_%s_%s_%d", rep(c("rspCrr", "rspTme"), each = 24), rep(rep(c("neutral", "cong", "incong"), each = 8), times = 2),
+                                                       rep(c("RED", "BLUE", "GREEN", "YELLOW"), each = 2), rep(1:2, times = 24))))
+    expect_equal(unname(colMeans(df4Chk[, 3:26])),
+      c(0.97, 0.97, 0.97, 0.98, 1.00, 1.00, 0.98, 0.99, 1.00, 0.99, 1.00, 0.99, 1.00, 1.00, 1.00, 1.00, 0.96, 0.95, 0.97, 0.98, 0.95, 0.95, 0.98, 0.97))
 
 
     # test cases for code coverage ============================================================================================================================

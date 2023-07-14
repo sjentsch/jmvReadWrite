@@ -114,10 +114,10 @@ long2wide_omv <- function(dtaInp = NULL, fleOut = "", varID = "ID", varTme = c()
         # either not transposed (in this case, the original variables are adjacent), or transposed (in this case, the
         # different steps of the time-varying variable are adjacent); [3] afterwards the reshapeWide-attribute is removed
         varVry <- attr(dtaFrm, "reshapeWide")$varying
-        varTgt <- eval(parse(text = paste0("as.vector(", ifelse(varOrd == "vars", "t(varVry)", "varVry"), ")")))
+        varTgt <- eval(parse(text = paste0("as.vector(", ifelse(varOrd == "times", "t(varVry)", "varVry"), ")")))
         attr(dtaFrm, "reshapeWide") <- NULL
     }
-    if (varOrd == "vars") dtaFrm <- dtaFrm[, c(setdiff(names(dtaFrm), as.vector(varVry)), varTgt)]
+    if (varOrd == "times") dtaFrm <- dtaFrm[, c(setdiff(names(dtaFrm), as.vector(varVry)), varTgt)]
 
     # select all variable(s) except those defined by varID and varExc and remove the prefix "measure", if present
     selVrN <- !grepl(paste0(c(varID, varExc), collapse = "|"), names(dtaFrm))

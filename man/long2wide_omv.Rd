@@ -13,6 +13,7 @@ long2wide_omv(
   varTgt = c(),
   varSep = "_",
   varOrd = c("times", "vars"),
+  varAgg = c("mean", "first"),
   varSrt = c(),
   usePkg = c("foreign", "haven"),
   selSet = "",
@@ -35,6 +36,8 @@ long2wide_omv(
 \item{varSep}{Separator character when concatenating the fixed and time-varying part of the variable name ("VAR1_1", "VAR1_2"; default: "_")}
 
 \item{varOrd}{How variables / columns are organized: for "times" (default) the steps of the time varying variable are adjacent, for "vars" the steps of the original columns in the long dataset}
+
+\item{varAgg}{How multiple occurrences of particular combinations of time varying variables are aggregated: either "mean" (calculate the mean over occurrences), or "first" (take the first occurrence)}
 
 \item{varSrt}{Variable(s) that are used to sort the data frame (see Details; if empty, the order returned from reshape is kept; default: c())}
 

@@ -8,6 +8,7 @@
 #' @param varTgt Names of one or more variables to be transformed / reshaped (other variables are excluded, if empty(c()) all variables except varTme, varID and varExc are included; default: c())
 #' @param varSep Separator character when concatenating the fixed and time-varying part of the variable name ("VAR1_1", "VAR1_2"; default: "_")
 #' @param varOrd How variables / columns are organized: for "times" (default) the steps of the time varying variable are adjacent, for "vars" the steps of the original columns in the long dataset
+#' @param varAgg How multiple occurrences of particular combinations of time varying variables are aggregated: either "mean" (calculate the mean over occurrences), or "first" (take the first occurrence)
 #' @param varSrt Variable(s) that are used to sort the data frame (see Details; if empty, the order returned from reshape is kept; default: c())
 #' @param usePkg Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata and SAS files; "foreign" is the default (it comes with base R), but "haven" is newer and more comprehensive
 #' @param selSet Name of the data set that is to be selected from the workspace (only applies when reading .RData-files)
@@ -105,7 +106,7 @@ long2wide_omv <- function(dtaInp = NULL, fleOut = "", varID = "ID", varTme = c()
     # [b] store the original variable labels, the original time-varying / target variable,
     # and an empty vector for storing labels
     lstLbl <- list(orgLbl = sapply(dtaFrm, attr, "jmv-desc"), orgTgt = varTgt)
-    
+
     # [c] there might be several occurrences for each combination of varID and varTme; aggregate them
     dtaFrm <- aggDta(dtaFrm = dtaFrm, varAgg = varAgg, varID = varID, varTme = varTme, varExc = varExc, varTgt = varTgt)
 
@@ -148,16 +149,16 @@ aggDta <- function(dtaFrm = NULL, varAgg = "", varID = c(), varTme = c(), varExc
     # if there exists only one occurence of each possible combination of the variables in varID and
     # varTme, the data don't need to be aggregated, just return the data frame with the relevant
     # columns selected
-    if (!any(aggregate(dtaFrm[, varTgt[1]], by = dtaFrm[, c(varID, varTme)], FUN = length)[["x"]] > 1)) {
+    if (!any(stats::aggregate(dtaFrm[, varTgt[1]], by = dtaFrm[, c(varID, varTme)], FUN = length)[["x"]] > 1)) {
         dtaFrm[, c(varID, varTme, varExc, varTgt)]
     # otherwise (with more than one occurence), values are aggregate at each possible combination of the
     # variables in varID and varTme
     } else if (varAgg == "first") {
         # [1] if "first" is chosen as aggregation function, the first occurence at each step is returned
-        aggregate(x = dtaFrm[, c(varTgt, varExc), drop = FALSE], by = dtaFrm[, c(varID, varTme), drop = FALSE], FUN = "[[", 1)
+        stats::aggregate(x = dtaFrm[, c(varTgt, varExc), drop = FALSE], by = dtaFrm[, c(varID, varTme), drop = FALSE], FUN = "[[", 1)
     } else if (varAgg == "mean")  {
         # [2] if "mean" is chosen as aggregation function, it becomes (a little) more complicated
-        # [a] the target variables (for which the mean is calculated) should be numeric 
+        # [a] the target variables (for which the mean is calculated) should be numeric
         if (!all(sapply(dtaFrm[, varTgt], is.numeric))) {
             stop(paste("In order to calculate the mean when aggregating the data, all target variables (varTgt) need to be numeric. Use varAgg = \"first\" instead",
                        "(to use the first occuring value) or convert the target variables to numeric."))
@@ -170,12 +171,12 @@ aggDta <- function(dtaFrm = NULL, varAgg = "", varID = c(), varTme = c(), varExc
         # participant [ID]); finally the results from the two aggregate-functions are merged again
         # to return the complete data set
         if (length(varExc) > 0) {
-            merge(aggregate(x = dtaFrm[, c(varTgt), drop = FALSE], by = dtaFrm[, c(varID, varTme), drop = FALSE], FUN = mean),
-                  aggregate(x = dtaFrm[, c(varExc), drop = FALSE], by = dtaFrm[, c(varID, varTme), drop = FALSE], FUN = "[[", 1))
+            merge(stats::aggregate(x = dtaFrm[, c(varTgt), drop = FALSE], by = dtaFrm[, c(varID, varTme), drop = FALSE], FUN = mean),
+                  stats::aggregate(x = dtaFrm[, c(varExc), drop = FALSE], by = dtaFrm[, c(varID, varTme), drop = FALSE], FUN = "[[", 1))
         # [c] if there is no “excluded” variable, the mean is calculated for the target variables
         # at each possible combination of the variables varID and varTme
         } else {
-            aggregate(x = dtaFrm[, c(varTgt), drop = FALSE], by = dtaFrm[, c(varID, varTme), drop = FALSE], FUN = mean)
+            stats::aggregate(x = dtaFrm[, c(varTgt), drop = FALSE], by = dtaFrm[, c(varID, varTme), drop = FALSE], FUN = mean)
         }
     }
 }
@@ -191,7 +192,7 @@ rstLbl <- function(dtaFrm = NULL, lstLbl = list(), varTgt = c(), varTme = c(), v
                     attr(dtaFrm[[varTgt[i]]], "jmv-desc") <-
                       sprintf("%s (%s)", lstLbl$orgLbl[[crrNme]], paste0(apply(rbind(varTme, splTgt[[i]][-1]), 2, paste0, collapse = ": "), collapse = ", "))
                 }
-            }        
+            }
         }
     }
 

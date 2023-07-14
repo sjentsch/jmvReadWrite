@@ -65,6 +65,7 @@
 <span>  varTgt <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  varSep <span class="op">=</span> <span class="st">"_"</span>,</span>
 <span>  varOrd <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"times"</span>, <span class="st">"vars"</span><span class="op">)</span>,</span>
+<span>  varAgg <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mean"</span>, <span class="st">"first"</span><span class="op">)</span>,</span>
 <span>  varSrt <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  usePkg <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"foreign"</span>, <span class="st">"haven"</span><span class="op">)</span>,</span>
 <span>  selSet <span class="op">=</span> <span class="st">""</span>,</span>
@@ -104,6 +105,10 @@
 
 <dt>varOrd</dt>
 <dd><p>How variables / columns are organized: for "times" (default) the steps of the time varying variable are adjacent, for "vars" the steps of the original columns in the long dataset</p></dd>
+
+
+<dt>varAgg</dt>
+<dd><p>How multiple occurrences of particular combinations of time varying variables are aggregated: either "mean" (calculate the mean over occurrences), or "first" (take the first occurrence)</p></dd>
 
 
 <dt>varSrt</dt>

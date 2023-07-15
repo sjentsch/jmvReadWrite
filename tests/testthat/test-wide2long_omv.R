@@ -66,7 +66,7 @@ test_that("wide2long_omv works", {
     expect_equal(df4Chk[, "cond2"], as.factor(rep(rep(c("BLUE", "GREEN", "RED", "YELLOW"), each = 2), times = 300)))
     expect_equal(df4Chk[, "cond3"], as.factor(rep(c("1", "2"), times = 1200)))
     expect_equal(unname(colMeans(dtaTmp[3:50])), as.vector(unlist(aggregate(x = df4Chk[, c("rspCrr", "rspTme")], by = df4Chk[, c("cond3", "cond2", "cond1")], FUN = mean)[4:5])))
-    
+
     df4Chk <- wide2long_omv(dtaInp = dtaTmp, fleOut = "", varLst = names(dtaTmp)[c(-1, -2)], varExc = "sex", varID = "ID", varTme = "cond")
     expect_s3_class(df4Chk, "data.frame")
     expect_equal(dim(df4Chk), c(4800, 7))

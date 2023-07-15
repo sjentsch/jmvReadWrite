@@ -13,6 +13,7 @@ wide2long_omv(
   varTme = "cond",
   varSep = "_",
   varSrt = c(),
+  excLvl = NULL,
   usePkg = c("foreign", "haven"),
   selSet = "",
   ...
@@ -35,6 +36,8 @@ wide2long_omv(
 
 \item{varSrt}{Variable(s) that are used to sort the data frame (see Details; if empty, the order returned from reshape is kept; default: c())}
 
+\item{excLvl}{Integer (or vector of integers) determining which parts of the variable names in varLst shall not be transformed (default: NULL), see Details below}
+
 \item{usePkg}{Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata and SAS files; "foreign" is the default (it comes with base R), but "haven" is newer and more comprehensive}
 
 \item{selSet}{Name of the data set that is to be selected from the workspace (only applies when reading .RData-files)}
@@ -48,15 +51,21 @@ a data frame (only returned if fleOut is empty) where the input data set is conv
 Converts .omv-files for the statistical spreadsheet 'jamovi' (\url{https://www.jamovi.org}) from wide to long format
 }
 \details{
-If varLst is empty, it is tried to generate it using all variables in the data frame except those defined by varExc and varID. The variable(s) in varID have to be unique identifiers (in the original
-dataset), those in varExc don't have this requirement. It is generally recommended that the variable names in varExc and varID should not include the variable separator (defined in varSep; default: "_")
-For further arguments, see the help for reshape (where varLst ~ varying, varSep ~ sep, varID ~ idvar, varTme ~ timevar).
-varSrt is a character vector containing column names that are used to sort the data frame before it is written.
-The ellipsis-parameter (...) can be used to submit arguments / parameters to the functions that are used for transforming or reading the data. The transformation uses \code{reshape}. When reading the
-data, the functions are: \code{read_omv} (for jamovi-files), \code{read.table} (for CSV / TSV files; using similar defaults as \code{read.csv} for CSV and \code{read.delim} for TSV which both are based upon
-\code{read.table} but with adjusted defaults for the respective file types), \code{readRDS} (for rds-files), \code{read_sav} (needs R-package "haven") or \code{read.spss} (needs R-package "foreign") for SPSS-files,
-\code{read_dta} ("haven") / \code{read.dta} ("foreign") for Stata-files, \code{read_sas} ("haven") for SAS-data-files, and \code{read_xpt} ("haven") / \code{read.xport} ("foreign") for SAS-transport-files. If you would like
-to use "haven", it may be needed to install it manually (i.e., \code{install.packages("haven", dep = TRUE)}).
+If varLst is empty, it is tried to generate it using all variables in the data frame except those defined by \code{varExc} and \code{varID}. The variable(s) in
+\code{varID} have to be unique identifiers (in the original dataset), those in varExc don't have this requirement. It is generally recommended that the variable
+names in \code{varExc} and \code{varID} should not include the variable separator (defined in \code{varSep}; default: "_"). For further arguments, see the help for
+\code{reshape} (where \code{varLst} ~ \code{varying}, \code{varSep} ~ \code{sep}, \code{varID} ~ \code{idvar}, \code{varTme} ~ \code{timevar}).
+\code{varSrt} is a character vector containing column names that are used to sort the data frame before it is written.
+\code{exclLvl} points to a part of the variable names in \code{varLst} to be excluded. For example, if the variable name is \code{PART1_PART2_PART3} (split at _), then
+\code{excLvl} = 1 would exclude PART1 from the transformation. Quite often, one has more that one variable of a particular type (e.g., responses, reaction
+times, etc.). Those would typically be the first part of each variable name in \code{varLst} (the conditions then being PART2, PART3, and so on). \code{excLvl} = 1
+would exclude those variable types / categories from being transformed into long (i.e., they would be kept as separate columns).
+The ellipsis-parameter (\code{...}) can be used to submit arguments / parameters to the functions that are used for transforming or reading the data. The
+transformation uses \code{reshape}. When reading the data, the functions are: \code{read_omv} (for jamovi-files), \code{read.table} (for CSV / TSV files; using similar
+defaults as \code{read.csv} for CSV and \code{read.delim} for TSV which both are based upon \code{read.table} but with adjusted defaults for the respective file types),
+\code{readRDS} (for rds-files), \code{read_sav} (needs R-package "haven") or \code{read.spss} (needs R-package "foreign") for SPSS-files, \code{read_dta} ("haven") / \code{read.dta}
+("foreign") for Stata-files, \code{read_sas} ("haven") for SAS-data-files, and \code{read_xpt} ("haven") / \code{read.xport} ("foreign") for SAS-transport-files. If you
+would like to use "haven", it may be needed to install it manually (i.e., \code{install.packages("haven", dep = TRUE)}).
 }
 \examples{
 \dontrun{

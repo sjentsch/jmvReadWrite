@@ -143,7 +143,7 @@ wide2long_omv <- function(dtaInp = NULL, fleOut = "", varLst = c(), varExc = c()
     dffSpl[is.na(dffSpl)] <- Inf
     dffSpl[excLvl] <- Inf
     nmbTme <- sum(is.finite(dffSpl)) > 1
-        
+
     # carry out the transformation
     crrNmV <- varLst
     while (any(is.finite(dffSpl))) {
@@ -153,7 +153,7 @@ wide2long_omv <- function(dtaInp = NULL, fleOut = "", varLst = c(), varExc = c()
         crrTms <- unique(sapply(varSpl, "[[", crrPos))
         # assemble the list for varying, if crrTms are the only elements of left in varLst, an output
         # variable “measure” is used as target, otherwise crrVry is assembled as named list with the
-        # target as name and all former variables for that step of the hierarchy as  
+        # target as name and all former variables for that step of the hierarchy as entries
         if (all(crrNmV %in% crrTms)) {
             crrVry <- list(measure = crrNmV)
         } else {

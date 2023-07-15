@@ -5,6 +5,8 @@
 * implement reading both data frames or file names for merge_cols_omv and merge_rows_omv (incl. phasing out fleInp as parameter for the helper functions: it now throws an error to prevent using it)
 * initial handling of weights in `read_omv` and `write_omv`
 * improvements and corrections for `long2wide_omv` (added aggregation, mean or take first, and fixed a bug that led to incorrect naming of variables when transforming complex data sets)
+* improvements and corrections for `wide2long_omv` (added parameter `excLvl`, to prevent that measurements (if there are more than one) are also transformed to long; fixed a bug that led to incorrect
+  an order of values within variables when transforming complex data sets)
 * improved unit tests (implementation of regular expressions for expect_error and expect_warning, bug-fixes and additional coverage)
 * improvements to setting attributes (`setAtt`, e.g., from the metadata to the data frame and vice versa)
 * improved handling of factors with numerical values (measureType Nominal or Ordinal and dataType Integer)

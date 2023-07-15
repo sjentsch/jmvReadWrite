@@ -59,6 +59,7 @@
 <li>initial handling of weights in <code>read_omv</code> and <code>write_omv</code>
 </li>
 <li>improvements and corrections for <code>long2wide_omv</code> (added aggregation, mean or take first, and fixed a bug that led to incorrect naming of variables when transforming complex data sets)</li>
+<li>improvements and corrections for <code>wide2long_omv</code> (added parameter <code>excLvl</code>, to prevent that measurements (if there are more than one) are also transformed to long; fixed a bug that led to incorrect an order of values within variables when transforming complex data sets)</li>
 <li>improved unit tests (implementation of regular expressions for expect_error and expect_warning, bug-fixes and additional coverage)</li>
 <li>improvements to setting attributes (<code>setAtt</code>, e.g., from the metadata to the data frame and vice versa)</li>
 <li>improved handling of factors with numerical values (measureType Nominal or Ordinal and dataType Integer)</li>

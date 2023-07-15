@@ -65,6 +65,7 @@
 <span>  varTme <span class="op">=</span> <span class="st">"cond"</span>,</span>
 <span>  varSep <span class="op">=</span> <span class="st">"_"</span>,</span>
 <span>  varSrt <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  excLvl <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  usePkg <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"foreign"</span>, <span class="st">"haven"</span><span class="op">)</span>,</span>
 <span>  selSet <span class="op">=</span> <span class="st">""</span>,</span>
 <span>  <span class="va">...</span></span>
@@ -105,6 +106,10 @@
 <dd><p>Variable(s) that are used to sort the data frame (see Details; if empty, the order returned from reshape is kept; default: c())</p></dd>
 
 
+<dt>excLvl</dt>
+<dd><p>Integer (or vector of integers) determining which parts of the variable names in varLst shall not be transformed (default: NULL), see Details below</p></dd>
+
+
 <dt>usePkg</dt>
 <dd><p>Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata and SAS files; "foreign" is the default (it comes with base R), but "haven" is newer and more comprehensive</p></dd>
 
@@ -125,15 +130,21 @@
     </div>
     <div id="details">
     <h2>Details</h2>
-    <p>If varLst is empty, it is tried to generate it using all variables in the data frame except those defined by varExc and varID. The variable(s) in varID have to be unique identifiers (in the original
-dataset), those in varExc don't have this requirement. It is generally recommended that the variable names in varExc and varID should not include the variable separator (defined in varSep; default: "_")
-For further arguments, see the help for reshape (where varLst ~ varying, varSep ~ sep, varID ~ idvar, varTme ~ timevar).
-varSrt is a character vector containing column names that are used to sort the data frame before it is written.
-The ellipsis-parameter (...) can be used to submit arguments / parameters to the functions that are used for transforming or reading the data. The transformation uses <code>reshape</code>. When reading the
-data, the functions are: <code>read_omv</code> (for jamovi-files), <code>read.table</code> (for CSV / TSV files; using similar defaults as <code>read.csv</code> for CSV and <code>read.delim</code> for TSV which both are based upon
-<code>read.table</code> but with adjusted defaults for the respective file types), <code>readRDS</code> (for rds-files), <code>read_sav</code> (needs R-package "haven") or <code>read.spss</code> (needs R-package "foreign") for SPSS-files,
-<code>read_dta</code> ("haven") / <code>read.dta</code> ("foreign") for Stata-files, <code>read_sas</code> ("haven") for SAS-data-files, and <code>read_xpt</code> ("haven") / <code>read.xport</code> ("foreign") for SAS-transport-files. If you would like
-to use "haven", it may be needed to install it manually (i.e., <code>install.packages("haven", dep = TRUE)</code>).</p>
+    <p>If varLst is empty, it is tried to generate it using all variables in the data frame except those defined by <code>varExc</code> and <code>varID</code>. The variable(s) in
+<code>varID</code> have to be unique identifiers (in the original dataset), those in varExc don't have this requirement. It is generally recommended that the variable
+names in <code>varExc</code> and <code>varID</code> should not include the variable separator (defined in <code>varSep</code>; default: "_"). For further arguments, see the help for
+<code>reshape</code> (where <code>varLst</code> ~ <code>varying</code>, <code>varSep</code> ~ <code>sep</code>, <code>varID</code> ~ <code>idvar</code>, <code>varTme</code> ~ <code>timevar</code>).
+<code>varSrt</code> is a character vector containing column names that are used to sort the data frame before it is written.
+<code>exclLvl</code> points to a part of the variable names in <code>varLst</code> to be excluded. For example, if the variable name is <code>PART1_PART2_PART3</code> (split at _), then
+<code>excLvl</code> = 1 would exclude PART1 from the transformation. Quite often, one has more that one variable of a particular type (e.g., responses, reaction
+times, etc.). Those would typically be the first part of each variable name in <code>varLst</code> (the conditions then being PART2, PART3, and so on). <code>excLvl</code> = 1
+would exclude those variable types / categories from being transformed into long (i.e., they would be kept as separate columns).
+The ellipsis-parameter (<code>...</code>) can be used to submit arguments / parameters to the functions that are used for transforming or reading the data. The
+transformation uses <code>reshape</code>. When reading the data, the functions are: <code>read_omv</code> (for jamovi-files), <code>read.table</code> (for CSV / TSV files; using similar
+defaults as <code>read.csv</code> for CSV and <code>read.delim</code> for TSV which both are based upon <code>read.table</code> but with adjusted defaults for the respective file types),
+<code>readRDS</code> (for rds-files), <code>read_sav</code> (needs R-package "haven") or <code>read.spss</code> (needs R-package "foreign") for SPSS-files, <code>read_dta</code> ("haven") / <code>read.dta</code>
+("foreign") for Stata-files, <code>read_sas</code> ("haven") for SAS-data-files, and <code>read_xpt</code> ("haven") / <code>read.xport</code> ("foreign") for SAS-transport-files. If you
+would like to use "haven", it may be needed to install it manually (i.e., <code>install.packages("haven", dep = TRUE)</code>).</p>
     </div>
 
     <div id="ref-examples">

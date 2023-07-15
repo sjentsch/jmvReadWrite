@@ -8,6 +8,7 @@
 #' @param varTme Name of the variable that (is created to) differentiate multiple records from the same group / individual (default: "cond"; a counter is added for each time-varying part)
 #' @param varSep Character that separates the variables in varLst into a time-varying part and a part that forms the variable name in long format ("_" in "VAR_1", "VAR_2", default: "_")
 #' @param varSrt Variable(s) that are used to sort the data frame (see Details; if empty, the order returned from reshape is kept; default: c())
+#' @param excLvl Integer (or vector of integers) determining which parts of the variable names in varLst shall not be transformed (default: NULL), see Details below
 #' @param usePkg Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata and SAS files; "foreign" is the default (it comes with base R), but "haven" is newer and more comprehensive
 #' @param selSet Name of the data set that is to be selected from the workspace (only applies when reading .RData-files)
 #' @param ... Additional arguments passed on to methods; see Details below
@@ -15,15 +16,21 @@
 #' @return a data frame (only returned if fleOut is empty) where the input data set is converted from wide to long format
 #'
 #' @details
-#' If varLst is empty, it is tried to generate it using all variables in the data frame except those defined by varExc and varID. The variable(s) in varID have to be unique identifiers (in the original
-#' dataset), those in varExc don't have this requirement. It is generally recommended that the variable names in varExc and varID should not include the variable separator (defined in varSep; default: "_")
-#' For further arguments, see the help for reshape (where varLst ~ varying, varSep ~ sep, varID ~ idvar, varTme ~ timevar).
-#' varSrt is a character vector containing column names that are used to sort the data frame before it is written.
-#' The ellipsis-parameter (...) can be used to submit arguments / parameters to the functions that are used for transforming or reading the data. The transformation uses `reshape`. When reading the
-#' data, the functions are: `read_omv` (for jamovi-files), `read.table` (for CSV / TSV files; using similar defaults as `read.csv` for CSV and `read.delim` for TSV which both are based upon
-#' `read.table` but with adjusted defaults for the respective file types), `readRDS` (for rds-files), `read_sav` (needs R-package "haven") or `read.spss` (needs R-package "foreign") for SPSS-files,
-#' `read_dta` ("haven") / `read.dta` ("foreign") for Stata-files, `read_sas` ("haven") for SAS-data-files, and `read_xpt` ("haven") / `read.xport` ("foreign") for SAS-transport-files. If you would like
-#' to use "haven", it may be needed to install it manually (i.e., `install.packages("haven", dep = TRUE)`).
+#' If varLst is empty, it is tried to generate it using all variables in the data frame except those defined by `varExc` and `varID`. The variable(s) in
+#' `varID` have to be unique identifiers (in the original dataset), those in varExc don't have this requirement. It is generally recommended that the variable
+#' names in `varExc` and `varID` should not include the variable separator (defined in `varSep`; default: "_"). For further arguments, see the help for
+#' `reshape` (where `varLst` ~ `varying`, `varSep` ~ `sep`, `varID` ~ `idvar`, `varTme` ~ `timevar`).
+#' `varSrt` is a character vector containing column names that are used to sort the data frame before it is written.
+#' `exclLvl` points to a part of the variable names in `varLst` to be excluded. For example, if the variable name is `PART1_PART2_PART3` (split at _), then
+#' `excLvl` = 1 would exclude PART1 from the transformation. Quite often, one has more that one variable of a particular type (e.g., responses, reaction
+#' times, etc.). Those would typically be the first part of each variable name in `varLst` (the conditions then being PART2, PART3, and so on). `excLvl` = 1
+#'  would exclude those variable types / categories from being transformed into long (i.e., they would be kept as separate columns).
+#' The ellipsis-parameter (`...`) can be used to submit arguments / parameters to the functions that are used for transforming or reading the data. The
+#' transformation uses `reshape`. When reading the data, the functions are: `read_omv` (for jamovi-files), `read.table` (for CSV / TSV files; using similar
+#' defaults as `read.csv` for CSV and `read.delim` for TSV which both are based upon `read.table` but with adjusted defaults for the respective file types),
+#' `readRDS` (for rds-files), `read_sav` (needs R-package "haven") or `read.spss` (needs R-package "foreign") for SPSS-files, `read_dta` ("haven") / `read.dta`
+#' ("foreign") for Stata-files, `read_sas` ("haven") for SAS-data-files, and `read_xpt` ("haven") / `read.xport` ("foreign") for SAS-transport-files. If you
+#' would like to use "haven", it may be needed to install it manually (i.e., `install.packages("haven", dep = TRUE)`).
 #'
 #' @examples
 #' \dontrun{
@@ -82,7 +89,7 @@
 #'
 #' @export wide2long_omv
 #'
-wide2long_omv <- function(dtaInp = NULL, fleOut = "", varLst = c(), varExc = c(), varID = "ID", varTme = "cond", varSep = "_", varSrt = c(), usePkg = c("foreign", "haven"), selSet = "", ...) {
+wide2long_omv <- function(dtaInp = NULL, fleOut = "", varLst = c(), varExc = c(), varID = "ID", varTme = "cond", varSep = "_", varSrt = c(), excLvl = NULL, usePkg = c("foreign", "haven"), selSet = "", ...) {
 
     # check and import input data set (either as data frame or from a file)
     if (!is.null(list(...)[["fleInp"]])) stop("Please use the argument dtaInp instead of fleInp.")
@@ -117,27 +124,56 @@ wide2long_omv <- function(dtaInp = NULL, fleOut = "", varLst = c(), varExc = c()
         varSpl <- as.list(varLst)
         lngSpl <- 1
     }
-    unqSpl <- c()
-    for (i in seq_len(lngSpl)) unqSpl <- c(unqSpl, rep(i, length(unique(sapply(varSpl, "[[", i))) == 1))
-    cntTme <- (lngSpl - length(unqSpl))
 
-    # carry out the transformation (limiting the variable arguments - ... - to those permitted by "reshape")
-    # the transformation also corrects labels (if available)
-    for (i in setdiff(seq(lngSpl, 1), unqSpl)) {
-        crrTms <- unique(sapply(varSpl, "[[", i))
-        crrArg <- list(data    = dtaFrm, direction = "long", idvar = varID, sep = varSep,
-                       varying = unique(sapply(varSpl, function(x) paste(x[unique(sort(c(seq(1, i), unqSpl)))], collapse = varSep))),
-                       timevar = paste0(varTme, rep(cntTme, (lngSpl - length(unqSpl)) > 1)), times = crrTms)
-        if (all(crrArg$varying %in% crrTms)) {
-            crrArg <- c(crrArg, list(v.names = "measure"))
+    # check excLvl: must be numeric and not contain any values that are outside lngSpl
+    if (!is.null(excLvl) && length(excLvl) > 0 && (!is.numeric(excLvl) || excLvl < 1 || excLvl > lngSpl)) {
+        stop(sprintf("excLvl must be numeric and must not be less (excLvl < 1) or more then the number of available levels (excLvl > %d).", lngSpl))
+    }
+    # dffSpl determines for each of the splits how soon the first element is differing; it is
+    # assumed that the variables in varLst are hierarchically organized, i.e., one condition varies
+    # first (here the difference should be smallest), for the next factor in the hierarchy, the
+    # difference should be larger and so on; if factors are unique (i.e., if there is no difference
+    # for this part of the split), an NA is returned; however: further below (in the while-loop),
+    # NAs are used to indicate which positions have already been processed, setting NAs and the
+    # levels to be excluded (excLvl) to Inf ensures that they would never be found as crrPos
+    # (Inf is larger than any finite number and the while loop stops if there aren't any finite
+    # numbers, i.e., values other than Inf or NA) left
+    dffSpl <- rep(NA, lngSpl)
+    for (i in seq(lngSpl)) dffSpl[i] <- which(sapply(varSpl, "[[", i)[1] != sapply(varSpl, "[[", i)[-1])[1]
+    dffSpl[is.na(dffSpl)] <- Inf
+    dffSpl[excLvl] <- Inf
+    nmbTme <- sum(is.finite(dffSpl)) > 1
+        
+    # carry out the transformation
+    crrNmV <- varLst
+    while (any(is.finite(dffSpl))) {
+        # crrPos: the smallest level that is valid (i.e., that is not unique or excluded because of excLvl)
+        crrPos <- which(dffSpl == min(dffSpl, na.rm = TRUE))
+        # crrTms is used as parameter in crrArg and the if-condition below
+        crrTms <- unique(sapply(varSpl, "[[", crrPos))
+        # assemble the list for varying, if crrTms are the only elements of left in varLst, an output
+        # variable “measure” is used as target, otherwise crrVry is assembled as named list with the
+        # target as name and all former variables for that step of the hierarchy as  
+        if (all(crrNmV %in% crrTms)) {
+            crrVry <- list(measure = crrNmV)
         } else {
-            crrArg <- c(crrArg, list(v.names = unique(sub(paste0(c(paste0("_", crrTms), paste0(crrTms, "_")), collapse = "|"), "", crrArg$varying))))
+            vldPos <- which(!is.na(dffSpl))
+            crrVry <- list()
+            for (i in seq_along(varSpl)) {
+                tmpTgt <- paste0(varSpl[[i]][setdiff(vldPos, crrPos)], collapse = varSep)
+                crrVry[[tmpTgt]] <- unique(c(crrVry[[tmpTgt]], paste0(varSpl[[i]][vldPos], collapse = varSep)))
+            }
         }
-        dtaFrm <- rplLbl(do.call(stats::reshape, adjArg("stats::reshape", crrArg, ...,
-                                                        c("data", "direction", "idvar", "sep", "varying", "times", "timevar", "v.names"))))
+        # assemble the arguments to call reshape (limiting the variable arguments - ... - to those permitted)
+        # rplAtt also corrects labels (if available) and variable names
+        crrArg <- list(data = dtaFrm, direction = "long", idvar = varID, sep = varSep, varying = crrVry, v.names = names(crrVry),
+                       timevar = paste0(varTme, rep(sum(is.finite(dffSpl)), nmbTme)), times = crrTms)
+        dtaFrm <- rplAtt(do.call(stats::reshape, adjArg("stats::reshape", crrArg, ...,
+                                                        c("data", "direction", "idvar", "sep", "varying", "times", "timevar", "v.names"))), crrTms)
         dtaFrm[[crrArg$timevar]] <- as.factor(dtaFrm[[crrArg$timevar]])
         varID  <- c(varID, crrArg$timevar)
-        cntTme <- cntTme - 1
+        crrNmV <- names(crrVry)
+        dffSpl[crrPos] <- NA
     }
     # remove attributes from reshape attached to the data set
     attr(dtaFrm, "reshapeLong") <- NULL
@@ -167,9 +203,10 @@ wide2long_omv <- function(dtaInp = NULL, fleOut = "", varLst = c(), varExc = c()
 }
 
 ordCol <- function(varNme = c(), dtaNmV = c(), varID = c(), varLst = c()) {
-    splNmV <- gsub("\\|$|^\\|", "", strsplit(paste0(setdiff(dtaNmV, varID), collapse = "|"), paste0(varLst, collapse = "\\|"))[[1]])
-    varOrd <- c(varID[1], rep(strsplit(splNmV[1], "\\|")[[1]], length(splNmV) > 0), sort(varID[-1]),
-                setdiff(varNme, c(varID, setdiff(dtaNmV, varLst))), rep(strsplit(splNmV[2], "\\|")[[1]], length(splNmV) > 1))
+    posVrL <- range(which(dtaNmV %in% varLst))
+    varOrd <- c(varID[1], setdiff(dtaNmV[rep(seq(1, posVrL[1] - 1), posVrL[1] > 1)], varID), sort(varID[-1]),
+                setdiff(varNme, c(varID, setdiff(dtaNmV, varLst))),
+                setdiff(dtaNmV[rep(seq(posVrL[2] + 1, length(dtaNmV)), posVrL[2] < length(dtaNmV))], varID))
     if (length(c(setdiff(varNme, varOrd), setdiff(varOrd, varNme))) != 0) {
         stop(paste0("Mismatch between old and new variable order - old: ", paste0(varNme, collapse = ", "), "; new: ", paste0(varOrd, collapse = ", "), "."))
     }
@@ -188,16 +225,18 @@ rmvID <- function(dtaFrm = NULL, varID = c(), hasID = TRUE) {
     dtaFrm
 }
 
-rplLbl <- function(dtaFrm = NULL) {
-    varTme <- attr(attr(dtaFrm, "reshapeLong")$varying, "times")
-    # return if the time-vector only contains consecutive numbers
-    if (all(varTme == seq_along(varTme))) return(dtaFrm)
-    varTme <- as.character(varTme[1])
-    lstAtt <- sapply(dtaFrm, attr, "jmv-desc")
-    lstAtt <- lstAtt[!sapply(lstAtt, is.null)]
-    for (crrNme in names(lstAtt)) {
-        # removes the content of the first occurence of the time variable and any non alphanumeric characters at the end
-        attr(dtaFrm[[crrNme]], "jmv-desc") <- trimws(gsub(paste0("[[:punct:]]", varTme, "[[:punct:]]|", varTme), "", attr(dtaFrm[[crrNme]], "jmv-desc")))
+rplAtt <- function(dtaFrm = NULL, crrTms = c()) {
+    varNme <-      attr(dtaFrm, "reshapeLong")$v.names
+    for (crrNme in varNme) {
+        attr(dtaFrm[[crrNme]], "name") <- crrNme
+        crrDsc <- c(attr(dtaFrm[, crrNme], "jmv-desc"), attr(dtaFrm[, crrNme], "description"))[1]
+        if (is.null(crrDsc) || !nzchar(crrDsc)) next
+        splDsc <- trimws(strsplit(crrDsc, "\\(|\\)")[[1]])
+        if (length(splDsc) == 2) {
+            rplDsc <- paste0(trimws(strsplit(splDsc[2], ",")[[1]])[!grepl(paste(paste0("\\w+: ", crrTms, "$"), collapse = "|"), trimws(strsplit(splDsc[2], ",")[[1]]))], collapse = ", ")
+            attr(dtaFrm[[crrNme]], "jmv-desc")    <- ifelse(nzchar(rplDsc), paste0(splDsc[1], " (", rplDsc, ")"), splDsc[1])
+            attr(dtaFrm[[crrNme]], "description") <- ifelse(nzchar(rplDsc), paste0(splDsc[1], " (", rplDsc, ")"), splDsc[1])
+        }
     }
 
     dtaFrm

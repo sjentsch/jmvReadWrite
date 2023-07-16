@@ -70,11 +70,13 @@
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>dtaInp</dt>
-<dd><p>Either a data frame or the name of a data file to be read (including the path, if required; "FILENAME.ext"; default: NULL); files can be of any supported file type, see Details below</p></dd>
+<dd><p>Either a data frame or the name of a data file to be read (including the path, if required; "FILENAME.ext"; default: NULL); files can be of
+any supported file type, see Details below</p></dd>
 
 
 <dt>fleOut</dt>
-<dd><p>Name of the data file to be written (including the path, if required; "FILE_OUT.omv"; default: ""); if empty, the resulting data frame is returned instead</p></dd>
+<dd><p>Name of the data file to be written (including the path, if required; "FILE_OUT.omv"; default: ""); if empty, the resulting data frame is
+returned instead</p></dd>
 
 
 <dt>varSrt</dt>
@@ -86,7 +88,8 @@
 
 
 <dt>usePkg</dt>
-<dd><p>Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata and SAS files; "foreign" is the default (it comes with base R), but "haven" is newer and more comprehensive</p></dd>
+<dd><p>Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata and SAS files; "foreign" is the default (it comes with
+base R), but "haven" is newer and more comprehensive</p></dd>
 
 
 <dt>selSet</dt>
@@ -101,17 +104,28 @@
     <h2>Value</h2>
     
 
-<p>a data frame (only returned if fleOut is empty) where the input data set is sorted (according to the variables in varSrt)</p>
+<p>a data frame (only returned if <code>fleOut</code> is empty) where the input data set is sorted (according to the variables in <code>varSrt</code>)</p>
     </div>
     <div id="details">
     <h2>Details</h2>
-    <p>varSrt can be either a character or a character vector (with one or more variables respectively). The sorting order for a particular variable can be inverted with preceding the variable name with
-"-". Please note that this doesn't make sense and hence throws a warning for certain variable types (e.g., factors).
-The ellipsis-parameter can be used to submit arguments / parameters to the functions that are used for reading the data. These are: <code>read_omv</code> (for jamovi-files), <code>read.table</code> (for CSV / TSV
-files; using similar defaults as <code>read.csv</code> for CSV and <code>read.delim</code> for TSV which both are based upon <code>read.table</code> but with adjusted defaults for the respective file types), <code>readRDS</code> (for
-rds-files), <code>read_sav</code> (needs R-package "haven") or <code>read.spss</code> (needs R-package "foreign") for SPSS-files, <code>read_dta</code> ("haven") / <code>read.dta</code> ("foreign") for Stata-files, <code>read_sas</code> ("haven") for
-SAS-data-files, and <code>read_xpt</code> ("haven") / <code>read.xport</code> ("foreign") for SAS-transport-files. If you would like to use "haven", it may be needed to install it manually
-(i.e., <code>install.packages("haven", dep = TRUE)</code>).</p>
+    
+<ul><li><p><code>varSrt</code> can be either a character or a character vector (with one or more variables respectively). The sorting order for a particular variable can be
+inverted with preceding the variable name with "-". Please note that this doesn't make sense and hence throws a warning for certain variable types (e.g.,
+factors).</p></li>
+<li><p>The ellipsis-parameter (<code>...</code>) can be used to submit arguments / parameters to the functions that are used for reading the data. By clicking on the
+respective function under “See also”, you can get a more detailed overview over which parameters each of those functions take. The functions are:
+<code>read_omv</code> (for jamovi-files), <code>read.table</code> (for CSV / TSV files; using similar defaults as <code>read.csv</code> for CSV and <code>read.delim</code> for TSV which both are
+based upon <code>read.table</code>), <code>load</code> (for .RData-files), <code>readRDS</code> (for .rds-files), <code>read_sav</code> (needs R-package <code>haven</code>) or <code>read.spss</code> (needs R-package
+<code>foreign</code>) for SPSS-files, <code>read_dta</code> (<code>haven</code>) / <code>read.dta</code> (<code>foreign</code>) for Stata-files, <code>read_sas</code> (<code>haven</code>) for SAS-data-files, and <code>read_xpt</code>
+(<code>haven</code>) / <code>read.xport</code> (<code>foreign</code>) for SAS-transport-files. If you would like to use <code>haven</code>, you may need to install it manually (i.e.,
+<code>install.packages("haven", dep = TRUE)</code>).</p></li>
+</ul></div>
+    <div id="see-also">
+    <h2>See also</h2>
+    <div class="dont-index"><p><code>sort_omv</code> internally uses the following functions to read data files in different formats: <code><a href="read_omv.html">read_omv()</a></code> for jamovi-files,
+<code><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">utils::read.table()</a></code> for CSV / TSV files, <code><a href="https://rdrr.io/r/base/load.html" class="external-link">load()</a></code> for reading .RData-files, <code><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS()</a></code> for .rds-files, <code><a href="https://haven.tidyverse.org/reference/read_spss.html" class="external-link">haven::read_sav()</a></code> or <code><a href="https://rdrr.io/pkg/foreign/man/read.spss.html" class="external-link">foreign::read.spss()</a></code>
+for SPSS-files, <code><a href="https://haven.tidyverse.org/reference/read_dta.html" class="external-link">haven::read_dta()</a></code> or <code><a href="https://rdrr.io/pkg/foreign/man/read.dta.html" class="external-link">foreign::read.dta()</a></code> for Stata-files, <code><a href="https://haven.tidyverse.org/reference/read_sas.html" class="external-link">haven::read_sas()</a></code> for SAS-data-files, and <code><a href="https://haven.tidyverse.org/reference/read_xpt.html" class="external-link">haven::read_xpt()</a></code> or
+<code><a href="https://rdrr.io/pkg/foreign/man/read.xport.html" class="external-link">foreign::read.xport()</a></code> for SAS-transport-files.</p></div>
     </div>
 
     <div id="ref-examples">

@@ -75,11 +75,13 @@
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>dtaInp</dt>
-<dd><p>Either a data frame or the name of a data file to be read (including the path, if required; "FILENAME.ext"; default: NULL); files can be of any supported file type, see Details below</p></dd>
+<dd><p>Either a data frame or the name of a data file to be read (including the path, if required; "FILENAME.ext"; default: NULL); files can be of
+any supported file type, see Details below</p></dd>
 
 
 <dt>fleOut</dt>
-<dd><p>Name of the data file to be written (including the path, if required; "FILE_OUT.omv"; default: ""); if empty, the resulting data frame is returned instead</p></dd>
+<dd><p>Name of the data file to be written (including the path, if required; "FILE_OUT.omv"; default: ""); if empty, the resulting data frame is
+returned instead</p></dd>
 
 
 <dt>varLst</dt>
@@ -87,19 +89,22 @@
 
 
 <dt>varExc</dt>
-<dd><p>List / set of variables to be excluded from the variable list (default: c())</p></dd>
+<dd><p>Name of the variable(s) should be excluded from the transformation, typically this will be between-subject-variable(s) (default: c())</p></dd>
 
 
 <dt>varID</dt>
-<dd><p>Name(s) of one or more variables that (is created to) identify the same group / individual (if empty, "ID" is added with row numbers identifying cases; default: "ID")</p></dd>
+<dd><p>Name(s) of one or more variables that (is created to) identify the same group / individual (if empty, "ID" is added with row numbers
+identifying cases; default: "ID")</p></dd>
 
 
 <dt>varTme</dt>
-<dd><p>Name of the variable that (is created to) differentiate multiple records from the same group / individual (default: "cond"; a counter is added for each time-varying part)</p></dd>
+<dd><p>Name of the variable that (is created to) differentiate multiple records from the same group / individual (default: "cond"; a counter is added
+for each time-varying part)</p></dd>
 
 
 <dt>varSep</dt>
-<dd><p>Character that separates the variables in varLst into a time-varying part and a part that forms the variable name in long format ("<em>" in "VAR_1", "VAR_2", default: "</em>")</p></dd>
+<dd><p>Character that separates the variables in varLst into a time-varying part and a part that forms the variable name in long format ("<em>" in
+"VAR_1", "VAR_2", default: "</em>")</p></dd>
 
 
 <dt>varSrt</dt>
@@ -107,11 +112,13 @@
 
 
 <dt>excLvl</dt>
-<dd><p>Integer (or vector of integers) determining which parts of the variable names in varLst shall not be transformed (default: NULL), see Details below</p></dd>
+<dd><p>Integer (or vector of integers) determining which parts of the variable names in varLst shall not be transformed (default: NULL), see Details
+below</p></dd>
 
 
 <dt>usePkg</dt>
-<dd><p>Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata and SAS files; "foreign" is the default (it comes with base R), but "haven" is newer and more comprehensive</p></dd>
+<dd><p>Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata and SAS files; "foreign" is the default (it comes with
+base R), but "haven" is newer and more comprehensive</p></dd>
 
 
 <dt>selSet</dt>
@@ -126,25 +133,37 @@
     <h2>Value</h2>
     
 
-<p>a data frame (only returned if fleOut is empty) where the input data set is converted from wide to long format</p>
+<p>a data frame (only returned if <code>fleOut</code> is empty) where the input data set is converted from wide to long format</p>
     </div>
     <div id="details">
     <h2>Details</h2>
-    <p>If varLst is empty, it is tried to generate it using all variables in the data frame except those defined by <code>varExc</code> and <code>varID</code>. The variable(s) in
-<code>varID</code> have to be unique identifiers (in the original dataset), those in varExc don't have this requirement. It is generally recommended that the variable
-names in <code>varExc</code> and <code>varID</code> should not include the variable separator (defined in <code>varSep</code>; default: "_"). For further arguments, see the help for
-<code>reshape</code> (where <code>varLst</code> ~ <code>varying</code>, <code>varSep</code> ~ <code>sep</code>, <code>varID</code> ~ <code>idvar</code>, <code>varTme</code> ~ <code>timevar</code>).
-<code>varSrt</code> is a character vector containing column names that are used to sort the data frame before it is written.
-<code>exclLvl</code> points to a part of the variable names in <code>varLst</code> to be excluded. For example, if the variable name is <code>PART1_PART2_PART3</code> (split at _), then
+    
+<ul><li><p>If <code>varLst</code> is empty, it is tried to generate it using all variables in the data frame except those defined by <code>varExc</code> and <code>varID</code>. The variable(s) in
+<code>varID</code> need to be unique identifiers (in the original dataset), those in <code>varExc</code> don't have this requirement. It is generally recommended that the
+variable names in <code>varExc</code> and <code>varID</code> should not contain the variable separator (defined in <code>varSep</code>; default: "_").</p></li>
+<li><p><code>varSrt</code> can be either a character or a character vector (with one or more variables respectively). The sorting order for a particular variable can be
+inverted with preceding the variable name with "-". Please note that this doesn't make sense and hence throws a warning for certain variable types (e.g.,
+factors).</p></li>
+<li><p><code>exclLvl</code> points to a part of the variable names in <code>varLst</code> to be excluded. For example, if the variable name is <code>PART1_PART2_PART3</code> (split at _), then
 <code>excLvl</code> = 1 would exclude PART1 from the transformation. Quite often, one has more that one variable of a particular type (e.g., responses, reaction
 times, etc.). Those would typically be the first part of each variable name in <code>varLst</code> (the conditions then being PART2, PART3, and so on). <code>excLvl</code> = 1
-would exclude those variable types / categories from being transformed into long (i.e., they would be kept as separate columns).
-The ellipsis-parameter (<code>...</code>) can be used to submit arguments / parameters to the functions that are used for transforming or reading the data. The
-transformation uses <code>reshape</code>. When reading the data, the functions are: <code>read_omv</code> (for jamovi-files), <code>read.table</code> (for CSV / TSV files; using similar
-defaults as <code>read.csv</code> for CSV and <code>read.delim</code> for TSV which both are based upon <code>read.table</code> but with adjusted defaults for the respective file types),
-<code>readRDS</code> (for rds-files), <code>read_sav</code> (needs R-package "haven") or <code>read.spss</code> (needs R-package "foreign") for SPSS-files, <code>read_dta</code> ("haven") / <code>read.dta</code>
-("foreign") for Stata-files, <code>read_sas</code> ("haven") for SAS-data-files, and <code>read_xpt</code> ("haven") / <code>read.xport</code> ("foreign") for SAS-transport-files. If you
-would like to use "haven", it may be needed to install it manually (i.e., <code>install.packages("haven", dep = TRUE)</code>).</p>
+would exclude those variable types / categories from being transformed into long (i.e., they would be kept as separate columns).</p></li>
+<li><p>The ellipsis-parameter (<code>...</code>) can be used to submit arguments / parameters to the functions that are used for transforming or reading the data. By
+clicking on the respective function under “See also”, you can get a more detailed overview over which parameters each of those functions take.</p></li>
+<li><p>The transformation from long to wide uses <code>reshape</code>: <code>varID</code> matches (~) <code>idvar</code> in <code>reshape</code>, <code>varTme</code> ~ <code>timevar</code>, <code>varLst</code> ~ <code>varying</code>, and <code>varSep</code> ~
+<code>sep</code>. The help for <code>reshape</code> is very explanatory, click on the link under “See also” to access it, particularly what is explained under “Details”.</p></li>
+<li><p>The functions for reading the data are: <code>read_omv</code> (for jamovi-files), <code>read.table</code> (for CSV / TSV files; using similar defaults as <code>read.csv</code> for CSV and
+<code>read.delim</code> for TSV which both are based upon <code>read.table</code>), <code>load</code> (for .RData-files), <code>readRDS</code> (for .rds-files), <code>read_sav</code> (needs R-package <code>haven</code>)
+or <code>read.spss</code> (needs R-package <code>foreign</code>) for SPSS-files, <code>read_dta</code> (<code>haven</code>) / <code>read.dta</code> (<code>foreign</code>) for Stata-files, <code>read_sas</code> (<code>haven</code>) for
+SAS-data-files, and <code>read_xpt</code> (<code>haven</code>) / <code>read.xport</code> (<code>foreign</code>) for SAS-transport-files. If you would like to use <code>haven</code>, you may need to install it
+manually (i.e., <code>install.packages("haven", dep = TRUE)</code>).</p></li>
+</ul></div>
+    <div id="see-also">
+    <h2>See also</h2>
+    <div class="dont-index"><p><code>long2wide_omv</code> internally uses the following functions: The transformation from long to wide uses <code><a href="https://rdrr.io/r/stats/reshape.html" class="external-link">stats::reshape()</a></code>. For reading data files in
+different formats, the following functions are used: <code><a href="read_omv.html">read_omv()</a></code> for jamovi-files, <code><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">utils::read.table()</a></code> for CSV / TSV files, <code><a href="https://rdrr.io/r/base/load.html" class="external-link">load()</a></code> for
+reading .RData-files, <code><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS()</a></code> for .rds-files, <code><a href="https://haven.tidyverse.org/reference/read_spss.html" class="external-link">haven::read_sav()</a></code> or <code><a href="https://rdrr.io/pkg/foreign/man/read.spss.html" class="external-link">foreign::read.spss()</a></code> for SPSS-files, <code><a href="https://haven.tidyverse.org/reference/read_dta.html" class="external-link">haven::read_dta()</a></code> or
+<code><a href="https://rdrr.io/pkg/foreign/man/read.dta.html" class="external-link">foreign::read.dta()</a></code> for Stata-files, <code><a href="https://haven.tidyverse.org/reference/read_sas.html" class="external-link">haven::read_sas()</a></code> for SAS-data-files, and <code><a href="https://haven.tidyverse.org/reference/read_xpt.html" class="external-link">haven::read_xpt()</a></code> or <code><a href="https://rdrr.io/pkg/foreign/man/read.xport.html" class="external-link">foreign::read.xport()</a></code> for SAS-transport-files.</p></div>
     </div>
 
     <div id="ref-examples">

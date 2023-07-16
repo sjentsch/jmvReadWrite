@@ -71,11 +71,13 @@
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>dtaInp</dt>
-<dd><p>Either a data frame or the name of a data file to be read (including the path, if required; "FILENAME.ext"; default: NULL); files can be of any supported file type, see Details below</p></dd>
+<dd><p>Either a data frame or the name of a data file to be read (including the path, if required; "FILENAME.ext"; default: NULL); files can be of
+any supported file type, see Details below</p></dd>
 
 
 <dt>fleOut</dt>
-<dd><p>Name of the data file to be written (including the path, if required; "FILE_OUT.omv"; default: ""); if empty, the resulting data frame is returned instead</p></dd>
+<dd><p>Name of the data file to be written (including the path, if required; "FILE_OUT.omv"; default: ""); if empty, the resulting data frame is
+returned instead</p></dd>
 
 
 <dt>varOrd</dt>
@@ -83,7 +85,8 @@
 
 
 <dt>varMve</dt>
-<dd><p>Named list defining to how much a particular variable (name of a list entry) should be moved up (neg. value of a list entry) or down (pos. value) in the data frame (see Details; default: c())</p></dd>
+<dd><p>Named list defining to how much a particular variable (name of a list entry) should be moved up (neg. value of a list entry) or down (pos.
+value) in the data frame (see Details; default: c())</p></dd>
 
 
 <dt>psvAnl</dt>
@@ -91,7 +94,8 @@
 
 
 <dt>usePkg</dt>
-<dd><p>Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata and SAS files; "foreign" is the default (it comes with base R), but "haven" is newer and more comprehensive</p></dd>
+<dd><p>Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata and SAS files; "foreign" is the default (it comes with
+base R), but "haven" is newer and more comprehensive</p></dd>
 
 
 <dt>selSet</dt>
@@ -106,23 +110,34 @@
     <h2>Value</h2>
     
 
-<p>a data frame (only returned if fleOut is empty) where the variables / columns of the input data set are re-arranged</p>
+<p>a data frame (only returned if <code>fleOut</code> is empty) where the order of variables / columns of the input data set is re-arranged</p>
     </div>
     <div id="details">
     <h2>Details</h2>
-    <p>varOrd is a character vector. If not all variables of the original data set are contained in varOrd, a warning is issued but otherwise the list of variables defined in varOrd is used (removing
-variables not contained in varOrd).
-varMve is a named list. For example would list(VARNAME = -3) move the variable VARNAME three positions up in the list of variables (towards the first column), and list(VARNAME = 3) would move
-it three positions down (towards the last column). If how much the variable is to be moved leads to the position being lower than the first or higher than the total number of variables in the
-data set, an error message is issued. Please note that the list entries are processed one after another, that is, you have for a second list entry to consider how the first list entry may have
-changed to order of variables.
-Generally, using varOrd makes more sense if several variables shall change their position whereas using varMve makes more sense for one variable. If both parameters are given, a warning is
-issued and varOrd takes precedence.
-The ellipsis-parameter can be used to submit arguments / parameters to the functions that are used for reading the data. These are: <code>read_omv</code> (for jamovi-files), <code>read.table</code> (for CSV / TSV
-files; using similar defaults as <code>read.csv</code> for CSV and <code>read.delim</code> for TSV which both are based upon <code>read.table</code> but with adjusted defaults for the respective file types), <code>readRDS</code> (for
-rds-files), <code>read_sav</code> (needs R-package "haven") or <code>read.spss</code> (needs R-package "foreign") for SPSS-files, <code>read_dta</code> ("haven") / <code>read.dta</code> ("foreign") for Stata-files, <code>read_sas</code> ("haven") for
-SAS-data-files, and <code>read_xpt</code> ("haven") / <code>read.xport</code> ("foreign") for SAS-transport-files. If you would like to use "haven", it may be needed to install it manually
-(i.e., <code>install.packages("haven", dep = TRUE)</code>).</p>
+    
+<ul><li><p><code>varOrd</code> is a character vector. If not all variables of the original data set are contained in <code>varOrd</code>, a warning is issued but otherwise the list of
+variables defined in <code>varOrd</code> is used (removing variables not contained in <code>varOrd</code>).</p></li>
+<li><p><code>varMve</code> is a named list. For example would <code>list(VARNAME = -3)</code> move the variable <code>VARNAME</code> three positions up in the list of variables (towards the
+first column), and <code>list(VARNAME = 3)</code> would move it three positions down (towards the last column). If the number of steps the variable is to be moved
+leads to the position being either lower than the first or higher than the total number of variables in the data set, an error message is issued. Please
+note that the list entries are processed one after another, that is, for a second list entry, you have to consider how the first list entry may have
+changed to order of variables.</p></li>
+<li><p>Using <code>varOrd</code> makes more sense for changing the position of several variables, whereas using <code>varMve</code> makes more sense for one variable. If
+both parameters are given, a warning is issued and <code>varOrd</code> takes precedence.</p></li>
+<li><p>The ellipsis-parameter (<code>...</code>) can be used to submit arguments / parameters to the functions that are used for reading the data. By clicking on the
+respective function under “See also”, you can get a more detailed overview over which parameters each of those functions take. The functions are:
+<code>read_omv</code> (for jamovi-files), <code>read.table</code> (for CSV / TSV files; using similar defaults as <code>read.csv</code> for CSV and <code>read.delim</code> for TSV which both are
+based upon <code>read.table</code>), <code>load</code> (for .RData-files), <code>readRDS</code> (for .rds-files), <code>read_sav</code> (needs R-package <code>haven</code>) or <code>read.spss</code> (needs R-package
+<code>foreign</code>) for SPSS-files, <code>read_dta</code> (<code>haven</code>) / <code>read.dta</code> (<code>foreign</code>) for Stata-files, <code>read_sas</code> (<code>haven</code>) for SAS-data-files, and <code>read_xpt</code>
+(<code>haven</code>) / <code>read.xport</code> (<code>foreign</code>) for SAS-transport-files. If you would like to use <code>haven</code>, you may need to install it manually (i.e.,
+<code>install.packages("haven", dep = TRUE)</code>).</p></li>
+</ul></div>
+    <div id="see-also">
+    <h2>See also</h2>
+    <div class="dont-index"><p><code>arrange_cols_omv</code> internally uses the following functions to read data files in different formats: <code><a href="read_omv.html">read_omv()</a></code> for jamovi-files,
+<code><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">utils::read.table()</a></code> for CSV / TSV files, <code><a href="https://rdrr.io/r/base/load.html" class="external-link">load()</a></code> for reading .RData-files, <code><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS()</a></code> for .rds-files, <code><a href="https://haven.tidyverse.org/reference/read_spss.html" class="external-link">haven::read_sav()</a></code> or <code><a href="https://rdrr.io/pkg/foreign/man/read.spss.html" class="external-link">foreign::read.spss()</a></code>
+for SPSS-files, <code><a href="https://haven.tidyverse.org/reference/read_dta.html" class="external-link">haven::read_dta()</a></code> or <code><a href="https://rdrr.io/pkg/foreign/man/read.dta.html" class="external-link">foreign::read.dta()</a></code> for Stata-files, <code><a href="https://haven.tidyverse.org/reference/read_sas.html" class="external-link">haven::read_sas()</a></code> for SAS-data-files, and <code><a href="https://haven.tidyverse.org/reference/read_xpt.html" class="external-link">haven::read_xpt()</a></code> or
+<code><a href="https://rdrr.io/pkg/foreign/man/read.xport.html" class="external-link">foreign::read.xport()</a></code> for SAS-transport-files.</p></div>
     </div>
 
     <div id="ref-examples">

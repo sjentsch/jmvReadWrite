@@ -92,11 +92,11 @@
 <!---
 [//]: [![Build Status](https://app.travis-ci.com/sjentsch/jmvReadWrite.svg?branch=main)](https://app.travis-ci.com/sjentsch/jmvReadWrite)
 --->
-<p>The R-package <code>jmvReadWrite</code> reads and writes the .omv-files that are used by the statistical spreadsheet <code>jamovi</code> (<a href="https://www.jamovi.org" class="external-link uri">https://www.jamovi.org</a>). It is supposed to ease using syntax for statistical analyses created using the GUI in <code>jamovi</code> in connection with the R-library <code>jmv</code>.</p>
+<p>The R-package <code>jmvReadWrite</code> reads and writes the .omv-files that are used by the statistical spreadsheet <code>jamovi</code> (<a href="https://www.jamovi.org" class="external-link uri">https://www.jamovi.org</a>). It is supposed to ease using jamovi and R together, provide helper functions for some often required data management tasks, and to adjust and use syntax for statistical analyses that were created using the GUI in <code>jamovi</code> in R (in connection with the R-library <code>jmv</code>). More recently, <code>jmvReadWrite</code> became easily available from within <code>jamovi</code> by becoming part of the <code>Rj</code> module (where you can use it by writing R commands, documented below), and via the <code>jTransform</code> module that provides a graphical user interface for most helper functions.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p>You can either install a stable version of <code>jmvReadWrite</code> which is available on <a href="https://cran.r-project.org/package=jmvReadWrite" class="external-link">CRAN</a> using the following command:</p>
+<p>In R, you can either install a stable version of <code>jmvReadWrite</code> which is available on <a href="https://cran.r-project.org/package=jmvReadWrite" class="external-link">CRAN</a> using the following command:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"jmvReadWrite"</span><span class="op">)</span></span></code></pre></div>
 <p>or you can install the development version of the <code>jmvReadWrite</code> package from <a href="https://github.com/sjentsch/jmvReadWrite/" class="external-link">GitHub</a>:</p>
@@ -107,7 +107,6 @@
 <div class="section level2">
 <h2 id="how-to-use-the-package">How to use the package?<a class="anchor" aria-label="anchor" href="#how-to-use-the-package"></a>
 </h2>
-<p><br></p>
 <p><a href="https://sjentsch.github.io/jmvReadWrite/reference/read_omv.html"><strong>read_omv</strong></a></p>
 <p>The following code uses the ToothGrowth-data set that is part of the data sets included in R (the current file contains some modifications though for testing the reading and writing routines: <code>read_omv</code> and <code>write_omv</code>). With this data set, a syntax to conduct an ANOVA is run.</p>
 <p>The results should be similar to those obtained when running the same analysis in jamovi (using the GUI). To do so, open the file menu (☰) choose <code>Open</code>, <code>Data Library</code> and <code>ToothGrowth</code>. Afterwards, click on the <code>ANOVA</code>-button in the <code>Analyses</code>-tab and choose <code>ANOVA</code>. There, you assign the variable <code>len</code> to <code>Dependent Variable</code> and <code>supp</code> and <code>dose</code> to <code>Fixed Factors</code>. Afterwards, you choose / tick <code>Overall Model Test</code> and <code>ω²</code>. Open the drop-down menu <code>Assumption Checks</code> and tick <code>Homogeneity test</code> and <code>Normality test</code>. The results should be identical apart from that the table output looks nicer in <code>jamovi</code> (not only text, as below), numbers are rounded and maybe one or two other cosmetic differences.</p>
@@ -207,9 +206,9 @@
 <span><span class="co">#&gt; [1] "Trial.omv"</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/file.info.html" class="external-link">file.info</a></span><span class="op">(</span><span class="st">"Trial.omv"</span><span class="op">)</span></span>
 <span><span class="co">#&gt;           size isdir mode               mtime               ctime</span></span>
-<span><span class="co">#&gt; Trial.omv 1573 FALSE  664 2023-07-16 00:23:24 2023-07-16 00:23:24</span></span>
+<span><span class="co">#&gt; Trial.omv 1573 FALSE  664 2023-07-16 12:53:03 2023-07-16 12:53:03</span></span>
 <span><span class="co">#&gt;                         atime  uid  gid    uname   grname</span></span>
-<span><span class="co">#&gt; Trial.omv 2023-07-16 00:23:24 1000 1000 sjentsch sjentsch</span></span>
+<span><span class="co">#&gt; Trial.omv 2023-07-16 12:53:03 1000 1000 sjentsch sjentsch</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="st">"Trial.omv"</span><span class="op">)</span></span></code></pre></div>
 <p>Although jamovi reads R-data files (.RData, .rda, .rds) <a href="https://sjentsch.github.io/jmvReadWrite/reference/write_omv.html"><code>write_omv</code></a> permits to store <code>jamovi</code>-specific attributes (such as variable labels) in addition. Please note that if you are reading from an <code>.omv</code>-file in order to write back to an <code>.omv</code>-file (perhaps after some modifications), it is recommended to leave the <code>sveAtt</code>-attribute set to <code>TRUE</code> (which is the default).</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">

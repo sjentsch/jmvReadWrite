@@ -1,36 +1,52 @@
 #' Converts .omv-files for the statistical spreadsheet 'jamovi' (<https://www.jamovi.org>) from wide to long format
 #'
-#' @param dtaInp Either a data frame or the name of a data file to be read (including the path, if required; "FILENAME.ext"; default: NULL); files can be of any supported file type, see Details below
-#' @param fleOut Name of the data file to be written (including the path, if required; "FILE_OUT.omv"; default: ""); if empty, the resulting data frame is returned instead
+#' @param dtaInp Either a data frame or the name of a data file to be read (including the path, if required; "FILENAME.ext"; default: NULL); files can be of
+#'               any supported file type, see Details below
+#' @param fleOut Name of the data file to be written (including the path, if required; "FILE_OUT.omv"; default: ""); if empty, the resulting data frame is
+#'               returned instead
 #' @param varLst List / set of variables that are to be transformed into single (time-varying) variables in long format (default: c())
-#' @param varExc List / set of variables to be excluded from the variable list (default: c())
-#' @param varID  Name(s) of one or more variables that (is created to) identify the same group / individual (if empty, "ID" is added with row numbers identifying cases; default: "ID")
-#' @param varTme Name of the variable that (is created to) differentiate multiple records from the same group / individual (default: "cond"; a counter is added for each time-varying part)
-#' @param varSep Character that separates the variables in varLst into a time-varying part and a part that forms the variable name in long format ("_" in "VAR_1", "VAR_2", default: "_")
+#' @param varExc Name of the variable(s) should be excluded from the transformation, typically this will be between-subject-variable(s) (default: c())
+#' @param varID  Name(s) of one or more variables that (is created to) identify the same group / individual (if empty, "ID" is added with row numbers
+#'               identifying cases; default: "ID")
+#' @param varTme Name of the variable that (is created to) differentiate multiple records from the same group / individual (default: "cond"; a counter is added
+#'               for each time-varying part)
+#' @param varSep Character that separates the variables in varLst into a time-varying part and a part that forms the variable name in long format ("_" in
+#'               "VAR_1", "VAR_2", default: "_")
 #' @param varSrt Variable(s) that are used to sort the data frame (see Details; if empty, the order returned from reshape is kept; default: c())
-#' @param excLvl Integer (or vector of integers) determining which parts of the variable names in varLst shall not be transformed (default: NULL), see Details below
-#' @param usePkg Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata and SAS files; "foreign" is the default (it comes with base R), but "haven" is newer and more comprehensive
+#' @param excLvl Integer (or vector of integers) determining which parts of the variable names in varLst shall not be transformed (default: NULL), see Details
+#'               below
+#' @param usePkg Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata and SAS files; "foreign" is the default (it comes with
+#'               base R), but "haven" is newer and more comprehensive
 #' @param selSet Name of the data set that is to be selected from the workspace (only applies when reading .RData-files)
-#' @param ... Additional arguments passed on to methods; see Details below
+#' @param ...    Additional arguments passed on to methods; see Details below
 #'
-#' @return a data frame (only returned if fleOut is empty) where the input data set is converted from wide to long format
+#' @return a data frame (only returned if `fleOut` is empty) where the input data set is converted from wide to long format
 #'
 #' @details
-#' If varLst is empty, it is tried to generate it using all variables in the data frame except those defined by `varExc` and `varID`. The variable(s) in
-#' `varID` have to be unique identifiers (in the original dataset), those in varExc don't have this requirement. It is generally recommended that the variable
-#' names in `varExc` and `varID` should not include the variable separator (defined in `varSep`; default: "_"). For further arguments, see the help for
-#' `reshape` (where `varLst` ~ `varying`, `varSep` ~ `sep`, `varID` ~ `idvar`, `varTme` ~ `timevar`).
-#' `varSrt` is a character vector containing column names that are used to sort the data frame before it is written.
-#' `exclLvl` points to a part of the variable names in `varLst` to be excluded. For example, if the variable name is `PART1_PART2_PART3` (split at _), then
-#' `excLvl` = 1 would exclude PART1 from the transformation. Quite often, one has more that one variable of a particular type (e.g., responses, reaction
-#' times, etc.). Those would typically be the first part of each variable name in `varLst` (the conditions then being PART2, PART3, and so on). `excLvl` = 1
-#'  would exclude those variable types / categories from being transformed into long (i.e., they would be kept as separate columns).
-#' The ellipsis-parameter (`...`) can be used to submit arguments / parameters to the functions that are used for transforming or reading the data. The
-#' transformation uses `reshape`. When reading the data, the functions are: `read_omv` (for jamovi-files), `read.table` (for CSV / TSV files; using similar
-#' defaults as `read.csv` for CSV and `read.delim` for TSV which both are based upon `read.table` but with adjusted defaults for the respective file types),
-#' `readRDS` (for rds-files), `read_sav` (needs R-package "haven") or `read.spss` (needs R-package "foreign") for SPSS-files, `read_dta` ("haven") / `read.dta`
-#' ("foreign") for Stata-files, `read_sas` ("haven") for SAS-data-files, and `read_xpt` ("haven") / `read.xport` ("foreign") for SAS-transport-files. If you
-#' would like to use "haven", it may be needed to install it manually (i.e., `install.packages("haven", dep = TRUE)`).
+#' * If `varLst` is empty, it is tried to generate it using all variables in the data frame except those defined by `varExc` and `varID`. The variable(s) in
+#'   `varID` need to be unique identifiers (in the original dataset), those in `varExc` don't have this requirement. It is generally recommended that the
+#'   variable names in `varExc` and `varID` should not contain the variable separator (defined in `varSep`; default: "_").
+#' * `varSrt` can be either a character or a character vector (with one or more variables respectively). The sorting order for a particular variable can be
+#'   inverted with preceding the variable name with "-". Please note that this doesn't make sense and hence throws a warning for certain variable types (e.g.,
+#'   factors).
+#' * `exclLvl` points to a part of the variable names in `varLst` to be excluded. For example, if the variable name is `PART1_PART2_PART3` (split at _), then
+#'   `excLvl` = 1 would exclude PART1 from the transformation. Quite often, one has more that one variable of a particular type (e.g., responses, reaction
+#'   times, etc.). Those would typically be the first part of each variable name in `varLst` (the conditions then being PART2, PART3, and so on). `excLvl` = 1
+#'   would exclude those variable types / categories from being transformed into long (i.e., they would be kept as separate columns).
+#' * The ellipsis-parameter (`...`) can be used to submit arguments / parameters to the functions that are used for transforming or reading the data. By
+#'   clicking on the respective function under “See also”, you can get a more detailed overview over which parameters each of those functions take.
+#' * The transformation from long to wide uses `reshape`: `varID` matches (~) `idvar` in `reshape`, `varTme` ~ `timevar`, `varLst` ~ `varying`, and `varSep` ~
+#'   `sep`. The help for `reshape` is very explanatory, click on the link under “See also” to access it, particularly what is explained under “Details”.
+#' * The functions for reading the data are: `read_omv` (for jamovi-files), `read.table` (for CSV / TSV files; using similar defaults as `read.csv` for CSV and
+#'   `read.delim` for TSV which both are based upon `read.table`), `load` (for .RData-files), `readRDS` (for .rds-files), `read_sav` (needs R-package `haven`)
+#'   or `read.spss` (needs R-package `foreign`) for SPSS-files, `read_dta` (`haven`) / `read.dta` (`foreign`) for Stata-files, `read_sas` (`haven`) for
+#'   SAS-data-files, and `read_xpt` (`haven`) / `read.xport` (`foreign`) for SAS-transport-files. If you would like to use `haven`, you may need to install it
+#'   manually (i.e., `install.packages("haven", dep = TRUE)`).
+#'
+#' @seealso `long2wide_omv` internally uses the following functions: The transformation from long to wide uses [stats::reshape()]. For reading data files in
+#'   different formats, the following functions are used: [jmvReadWrite::read_omv()] for jamovi-files, [utils::read.table()] for CSV / TSV files, [load()] for
+#'   reading .RData-files, [readRDS()] for .rds-files, [haven::read_sav()] or [foreign::read.spss()] for SPSS-files, [haven::read_dta()] or
+#'   [foreign::read.dta()] for Stata-files, [haven::read_sas()] for SAS-data-files, and [haven::read_xpt()] or [foreign::read.xport()] for SAS-transport-files.
 #'
 #' @examples
 #' \dontrun{

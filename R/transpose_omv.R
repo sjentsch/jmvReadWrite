@@ -1,22 +1,33 @@
 #' Transpose .omv-files for the statistical spreadsheet 'jamovi' (<https://www.jamovi.org>)
 #'
-#' @param dtaInp Either a data frame or the name of a data file to be read (including the path, if required; "FILENAME.ext"; default: NULL); files can be of any supported file type, see Details below
-#' @param fleOut Name of the data file to be written (including the path, if required; "FILE_OUT.omv"; default: ""); if empty, the resulting data frame is returned instead
+#' @param dtaInp Either a data frame or the name of a data file to be read (including the path, if required; "FILENAME.ext"; default: NULL); files can be of
+#'               any supported file type, see Details below
+#' @param fleOut Name of the data file to be written (including the path, if required; "FILE_OUT.omv"; default: ""); if empty, the resulting data frame is
+#'               returned instead
 #' @param varNme Name of the variables in the output data frame; see Details below
-#' @param usePkg Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata and SAS files; "foreign" is the default (it comes with base R), but "haven" is newer and more comprehensive
+#' @param usePkg Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata and SAS files; "foreign" is the default (it comes with
+#'               base R), but "haven" is newer and more comprehensive
 #' @param selSet Name of the data set that is to be selected from the workspace (only applies when reading .RData-files)
-#' @param ... Additional arguments passed on to methods; see Details below
+#' @param ...    Additional arguments passed on to methods; see Details below
 #'
-#' @return a data frame (only returned if fleOut is empty) where the input data set is transposed
+#' @return a data frame (only returned if `fleOut` is empty) where the input data set is transposed
 #'
 #' @details
-#' If varNme empty, the row names of the input data set are used (preceded by "V_" if all row names are numbers); if varNme has the length 1 then it is supposed to point to a variable in the input
-#' data frame; if varNme has the same length as the number of rows in the input data frame, then the values in varNme are assigned as column names to the output data frame.
-#' The ellipsis-parameter can be used to submit arguments / parameters to the functions that are used for reading the data. These are: `read_omv` (for jamovi-files), `read.table` (for CSV / TSV
-#' files; using similar defaults as `read.csv` for CSV and `read.delim` for TSV which both are based upon `read.table` but with adjusted defaults for the respective file types), `readRDS` (for
-#' rds-files), `read_sav` (needs R-package "haven") or `read.spss` (needs R-package "foreign") for SPSS-files, `read_dta` ("haven") / `read.dta` ("foreign") for Stata-files, `read_sas` ("haven") for
-#' SAS-data-files, and `read_xpt` ("haven") / `read.xport` ("foreign") for SAS-transport-files. If you would like to use "haven", it may be needed to install it manually
-#' (i.e., `install.packages("haven", dep = TRUE)`).
+#' * If `varNme` empty, the row names of the input data set are used (preceded by "V_" if all row names are numbers); if `varNme` has length 1, then it is
+#'   supposed to point to a variable in the input data frame; if `varNme` has the same length as the number of rows in the input data frame, then the values
+#'   in `varNme` are assigned as column names to the output data frame.
+#' * The ellipsis-parameter (`...`) can be used to submit arguments / parameters to the functions that are used for reading the data. By clicking on the
+#'   respective function under “See also”, you can get a more detailed overview over which parameters each of those functions take. The functions are:
+#'   `read_omv` (for jamovi-files), `read.table` (for CSV / TSV files; using similar defaults as `read.csv` for CSV and `read.delim` for TSV which both are
+#'   based upon `read.table`), `load` (for .RData-files), `readRDS` (for .rds-files), `read_sav` (needs R-package `haven`) or `read.spss` (needs R-package
+#'   `foreign`) for SPSS-files, `read_dta` (`haven`) / `read.dta` (`foreign`) for Stata-files, `read_sas` (`haven`) for SAS-data-files, and `read_xpt`
+#'   (`haven`) / `read.xport` (`foreign`) for SAS-transport-files. If you would like to use `haven`, you may be need to install it manually (i.e.,
+#'   `install.packages("haven", dep = TRUE)`).
+#'
+#' @seealso `sort_omv` internally uses the following functions to read data files in different formats: [jmvReadWrite::read_omv()] for jamovi-files,
+#'   [utils::read.table()] for CSV / TSV files, [load()] for reading .RData-files, [readRDS()] for .rds-files, [haven::read_sav()] or [foreign::read.spss()]
+#'   for SPSS-files, [haven::read_dta()] or [foreign::read.dta()] for Stata-files, [haven::read_sas()] for SAS-data-files, and [haven::read_xpt()] or
+#'   [foreign::read.xport()] for SAS-transport-files.
 #'
 #' @examples
 #' \dontrun{

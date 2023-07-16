@@ -5,11 +5,13 @@
 #' @param fleOut Name / position of the output file to be generated ("FILENAME.omv"; default: "")
 #' @param retDbg Whether to return a list with debugging information (see Value; default: FALSE)
 #'
-#' @return a list (if retDbg == TRUE), containing the meta data (mtaDta, metadata.json in the OMV-file), the extended data (xtdDta, xdata.json in the OMV-file) and the original data frame (dtaFrm)
+#' @return a list (if retDbg == TRUE), containing the meta data (mtaDta, metadata.json in the OMV-file), the extended data (xtdDta, xdata.json in the OMV-file)
+#'         and the original data frame (dtaFrm)
 #'
 #' @details
-#' jamovi has a specific measurement level / type "ID" (in addition to the "standard" ones "Nominal", "Ordinal", and "Continuous"). "ID" is used for columns that contain some form of ID (e.g., a
-#' participant code). In order to set a variable of your data frame to "ID", you have to manually set an attribute \code{jmv-id} (e.g., \code{attr(dtaFrm$column, "jmv-id") = TRUE}).
+#' * jamovi has a specific measurement level / type "ID" (in addition to the "standard" ones "Nominal", "Ordinal", and "Continuous"). "ID" is used for columns
+#'    that contain some form of ID (e.g., a participant code). In order to set a variable of your data frame to "ID", you have to manually set an attribute
+#'    `jmv-id` (e.g., `attr(dtaFrm$column, "jmv-id") = TRUE`).
 #'
 #' @examples
 #' \dontrun{

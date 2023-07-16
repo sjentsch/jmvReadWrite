@@ -1,33 +1,52 @@
-#' Merges two or more data files by adding the content of other input files as columns to the first input file and outputs them as files for the statistical spreadsheet 'jamovi' (<https://www.jamovi.org>)
+#' Merges two or more data files by adding the content of other input files as columns to the first input file and outputs them as files for the statistical
+#' spreadsheet 'jamovi' (<https://www.jamovi.org>)
 #'
-#' @param dtaInp Either a data frame (with the attribute "fleInp" containing the files to merge) or vector with the names of the input files (including the path, if required)
-#' @param fleOut Name of the data file to be written (including the path, if required; "FILE_OUT.omv"; default: ""); if empty, the resulting data frame is returned instead
+#' @param dtaInp Either a data frame (with the attribute "fleInp" containing the files to merge) or vector with the names of the input files (including the
+#'               path, if required; "FILENAME.ext"; default: NULL); files can be of any supported file type, see Details below
+#' @param fleOut Name of the data file to be written (including the path, if required; "FILE_OUT.omv"; default: ""); if empty, the resulting data frame is
+#'               returned instead
 #' @param typMrg Type of merging operation: "outer" (default), "inner", "left" or "right"; see Details below
 #' @param varBy  Name of the variable by which the data sets are matched, can either be a string, a character or a list (see Details below; default: list())
 #' @param varSrt Variable(s) that are used to sort the data frame (see Details; if empty, the order after merging is kept; default: c())
 #' @param psvAnl Whether analyses that are contained in the input file shall be transferred to the output file (TRUE / FALSE; default: FALSE)
-#' @param usePkg Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata and SAS files; "foreign" is the default (it comes with base R), but "haven" is newer and more comprehensive
+#' @param usePkg Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata and SAS files; "foreign" is the default (it comes with
+#'               base R), but "haven" is newer and more comprehensive
 #' @param selSet Name of the data set that is to be selected from the workspace (only applies when reading .RData-files)
-#' @param ... Additional arguments passed on to methods; see Details below
+#' @param ...    Additional arguments passed on to methods; see Details below
 #'
-#' @return a data frame (if fleOut is empty) where the columns of all input data sets (given in the dtaInp-argument) are concatenated
+#' @return a data frame (only returned if `fleOut` is empty) where the columns of all input data sets (given in the `dtaInp`-argument) are concatenated
 #'
 #' @details
-#' Using data frames with the input parameter dtaInp is primarily thought to be used when calling merge_cols_omv from the jamovi-module jTransform. For the use in R, it is strongly recommended to use a
-#' character vector with the file names instead.
-#' There are four different types of merging operations: "outer" keeps all cases (but columns in the resulting data set may be empty if they did not contain values in same input data sets), "inner" keeps
-#' only those cases where all datasets contain the same value in the matching variable, for "left" all cases from the first data set in dtaInp are kept (whereas cases that are only contained in input data
-#' set two or higher are dropped), for "right" all cases from the second (or any higher) data set in dtaInp are kept. The behaviour of "left" and "right" may be somewhat difficult to predict in case of
-#' merging several data sets, therefore "outer" might be a safer choice if several data sets are merged.
-#' The variable that is used for matching (varBy) can either be a string (if all datasets contain a matching variable with the same name), a character vector (containing several matching variables that
-#' are the same for all data sets) or a list with the same length as dtaInp. In the latter case, each cell of that list can again contain either a string (one matching variable for each data set in dtaInp)
-#' or a character vector (several matching variables for each data set in dtaInp; NB: all character vectors in the cells of the list must have the same length as it is necessary to always use the same
-#' number of matching variables when merging).
-#' The ellipsis-parameter (...) can be used to submit arguments / parameters to the functions that are used for merging or reading the data. Adding columns uses `merge`. When reading the data, the
-#' functions are: `read_omv` (for jamovi-files), `read.table` (for CSV / TSV files; using similar defaults as `read.csv` for CSV and `read.delim` for TSV which both are based upon `read.table` but
-#' with adjusted defaults for the respective file types), `readRDS` (for rds-files), `read_sav` (needs R-package "haven") or `read.spss` (needs R-package "foreign") for SPSS-files, `read_dta`
-#' ("haven") / `read.dta` ("foreign") for Stata-files, `read_sas` ("haven") for SAS-data-files, and `read_xpt` ("haven") / `read.xport` ("foreign") for SAS-transport-files. If you would like to use
-#' "haven", it may be needed to install it manually (i.e., `install.packages("haven", dep = TRUE)`).
+#' * Using data frames with the input parameter `dtaInp` is primarily thought to be used when calling `merge_cols_omv` from the jamovi-modules `jTransform` and
+#'   `Rj`. For the use in R, it is strongly recommended to use a character vector with the file names instead.
+#' * There are four different types of merging operations (defined via `typMrg`): "outer" keeps all cases (but columns in the resulting data set may contain
+#'   empty cells / missing values if same input data sets did not have a row containing the matching variable (defined in `varBy`). "inner" keeps only those
+#'   cases where all datasets contain the same value in the matching variable, for "left" all cases from the first data set in `dtaInp` are kept (whereas cases
+#'   that are only contained in the second or any later input data set are dropped), for "right" all cases from the second (or any higher) data set in `dtaInp`
+#'   are kept. The behaviour of "left" and "right" may be somewhat difficult to predict in case of merging several data sets, therefore "outer" might be a
+#'   safer choice if several data sets are merged.
+#' * The variable that is used for matching (`varBy`) can either be a string (if all datasets contain a matching variable with the same name), a character
+#'   vector (containing more than one matching variables that are contained in / the same for all data sets) or a list with the same length as dtaInp. In such
+#'   list, each cell can again contain either a string (one matching variable for each data set in dtaInp) or a character vector (several matching variables
+#'   for each data set in dtaInp; NB: all character vectors in the cells of the list must have the same length as it is necessary to always use the same number
+#'   of matching variables when merging).
+#' * `varSrt` can be either a character or a character vector (with one or more variables respectively). The sorting order for a particular variable can be
+#'   inverted with preceding the variable name with "-". Please note that this doesn't make sense and hence throws a warning for certain variable types (e.g.,
+#'   factors).
+#' * The ellipsis-parameter (`...`) can be used to submit arguments / parameters to the functions that are used for transforming or reading the data. By
+#'   clicking on the respective function under “See also”, you can get a more detailed overview over which parameters each of those functions take.
+#' * Adding columns uses `merge`. `typMrg` is implemented by setting `TRUE` or `FALSE` to `all.x` and `all.y` in `merge`, `varBy` matches `by.x` and `by.y`.
+#'   The help for `merge` can be accessed by clicking on the link under “See also”.
+#' * The functions for reading the data are: `read_omv` (for jamovi-files), `read.table` (for CSV / TSV files; using similar defaults as `read.csv` for CSV and
+#'   `read.delim` for TSV which both are based upon `read.table`), `load` (for .RData-files), `readRDS` (for .rds-files), `read_sav` (needs R-package `haven`)
+#'   or `read.spss` (needs R-package `foreign`) for SPSS-files, `read_dta` (`haven`) / `read.dta` (`foreign`) for Stata-files, `read_sas` (`haven`) for
+#'   SAS-data-files, and `read_xpt` (`haven`) / `read.xport` (`foreign`) for SAS-transport-files. If you would like to use `haven`, you may need to install it
+#'   manually (i.e., `install.packages("haven", dep = TRUE)`).
+#'
+#' @seealso `merge_cols_omv` internally uses the following functions: Adding columns uses [merge()]. For reading data files in different formats, the following
+#'   functions are used: [jmvReadWrite::read_omv()] for jamovi-files, [utils::read.table()] for CSV / TSV files, [load()] for reading .RData-files, [readRDS()]
+#'   for .rds-files, [haven::read_sav()] or [foreign::read.spss()] for SPSS-files, [haven::read_dta()] or [foreign::read.dta()] for Stata-files,
+#'   [haven::read_sas()] for SAS-data-files, and [haven::read_xpt()] or [foreign::read.xport()] for SAS-transport-files.
 #'
 #' @examples
 #' \dontrun{

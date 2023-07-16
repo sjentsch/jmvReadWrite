@@ -31,12 +31,18 @@ coverage](https://codecov.io/gh/sjentsch/jmvReadWrite/branch/main/graph/badge.sv
 
 The R-package `jmvReadWrite` reads and writes the .omv-files that are
 used by the statistical spreadsheet `jamovi` (<https://www.jamovi.org>).
-It is supposed to ease using syntax for statistical analyses created
-using the GUI in `jamovi` in connection with the R-library `jmv`.
+It is supposed to ease using jamovi and R together, provide helper
+functions for some often required data management tasks, and to adjust
+and use syntax for statistical analyses that were created using the GUI
+in `jamovi` in R (in connection with the R-library `jmv`). More
+recently, `jmvReadWrite` became easily available from within `jamovi` by
+becoming part of the `Rj` module (where you can use it by writing R
+commands, documented below), and via the `jTransform` module that
+provides a graphical user interface for most helper functions.
 
 ## Installation
 
-You can either install a stable version of `jmvReadWrite` which is
+In R, you can either install a stable version of `jmvReadWrite` which is
 available on [CRAN](https://cran.r-project.org/package=jmvReadWrite)
 using the following command:
 
@@ -53,8 +59,6 @@ devtools::install_github("sjentsch/jmvReadWrite")
 ```
 
 ## How to use the package?
-
-<br />
 
 [**read\_omv**](https://sjentsch.github.io/jmvReadWrite/reference/read_omv.html)
 
@@ -198,9 +202,9 @@ list.files(".", "Trial.omv")
 #> [1] "Trial.omv"
 file.info("Trial.omv")
 #>           size isdir mode               mtime               ctime
-#> Trial.omv 1573 FALSE  664 2023-07-16 00:23:24 2023-07-16 00:23:24
+#> Trial.omv 1573 FALSE  664 2023-07-16 12:53:03 2023-07-16 12:53:03
 #>                         atime  uid  gid    uname   grname
-#> Trial.omv 2023-07-16 00:23:24 1000 1000 sjentsch sjentsch
+#> Trial.omv 2023-07-16 12:53:03 1000 1000 sjentsch sjentsch
 unlink("Trial.omv")
 ```
 

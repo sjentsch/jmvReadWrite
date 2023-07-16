@@ -7,7 +7,8 @@
 #' @param getSyn Extract syntax from the analyses in the 'jamovi'-file and store it in the attribute "syntax" (default: FALSE)?
 #' @param getHTM Store index.html in the attribute "HTML" (default: FALSE)?
 #'
-#' @return data frame (can be directly used with functions included in the R-package 'jmv' and syntax from 'jamovi'; also compatible with the format of the R-package "foreign")
+#' @return data frame (can be directly used with functions included in the R-package `jmv` and syntax from 'jamovi'; also compatible with the format of the
+#'         R-package `foreign`)
 #'
 #' @examples
 #' \dontrun{

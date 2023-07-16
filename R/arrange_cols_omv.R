@@ -1,30 +1,42 @@
 #' Re-arrange columns / variables in .omv-files for the statistical spreadsheet 'jamovi' (<https://www.jamovi.org>)
 #'
-#' @param dtaInp Either a data frame or the name of a data file to be read (including the path, if required; "FILENAME.ext"; default: NULL); files can be of any supported file type, see Details below
-#' @param fleOut Name of the data file to be written (including the path, if required; "FILE_OUT.omv"; default: ""); if empty, the resulting data frame is returned instead
+#' @param dtaInp Either a data frame or the name of a data file to be read (including the path, if required; "FILENAME.ext"; default: NULL); files can be of
+#'               any supported file type, see Details below
+#' @param fleOut Name of the data file to be written (including the path, if required; "FILE_OUT.omv"; default: ""); if empty, the resulting data frame is
+#'               returned instead
 #' @param varOrd Character vector with the desired order of variable(s) in the data frame (see Details; default: c())
-#' @param varMve Named list defining to how much a particular variable (name of a list entry) should be moved up (neg. value of a list entry) or down (pos. value) in the data frame (see Details; default: c())
+#' @param varMve Named list defining to how much a particular variable (name of a list entry) should be moved up (neg. value of a list entry) or down (pos.
+#'               value) in the data frame (see Details; default: c())
 #' @param psvAnl Whether analyses that are contained in the input file shall be transferred to the output file (TRUE / FALSE; default: FALSE)
-#' @param usePkg Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata and SAS files; "foreign" is the default (it comes with base R), but "haven" is newer and more comprehensive
+#' @param usePkg Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata and SAS files; "foreign" is the default (it comes with
+#'               base R), but "haven" is newer and more comprehensive
 #' @param selSet Name of the data set that is to be selected from the workspace (only applies when reading .RData-files)
-#' @param ... Additional arguments passed on to methods; see Details below
+#' @param ...    Additional arguments passed on to methods; see Details below
 #'
-#' @return a data frame (only returned if fleOut is empty) where the variables / columns of the input data set are re-arranged
+#' @return a data frame (only returned if `fleOut` is empty) where the order of variables / columns of the input data set is re-arranged
 #'
 #' @details
-#' varOrd is a character vector. If not all variables of the original data set are contained in varOrd, a warning is issued but otherwise the list of variables defined in varOrd is used (removing
-#' variables not contained in varOrd).
-#' varMve is a named list. For example would list(VARNAME = -3) move the variable VARNAME three positions up in the list of variables (towards the first column), and list(VARNAME = 3) would move
-#' it three positions down (towards the last column). If how much the variable is to be moved leads to the position being lower than the first or higher than the total number of variables in the
-#' data set, an error message is issued. Please note that the list entries are processed one after another, that is, you have for a second list entry to consider how the first list entry may have
-#' changed to order of variables.
-#' Generally, using varOrd makes more sense if several variables shall change their position whereas using varMve makes more sense for one variable. If both parameters are given, a warning is
-#' issued and varOrd takes precedence.
-#' The ellipsis-parameter can be used to submit arguments / parameters to the functions that are used for reading the data. These are: `read_omv` (for jamovi-files), `read.table` (for CSV / TSV
-#' files; using similar defaults as `read.csv` for CSV and `read.delim` for TSV which both are based upon `read.table` but with adjusted defaults for the respective file types), `readRDS` (for
-#' rds-files), `read_sav` (needs R-package "haven") or `read.spss` (needs R-package "foreign") for SPSS-files, `read_dta` ("haven") / `read.dta` ("foreign") for Stata-files, `read_sas` ("haven") for
-#' SAS-data-files, and `read_xpt` ("haven") / `read.xport` ("foreign") for SAS-transport-files. If you would like to use "haven", it may be needed to install it manually
-#' (i.e., `install.packages("haven", dep = TRUE)`).
+#' * `varOrd` is a character vector. If not all variables of the original data set are contained in `varOrd`, a warning is issued but otherwise the list of
+#'   variables defined in `varOrd` is used (removing variables not contained in `varOrd`).
+#' * `varMve` is a named list. For example would `list(VARNAME = -3)` move the variable `VARNAME` three positions up in the list of variables (towards the
+#'   first column), and `list(VARNAME = 3)` would move it three positions down (towards the last column). If the number of steps the variable is to be moved
+#'   leads to the position being either lower than the first or higher than the total number of variables in the data set, an error message is issued. Please
+#'   note that the list entries are processed one after another, that is, for a second list entry, you have to consider how the first list entry may have
+#'   changed to order of variables.
+#' * Using `varOrd` makes more sense for changing the position of several variables, whereas using `varMve` makes more sense for one variable. If
+#'   both parameters are given, a warning is issued and `varOrd` takes precedence.
+#' * The ellipsis-parameter (`...`) can be used to submit arguments / parameters to the functions that are used for reading the data. By clicking on the
+#'   respective function under “See also”, you can get a more detailed overview over which parameters each of those functions take. The functions are:
+#'   `read_omv` (for jamovi-files), `read.table` (for CSV / TSV files; using similar defaults as `read.csv` for CSV and `read.delim` for TSV which both are
+#'   based upon `read.table`), `load` (for .RData-files), `readRDS` (for .rds-files), `read_sav` (needs R-package `haven`) or `read.spss` (needs R-package
+#'   `foreign`) for SPSS-files, `read_dta` (`haven`) / `read.dta` (`foreign`) for Stata-files, `read_sas` (`haven`) for SAS-data-files, and `read_xpt`
+#'   (`haven`) / `read.xport` (`foreign`) for SAS-transport-files. If you would like to use `haven`, you may need to install it manually (i.e.,
+#'   `install.packages("haven", dep = TRUE)`).
+#'
+#' @seealso `arrange_cols_omv` internally uses the following functions to read data files in different formats: [jmvReadWrite::read_omv()] for jamovi-files,
+#'   [utils::read.table()] for CSV / TSV files, [load()] for reading .RData-files, [readRDS()] for .rds-files, [haven::read_sav()] or [foreign::read.spss()]
+#'   for SPSS-files, [haven::read_dta()] or [foreign::read.dta()] for Stata-files, [haven::read_sas()] for SAS-data-files, and [haven::read_xpt()] or
+#'   [foreign::read.xport()] for SAS-transport-files.
 #'
 #' @examples
 #' \dontrun{

@@ -16,42 +16,51 @@ arrange_cols_omv(
 )
 }
 \arguments{
-\item{dtaInp}{Either a data frame or the name of a data file to be read (including the path, if required; "FILENAME.ext"; default: NULL); files can be of any supported file type, see Details below}
+\item{dtaInp}{Either a data frame or the name of a data file to be read (including the path, if required; "FILENAME.ext"; default: NULL); files can be of
+any supported file type, see Details below}
 
-\item{fleOut}{Name of the data file to be written (including the path, if required; "FILE_OUT.omv"; default: ""); if empty, the resulting data frame is returned instead}
+\item{fleOut}{Name of the data file to be written (including the path, if required; "FILE_OUT.omv"; default: ""); if empty, the resulting data frame is
+returned instead}
 
 \item{varOrd}{Character vector with the desired order of variable(s) in the data frame (see Details; default: c())}
 
-\item{varMve}{Named list defining to how much a particular variable (name of a list entry) should be moved up (neg. value of a list entry) or down (pos. value) in the data frame (see Details; default: c())}
+\item{varMve}{Named list defining to how much a particular variable (name of a list entry) should be moved up (neg. value of a list entry) or down (pos.
+value) in the data frame (see Details; default: c())}
 
 \item{psvAnl}{Whether analyses that are contained in the input file shall be transferred to the output file (TRUE / FALSE; default: FALSE)}
 
-\item{usePkg}{Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata and SAS files; "foreign" is the default (it comes with base R), but "haven" is newer and more comprehensive}
+\item{usePkg}{Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata and SAS files; "foreign" is the default (it comes with
+base R), but "haven" is newer and more comprehensive}
 
 \item{selSet}{Name of the data set that is to be selected from the workspace (only applies when reading .RData-files)}
 
 \item{...}{Additional arguments passed on to methods; see Details below}
 }
 \value{
-a data frame (only returned if fleOut is empty) where the variables / columns of the input data set are re-arranged
+a data frame (only returned if \code{fleOut} is empty) where the order of variables / columns of the input data set is re-arranged
 }
 \description{
 Re-arrange columns / variables in .omv-files for the statistical spreadsheet 'jamovi' (\url{https://www.jamovi.org})
 }
 \details{
-varOrd is a character vector. If not all variables of the original data set are contained in varOrd, a warning is issued but otherwise the list of variables defined in varOrd is used (removing
-variables not contained in varOrd).
-varMve is a named list. For example would list(VARNAME = -3) move the variable VARNAME three positions up in the list of variables (towards the first column), and list(VARNAME = 3) would move
-it three positions down (towards the last column). If how much the variable is to be moved leads to the position being lower than the first or higher than the total number of variables in the
-data set, an error message is issued. Please note that the list entries are processed one after another, that is, you have for a second list entry to consider how the first list entry may have
+\itemize{
+\item \code{varOrd} is a character vector. If not all variables of the original data set are contained in \code{varOrd}, a warning is issued but otherwise the list of
+variables defined in \code{varOrd} is used (removing variables not contained in \code{varOrd}).
+\item \code{varMve} is a named list. For example would \code{list(VARNAME = -3)} move the variable \code{VARNAME} three positions up in the list of variables (towards the
+first column), and \code{list(VARNAME = 3)} would move it three positions down (towards the last column). If the number of steps the variable is to be moved
+leads to the position being either lower than the first or higher than the total number of variables in the data set, an error message is issued. Please
+note that the list entries are processed one after another, that is, for a second list entry, you have to consider how the first list entry may have
 changed to order of variables.
-Generally, using varOrd makes more sense if several variables shall change their position whereas using varMve makes more sense for one variable. If both parameters are given, a warning is
-issued and varOrd takes precedence.
-The ellipsis-parameter can be used to submit arguments / parameters to the functions that are used for reading the data. These are: \code{read_omv} (for jamovi-files), \code{read.table} (for CSV / TSV
-files; using similar defaults as \code{read.csv} for CSV and \code{read.delim} for TSV which both are based upon \code{read.table} but with adjusted defaults for the respective file types), \code{readRDS} (for
-rds-files), \code{read_sav} (needs R-package "haven") or \code{read.spss} (needs R-package "foreign") for SPSS-files, \code{read_dta} ("haven") / \code{read.dta} ("foreign") for Stata-files, \code{read_sas} ("haven") for
-SAS-data-files, and \code{read_xpt} ("haven") / \code{read.xport} ("foreign") for SAS-transport-files. If you would like to use "haven", it may be needed to install it manually
-(i.e., \code{install.packages("haven", dep = TRUE)}).
+\item Using \code{varOrd} makes more sense for changing the position of several variables, whereas using \code{varMve} makes more sense for one variable. If
+both parameters are given, a warning is issued and \code{varOrd} takes precedence.
+\item The ellipsis-parameter (\code{...}) can be used to submit arguments / parameters to the functions that are used for reading the data. By clicking on the
+respective function under “See also”, you can get a more detailed overview over which parameters each of those functions take. The functions are:
+\code{read_omv} (for jamovi-files), \code{read.table} (for CSV / TSV files; using similar defaults as \code{read.csv} for CSV and \code{read.delim} for TSV which both are
+based upon \code{read.table}), \code{load} (for .RData-files), \code{readRDS} (for .rds-files), \code{read_sav} (needs R-package \code{haven}) or \code{read.spss} (needs R-package
+\code{foreign}) for SPSS-files, \code{read_dta} (\code{haven}) / \code{read.dta} (\code{foreign}) for Stata-files, \code{read_sas} (\code{haven}) for SAS-data-files, and \code{read_xpt}
+(\code{haven}) / \code{read.xport} (\code{foreign}) for SAS-transport-files. If you would like to use \code{haven}, you may need to install it manually (i.e.,
+\code{install.packages("haven", dep = TRUE)}).
+}
 }
 \examples{
 \dontrun{
@@ -70,4 +79,10 @@ names(read_omv(fleTmp))
 unlink(fleTmp)
 }
 
+}
+\seealso{
+\code{arrange_cols_omv} internally uses the following functions to read data files in different formats: \code{\link[=read_omv]{read_omv()}} for jamovi-files,
+\code{\link[utils:read.table]{utils::read.table()}} for CSV / TSV files, \code{\link[=load]{load()}} for reading .RData-files, \code{\link[=readRDS]{readRDS()}} for .rds-files, \code{\link[haven:read_spss]{haven::read_sav()}} or \code{\link[foreign:read.spss]{foreign::read.spss()}}
+for SPSS-files, \code{\link[haven:read_dta]{haven::read_dta()}} or \code{\link[foreign:read.dta]{foreign::read.dta()}} for Stata-files, \code{\link[haven:read_sas]{haven::read_sas()}} for SAS-data-files, and \code{\link[haven:read_xpt]{haven::read_xpt()}} or
+\code{\link[foreign:read.xport]{foreign::read.xport()}} for SAS-transport-files.
 }

@@ -14,32 +14,40 @@ transpose_omv(
 )
 }
 \arguments{
-\item{dtaInp}{Either a data frame or the name of a data file to be read (including the path, if required; "FILENAME.ext"; default: NULL); files can be of any supported file type, see Details below}
+\item{dtaInp}{Either a data frame or the name of a data file to be read (including the path, if required; "FILENAME.ext"; default: NULL); files can be of
+any supported file type, see Details below}
 
-\item{fleOut}{Name of the data file to be written (including the path, if required; "FILE_OUT.omv"; default: ""); if empty, the resulting data frame is returned instead}
+\item{fleOut}{Name of the data file to be written (including the path, if required; "FILE_OUT.omv"; default: ""); if empty, the resulting data frame is
+returned instead}
 
 \item{varNme}{Name of the variables in the output data frame; see Details below}
 
-\item{usePkg}{Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata and SAS files; "foreign" is the default (it comes with base R), but "haven" is newer and more comprehensive}
+\item{usePkg}{Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata and SAS files; "foreign" is the default (it comes with
+base R), but "haven" is newer and more comprehensive}
 
 \item{selSet}{Name of the data set that is to be selected from the workspace (only applies when reading .RData-files)}
 
 \item{...}{Additional arguments passed on to methods; see Details below}
 }
 \value{
-a data frame (only returned if fleOut is empty) where the input data set is transposed
+a data frame (only returned if \code{fleOut} is empty) where the input data set is transposed
 }
 \description{
 Transpose .omv-files for the statistical spreadsheet 'jamovi' (\url{https://www.jamovi.org})
 }
 \details{
-If varNme empty, the row names of the input data set are used (preceded by "V_" if all row names are numbers); if varNme has the length 1 then it is supposed to point to a variable in the input
-data frame; if varNme has the same length as the number of rows in the input data frame, then the values in varNme are assigned as column names to the output data frame.
-The ellipsis-parameter can be used to submit arguments / parameters to the functions that are used for reading the data. These are: \code{read_omv} (for jamovi-files), \code{read.table} (for CSV / TSV
-files; using similar defaults as \code{read.csv} for CSV and \code{read.delim} for TSV which both are based upon \code{read.table} but with adjusted defaults for the respective file types), \code{readRDS} (for
-rds-files), \code{read_sav} (needs R-package "haven") or \code{read.spss} (needs R-package "foreign") for SPSS-files, \code{read_dta} ("haven") / \code{read.dta} ("foreign") for Stata-files, \code{read_sas} ("haven") for
-SAS-data-files, and \code{read_xpt} ("haven") / \code{read.xport} ("foreign") for SAS-transport-files. If you would like to use "haven", it may be needed to install it manually
-(i.e., \code{install.packages("haven", dep = TRUE)}).
+\itemize{
+\item If \code{varNme} empty, the row names of the input data set are used (preceded by "V_" if all row names are numbers); if \code{varNme} has length 1, then it is
+supposed to point to a variable in the input data frame; if \code{varNme} has the same length as the number of rows in the input data frame, then the values
+in \code{varNme} are assigned as column names to the output data frame.
+\item The ellipsis-parameter (\code{...}) can be used to submit arguments / parameters to the functions that are used for reading the data. By clicking on the
+respective function under “See also”, you can get a more detailed overview over which parameters each of those functions take. The functions are:
+\code{read_omv} (for jamovi-files), \code{read.table} (for CSV / TSV files; using similar defaults as \code{read.csv} for CSV and \code{read.delim} for TSV which both are
+based upon \code{read.table}), \code{load} (for .RData-files), \code{readRDS} (for .rds-files), \code{read_sav} (needs R-package \code{haven}) or \code{read.spss} (needs R-package
+\code{foreign}) for SPSS-files, \code{read_dta} (\code{haven}) / \code{read.dta} (\code{foreign}) for Stata-files, \code{read_sas} (\code{haven}) for SAS-data-files, and \code{read_xpt}
+(\code{haven}) / \code{read.xport} (\code{foreign}) for SAS-transport-files. If you would like to use \code{haven}, you may be need to install it manually (i.e.,
+\code{install.packages("haven", dep = TRUE)}).
+}
 }
 \examples{
 \dontrun{
@@ -65,4 +73,10 @@ str(dtaFrm)
 unlink(fleTmp)
 }
 
+}
+\seealso{
+\code{sort_omv} internally uses the following functions to read data files in different formats: \code{\link[=read_omv]{read_omv()}} for jamovi-files,
+\code{\link[utils:read.table]{utils::read.table()}} for CSV / TSV files, \code{\link[=load]{load()}} for reading .RData-files, \code{\link[=readRDS]{readRDS()}} for .rds-files, \code{\link[haven:read_spss]{haven::read_sav()}} or \code{\link[foreign:read.spss]{foreign::read.spss()}}
+for SPSS-files, \code{\link[haven:read_dta]{haven::read_dta()}} or \code{\link[foreign:read.dta]{foreign::read.dta()}} for Stata-files, \code{\link[haven:read_sas]{haven::read_sas()}} for SAS-data-files, and \code{\link[haven:read_xpt]{haven::read_xpt()}} or
+\code{\link[foreign:read.xport]{foreign::read.xport()}} for SAS-transport-files.
 }

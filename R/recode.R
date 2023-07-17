@@ -47,3 +47,27 @@ recode <- function(crrCmd = c(), data = data.frame()) {
 
     data
 }
+
+chkRcd <- function(clsVrO = "", clsVrT = "", isCrpO = FALSE, isCrpT = FALSE, nmeClO = "", nmeClT = "", crrSPS = "") {
+    if        (grepl("character",       clsVrO) && !is.na(isCrpO) && !isCrpO) {
+        stop(sprintf("If the original data column (\"%\") is defined as string / character, the recode original terms also have to be characters:\n%s\n\n", nmeClO, crrSPS));
+    } else if (grepl("numeric|integer", clsVrO) && !is.na(isCrpO) &&  isCrpO) {
+        stop(sprintf("If the original data column (\"%\") is defined as numeric, the recode original terms also have to be numeric:\n%s\n\n",               nmeClO, crrSPS));
+    } else if (grepl("character",       clsVrT) && !is.na(isCrpT) && !isCrpT) {
+        stop(sprintf("If the target data column (\"%\") is defined as string / character, the recode target terms also have to be characters:\n%s\n\n",     nmeClT, crrSPS));
+    } else if (grepl("numeric|integer", clsVrT) && !is.na(isCrpT) &&  isCrpT) {
+        stop(sprintf("If the target data column (\"%\") is defined as numeric, the recode target terms also have to be numeric:\n%s\n\n",                   nmeClT, crrSPS));
+    }
+}
+
+do_Rcd <- function(rcdCrC = c(), rcdSel = c(), rcdRpl = NULL) {
+    if (is.character(rcdRpl)) {
+        rcdCrC[rcdSel] <- rcdRpl;
+    } else {
+        rcdNA <- is.na(rcdCrC);
+        # if cell contains NA, assign a value, otherwise add to the existing value
+        rcdCrC[rcdSel &  rcdNA] <- rcdRpl;
+        rcdCrC[rcdSel & !rcdNA] <- rcdCrC[rcdSel & !rcdNA] + rcdRpl;
+    }
+    rcdCrC
+}

@@ -1,6 +1,56 @@
-# jmvReadWrite 0.3.3
+# jmvReadWrite 0.3.8
+
+## Enhancements and bug fixes:
+* adjustments to make `jmvReadWrite` more suited for using it together with the jamovi-module `jTransform` (https://github.com/sjentsch/jTransform)
+* implement reading both data frames or file names for merge_cols_omv and merge_rows_omv (incl. phasing out fleInp as parameter for the helper functions: it now throws an error to prevent using it)
+* initial handling of weights in `read_omv` and `write_omv`
+* improvements and corrections for `long2wide_omv` (added aggregation, mean or take first, and fixed a bug that led to incorrect naming of variables when transforming complex data sets)
+* improvements and corrections for `wide2long_omv` (added parameter `excLvl`, to prevent that measurements (if there are more than one) are also transformed to long; fixed a bug that led to incorrect
+  an order of values within variables when transforming complex data sets)
+* improved unit tests (implementation of regular expressions for expect_error and expect_warning, bug-fixes and additional coverage)
+* improvements to setting attributes (`setAtt`, e.g., from the metadata to the data frame and vice versa)
+* improved handling of factors with numerical values (measureType Nominal or Ordinal and dataType Integer)
+* added function `jmvAtt` to attach the attributes `measureType` and `dataType` to data frames coming from inside jamovi (i.e., when `jmvReadWrite` is used in modules, e.g., `Rj`)
+  OBS: rather for internal use and thus not exported, use `jmvReadWrite:::jmvAtt()` to call it
+* smaller bug fixes (typos, to ensure consistency in naming, etc.)
+
+
+# jmvReadWrite 0.3.7
+
+## Enhancements and bug fixes:
+* added `transpose_omv` (transpose data frame and write the resulting jamovi-file)
+* enable to have either data frames or strings with a file name as input to the helper functions `arrange_cols_omv`, `long2wide_omv`, `wide2long_omv`, `sort_omv`, and `transpose_omv`
+* preserve attributes when merging columns (`merge_cols_omv`)
+* changed R-package that handles JSON files from `RJSON` to `jsonlite`
+* bug fixes: added a check in `fmtFlO` to ensure that the output files are in jamovi-format (.omv); removed typos, etc.
+
+
+# jmvReadWrite 0.3.6
+
+## Enhancements and bug fixes:
+* added `arrange_cols_omv` (to change the order of variables / columns in jamovi-files)
+* added the parameter `psvAnl` to preserve the analyses in data files
+  (only for `arrange_cols_omv`, `merge_cols_omv`, `sort_omv` where it makes sense – there the number of rows / participants / units doesn't change)
+* bug fixes: corrected an error in `chkFle`, removed duplicate functions from `globals.R`
+
+
+# jmvReadWrite 0.3.5
 
 ## Bug fixes and enhancements:
+* fixed an error that led to a warning when adding columns (to make different data frames have the same set of variables) in merge_cols_omv()
+* added logo and citation
+
+
+# jmvReadWrite 0.3.4
+
+## Bug fixes and enhancements:
+* fixed an error that led to a crash when an ID variable contained empty values ("")
+* general bug fixes and improvements (removing ;s as suggested by lintr, etc.)
+
+
+# jmvReadWrite 0.3.3
+
+## Enhancements and bug fixes:
 * made replacements using regular expressions compatible with R >= 4.3 (changing occurrences of replacement pattern that included `\xNN`)
 * improvements to `wide2long_omv` and `long2wide_omv` (those can now handle several factors, not only one)
 * improvement to how `write_omv` handles / stores factors (those are now zero-based to be in accordance with most programming languages including Python and C++ used in the jamovi engine)
@@ -25,9 +75,9 @@
 
 # jmvReadWrite 0.3.0
 
-## Bug fixes and enhancements:
+## Enhancements and bug fixes:
 * added a couple of helper functions:
-  `convert_to_omv` (converts data sets from other formats - CSV, R, SPSS, SAS, Stata) to `.omv` 
+  `convert_to_omv` (converts data sets from other formats - CSV, R, SPSS, SAS, Stata - to `.omv`)
   `merge_cols_omv` (merges two or more data sets by concatenating columns)
   `merge_rows_omv` (merges two or more data sets by concatenating rows)
   `long2wide_omv` (converts data sets from long to wide, e.g., for running mixed-model-analyses in jamovi)

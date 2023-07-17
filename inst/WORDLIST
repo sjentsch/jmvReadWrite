@@ -1,4 +1,5 @@
 AGPL
+arrCol
 bfi
 Changelog
 CMD
@@ -8,6 +9,8 @@ cond
 com
 CR
 csv
+dataType
+dtaInp
 delim
 dta
 dtaFrm
@@ -25,18 +28,22 @@ ipip
 jamovi
 jmv
 json
+jTransform
 len
 LF
 lintr
 MAgojam
+measureType
 MinGW
 mtaDta
 NC
+OBS
 OMV
 omv
 org
 ori
 pkgdown
+pos
 rda
 RData
 rds
@@ -64,7 +71,14 @@ varBy
 varExc
 varID
 varLst
+<<<<<<< HEAD
 VARNAME
+=======
+varMve
+VARNAME
+varNme
+varOrd
+>>>>>>> main
 vars
 varSep
 varSrt
@@ -74,5 +88,6 @@ vecSPS
 www
 xdata
 xport
+xpsd
 xpt
 xtdDta

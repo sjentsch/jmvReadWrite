@@ -9,7 +9,7 @@ test_that("merge_cols_omv works", {
         saveRDS(dtaTmp[sample(seq_len(dim(dtaTmp)[1]), size = round(dim(dtaTmp)[1] * (0.97 + 0.01 * i))), ], nmeInp[i])
     }
 
-    merge_cols_omv(nmeInp, nmeOut, typMrg = "outer", varBy = "ID", varSrt = c("gender_3", "age_3"))
+    expect_null(merge_cols_omv(dtaInp = nmeInp, fleOut = nmeOut, typMrg = "outer", varBy = "ID", varSrt = c("gender_3", "age_3")))
     expect_true(file.exists(nmeOut))
     expect_gt(file.info(nmeOut)$size, 1)
     expect_true(chkFle(nmeOut, isZIP = TRUE))
@@ -18,7 +18,7 @@ test_that("merge_cols_omv works", {
     expect_true(chkFle(nmeOut, fleCnt = "data.bin"))
     unlink(nmeOut)
 
-    dtaFrm <- merge_cols_omv(nmeInp, typMrg = "outer", varBy = "ID", varSrt = c("gender_3", "age_3"))
+    dtaFrm <- merge_cols_omv(dtaInp = nmeInp, typMrg = "outer", varBy = "ID", varSrt = c("gender_3", "age_3"))
     expect_s3_class(dtaFrm, "data.frame")
     expect_equal(dim(dtaFrm), c(250, 85))
     expect_equal(as.vector(sapply(dtaFrm, typeof)), c("character", rep(c(rep("integer", 27), "character"), 3)))
@@ -29,18 +29,50 @@ test_that("merge_cols_omv works", {
     expect_equal(length(which(diff(as.integer(dtaFrm[["age_3"]])) == 1)), 52)
     expect_equal(max(diff(which(diff(as.integer(dtaFrm[["age_3"]])) == 1))), 12)
 
-    dtaFrm <- merge_cols_omv(nmeInp[-2], typMrg = "inner", varBy = "ID", varSrt = c("gender_3", "age_3"))
+    dtaFrm <- merge_cols_omv(dtaInp = nmeInp[-2], typMrg = "inner", varBy = "ID", varSrt = c("gender_3", "age_3"))
     expect_s3_class(dtaFrm, "data.frame")
     expect_equal(dim(dtaFrm), c(245, 57))
 
+    # test cases for code coverage ============================================================================================================================
+    expect_error(merge_cols_omv(fleInp = nmeInp, typMrg = "outer", varBy = "ID"), regexp = "Please use the argument dtaInp instead of fleInp\\.")
+    expect_warning(merge_cols_omv(dtaInp = nmeInp, typMrg = "outer", varBy = "ID", psvAnl = TRUE),
+      regexp = "psvAnl is only possible if fleOut is a file name \\(analyses are not stored in data frames, only in the jamovi files\\)\\.")
+    attr(dtaTmp, "fleInp") <- nmeInp
+    expect_warning(merge_cols_omv(dtaInp = dtaTmp, fleOut = nmeOut, typMrg = "outer", varBy = "ID", psvAnl = TRUE),
+      regexp = "psvAnl is only possible if dtaInp is a file name \\(analyses are not stored in data frames, only in the jamovi files\\)\\.")
     unlink(nmeInp)
 
-    # test cases for code coverage ============================================================================================================================
     dtaFrm <- list(data.frame(ID = runif(10), A = runif(10)), data.frame(ID = runif(10), B = runif(10)), data.frame(ID = runif(10), C = runif(10)), data.frame(ID = runif(10), D = runif(10)))
     expect_equal(chkByV(list(), dtaFrm), rep(list("ID"), 4))
     expect_equal(chkByV(rep(list("ID"), 4), dtaFrm), rep(list("ID"), 4))
-    expect_error(chkByV(rep(list("ID2"), 4), dtaFrm))
+    expect_error(chkByV(rep(list("ID2"), 4), dtaFrm),
+      regexp = "^Not all data sets given in dtaInp contain the variable\\(s\\) / column\\(s\\) that shall be used for matching\\.")
     expect_equal(chkByV("ID", dtaFrm), rep(list("ID"), 4))
-    expect_error(chkByV("ID2", dtaFrm))
-    expect_error(chkByV(rep(list("ID"), 3), dtaFrm))
+    expect_error(chkByV("ID2", dtaFrm), regexp = "^Not all data sets given in dtaInp contain the variable\\(s\\) / column\\(s\\) that shall be used for matching\\.")
+    expect_error(chkByV(rep(list("ID"), 3), dtaFrm),
+      regexp = "^varBy must be either a list \\(with the same length as dtaInp\\), a character vector, or a string\\.")
+
+    nmeInp <- paste0(tempfile(), ".rds")
+    saveRDS(data.frame(ID = seq(60), A = rnorm(60), B = rnorm(60)), nmeInp)
+    expect_null(merge_cols_omv(c("../ToothGrowth.omv", nmeInp), fleOut = nmeOut, typMrg = "outer", varBy = "ID", psvAnl = TRUE))
+    expect_true(chkFle(nmeOut))
+    expect_gt(file.info(nmeOut)$size, 1)
+    expect_true(chkFle(nmeOut, isZIP = TRUE))
+    expect_true(chkFle(nmeOut, fleCnt = "meta"))
+    expect_true(chkFle(nmeOut, fleCnt = "metadata.json"))
+    expect_true(chkFle(nmeOut, fleCnt = "data.bin"))
+    df4Chk <- read_omv(nmeOut, sveAtt = FALSE, getSyn = TRUE)
+    expect_s3_class(df4Chk, "data.frame")
+    expect_equal(dim(df4Chk), c(60, 16))
+    expect_equal(names(df4Chk),
+      c("ID", "Filter 1", "logLen", "supp - Transform 1", "len", "supp", "dose", "dose2", "Trial", "Residuals", "J", "K", "L", "weights", "A", "B"))
+    expect_equal(as.vector(sapply(df4Chk, typeof)),
+      c("integer", "logical", "double", "integer", "double", "integer", "double", "integer", "integer", "double", "double", "double", "integer", "integer", "double", "double"))
+    expect_equal(sort(zip::zip_list(nmeOut)$filename),
+      c("01 empty/analysis", "02 anova/analysis", "02 anova/resources/61c33c657d5e31f1.png", "02 anova/resources/dd0ce025a00dad1b.png", "03 empty/analysis",
+        "04 ancova/analysis", "05 empty/analysis", "data.bin", "index.html", "meta", "metadata.json", "xdata.json"))
+    expect_equal(attr(df4Chk, "syntax"),
+      list(paste("jmv::ANOVA(formula = len ~ supp + dose2 + supp:dose2, data = data, effectSize = \"partEta\", modelTest = TRUE, qq = TRUE,",
+                 "contrasts = list(list(var=\"supp\", type=\"none\"), list(var=\"dose2\", type=\"polynomial\")), postHoc = ~ supp + dose2, emMeans = ~ dose2:supp)"),
+           "jmv::ancova(formula = len ~ supp + dose, data = data, effectSize = \"partEta\", modelTest = TRUE)"))
 })

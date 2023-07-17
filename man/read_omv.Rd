@@ -27,7 +27,8 @@ read_omv(
 \item{getHTM}{Store index.html in the attribute "HTML" (default: FALSE)?}
 }
 \value{
-data frame (can be directly used with functions included in the R-package 'jmv' and syntax from 'jamovi'; also compatible with the format of the R-package "foreign")
+data frame (can be directly used with functions included in the R-package \code{jmv} and syntax from 'jamovi'; also compatible with the format of the
+R-package \code{foreign})
 }
 \description{
 Read files created of the statistical spreadsheet 'jamovi' (\url{https://www.jamovi.org})

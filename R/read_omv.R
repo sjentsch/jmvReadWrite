@@ -7,7 +7,8 @@
 #' @param getSyn Extract syntax from the analyses in the 'jamovi'-file and store it in the attribute "syntax" (default: FALSE)?
 #' @param getHTM Store index.html in the attribute "HTML" (default: FALSE)?
 #'
-#' @return data frame (can be directly used with functions included in the R-package 'jmv' and syntax from 'jamovi'; also compatible with the format of the R-package "foreign")
+#' @return data frame (can be directly used with functions included in the R-package `jmv` and syntax from 'jamovi'; also compatible with the format of the
+#'         R-package `foreign`)
 #'
 #' @examples
 #' \dontrun{
@@ -35,7 +36,7 @@
 read_omv <- function(fleInp = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = TRUE, getSyn = FALSE, getHTM = FALSE) {
     if (nchar(fleInp) == 0) stop("File name to the input data file needs to be given as parameter (fleInp = ...).")
 
-    # check and format input file names
+    # check and format input file names - do not use chkExt here
     if (tolower(tools::file_ext(fleInp)) != "omv") stop("read_omv only reads jamovi files (.omv), use convert_to_omv first, if you want to read other files types.")
     fleInp <- fmtFlI(fleInp, maxLng = 1)
     fleLst <- zip::zip_list(fleInp)$filename
@@ -59,8 +60,8 @@ read_omv <- function(fleInp = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = TRUE,
         strPos <- 0
     }
 
-    # process meta-data
-    if (!all(grepl(grpMta, names(mtaDta)))) stop("Unimplemeted field in the meta data")
+    # check meta-data, change weights if NULL
+    if (!all(grepl(grpMta, names(mtaDta)))) stop("Unimplemeted field in the meta data (data frame).")
 
     # determine rows and columns and create data frame
     rowNum <- mtaDta$rowCount
@@ -71,6 +72,9 @@ read_omv <- function(fleInp = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = TRUE,
 
     # iterate through fields
     for (i in seq_len(colNum)) {
+        # check meta-data
+        if (!all(grepl(grpMta, names(mtaDta$fields[[i]])))) stop("Unimplemeted field in the meta data (column).")
+
         # type: determines the format in the binary file
         if        (chkFld(mtaDta$fields[[i]], "type", "integer")) {
             crrCol <- readBin(binHdl, integer(), n = rowNum)
@@ -117,19 +121,19 @@ read_omv <- function(fleInp = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = TRUE,
 
         dtaFrm[[crrNme]] <- crrCol
 
-        if (chkFld(mtaDta$fields[[i]], "description", ".+")) attr(dtaFrm[[crrNme]], "jmv-desc") <- mtaDta$fields[[i]]$description
         if (chkFld(mtaDta$fields[[i]], "measureType", "ID")) attr(dtaFrm[[crrNme]], "jmv-id")   <- TRUE
-
-        dtaFrm[[crrNme]] <- setAtt("missingValues",   mtaDta$fields[[i]], dtaFrm[[crrNme]])
+        if (chkFld(mtaDta$fields[[i]], "description", ".+")) attr(dtaFrm[[crrNme]], "jmv-desc") <- mtaDta$fields[[i]][["description"]]
 
         if (sveAtt) {
-            dtaFrm[[crrNme]] <- setAtt(names(mtaFld), mtaDta$fields[[i]], dtaFrm[[crrNme]])
+            dtaFrm[crrNme] <- setAtt(names(mtaFld),   mtaDta$fields[[i]], dtaFrm[crrNme])
+        } else {
+            dtaFrm[crrNme] <- setAtt("missingValues", mtaDta$fields[[i]], dtaFrm[crrNme])
         }
 
         if (rmMsVl) {
             mssLst <- attr(dtaFrm[[crrNme]], "missingValues")
             if (length(mssLst) > 0) {
-               crrAtt <- attributes(dtaFrm[[crrNme]])
+               crrAtt <- attributes(dtaFrm[crrNme])
                rmvLvl <- rep(FALSE, length(levels(dtaFrm[[crrNme]])))
                for (j in seq_along(mssLst)) {
                    dtaFrm[[crrNme]][eval(parse(text = paste0("dtaFrm[[\"", crrNme, "\"]]", mssLst[[j]])))] <- NA
@@ -138,7 +142,7 @@ read_omv <- function(fleInp = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = TRUE,
                dtaFrm[[crrNme]] <- dtaFrm[[crrNme]][, drop = TRUE]
                crrAtt$missingValues <- list()
                crrAtt$values <- crrAtt$values[!rmvLvl]
-               dtaFrm[[crrNme]] <- setAtt(setdiff(names(crrAtt), names(attributes(dtaFrm[[crrNme]]))), crrAtt, dtaFrm[[crrNme]])
+               dtaFrm[crrNme] <- setAtt(setdiff(names(crrAtt), names(attributes(dtaFrm[crrNme]))), crrAtt, dtaFrm[crrNme])
                rm(crrAtt, rmvLvl)
             }
         }
@@ -163,9 +167,22 @@ read_omv <- function(fleInp = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = TRUE,
         attr(dtaFrm, "fltLst") <- names(dtaFrm)[fltLst]
     }
 
-    # removedRows, addedRows, transforms
+    # store data frame attributes except rowCount, columnCount and fields (the first two available
+    # as data frame dimensions, the latter stored in the variables / columns)
     if (sveAtt) {
-        dtaFrm <- setAtt(c("removedRows", "addedRows", "transforms"), mtaDta, dtaFrm)
+        dtaFrm <- setAtt(setdiff(names(mtaGlb), c("rowCount", "columnCount", "fields")), mtaDta, dtaFrm)
+    }
+
+    # handle weights
+    if (is.character(mtaDta$weights) && nzchar(mtaDta$weights)) {
+        # TO-DO: check whether the protobuffers (.. weights) contain
+        # anything useful beyond that information
+        attr(dtaFrm, "jmv-weights-name") <- mtaDta$weights
+        attr(dtaFrm, "jmv-weights")      <- as.vector(dtaFrm[, mtaDta$weights])
+        # it would be possible to keep both jmv-weights-name and weights, but
+        # this might be rather confusing, so the version jamovi uses internally
+        # (jmv-weights-name) is chosen and the other (weights) disregarded
+        attr(dtaFrm, "weights")          <- NULL
     }
 
     # import and extract syntax from the analyses
@@ -396,7 +413,7 @@ getHdl <- function(fleOMV = "", crrFle = "", crrMde = "r") {
              },
              error = function(errMsg) {
                  message(sprintf("The file \"%s\" could not be extracted from \"%s\".\nPlease send the file to sebastian.jentschke@uib.no!\nError message: %s\n", crrFle, fleOMV, errMsg))
-                 NULL
+                 return(invisible(NULL))
              }
         )
 }
@@ -409,7 +426,7 @@ getTxt <- function(fleOMV = "", crrFle = "") {
 
     # depending on whether the original was a JSON file or not, return the appropriate result
     if (hasExt(crrFle, "json")) {
-        crrTxt <- rjson::fromJSON(crrTxt, simplify = FALSE)
+        crrTxt <- jsonlite::fromJSON(crrTxt, simplifyVector = FALSE)
     }
 
     crrTxt
@@ -442,11 +459,11 @@ rmvQtn <- function(dtaFrm = NULL) {
 rplAtt <- function(dtaFrm = NULL) {
     # extract the attributes from the dataset and its columns and determine which attributes are
     # character
-    setAtt <- setdiff(names(attributes(dtaFrm))[sapply(attributes(dtaFrm), is.character)], c("names", "row.names", "class"))
+    dfAtt  <- setdiff(names(attributes(dtaFrm))[sapply(attributes(dtaFrm), is.character)], c("names", "row.names", "class"))
     colAtt <- setdiff(unique(unlist(sapply(sapply(dtaFrm, attributes), names), use.names = FALSE)), c("class"))
 
-    # go through the data set attributes (except the attributes from R) and check their validity
-    for (crrAtt in setAtt) {
+    # go through the data frame attributes (except the attributes from R) and check their validity
+    for (crrAtt in dfAtt) {
         attr(dtaFrm, crrAtt) <- rplStr(attr(dtaFrm, crrAtt), crrAtt)
     }
 
@@ -483,10 +500,10 @@ rplStr <- function(strMod = "", crrAtt = "") {
 
 tryErr <- function(fleInp = "", errMsg = NULL) {
     message(sprintf("File \"%s\" couldn\'t be read.\nThe error message was: %s\n", basename(fleInp), conditionMessage(errMsg)))
-    return(NULL)
+    return(invisible(NULL))
 }
 
 tryWrn <- function(fleInp = "", wrnMsg = NULL) {
     message(sprintf("Warnings were issued when reading the file \"%s\".\nThe warning was: %s\n", basename(fleInp), conditionMessage(wrnMsg)))
-    return(NULL)
+    return(invisible(NULL))
 }

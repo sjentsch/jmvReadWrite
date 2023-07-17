@@ -9,6 +9,8 @@ cond
 com
 CR
 csv
+dataType
+dtaInp
 delim
 dta
 dtaFrm
@@ -18,17 +20,21 @@ extdata
 fleInp
 fleOut
 idvar
+incl
 ipip
 jamovi
 jmv
 json
+jTransform
 len
 LF
 lintr
 MAgojam
+measureType
 MinGW
 mtaDta
 NC
+OBS
 OMV
 omv
 org
@@ -61,6 +67,7 @@ varID
 varLst
 varMve
 VARNAME
+varNme
 varOrd
 vars
 varSep
@@ -70,5 +77,6 @@ VC
 www
 xdata
 xport
+xpsd
 xpt
 xtdDta

@@ -1,3 +1,30 @@
+# jmvReadWrite 0.3.8
+
+## Enhancements and bug fixes:
+* adjustments to make `jmvReadWrite` more suited for using it together with the jamovi-module `jTransform` (https://github.com/sjentsch/jTransform)
+* implement reading both data frames or file names for merge_cols_omv and merge_rows_omv (incl. phasing out fleInp as parameter for the helper functions: it now throws an error to prevent using it)
+* initial handling of weights in `read_omv` and `write_omv`
+* improvements and corrections for `long2wide_omv` (added aggregation, mean or take first, and fixed a bug that led to incorrect naming of variables when transforming complex data sets)
+* improvements and corrections for `wide2long_omv` (added parameter `excLvl`, to prevent that measurements (if there are more than one) are also transformed to long; fixed a bug that led to incorrect
+  an order of values within variables when transforming complex data sets)
+* improved unit tests (implementation of regular expressions for expect_error and expect_warning, bug-fixes and additional coverage)
+* improvements to setting attributes (`setAtt`, e.g., from the metadata to the data frame and vice versa)
+* improved handling of factors with numerical values (measureType Nominal or Ordinal and dataType Integer)
+* added function `jmvAtt` to attach the attributes `measureType` and `dataType` to data frames coming from inside jamovi (i.e., when `jmvReadWrite` is used in modules, e.g., `Rj`)
+  OBS: rather for internal use and thus not exported, use `jmvReadWrite:::jmvAtt()` to call it
+* smaller bug fixes (typos, to ensure consistency in naming, etc.)
+
+
+# jmvReadWrite 0.3.7
+
+## Enhancements and bug fixes:
+* added `transpose_omv` (transpose data frame and write the resulting jamovi-file)
+* enable to have either data frames or strings with a file name as input to the helper functions `arrange_cols_omv`, `long2wide_omv`, `wide2long_omv`, `sort_omv`, and `transpose_omv`
+* preserve attributes when merging columns (`merge_cols_omv`)
+* changed R-package that handles JSON files from `RJSON` to `jsonlite`
+* bug fixes: added a check in `fmtFlO` to ensure that the output files are in jamovi-format (.omv); removed typos, etc.
+
+
 # jmvReadWrite 0.3.6
 
 ## Enhancements and bug fixes:

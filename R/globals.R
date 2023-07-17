@@ -20,7 +20,7 @@ lstMnf <- list(mnfVer = c("Manifest-Version",        "1.0"),
 # the next lines are dealing with storing the global and the data column attributes (that go into
 # metadata.json inside the .omv-file; the currently defined defaults are in accordance with
 # jamovi-Archive-Version: 11.0 (from jamovi 1.8)
-mtaGlb <- list(rowCount = NA, columnCount = NA, removedRows = list(), addedRows = list(), fields = list(), transforms = list())
+mtaGlb <- list(rowCount = NA, columnCount = NA, removedRows = list(), addedRows = list(), fields = list(), transforms = list(), weights = NULL)
 mtaFld <- list(name = "", id = NA, columnType = "Data", dataType = "Integer", measureType = "Nominal", formula = "", formulaMessage = "",
                parentId = 0, width = 100, type = "number", outputAnalysisId = NA, outputOptionName = "", outputName = "",
                outputDesiredColumnName = "", outputAssignedColumnName = "", importName = "", description = "", transform = 0,
@@ -47,7 +47,7 @@ chkDir <- function(fleNme = "", wrtPrm = TRUE) {
 
 chkDtF <- function(dtaFrm = NULL, minSze = c(1, 1)) {
     if (length(minSze) != 2) minSze <- rep(minSze[1], 2)
-    if (is.null(dtaFrm) || ! is.data.frame(dtaFrm) || length(dim(dtaFrm)) != 2) {
+    if (is.null(dtaFrm) || !is.data.frame(dtaFrm) || length(dim(dtaFrm)) != 2) {
         stop("Input data are either not a data frame or have incorrect (only one or more than two) dimensions.")
     } else if (any(dim(dtaFrm) < minSze)) {
         stop(sprintf("The %s dimension of the input data frame has not the required size (%d < %d).",
@@ -118,14 +118,11 @@ fmtFlI <- function(fleInp = c(), minLng = 1, maxLng = Inf, excExt = "") {
     fleInp
 }
 
-fmtFlO <- function(fleOut = "", fleInp = "", rplExt = "") {
-    if (nzchar(fleOut)) {
-        nrmFle(fleOut)
-    } else if (length(fleInp) == 1 && nzchar(fleInp[1])) {
-        sub(paste0(".", tools::file_ext(fleInp[1])), rplExt, fleInp[1])
-    } else {
-        stop(paste0("Either fleOut needs to be given as a valid non-empty file name or a single entry in fleInp where the extension is replaced with: \"", rplExt, "\"."))
+fmtFlO <- function(fleOut = "") {
+    if (!nzchar(fleOut) || (nzchar(fleOut) && !hasExt(fleOut, "omv"))) {
+        stop("fleOut needs to be a valid non-empty file name (character), and the file extension for output file needs to be .omv.")
     }
+    nrmFle(fleOut)
 }
 
 # =================================================================================================
@@ -151,28 +148,45 @@ fcnArg <- function(fcnNme = c()) {
 # functions for handling setting and storing metadata-information
 
 setAtt <- function(attLst = c(), inpObj = NULL, outObj = NULL) {
+    if (!is.character(attLst)) stop("setAtt: The parameter attLst is supposed to be a character vector.")
+    if (!is.list(inpObj))      stop("setAtt: The parameter inpObj is supposed to be either a list or a data frame.")
+    if (!is.list(outObj))      stop("setAtt: The parameter outObj is supposed to be either a list or a data frame.")
+
     for (attNme in attLst) {
-        # if the output object is the mtaDta-variable, the input object must be the data frame
-        # which contains the attribute in attNme (chkAtt), that are then stored in the mtaDta-
-        # variable; the attribute might be empty (chkAtt == FALSE), and then the default is kept
-        if        (is.list(outObj) && chkAtt(inpObj, attNme)) {
-            outObj[[attNme]] <- attr(inpObj, attNme)
-        # if the input object is the mtaDta-variable (which is a list), and the attribute is set in
-        # the output object unless the attribute already exists in the ouput object (!chkAtt), then
-        # it shouldn't be overwritten
-        } else if (is.list(inpObj) && !chkAtt(outObj, attNme)) {
-            attr(outObj, attNme) <- inpObj[[attNme]]
+        # ensure that we have one data frame and one list; the problem is that data frames
+        # frames are both lists and data frames, and therefore an error is thrown if BOTH
+        # input and output objects are lists but not data frames
+        if (identical(sort(c(class(inpObj), class(outObj))), c("data.frame", "list"))) {
+            # if the output object is the mtaDta-variable, the input object must be the data frame
+            # which contains the attribute in attNme (chkAtt), that are then stored in the mtaDta-
+            # variable; the attribute might be empty (chkAtt == FALSE), and then the default is kept
+            if        (is.data.frame(inpObj)) {
+                if        (dim(inpObj)[2] >  1 &&  chkAtt(inpObj,      attNme)) {
+                    outObj[[attNme]] <- attr(inpObj,      attNme)
+                } else if (dim(inpObj)[2] == 1 &&  chkAtt(inpObj[[1]], attNme)) {
+                    outObj[[attNme]] <- attr(inpObj[[1]], attNme)
+                }
+                eval(parse(text = paste0("")))
+            # if the input object is the mtaDta-variable (which is a list), then the attribute is set
+            # in the output object unless the attribute already exists in the ouput object (!chkAtt -
+            # it shouldn't be overwritten)
+            } else if (is.data.frame(outObj)) {
+                if        (dim(outObj)[2] >  1 && !chkAtt(outObj,      attNme)) {
+                    attr(outObj,      attNme) <- inpObj[[attNme]]
+                } else if (dim(outObj)[2] == 1 && !chkAtt(outObj[[1]], attNme)) {
+                    attr(outObj[[1]], attNme) <- inpObj[[attNme]]
+                }
+#               eval(parse(text = paste0("attr(outObj", ifelse(dim(outObj)[2] == 1, "[[1]]", ""), ", attNme) <- inpObj[[attNme]]")))
+            }
         # the case which is critical is if both input and output objects are lists (then the first
-        # part of the if-conditions above - is.list - wouldn't work); the problem is that data
-        # frames are both lists and data frames, and therefore an error is thrown if BOTH input
-        # and output objects are lists but not data frames
-        } else if (is.list(inpObj) && !is.data.frame(inpObj) && is.list(outObj) && !is.data.frame(outObj)) {
+        # part of the if-conditions above - is.list - wouldn't work)
+        } else {
+            cat("\nOne input object (inpObj or outObj) must be a list, the other must be a data frame.\n\n")
             cat(paste0("attNme: ", attNme, "\n"))
             cat(paste0("attLst: ", paste0(attLst, collapse = ", "), "\n\n"))
             cat("inpObj:\n")
             cat(utils::str(inpObj))
-            cat("\n\n")
-            cat("outObj:\n")
+            cat("\n\noutObj:\n")
             cat(utils::str(outObj))
             cat("\n\n")
             stop("Error when storing or accessing meta-data information. Please send the file causing the error to sebastian.jentschke@uib.no")
@@ -191,13 +205,45 @@ rmvAtt <- function(attObj = NULL) {
 }
 
 chkAtt <- function(attObj = NULL, attNme = "", attVal = NULL) {
-   (!is.null(attr(attObj, attNme)) && length(attr(attObj, attNme)) > 0 && ifelse(!is.null(attVal), grepl(attVal, attr(attObj, attNme)), TRUE))
+   ((attNme %in% names(attributes(attObj))) && length(attr(attObj, attNme)) > 0 && ifelse(!is.null(attVal), grepl(attVal, attr(attObj, attNme)), TRUE))
 }
 
 chkFld <- function(fldObj = NULL, fldNme = "", fldVal = NULL) {
    ((fldNme %in% names(fldObj))    && length(fldObj[[fldNme]])     > 0 && ifelse(!is.null(fldVal), grepl(fldVal, fldObj[[fldNme]]),     TRUE))
 }
 
+# =================================================================================================
+# function handling to have either a data frame or a character (pointing to a file) as input
+inp2DF <- function(dtaInp = NULL, fleOut = "", minDF = 1, maxDF = 1, usePkg = c("foreign", "haven"), selSet = "", ...) {
+    usePkg <- match.arg(usePkg)
+    # check and format input and output files, handle / check further input arguments:
+    # if the input is a data frame, it is “embedded” in a list (in order to permit to read
+    # and to concatenate this data frame with further data frames given as fleInp-attribute
+    # and read via the lapply function)
+    if (is.data.frame(dtaInp) && chkDtF(dtaInp)) {
+        lstDF <- list(dtaInp)
+        if (!is.null(attr(dtaInp, "fleInp"))) {
+            lstDF <- c(lstDF, lapply(fmtFlI(attr(dtaInp, "fleInp"), minLng = minDF - 1, maxLng = maxDF - 1), function(x) read_all(fleInp = x, usePkg = usePkg, selSet = selSet, ...)))
+        }
+    # if the input is a character vector (with file names), all file names are read into
+    # data frames (using the lapply function)
+    } else if (is.character(dtaInp)) {
+        lstDF <-              lapply(fmtFlI(dtaInp,                 minLng = minDF - 0, maxLng = maxDF - 0), function(x) read_all(fleInp = x, usePkg = usePkg, selSet = selSet, ...))
+    } else {
+        stop("dtaInp must either be a data frame or a character (pointing to a location where the input file can be found).")
+    }
+    if (is.character(fleOut) && nzchar(fleOut)) {
+        attr(lstDF[[1]], "fleOut") <- fmtFlO(fleOut)
+    } else if (chkAtt(lstDF[[1]], "fleOut")) {
+        attr(lstDF[[1]], "fleOut") <- fmtFlO(attr(lstDF[[1]], "fleOut"))
+    } else if (!is.character(fleOut)) {
+        stop("The output file name must be a character (given either via the parameter fleOut or as attribute attached to the input data frame).")
+    }
+    # most functions expect only one data frame to be returned, thus, the list
+    # used for reading processing those data frames is unpacked if there is
+    # only one data frame to return
+    if (maxDF == 1) lstDF[[1]] else lstDF
+}
 
 # =================================================================================================
 # function for copying analyses from one data file to another
@@ -225,4 +271,43 @@ xfrAnl <- function(fleOrg = "", fleTgt = "") {
     unlink(xfrDir, recursive = TRUE)
 
     TRUE
+}
+
+# =================================================================================================
+# function for adding attributes to data frames (e.g., those opened in Rj or via jTransform)
+
+jmvAtt <- function(dtaFrm = NULL) {
+    chkDtF(dtaFrm)
+
+    for (crrNme in names(dtaFrm)) {
+         # jmv-id
+         if (!is.null(attr(dtaFrm[[crrNme]], "jmv-id")) && attr(dtaFrm[[crrNme]], "jmv-id")) {
+             attr(dtaFrm[[crrNme]], "measureType") <- "ID"
+             attr(dtaFrm[[crrNme]], "dataType")    <- ifelse(is.integer(dtaFrm[[crrNme]]), "Integer", "Text")
+         } else if (is.integer(dtaFrm[[crrNme]])) {
+             attr(dtaFrm[[crrNme]], "measureType") <- "Continuous"
+             attr(dtaFrm[[crrNme]], "dataType")    <- "Integer"
+         } else if (is.numeric(dtaFrm[[crrNme]])) {
+             attr(dtaFrm[[crrNme]], "measureType") <- "Continuous"
+             attr(dtaFrm[[crrNme]], "dataType")    <- "Decimal"
+         } else if (is.ordered(dtaFrm[[crrNme]]) &&  is.null(attr(dtaFrm[[crrNme]], "values"))) {
+             attr(dtaFrm[[crrNme]], "measureType") <- "Ordinal"
+             attr(dtaFrm[[crrNme]], "dataType")    <- "Text"
+         } else if (is.ordered(dtaFrm[[crrNme]]) && !is.null(attr(dtaFrm[[crrNme]], "values"))) {
+             attr(dtaFrm[[crrNme]], "measureType") <- "Ordinal"
+             attr(dtaFrm[[crrNme]], "dataType")    <- "Integer"
+         } else if (is.factor(dtaFrm[[crrNme]]) &&  is.null(attr(dtaFrm[[crrNme]], "values"))) {
+             attr(dtaFrm[[crrNme]], "measureType") <- "Nominal"
+             attr(dtaFrm[[crrNme]], "dataType")    <- "Text"
+         } else if (is.factor(dtaFrm[[crrNme]]) && !is.null(attr(dtaFrm[[crrNme]], "values"))) {
+             attr(dtaFrm[[crrNme]], "measureType") <- "Nominal"
+             attr(dtaFrm[[crrNme]], "dataType")    <- "Integer"
+         } else {
+             cat("\n")
+             cat(utils::str(dtaFrm[[crrNme]]), "\n")
+             stop(sprintf("\n%s: Variable type %s not implemented.\n\n", crrNme, class(dtaFrm[[crrNme]])))
+         }
+    }
+
+    dtaFrm
 }

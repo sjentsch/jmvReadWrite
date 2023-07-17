@@ -5,11 +5,13 @@
 #' @param fleOut Name / position of the output file to be generated ("FILENAME.omv"; default: "")
 #' @param retDbg Whether to return a list with debugging information (see Value; default: FALSE)
 #'
-#' @return a list (if retDbg == TRUE), containing the meta data (mtaDta, metadata.json in the OMV-file), the extended data (xtdDta, xdata.json in the OMV-file) and the original data frame (dtaFrm)
+#' @return a list (if retDbg == TRUE), containing the meta data (mtaDta, metadata.json in the OMV-file), the extended data (xtdDta, xdata.json in the OMV-file)
+#'         and the original data frame (dtaFrm)
 #'
 #' @details
-#' jamovi has a specific measurement level / type "ID" (in addition to the "standard" ones "Nominal", "Ordinal", and "Continuous"). "ID" is used for columns that contain some form of ID (e.g., a
-#' participant code). In order to set a variable of your data frame to "ID", you have to manually set an attribute \code{jmv-id} (e.g., \code{attr(dtaFrm$column, "jmv-id") = TRUE}).
+#' * jamovi has a specific measurement level / type "ID" (in addition to the "standard" ones "Nominal", "Ordinal", and "Continuous"). "ID" is used for columns
+#'    that contain some form of ID (e.g., a participant code). In order to set a variable of your data frame to "ID", you have to manually set an attribute
+#'    `jmv-id` (e.g., `attr(dtaFrm$column, "jmv-id") = TRUE`).
 #'
 #' @examples
 #' \dontrun{
@@ -43,8 +45,8 @@
 #' @export write_omv
 
 write_omv <- function(dtaFrm = NULL, fleOut = "", retDbg = FALSE) {
-    if (is.null(dtaFrm))  stop("The data frame to be written needs to be given as parameter (dtaFrm = ...).")
-    if (! nzchar(fleOut)) stop("Output file name needs to be given as parameter (fleOut = ...).")
+    if (is.null(dtaFrm)) stop("The data frame to be written needs to be given as parameter (dtaFrm = ...).")
+    if (!nzchar(fleOut)) stop("Output file name needs to be given as parameter (fleOut = ...).")
 
     # check that the file name isn't empty, that the destination directory exists and that it ends in .omv
     fleOut <- nrmFle(fleOut)
@@ -62,7 +64,13 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", retDbg = FALSE) {
     # initialize metadata.json
     mtaDta <- mtaGlb
     # use the attributes stored in the data frame (for the whole data set) to
-    # update the metadata
+    # update the metadata; jmv-weights-name are stored as weights, jmv-weights
+    # needs to be dropped
+    if (chkAtt(dtaFrm, "jmv-weights-name")) {
+        attr(dtaFrm, "weights") <- attr(dtaFrm, "jmv-weights-name")
+        attr(dtaFrm, "jmv-weights-name") <- NULL
+        attr(dtaFrm, "jmv-weights")      <- NULL
+    }
     mtaDta <- setAtt(names(mtaDta), dtaFrm, mtaDta)
     # the number of rows and columns has to be adjusted to the current data set
     mtaDta$rowCount    <- nrow(dtaFrm)
@@ -82,7 +90,7 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", retDbg = FALSE) {
 
     for (i in seq_along(dtaFrm)) {
         # assign the jamovi-specific-attributes that are stored in data frame for this data column (if available)
-        mtaDta$fields[[i]] <- setAtt(names(mtaDta$fields[[i]]), dtaFrm[[i]], mtaDta$fields[[i]])
+        mtaDta$fields[[i]] <- setAtt(names(mtaDta$fields[[i]]), dtaFrm[i], mtaDta$fields[[i]])
 
         # name
         mtaDta$fields[[i]][["name"]] <- names(dtaFrm[i])
@@ -99,12 +107,13 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", retDbg = FALSE) {
         # if the jmv-id marker is set or if the measureType is set to "ID" in the original data or if it is the first column with the values
         # being unique and being either a factor or an integer (rounded equals the original value; integers may be stored as doubles)
         if (chkAtt(dtaFrm[[i]], "jmv-id", TRUE) || chkAtt(dtaFrm[[i]], "measureType", "ID") ||
-            (i == 1 && length(unique(crrCol)) == length(crrCol)) && (is.factor(crrCol) || (is.double(crrCol) && all(crrCol %% 1 == 0)))) {
-            if (!is.character(crrCol)) crrCol <- as.character(crrCol)
-            mtaDta$fields[[i]][["dataType"]]    <- "Text"
-            mtaDta$fields[[i]][["type"]]        <- "string"
+          (i == 1 && length(unique(crrCol)) == length(crrCol)) && (is.factor(crrCol) || (is.double(crrCol) && all(crrCol %% 1 == 0)))) {
             mtaDta$fields[[i]][["measureType"]] <- "ID"
+            mtaDta$fields[[i]][["dataType"]]    <- ifelse(is.integer(crrCol), "Integer", "Text")
+            mtaDta$fields[[i]][["type"]]        <- ifelse(is.integer(crrCol), "integer", "string")
         # afterwards, the different variable types for each column of the original data frame are tested
+        # an overview about how jamovi treats variable types internally and as which types they are written
+        # can be found in the function jmvAtt under globals.R
         # [a] logical
         } else if (is.logical(crrCol)) {
             crrCol <- as.integer(crrCol)
@@ -117,25 +126,29 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", retDbg = FALSE) {
         # [b] factors or characters / strings
         } else if (is.factor(crrCol) || is.character(crrCol)) {
             if (is.character(crrCol)) {
-                crrCol <- factor(trimws(crrCol), eval(parse(text = ifelse(!any(is.na(suppressWarnings(as.numeric(crrCol)))),
+                mtaDta$fields[[i]][["dataType"]] <- ifelse(!any(is.na(suppressWarnings(as.numeric(crrCol)))), "Integer", "Text")
+                crrCol <- factor(trimws(crrCol), eval(parse(text = ifelse(mtaDta$fields[[i]][["dataType"]] == "Integer",
                                                                           "as.character(sort(as.numeric(unique(trimws(crrCol)))))",
                                                                           "sort(unique(trimws(crrCol)))"))))
             }
             # NB: If jamovi imports RData / RDS-files, character variables are given "ID" (measureType) / "Text" (dataType)
             #     however, converting them to factors and exporting those seems to make more sense
             facLvl <- attr(crrCol, "levels")
-            facOrd <- is.ordered(crrCol)
-            if (!is.null(attr(crrCol, "values")) && !identical(attr(crrCol, "values")[as.integer(crrCol)], as.integer(crrCol))) {
-                stop(sprintf("\"values\"-attribute found for column \"%s\". Please send the file to sebastian.jentschke@uib.no for debugging.", names(dtaFrm[i])))
-#               crrCol <- facVal[as.integer(crrCol)]
-#               mtaDta$fields[[i]][["dataType"]] <- "Integer"
+            # above must be kept at crrCol as the original column might be character and was converted above
+            facOrd <- is.ordered(dtaFrm[[i]])
+            if (chkAtt(dtaFrm[[i]], "values") && !identical(attr(dtaFrm[[i]], "values"), as.integer(attr(dtaFrm[[i]], "levels")))) {
+                clsRmv(list(binHdl, strHdl))
+                stop(sprintf(paste("\"values\"-attribute with unexpected values found for column \"%s\".",
+                                   "Please send the file to sebastian.jentschke@uib.no for debugging."), names(dtaFrm[i])))
             }
-            crrCol <- as.integer(crrCol) - 1
+            crrCol <- as.vector.factor(crrCol, mode = "integer") - 1
             # if "dataType" is already stored in the data frame, keep it, otherwise determine whether the factor levels are more likely to be "Integer" or "Text"
             mtaDta$fields[[i]][["dataType"]] <- ifelse(chkAtt(dtaFrm[[i]], "dataType"), attr(dtaFrm[[i]], "dataType"),
-                ifelse(all(!is.na(suppressWarnings(as.integer(facLvl)))) && all(as.character(as.integer(facLvl)) == facLvl), "Integer", "Text"))
+                ifelse(chkAtt(dtaFrm[[i]], "values"), "Integer",
+                ifelse(all(!is.na(suppressWarnings(as.integer(facLvl)))) && all(as.character(as.integer(facLvl)) == facLvl), "Integer", "Text")))
             mtaDta$fields[[i]][["type"]]     <- "integer"
-            # if "measureType" is already stored in the data frame, keep it, otherwise set it to "Ordinal" if the properties indicate it to be likely ("Nominal" is already the default)
+            # if "measureType" is already stored in the data frame, keep it, otherwise set it to "Ordinal" if the properties indicate it to be likely
+            # ("Nominal" is already the default)
             if (facOrd) mtaDta$fields[[i]][["measureType"]] <- ifelse(chkAtt(dtaFrm[[i]], "measureType"), attr(dtaFrm[[i]], "measureType"), "Ordinal")
             # the code below permitted to "guess" whether a factor likely was ordered, but this lead to some problems when storing reshaped data
 #           if (facOrd || (chkFld(mtaDta$fields[[i]], "dataType", "Integer") && length(facLvl) > 5 && !any(is.na(c(as.integer(facLvl), crrCol))) &&
@@ -180,6 +193,7 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", retDbg = FALSE) {
             mtaDta$fields[[i]][["description"]] <- paste(c(ifelse(nzchar(mtaDta$fields[[i]][["description"]]), mtaDta$fields[[i]][["description"]], names(dtaFrm[i])),
                                                          "(time converted to numeric; sec since 00:00)"), collapse = " ")
         } else {
+            clsRmv(list(binHdl, strHdl))
             stop(sprintf("Variable type %s not implemented. Please send the data file that caused this problem to sebastian.jentschke@uib.no", class(crrCol)))
         }
 
@@ -224,6 +238,7 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", retDbg = FALSE) {
             }
             wrtCol <- as.integer(wrtCol)
         } else {
+            clsRmv(list(binHdl, strHdl))
             stop(sprintf("Variable type %s not implemented. Please send the data file that caused this problem to sebastian.jentschke@uib.no", mtaDta$fields[[i]][["type"]]))
         }
         writeBin(wrtCol, binHdl, endian = "little")
@@ -275,13 +290,29 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", retDbg = FALSE) {
     add2ZIP(fleOut, htmHdl, txtOut = htmTxt())
     rm(htmHdl)
 
+    # handle weights
+    if (chkAtt(dtaFrm, "weights", "\\w+")) {
+        # TO-DO: this likely requires creating protobuffers
+        warning("Handling of weights not yet implemented.")
+    }
+
     if (retDbg) {
         list(mtaDta = mtaDta, xtdDta = xtdDta, dtaFrm = dtaFrm)
     }
 }
 
+clsRmv <- function(fleHdl = NULL) {
+    for (crrHdl in fleHdl) {
+        crrFle <- summary(crrHdl)[["description"]]
+        close(crrHdl)
+        unlink(crrFle)
+        rm(crrFle)
+    }
+}
+
 fmtJSON <- function(txtJSON = "") {
-    gsub("00: 00", "00:00", gsub("  ", " ", gsub(":", ": ", gsub(",", ", ", rjson::toJSON(txtJSON)))))
+    gsub("\"weights\": \\{\\}", "\"weights\": null", gsub("00: 00", "00:00", gsub("  ", " ", gsub(":", ": ", gsub(",", ", ",
+      jsonlite::toJSON(txtJSON, auto_unbox = TRUE))))))
 }
 
 htmTxt <- function() {
@@ -342,7 +373,7 @@ mnfTxt <- function() {
 
 add2ZIP <- function(fleZIP = "", crrHdl = NULL, newFle = FALSE, blnZIP = TRUE, txtOut = "") {
 
-    if (! all(class(crrHdl) == c("file", "connection"))) {
+    if (!all(class(crrHdl) == c("file", "connection"))) {
         cat(utils::str(crrHdl))
         stop("Parameter isn\'t a file handle pointing to a file to be zipped.")
     }
@@ -353,7 +384,8 @@ add2ZIP <- function(fleZIP = "", crrHdl = NULL, newFle = FALSE, blnZIP = TRUE, t
         # for the other files (metadata.json, xdata.json, index.html), it doesn't matter, therefore sep = "\n" is added for all
         writeLines(txtOut, crrHdl, sep = "\n")
     }
-    crrFle <- summary(crrHdl)$description
+
+    crrFle <- summary(crrHdl)[["description"]]
     close(crrHdl)
 
     if (blnZIP) {
@@ -363,6 +395,7 @@ add2ZIP <- function(fleZIP = "", crrHdl = NULL, newFle = FALSE, blnZIP = TRUE, t
             zip::zip_append(fleZIP, basename(crrFle), root = dirname(crrFle))
         }
     }
+
     unlink(crrFle)
     rm(crrFle)
 }

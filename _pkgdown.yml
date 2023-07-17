@@ -23,6 +23,7 @@ reference:
   - merge_cols_omv
   - merge_rows_omv
   - sort_omv
+  - transpose_omv
 - title: Example datasets
 - contents:
   - AlbumSales

@@ -667,6 +667,9 @@ cmdClR <- function(strCmd = "", rplCmd = c()) {
     if (grepl("boxcox\\(", strCmd)) {
         strCmd <- paste0("boxcox <- function(X, lambda = 0) ifelse(lambda == 0, log(X), (X ** lambda - 1) / lambda); ", strCmd)
     }
+    if (grepl("filter\\(", strCmd)) {
+        strCmd <- paste0("filter <- function(X, fltExp = "") ifelse(eval(parse(text = fltExp)), X, ifelse(is.numeric(NA), "")); ", strCmd)
+    }
     if (grepl("iqr\\(", strCmd)) {
         strCmd <- paste0("iqr <- function(X) { Q <- quantile(X, c(0.25, 0.75)); "
                                               "Y <- rep(0, length(X)); ", 

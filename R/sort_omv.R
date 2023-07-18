@@ -100,7 +100,7 @@ srtFrm <- function(dtaFrm = NULL, varSrt = c()) {
             }), collapse = ", "), ")")))
         # sorting makes the data.frame lose it's attributes which are therefore stored and later restored
         attMem <- sapply(dtaFrm, attributes)
-        dtaFrm <- dtaFrm[srtOrd, ]
+        dtaFrm <- dtaFrm[srtOrd, , drop = FALSE]
         rownames(dtaFrm) <- NULL
         for (n in names(attMem)[!sapply(attMem, is.null)]) attributes(dtaFrm[[n]]) <- attMem[[n]]
     }

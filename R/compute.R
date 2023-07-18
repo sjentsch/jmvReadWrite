@@ -139,8 +139,8 @@ compute <- function(crrCmd = c(), data = data.frame()) {
         cmpRpR <- c(cmpRpR, "MATCH\\(", "match(")
     }
     # MAX(number 1, number 2, …): Returns the largest value of a set of numbers.
-    if (grepl("MAX\\(|MAX\\.\d+\\(", cmpJMV, ignore.case = TRUE)) {
-        cmpJMV <- gsub("MAX\\(|MAX\\.\d+\\(", "MAX(", cmpJMV, ignore.case = TRUE)
+    if (grepl("MAX\\(|MAX\\.\\d+\\(", cmpJMV, ignore.case = TRUE)) {
+        cmpJMV <- gsub("MAX\\(|MAX\\.\\d+\\(", "MAX(", cmpJMV, ignore.case = TRUE)
         cmpRpR <- c(cmpRpR, "MAX\\(", "max(", "[VARNAMES]", "[VARNAMES], na.rm = TRUE")
     }
     # MAXABSIQR(variable 1, variable 2, …): Max. absolute IQR-value (i.e., how far outside the box an individual datapoint is in terms of IQR - Q1/Q3-distance)

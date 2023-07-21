@@ -100,9 +100,9 @@ transpose_omv <- function(dtaInp = NULL, fleOut = "", varNme = "", usePkg = c("f
     # name was given, return the data frame
     if (!is.null(fleOut) && nzchar(fleOut)) {
         fleOut <- fmtFlO(fleOut)
-        write_omv(dtaFrm, fleOut)
+        write_omv(jmvAtt(dtaFrm), fleOut)
         return(invisible(NULL))
     } else {
-        dtaFrm
+        jmvAtt(dtaFrm)
     }
 }

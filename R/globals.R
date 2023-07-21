@@ -274,7 +274,7 @@ jmvAtt <- function(dtaFrm = NULL) {
 
     for (crrNme in names(dtaFrm)) {
          # if the attributes already exist, go to the next column
-         if (attr(dtaFrm[[crrNme]], "measureType") && attr(dtaFrm[[crrNme]], "measureType")) next
+         if (chkAtt(dtaFrm[[crrNme]], "measureType") && chkAtt(dtaFrm[[crrNme]], "measureType")) next
          # jmv-id
          if (!is.null(attr(dtaFrm[[crrNme]], "jmv-id")) && attr(dtaFrm[[crrNme]], "jmv-id")) {
              attr(dtaFrm[[crrNme]], "measureType") <- "ID"

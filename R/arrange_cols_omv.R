@@ -68,8 +68,7 @@ arrange_cols_omv <- function(dtaInp = "", fleOut = "", varOrd = c(), varMve = li
 
     # check and import input data set (either as data frame or from a file)
     if (!is.null(list(...)[["fleInp"]])) stop("Please use the argument dtaInp instead of fleInp.")
-    dtaFrm <- inp2DF(dtaInp = dtaInp, fleOut = fleOut, usePkg = usePkg, selSet = selSet, ...)
-    fleOut <- attr(dtaFrm, "fleOut")
+    dtaFrm <- inp2DF(dtaInp = dtaInp, usePkg = usePkg, selSet = selSet, ...)
 
     # re-arrange the order of variables in the data set (varOrd)
     if (length(varOrd) > 0) {
@@ -107,11 +106,12 @@ arrange_cols_omv <- function(dtaInp = "", fleOut = "", varOrd = c(), varMve = li
     # re-arrange to order of variables, while storing and restoring the attributes attached to the whole data frame (column attributes are not affected)
     attMem <- attributes(dtaFrm)
     dtaFrm <- dtaFrm[, varOrd]
-    dtaFrm <- setAtt(setdiff(names(attMem), c("names", "row.names", "class", "fltLst", "fleOut")), attMem, dtaFrm)
+    dtaFrm <- setAtt(setdiff(names(attMem), c("names", "row.names", "class", "fltLst")), attMem, dtaFrm)
 
     # write the resulting data frame to the output file or, if no output file
     # name was given, return the data frame
     if (!is.null(fleOut) && nzchar(fleOut)) {
+        fleOut <- fmtFlO(fleOut)
         write_omv(dtaFrm, fleOut)
         # transfer analyses from input to output file
         if (psvAnl) {

@@ -113,8 +113,7 @@ long2wide_omv <- function(dtaInp = NULL, fleOut = "", varTgt = c(), varExc = c()
 
     # check and import input data set (either as data frame or from a file)
     if (!is.null(list(...)[["fleInp"]])) stop("Please use the argument dtaInp instead of fleInp.")
-    dtaFrm <- inp2DF(dtaInp = dtaInp, fleOut = fleOut, usePkg = usePkg, selSet = selSet, ...)
-    fleOut <- attr(dtaFrm, "fleOut")
+    dtaFrm <- inp2DF(dtaInp = dtaInp, usePkg = usePkg, selSet = selSet, ...)
 
     # transform data set
     # [a] check whether varID, varTme and varTgt are not empty and exist in the data set
@@ -159,6 +158,7 @@ long2wide_omv <- function(dtaInp = NULL, fleOut = "", varTgt = c(), varExc = c()
     # write the resulting data frame to the output file or, if no output file
     # name was given, return the data frame
     if (!is.null(fleOut) && nzchar(fleOut)) {
+        fleOut <- fmtFlO(fleOut)
         write_omv(dtaFrm, fleOut)
         return(invisible(NULL))
     } else {

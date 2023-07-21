@@ -50,15 +50,9 @@ test_that("globals work", {
 
     expect_error(inp2DF(dtaInp = 1), regexp = "^dtaInp must either be a data frame or a character \\(pointing to a location where the input file can be found\\)\\.")
     inpDF <- jmvReadWrite::AlbumSales
-    expect_error(inp2DF(dtaInp = inpDF, fleOut = 1),
-      regexp = "^The output file name must be a character \\(given either via the parameter fleOut or as attribute attached to the input data frame\\)\\.")
-    attr(inpDF, "fleOut") <- "Trial1.omv"
-    expect_equal(basename(attr(inp2DF(dtaInp = inpDF),                        "fleOut")), "Trial1.omv")
-    expect_equal(basename(attr(inp2DF(dtaInp = inpDF, fleOut = "Trial2.omv"), "fleOut")), "Trial2.omv")
     inpNme <- file.path("..", "ToothGrowth.omv")
     expect_s3_class(inp2DF(dtaInp = inpNme), "data.frame")
     expect_equal(dim(inp2DF(dtaInp = inpNme)), c(60, 14))
-    expect_equal(basename(attr(inp2DF(dtaInp = inpNme, fleOut = "Trial.omv"), "fleOut")),  "Trial.omv")
 
     inpDF <- jmvReadWrite::AlbumSales
     attr(inpDF, "fleInp") <- file.path("..", "ToothGrowth.omv")

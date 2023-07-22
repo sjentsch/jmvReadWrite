@@ -267,7 +267,8 @@ xfrAnl <- function(fleOrg = "", fleTgt = "") {
 }
 
 # =================================================================================================
-# function for adding attributes to data frames (e.g., those opened in Rj or via jTransform)
+# function for adding attributes used by jamovi to data frames (e.g., those opened in Rj or via
+# jTransform)
 
 jmvAtt <- function(dtaFrm = NULL) {
     chkDtF(dtaFrm)
@@ -297,6 +298,13 @@ jmvAtt <- function(dtaFrm = NULL) {
          } else if (is.factor(dtaFrm[[crrNme]]) && !is.null(attr(dtaFrm[[crrNme]], "values"))) {
              attr(dtaFrm[[crrNme]], "measureType") <- "Nominal"
              attr(dtaFrm[[crrNme]], "dataType")    <- "Integer"
+         } else if (is.character(dtaFrm[[crrNme]])) {
+             crrAtt <- attributes(dtaFrm[[crrNme]])
+             dtaFrm[[crrNme]] <- as.factor(dtaFrm[[crrNme]])
+             dtaFrm[crrNme]   <- setAtt(attLst = setdiff(names(crrAtt), c("levels", "class")),
+                                        inpObj = crrAtt, outObj = dtaFrm[crrNme])
+             attr(dtaFrm[[crrNme]], "measureType") <- "Nominal"
+             attr(dtaFrm[[crrNme]], "dataType")    <- "Text"
          } else {
              cat("\n")
              cat(utils::str(dtaFrm[[crrNme]]), "\n")

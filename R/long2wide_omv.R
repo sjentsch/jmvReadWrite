@@ -156,19 +156,16 @@ long2wide_omv <- function(dtaInp = NULL, fleOut = "", varTgt = c(), varExc = c()
     dtaFrm <- srtFrm(dtaFrm, varSrt)
 
     # if varID is unique, set it's measureType to ID
-    if (!any(duplicated(dtaFrm[[varID]]))) {
-        attr(dtaFrm[[varID]], "jmv-id") <- TRUE
-        dtaFrm[varID] <- jmvAtt(dtaFrm[varID])
-    }
+    if (!any(duplicated(dtaFrm[[varID]]))) attr(dtaFrm[[varID]], "jmv-id") <- TRUE
 
     # write the resulting data frame to the output file or, if no output file
     # name was given, return the data frame
     if (!is.null(fleOut) && nzchar(fleOut)) {
         fleOut <- fmtFlO(fleOut)
-        write_omv(dtaFrm, fleOut)
+        write_omv(jmvAtt(dtaFrm), fleOut)
         return(invisible(NULL))
     } else {
-        dtaFrm
+        jmvAtt(dtaFrm)
     }
 }
 

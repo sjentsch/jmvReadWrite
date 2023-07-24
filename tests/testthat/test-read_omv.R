@@ -54,8 +54,12 @@ test_that("read_omv works", {
     df4Chk <- read_omv(fleInp = nmeInp, useFlt = FALSE, rmMsVl = FALSE, sveAtt = FALSE, getSyn = TRUE, getHTM = FALSE)
     expect_equal(names(attributes(df4Chk)), c("names", "row.names", "class", "fltLst", "syntax", "protobuf"))
     # the next two command actually work in both cases: when a list with "syntax" is filled with command and if it's empty
-    expect_vector(attr(df4Chk, "syntax"), list(), 2)
+    expect_vector(attr(df4Chk, "syntax"), c(), 2)
     expect_true(all(grepl("^jmv::", attr(df4Chk, "syntax"))))
+    expect_equal(attr(df4Chk, "syntax"),
+      c(paste("jmv::ANOVA(formula = len ~ supp + dose2 + supp:dose2, data = data, effectSize = \"partEta\", modelTest = TRUE, qq = TRUE,",
+              "contrasts = list(list(var=\"supp\", type=\"none\"), list(var=\"dose2\", type=\"polynomial\")), postHoc = ~ supp + dose2, emMeans = ~ dose2:supp)"),
+           "jmv::ancova(formula = len ~ supp + dose, data = data, effectSize = \"partEta\", modelTest = TRUE)"))
 
     # read the data set (with the getSyn-argument set TRUE) and test its properties: correct attributes (should contain "syntax" and "protobuf"), as well as the type, size and content of "syntax"
     df4Chk <- read_omv(fleInp = nmeInp, useFlt = FALSE, rmMsVl = FALSE, sveAtt = FALSE, getSyn = FALSE, getHTM = TRUE)

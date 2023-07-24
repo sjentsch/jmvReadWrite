@@ -14,7 +14,7 @@
 #' @return a data frame (only returned if `fleOut` is empty) where the order of variables / columns of the input data set is re-arranged
 #'
 #' @details
-#' * The aim of this function is to help 
+#' * The aim of this function is to help
 #'   The main use of it is likely to help creating data sets to be used in teaching (or provide ”properly described“ data when publishing in a repository
 #'   such as the OSF).
 #' * The ellipsis-parameter (`...`) can be used to submit arguments / parameters to the functions that are used for reading the data. By clicking on the
@@ -43,37 +43,49 @@
 describe_omv <- function(dtaInp = NULL, fleOut = "", dtaTtl = c(), dtaDsc = c(), usePkg = c("foreign", "haven"), selSet = "", ...) {
 
     # check the input parameters: either dtaTtl or dtaDsc need to be given
-    if ((length(dtaTtl) < 1 || !is.character(varOrd) || !all(nzchar(varOrd))) &&
-        (length(dtaDsc) < 1 || !is.list(varMve) || !is.character(names(varMve)) || !is.numeric(unlist(varMve)) || !all(unlist(varMve) != 0) || !all(unlist(varMve) %% 1 == 0))) {
-        stop("Calling annotate_omv requires either the parameter varOrd (a character vector) or the parameter varMve (a named list), using the correct format (see Details in help).")
+    if ((length(dtaTtl) < 1 || !nzchar(dtaTtl)) && (length(dtaDsc) < 1 || !nzchar(dtaDsc))) {
+        stop("Calling describe_omv requires either the parameter dtaTtl or the parameter dtaDsc (both are character vector).")
     }
-
-# name has to be given
 
     # check and import input data set (either as data frame or from a file)
     if (!is.null(list(...)[["fleInp"]])) stop("Please use the argument dtaInp instead of fleInp.")
     dtaFrm <- inp2DF(dtaInp = dtaInp, getSyn = TRUE, getHTM = TRUE, usePkg = usePkg, selSet = selSet, ...)
 
-    # check whether there are any 
-
-    # check whether the data set contains the attribute HTML, otherwise add it
+    # check whether the data set contains the attribute HTML, if so, check whether
+    # it contains analyses; if not, add it
     if (!is.null(attr(dtaFrm, "HTML"))) {
-            
+
+    } else {
+        attr(dtaFrm, "HTML") <- htmTxt()
     }
 
     # add title and description
     # in HMTL
+    if (nzchar(dtaDsc)) {
+    }
+    if (nzchar(dtaDsc)) {
+    }
+    
 #    <h1 contenteditable=\"\" spellcheck=\"false\">Results</h1>
 #    <p style=\"text-align:left;padding:0px 0px 0px 0px;\"></p>
 # ->
 #    <h1 contenteditable=\"\" spellcheck=\"false\">Album Sales</h1>
 #    <div class="note"><p><strong>Description:</strong></p><p>Imagine that you worked for a record company and that your boss was interested in predicting album sales from advertising. This data file has 200 rows, each one representing a different album.</p><p>&nbsp;</p><p><strong>Variables:</strong></p><ul><li><strong><em>Adverts</em></strong>: amount (in thousands of pounds) spent promoting the album before release</li><li><strong><em>Airplay</em></strong>: how many times songs from the album were played on a prominent national radio station in the week before release</li><li><strong><em>Image</em></strong>: how attractive people found the band&#x27;s image (out of 10)</li><li><strong><em>Sales</em></strong>: sales (in thousands) of each album in the week after release</li></ul><p>&nbsp;</p><p><strong>Reference:</strong></p><p>Field, A. P. (2017). <em>Discovering Statistics Using IBM SPSS Statistics</em> (5th ed.). Sage. [Fictional data set]</p><p><em>The data set was constructed by Andy Field who therefore owns the copyright. Andy Field generously agreed that we can include the data set in the jamovi Data Library. This data set is also publicly available on the website that accompanies Andy Field`s book, https:&#x2F;&#x2F;edge.sagepub.com&#x2F;field5e. Without Andy Field`s explicit consent, this data set may not be distributed for commercial purposes, this data set may not be edited, and this data set may not be presented without acknowledging its source (i.e., the terms of a CC BY-NC-ND license).</em></p> </div>
+
     # as protobuf
-    htmPtB <- list()
-    dscPtB <- RProtoBuf::new(jamovi.coms.AnalysisOption, c = RProtoBuf::new(jamovi.coms.AnalysisOptions, options =
-                  RProtoBuf::new(jamovi.coms.AnalysisOption, c = RProtoBuf::new(jamovi.coms.AnalysisOptions, options = htmPtB)),
-                hasNames = TRUE, names = "ops"))
-    ttlPtB <- RProtoBuf::new(jamovi.coms.AnalysisOption, s = dtaTtl)
+    if (nzchar(dtaDsc)) {
+        ttlPtB <- RProtoBuf::new(jamovi.coms.AnalysisOption, s = dtaTtl)
+    } else {
+        ttlPtB <- NULL
+    }
+    if (nzchar(dtaDsc)) {
+        htmPtB <- list()
+        dscPtB <- RProtoBuf::new(jamovi.coms.AnalysisOption, c = RProtoBuf::new(jamovi.coms.AnalysisOptions, options =
+                      RProtoBuf::new(jamovi.coms.AnalysisOption, c = RProtoBuf::new(jamovi.coms.AnalysisOptions, options = htmPtB)),
+                    hasNames = TRUE, names = "ops"))
+    } else {
+        dscPtB <- NULL
+    }
     optPtB <- RProtoBuf::new(jamovi.coms.AnalysisOptions, options = list(dscPtB, ttlPtB), hasNames = TRUE,
       names = c("results//topText", "results//heading"))
     attr(dtaFrm, "protobuf")[["01 empty/analysis"]] <-

@@ -191,38 +191,16 @@ read_omv <- function(fleInp = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = TRUE,
         savSyn <- list()
         savPBf <- list()
         if (length(anlLst) > 0) {
-            synPkg <- c("RProtoBuf", "jmvcore", "rlang")
-            flePtB <- system.file("jamovi.proto", package = "jmvcore")
-            # check whether all required packages and files are present
-            if (hasPkg(synPkg) && file.exists(flePtB)) {
-                # try reading the protobuffer-file (if it can be read / parsed, tryCatch returns TRUE and the syntax can be extracted)
-                blnPtb <- tryCatch(expr  = {
-                                             RProtoBuf::readProtoFiles(flePtB)
-                                             TRUE
-                                           },
-                                   error = function(e) {
-                                                         message("Error when loading protocol definition, syntax can\'t be extracted:\n", e)
-                                                         FALSE
-                                                       }
-                                 )
-                if (blnPtb) {
+                if (jmvPtB()) {
                     for (anlNme in anlLst) {
                         anlPBf <- RProtoBuf::read(jamovi.coms.AnalysisResponse, anlHdl <- getHdl(fleInp, anlNme, "rb"))
                         clsHdl(anlHdl)
                         rm(anlHdl)
-                        # for (anlFld in names(anlPBf))         { print(paste0(anlFld, ": ", anlPBf[[anlFld]])) }         # helper function to show all fields
-                        # for (anlFld in names(anlPBf$options)) { print(paste0(anlFld, ": ", anlPBf$options[[anlFld]])) } # helper function to show all fields in options
-                        # for (anlFld in names(anlPBf$results)) { print(paste0(anlFld, ": ", anlPBf$results[[anlFld]])) } # helper function to show all fields in results
-                        # ..$bytesize() - size of the protocol buffer (or any field contained in it)
                         savSyn <- c(savSyn, gsub("\\( ", "\\(", gsub("\\n\\s+", " ", fndSyn(anlPBf$results))))
                         anlPBf$results <- NULL
-                        savPBf <- c(savPBf, anlPBf)
+                        savPBf[[anlNme]] <- anlPBf
                     }
                 }
-            } else {
-                cat(paste0("WARNING: For extracting syntax, the package(s) \"", paste0(synPkg[!sapply(synPkg, function(X) nzchar(system.file(package = X)))],
-                                                                                       collapse = "\", \""), "\" need(s) to be installed.\n\n"))
-            }
         }
         attr(dtaFrm, "syntax")   <- savSyn
         attr(dtaFrm, "protobuf") <- savPBf

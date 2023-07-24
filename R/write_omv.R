@@ -2,16 +2,26 @@
 #' (<https://www.jamovi.org>)
 #'
 #' @param dtaFrm Data frame to be exported (default: NULL)
-#' @param fleOut Name / position of the output file to be generated ("FILENAME.omv"; default: "")
-#' @param retDbg Whether to return a list with debugging information (see Value; default: FALSE)
+#' @param fleOut Name / position of the output file to be generated
+#'               ("FILENAME.omv"; default: "")
+#' @param wrtPBf Whether to write protobuffers (see Details; default: FALSE)
+#' @param retDbg Whether to return a list with debugging information (see
+#'               Value; default: FALSE)
 #'
-#' @return a list (if retDbg == TRUE), containing the meta data (mtaDta, metadata.json in the OMV-file), the extended data (xtdDta, xdata.json in the OMV-file)
-#'         and the original data frame (dtaFrm)
+#' @return a list (if retDbg == TRUE), containing the meta data (mtaDta,
+#'         metadata.json in the OMV-file), the extended data (xtdDta,
+#'         xdata.json in the OMV-file) and the original data frame (dtaFrm)
 #'
 #' @details
-#' * jamovi has a specific measurement level / type "ID" (in addition to the "standard" ones "Nominal", "Ordinal", and "Continuous"). "ID" is used for columns
-#'    that contain some form of ID (e.g., a participant code). In order to set a variable of your data frame to "ID", you have to manually set an attribute
-#'    `jmv-id` (e.g., `attr(dtaFrm$column, "jmv-id") = TRUE`).
+#' * jamovi has a specific measurement level / type "ID" (in addition to the
+#'   "standard" ones "Nominal", "Ordinal", and "Continuous"). "ID" is used for
+#'   columns that contain some form of ID (e.g., a participant code). In order
+#'   to set a variable of your data frame to "ID", you have to manually set an
+#'   attribute `jmv-id` (e.g., `attr(dtaFrm$column, "jmv-id") = TRUE`).
+#' * CAUTION: Setting wrtPBf to TRUE currently overwrites analyses that already
+#'   exist in a data file. It is meant to be used for `describe_omv` only. If
+#'   you are setting wrtPBf to TRUE, ensure to use a file name that isn't the
+#'   same as those of any existing file.
 #'
 #' @examples
 #' \dontrun{
@@ -44,7 +54,7 @@
 #'
 #' @export write_omv
 
-write_omv <- function(dtaFrm = NULL, fleOut = "", retDbg = FALSE) {
+write_omv <- function(dtaFrm = NULL, fleOut = "", wrtPBf = FALSE, retDbg = FALSE) {
     if (is.null(dtaFrm)) stop("The data frame to be written needs to be given as parameter (dtaFrm = ...).")
     if (!nzchar(fleOut)) stop("Output file name needs to be given as parameter (fleOut = ...).")
 
@@ -277,17 +287,25 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", retDbg = FALSE) {
     xtdHdl <- file(file.path(tempdir(), "xdata.json"),    open = "w")
     add2ZIP(fleOut, xtdHdl, txtOut = fmtJSON(xtdDta))
     rm(xtdHdl)
+    
+    if (wrtPBf) {
+        # write ProtoBuffers
+# TO-DO
 
-    # write index.html and add it to ZIP file
-    # currently, the HTML that is stored in the HTML attribute can't be saved because it is only a "front"
-    # that doesn't work without the analyses and images contained in it being stored too
-    htmHdl <- file(file.path(tempdir(), "index.html"),    open = "w")
-#   if (!is.null(attr(dtaFrm, "HTML"))) {
-#      add2ZIP(fleOut, htmHdl, txtOut = attr(dtaFrm, "HTML"))
-#   } else {
-#      add2ZIP(fleOut, htmHdl, txtOut = htmTxt())
-#   }
-    add2ZIP(fleOut, htmHdl, txtOut = htmTxt())
+		# write index.html and add it to ZIP file
+		htmHdl <- file(file.path(tempdir(), "index.html"),    open = "w")
+		if (!is.null(attr(dtaFrm, "HTML"))) {
+	# TO-DO: check whether the HTML contains analyses
+		   # currently, the HTML that is stored in the HTML attribute can't be
+		   # saved because it is only a "front" that doesn't work without the
+		   # analyses and images contained in it being stored too
+		   add2ZIP(fleOut, htmHdl, txtOut = attr(dtaFrm, "HTML"))
+		} else {
+		   add2ZIP(fleOut, htmHdl, txtOut = htmTxt())
+		}
+    } else {
+        add2ZIP(fleOut, htmHdl, txtOut = htmTxt())
+    }
     rm(htmHdl)
 
     # handle weights
@@ -318,43 +336,54 @@ fmtJSON <- function(txtJSON = "") {
 htmTxt <- function() {
     c("<!DOCTYPE html>",
       "<html>",
-      "    <head>",
-      "        <meta charset=\"utf-8\" />",
-      "        <title>Results</title>",
-      "        <style>\n",
-      "            body {",
-      "                font-family: \"Segoe UI\",Roboto,Helvetica,Arial,sans-serif,\"Segoe UI Emoji\",\"Segoe UI Symbol\" ;",
-      "                font-size: 12px ;",
-      "                color: #333333 ;",
-      "                margin: 24px;",
-      "                cursor: default ;",
-      "            }\n",
-      "            h1 {",
-      "                font-size: 160% ;",
-      "                color: #3E6DA9 ;",
-      "                margin-bottom: 12px ;",
-      "                white-space: nowrap ;",
-      "            }\n",
-      "            h2 {",
-      "                font-size: 130% ;",
-      "                color: #3E6DA9 ;",
-      "                margin-bottom: 12px ;",
-      "            }\n",
-      "            h3, h4, h5 {",
-      "                font-size: 110% ;",
-      "                margin-bottom: 12px ;",
-      "            }\n",
-      "            table {",
-      "                page-break-inside: avoid;",
-      "                border-spacing: 0 ;",
-      "            }\n",
-      "            table tr td, table tr th {",
-      "                font-size: 12px ;",
-      "                page-break-inside: avoid;",
-      "            }\n",
-      "        </style>",
+      "<head>",
+      "    <meta charset=\"utf-8\" />",
+      "    <title>Results</title>",
+      "    <style>\n",
+      "    body {",
+      "        font-family: \"Segoe UI\",Roboto,Helvetica,Arial,sans-serif,\"Segoe UI Emoji\",\"Segoe UI Symbol\" ;",
+      "        color: #333333 ;",
+      "        cursor: default ;",
+      "        margin: 24px;",
+      "        font-size: 12px ;",
+      "    }\n",
+      "    h1 {",
+      "        font-size: 160% ;",
+      "        color: #3E6DA9 ;",
+      "        margin-bottom: 12px ;",
+      "        white-space: nowrap ;",
+      "    }\n",
+      "    h2 {",
+      "        font-size: 130% ;",
+      "        margin-bottom: 12px ;",
+      "        color: #3E6DA9 ;",
+      "    }\n",
+      "    h3, h4, h5 {",
+      "        font-size: 110% ;",
+      "        margin-bottom: 12px ;",
+      "    }\n",
+      "    table {",
+      "        border-spacing: 0 ;",
+      "        page-break-inside: avoid;",
+      "    }\n",
+      "    table tr td, table tr th {",
+      "        page-break-inside: avoid;",
+      "        font-size: 12px ;",
+      "    }\n",
+      "    .ql-align-center {\n        text-align: center;\n    }\n",
+      "    .ql-align-right {\n        text-align: right;\n    }\n",
+      "    .ql-align-justify {\n        text-align: justify;\n    }\n",
+      "    .ql-indent-1 {\n        padding-left: 3em;\n    }\n",
+      "    .ql-indent-2 {\n        padding-left: 6em;\n    }\n",
+      "    .ql-indent-3 {\n        padding-left: 9em;\n    }\n",
+      "    .ql-indent-4 {\n        padding-left: 12em;\n    }\n",
+      "    .ql-indent-5 {\n        padding-left: 15em;\n    }\n",
+      "    .note {\n        margin: 5px 0px;\n    }\n",
+      "    </style>",
       "</head>",
       "<body>\n",
+      "    <h1 contenteditable=\"\" spellcheck=\"false\">Results</h1>\n",
+      "    <p style=\"text-align:left;padding:0px 0px 0px 0px;\"></p>\n",
       "</body>",
       "</html>")
 }

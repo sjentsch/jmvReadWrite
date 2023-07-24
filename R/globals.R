@@ -125,6 +125,26 @@ fmtFlO <- function(fleOut = "") {
     nrmFle(fleOut)
 }
 
+
+# =================================================================================================
+# initialize ProtoBuffers
+
+jmvPtB <- function() {
+    synPkg <- c("RProtoBuf", "jmvcore", "rlang")
+    flePtB <- system.file("jamovi.proto", package = "jmvcore")
+    # check whether all required packages and files are present
+    if (hasPkg(synPkg) && file.exists(flePtB)) {
+        # try reading the protobuffer-file (if it can be read / parsed, tryCatch returns TRUE and the syntax can be extracted)
+        tryCatch(expr  =             { RProtoBuf::readProtoFiles(flePtB); TRUE },
+                 error = function(e) { message("Error when loading protocol definition, syntax can\'t be extracted:\n", e); FALSE })
+    } else {
+        warning(sprintf("For extracting syntax, the package(s) \"%s\" need(s) to be installed.\n\n",
+          paste0(synPkg[!sapply(synPkg, hasPkg)], collapse = "\", \"")))
+        FALSE
+    }
+}
+
+
 # =================================================================================================
 # get function arguments and adjust them / select those valid for the current function call
 
@@ -267,8 +287,12 @@ xfrAnl <- function(fleOrg = "", fleTgt = "") {
 }
 
 # =================================================================================================
-# function for adding attributes used by jamovi to data frames (e.g., those opened in Rj or via
-# jTransform)
+# function for checking whether running inside jamovi and for adding attributes used by jamovi to
+# data frames (e.g., those opened in Rj or via jTransform)
+
+isJmv <- function() {
+    nzchar(Sys.getenv("JAMOVI_HOME"))
+}
 
 jmvAtt <- function(dtaFrm = NULL) {
     chkDtF(dtaFrm)

@@ -63,8 +63,7 @@ sort_omv <- function(dtaInp = NULL, fleOut = "", varSrt = c(), psvAnl = FALSE, u
 
     # check and import input data set (either as data frame or from a file)
     if (!is.null(list(...)[["fleInp"]])) stop("Please use the argument dtaInp instead of fleInp.")
-    dtaFrm <- inp2DF(dtaInp = dtaInp, fleOut = fleOut, usePkg = usePkg, selSet = selSet, ...)
-    fleOut <- attr(dtaFrm, "fleOut")
+    dtaFrm <- inp2DF(dtaInp = dtaInp, usePkg = usePkg, selSet = selSet, ...)
 
     # sort data set
     dtaFrm <- srtFrm(dtaFrm, varSrt)
@@ -72,6 +71,7 @@ sort_omv <- function(dtaInp = NULL, fleOut = "", varSrt = c(), psvAnl = FALSE, u
     # write the resulting data frame to the output file or, if no output file
     # name was given, return the data frame
     if (!is.null(fleOut) && nzchar(fleOut)) {
+        fleOut <- fmtFlO(fleOut)
         write_omv(dtaFrm, fleOut)
         # transfer analyses from input to output file
         if (psvAnl) {

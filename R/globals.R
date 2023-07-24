@@ -214,7 +214,7 @@ chkFld <- function(fldObj = NULL, fldNme = "", fldVal = NULL) {
 
 # =================================================================================================
 # function handling to have either a data frame or a character (pointing to a file) as input
-inp2DF <- function(dtaInp = NULL, fleOut = "", minDF = 1, maxDF = 1, usePkg = c("foreign", "haven"), selSet = "", ...) {
+inp2DF <- function(dtaInp = NULL, minDF = 1, maxDF = 1, usePkg = c("foreign", "haven"), selSet = "", ...) {
     usePkg <- match.arg(usePkg)
     # check and format input and output files, handle / check further input arguments:
     # if the input is a data frame, it is “embedded” in a list (in order to permit to read
@@ -231,13 +231,6 @@ inp2DF <- function(dtaInp = NULL, fleOut = "", minDF = 1, maxDF = 1, usePkg = c(
         lstDF <-              lapply(fmtFlI(dtaInp,                 minLng = minDF - 0, maxLng = maxDF - 0), function(x) read_all(fleInp = x, usePkg = usePkg, selSet = selSet, ...))
     } else {
         stop("dtaInp must either be a data frame or a character (pointing to a location where the input file can be found).")
-    }
-    if (is.character(fleOut) && nzchar(fleOut)) {
-        attr(lstDF[[1]], "fleOut") <- fmtFlO(fleOut)
-    } else if (chkAtt(lstDF[[1]], "fleOut")) {
-        attr(lstDF[[1]], "fleOut") <- fmtFlO(attr(lstDF[[1]], "fleOut"))
-    } else if (!is.character(fleOut)) {
-        stop("The output file name must be a character (given either via the parameter fleOut or as attribute attached to the input data frame).")
     }
     # most functions expect only one data frame to be returned, thus, the list
     # used for reading processing those data frames is unpacked if there is
@@ -274,12 +267,15 @@ xfrAnl <- function(fleOrg = "", fleTgt = "") {
 }
 
 # =================================================================================================
-# function for adding attributes to data frames (e.g., those opened in Rj or via jTransform)
+# function for adding attributes used by jamovi to data frames (e.g., those opened in Rj or via
+# jTransform)
 
 jmvAtt <- function(dtaFrm = NULL) {
     chkDtF(dtaFrm)
 
     for (crrNme in names(dtaFrm)) {
+         # if the attributes already exist, go to the next column
+         if (chkAtt(dtaFrm[[crrNme]], "measureType") && chkAtt(dtaFrm[[crrNme]], "measureType")) next
          # jmv-id
          if (!is.null(attr(dtaFrm[[crrNme]], "jmv-id")) && attr(dtaFrm[[crrNme]], "jmv-id")) {
              attr(dtaFrm[[crrNme]], "measureType") <- "ID"
@@ -302,6 +298,13 @@ jmvAtt <- function(dtaFrm = NULL) {
          } else if (is.factor(dtaFrm[[crrNme]]) && !is.null(attr(dtaFrm[[crrNme]], "values"))) {
              attr(dtaFrm[[crrNme]], "measureType") <- "Nominal"
              attr(dtaFrm[[crrNme]], "dataType")    <- "Integer"
+         } else if (is.character(dtaFrm[[crrNme]])) {
+             crrAtt <- attributes(dtaFrm[[crrNme]])
+             dtaFrm[[crrNme]] <- as.factor(dtaFrm[[crrNme]])
+             dtaFrm[crrNme]   <- setAtt(attLst = setdiff(names(crrAtt), c("levels", "class")),
+                                        inpObj = crrAtt, outObj = dtaFrm[crrNme])
+             attr(dtaFrm[[crrNme]], "measureType") <- "Nominal"
+             attr(dtaFrm[[crrNme]], "dataType")    <- "Text"
          } else {
              cat("\n")
              cat(utils::str(dtaFrm[[crrNme]]), "\n")

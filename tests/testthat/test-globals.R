@@ -50,15 +50,9 @@ test_that("globals work", {
 
     expect_error(inp2DF(dtaInp = 1), regexp = "^dtaInp must either be a data frame or a character \\(pointing to a location where the input file can be found\\)\\.")
     inpDF <- jmvReadWrite::AlbumSales
-    expect_error(inp2DF(dtaInp = inpDF, fleOut = 1),
-      regexp = "^The output file name must be a character \\(given either via the parameter fleOut or as attribute attached to the input data frame\\)\\.")
-    attr(inpDF, "fleOut") <- "Trial1.omv"
-    expect_equal(basename(attr(inp2DF(dtaInp = inpDF),                        "fleOut")), "Trial1.omv")
-    expect_equal(basename(attr(inp2DF(dtaInp = inpDF, fleOut = "Trial2.omv"), "fleOut")), "Trial2.omv")
     inpNme <- file.path("..", "ToothGrowth.omv")
     expect_s3_class(inp2DF(dtaInp = inpNme), "data.frame")
     expect_equal(dim(inp2DF(dtaInp = inpNme)), c(60, 14))
-    expect_equal(basename(attr(inp2DF(dtaInp = inpNme, fleOut = "Trial.omv"), "fleOut")),  "Trial.omv")
 
     inpDF <- jmvReadWrite::AlbumSales
     attr(inpDF, "fleInp") <- file.path("..", "ToothGrowth.omv")
@@ -79,14 +73,17 @@ test_that("globals work", {
                         OT = factor(sample(c("low", "middle", "high"), 100, replace = TRUE), levels = c("low", "middle", "high"), ordered = TRUE),
                         ON = factor(sample(seq(7), 100, replace = TRUE), levels = seq(7), ordered = TRUE),
                         NT = factor(sample(c("low", "middle", "high"), 100, replace = TRUE), levels = c("low", "middle", "high")),
-                        NN = factor(sample(seq(7), 100, replace = TRUE), levels = seq(7)))
-    attr(tmpDF[["ID"]], "jmv-id") <- TRUE
-    attr(tmpDF[["ON"]], "values") <- seq(7)
-    attr(tmpDF[["NN"]], "values") <- seq(7)
+                        NN = factor(sample(seq(7), 100, replace = TRUE), levels = seq(7)),
+                        CR = sample(c("low", "middle", "high"), 100, replace = TRUE))
+    attr(tmpDF[["ID"]], "jmv-id")   <- TRUE
+    attr(tmpDF[["ON"]], "values")   <- seq(7)
+    attr(tmpDF[["NN"]], "values")   <- seq(7)
+    attr(tmpDF[["CR"]], "jmv-desc") <- "Trial (is description kept?)"
     expect_equal(sapply(sapply(jmvAtt(tmpDF), attributes), names), list(ID = c("jmv-id", "measureType", "dataType"),
         I = c("measureType", "dataType"), D = c("measureType", "dataType"),
         OT = c("levels", "class", "measureType", "dataType"), ON = c("levels", "class", "values", "measureType", "dataType"),
-        NT = c("levels", "class", "measureType", "dataType"), NN = c("levels", "class", "values", "measureType", "dataType")))
+        NT = c("levels", "class", "measureType", "dataType"), NN = c("levels", "class", "values", "measureType", "dataType"),
+        CR = c("levels", "class", "jmv-desc", "measureType", "dataType")))
     expect_equal(unlist(attributes(jmvAtt(tmpDF)[["ID"]]), use.names = FALSE), c("TRUE", "ID", "Text"))
     expect_equal(unlist(attributes(jmvAtt(tmpDF)[["I"]]),  use.names = FALSE), c("Continuous", "Integer"))
     expect_equal(unlist(attributes(jmvAtt(tmpDF)[["D"]]),  use.names = FALSE), c("Continuous", "Decimal"))
@@ -94,6 +91,10 @@ test_that("globals work", {
     expect_equal(unlist(attributes(jmvAtt(tmpDF)[["ON"]]), use.names = FALSE), c(sprintf("%d", seq(1:7)), "ordered", "factor", sprintf("%d", seq(1:7)), "Ordinal", "Integer"))
     expect_equal(unlist(attributes(jmvAtt(tmpDF)[["NT"]]), use.names = FALSE), c("low", "middle", "high", "factor", "Nominal", "Text"))
     expect_equal(unlist(attributes(jmvAtt(tmpDF)[["NN"]]), use.names = FALSE), c(sprintf("%d", seq(1:7)), "factor", sprintf("%d", seq(1:7)), "Nominal", "Integer"))
+    expect_equal(unlist(attributes(jmvAtt(tmpDF)[["CR"]]), use.names = FALSE), c("high", "low", "middle", "factor", "Trial (is description kept?)", "Nominal", "Text"))
+    tmpCR <- tmpDF["CR"]
+    attr(tmpCR[["CR"]], "measureType") <- attr(tmpCR[["CR"]], "dataType") <- "Trial"
+    expect_equal(attributes(jmvAtt(tmpCR)[["CR"]]), list(`jmv-desc` = "Trial (is description kept?)", dataType = "Trial", measureType = "Trial"))
     expect_error(jmvAtt("Trial"),      regexp = "^Input data are either not a data frame or have incorrect \\(only one or more than two\\) dimensions\\.")
     expect_error(jmvAtt(data.frame()), regexp = "^The first dimension of the input data frame has not the required size \\(0 < 1\\)\\.")
     suppressMessages(expect_error(capture_output(jmvAtt(cbind(tmpDF, data.frame(ER = sample(seq(as.Date("2000/01/01"), as.Date("2019/12/31"), by = "day"), 100))))),

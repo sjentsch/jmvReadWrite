@@ -59,8 +59,7 @@ transpose_omv <- function(dtaInp = NULL, fleOut = "", varNme = "", usePkg = c("f
 
     # check and import input data set (either as data frame or from a file)
     if (!is.null(list(...)[["fleInp"]])) stop("Please use the argument dtaInp instead of fleInp.")
-    dtaFrm <- inp2DF(dtaInp = dtaInp, fleOut = fleOut, usePkg = usePkg, selSet = selSet, ...)
-    fleOut <- attr(dtaFrm, "fleOut")
+    dtaFrm <- inp2DF(dtaInp = dtaInp, usePkg = usePkg, selSet = selSet, ...)
 
     # create variable names for the output data frame: if varNme is empty (default), then the row names of the
     # original data frame are used (preceded by "V_" if they contain only numbers); if varNme has the length 1
@@ -100,9 +99,10 @@ transpose_omv <- function(dtaInp = NULL, fleOut = "", varNme = "", usePkg = c("f
     # write the resulting data frame to the output file or, if no output file
     # name was given, return the data frame
     if (!is.null(fleOut) && nzchar(fleOut)) {
-        write_omv(dtaFrm, fleOut)
+        fleOut <- fmtFlO(fleOut)
+        write_omv(jmvAtt(dtaFrm), fleOut)
         return(invisible(NULL))
     } else {
-        dtaFrm
+        jmvAtt(dtaFrm)
     }
 }

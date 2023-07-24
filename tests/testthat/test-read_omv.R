@@ -126,8 +126,15 @@ test_that("read_all works", {
     expect_error(read_all(""), regexp = "^File name to the input data file needs to be given as parameter \\(fleInp = \\.\\.\\.\\)\\.")
     # replace strings in attributes, etc.
     if (l10n_info()$`UTF-8`) {
+        # actual replacement
+        expect_equal(rplStr(strMod = "<c4><d6><dc><df><e4><f6><fc>", crrAtt = "Trial"), "ÄÖÜßäöü")
         expect_error(rplStr(strMod = "<c3><28>", crrAtt = "Trial"),
           regexp = "^The current data set still contains an invalid character \\(\".*\"\\) in attribute: \".*\"\\.")
+        # finding attributes that may contain such strings
+# TO-DO: need to figure out what rplAtt is actually supposed to do
+#        tmpDF <- read_omv(nmeInp)
+#        attr(tmpDF[["weights"]], "description") <- "<c4><d6><dc><df><e4><f6><fc>"
+#        rplAtt(dtaFrm = tmpDF)[["weights"]]
     }
 
     # more than one object when using Rdata

@@ -89,8 +89,7 @@ merge_cols_omv <- function(dtaInp = NULL, fleOut = "", typMrg = c("outer", "inne
 
     # check and import input data set (either as data frame or from a file)
     if (!is.null(list(...)[["fleInp"]])) stop("Please use the argument dtaInp instead of fleInp.")
-    dtaFrm <- inp2DF(dtaInp = dtaInp, fleOut = fleOut, minDF = 2, maxDF = Inf, usePkg = usePkg, selSet = selSet, ...)
-    fleOut <- attr(dtaFrm[[1]], "fleOut")
+    dtaFrm <- inp2DF(dtaInp = dtaInp, minDF = 2, maxDF = Inf, usePkg = usePkg, selSet = selSet, ...)
 
     # store attributes
     attCol <- list()
@@ -124,6 +123,7 @@ merge_cols_omv <- function(dtaInp = NULL, fleOut = "", typMrg = c("outer", "inne
     # write the resulting data frame to the output file or, if no output file
     # name was given, return the data frame
     if (!is.null(fleOut) && nzchar(fleOut)) {
+        fleOut <- fmtFlO(fleOut)
         write_omv(dtaFrm, fleOut)
         # transfer analyses from input to output file
         if (psvAnl) {

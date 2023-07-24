@@ -290,12 +290,15 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", wrtPBf = FALSE, retDbg = FALSE
     
     if (wrtPBf) {
         # write ProtoBuffers
+#
+        pbfHdl <- file(file.path(tempdir(), ),    open = "w")
+        add2ZIP(fleOut, htmHdl, txtOut = htmTxt())
+        rm(htmHdl)
 # TO-DO
 
 		# write index.html and add it to ZIP file
 		htmHdl <- file(file.path(tempdir(), "index.html"),    open = "w")
 		if (!is.null(attr(dtaFrm, "HTML"))) {
-	# TO-DO: check whether the HTML contains analyses
 		   # currently, the HTML that is stored in the HTML attribute can't be
 		   # saved because it is only a "front" that doesn't work without the
 		   # analyses and images contained in it being stored too

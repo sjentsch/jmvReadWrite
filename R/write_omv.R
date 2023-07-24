@@ -64,7 +64,9 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", wrtPBf = FALSE, retDbg = FALSE
     chkExt(fleOut, "omv")
 
     # check whether dtaFrm is a data frame
+    # attach dataType and measureType attributes when inside jamovi
     chkDtF(dtaFrm)
+    if (isJmv()) dtaFrm <- jmvAtt(dtaFrm)
 
     # handle the attributes "variable.labels" and "value.labels" in the format provided by the R-package "foreign"
     # the attribute "variable.labels" (attached to the data frame) is converted them to the format used by jamovi ("jmv-desc" attached to the data column)

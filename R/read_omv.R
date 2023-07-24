@@ -21,9 +21,9 @@
 #' if (length(attr(data, "syntax")) >= 1) {
 #'     print(attr(data, "syntax"))
 #'     # the print-function is only used to force devtools::run_examples() to show output
-#'     eval(parse(text=paste0("result = ", attr(data, "syntax")[[1]])))
+#'     eval(parse(text=paste0("result = ", attr(data, "syntax")[1])))
 #'     # without assigning the output to a variable, the command would be:
-#'     # eval(parse(text=attr(data, "syntax")[[1]]))
+#'     # eval(parse(text=attr(data, "syntax")[1]))
 #'     print(names(result))
 #'     print(result$main)
 #'     # -> "main"      "assump"    "contrasts" "postHoc"   "emm"       "residsOV"
@@ -187,23 +187,22 @@ read_omv <- function(fleInp = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = TRUE,
 
     # import and extract syntax from the analyses
     if (getSyn) {
-        anlLst <- fleLst[grepl("[0-9][0-9].*/analysis", fleLst)]
-        savSyn <- list()
-        savPBf <- list()
-        if (length(anlLst) > 0) {
-                if (jmvPtB()) {
-                    for (anlNme in anlLst) {
-                        anlPBf <- RProtoBuf::read(jamovi.coms.AnalysisResponse, anlHdl <- getHdl(fleInp, anlNme, "rb"))
-                        clsHdl(anlHdl)
-                        rm(anlHdl)
-                        savSyn <- c(savSyn, gsub("\\( ", "\\(", gsub("\\n\\s+", " ", fndSyn(anlPBf$results))))
-                        anlPBf$results <- NULL
-                        savPBf[[anlNme]] <- anlPBf
-                    }
-                }
+        anlLst <- fleLst[grepl("[0-9]+\\s\\w+/analysis", fleLst)]
+        savSyn <- c()
+        savPtB <- list()
+        if (length(anlLst) > 0 && jmvPtB()) {
+            for (anlNme in anlLst) {
+                if (grepl("empty$", dirname(anlNme))) next
+                anlPtB <- RProtoBuf::read(jamovi.coms.AnalysisResponse, anlHdl <- getHdl(fleInp, anlNme, "rb"))
+                clsHdl(anlHdl)
+                rm(anlHdl)
+                savSyn <- c(savSyn, gsub("\\( ", "\\(", gsub("\\n\\s+", " ", fndSyn(anlPtB$results))))
+                anlPtB$results <- NULL
+                savPtB[[anlNme]] <- anlPtB
+            }
         }
         attr(dtaFrm, "syntax")   <- savSyn
-        attr(dtaFrm, "protobuf") <- savPBf
+        attr(dtaFrm, "protobuf") <- savPtB
     }
 
     # import the HTML output

@@ -127,20 +127,86 @@ fmtFlO <- function(fleOut = "") {
 
 
 # =================================================================================================
-# initialize ProtoBuffers
+# initializing and handling ProtoBuffers
 
 jmvPtB <- function() {
-    synPkg <- c("RProtoBuf", "jmvcore", "rlang")
-    flePtB <- system.file("jamovi.proto", package = "jmvcore")
-    # check whether all required packages and files are present
-    if (hasPkg(synPkg) && file.exists(flePtB)) {
-        # try reading the protobuffer-file (if it can be read / parsed, tryCatch returns TRUE and the syntax can be extracted)
-        tryCatch(expr  =             { RProtoBuf::readProtoFiles(flePtB); TRUE },
-                 error = function(e) { message("Error when loading protocol definition, syntax can\'t be extracted:\n", e); FALSE })
-    } else {
-        warning(sprintf("For extracting syntax, the package(s) \"%s\" need(s) to be installed.\n\n",
+    # exit with TRUE if the ProtoBuffers are already initialized
+    if (exists('jamovi.coms.Status')) return(TRUE)
+    # check whether all required packages are present
+    synPkg <- c("RProtoBuf", "jmvcore")
+    if (!hasPkg(synPkg)) {
+        warning(sprintf("For using protocol buffers, the package(s) \"%s\" need(s) to be installed.\n\n",
           paste0(synPkg[!sapply(synPkg, hasPkg)], collapse = "\", \"")))
-        FALSE
+        return(FALSE)
+    }
+    # check the two possible places for the jamovi.proto file
+    flePtB <- system.file("jamovi.proto", package = "jmvcore")
+    if (!nzchar(flePtB)) flePtB <- system.file("inst", "jamovi.proto", package="jmvcore")
+    if (!nzchar(flePtB)) {
+        warning("For using protocol buffers, the protocol file \"jamovi.proto\" (from the jmvcore-package) is required.\n\n")
+        return(FALSE)
+    }
+    # read protocol file and initialize the protobuffers with it
+    if (requireNamespace('RProtoBuf', quietly = TRUE)) {
+        # try reading the protobuffer-file (if it can be read / parsed, tryCatch returns TRUE and the syntax can be extracted)
+        tryCatch(expr  =             { RProtoBuf::readProtoFiles(flePtB); return(TRUE); },
+                 error = function(e) { message("Error when loading protocol definition, syntax can\'t be extracted:\n", e); return(FALSE); })
+    }
+}
+
+var2PB <- function(inpVar = NULL) {
+    # NULL (o) ================================================================
+    if        (is.null(inpVar)) {
+        tmpPB   <- RProtoBuf::new(jamovi.coms.AnalysisOption)
+        tmpPB$o <- 2
+        return(tmpPB)
+    # BOOLEAN (o) =============================================================
+    } else if (is.logical(inpVar)) {
+        if (length(inpVar) == 1) {
+            tmpPB   <- RProtoBuf::new(jamovi.coms.AnalysisOption)
+            tmpPB$o <- as.integer(inpVar)
+            return(tmpPB)
+        } else {
+            stop("Not yet implemented: boolean (length > 1)")
+        }
+    # INTEGER (i) =============================================================
+    } else if (is.numeric(inpVar) &&  all(inpVar - floor(inpVar) == 0)) {
+        if (length(inpVar) == 1) {
+            return(RProtoBuf::new(jamovi.coms.AnalysisOption, i = inpVar))
+        } else {
+            stop("Not yet implemented: integer (length > 1)")
+        }
+    # DECIMAL (d) =============================================================
+    } else if (is.numeric(inpVar)) {
+        if (length(inpVar) == 1) {
+            tmpPB   <- RProtoBuf::new(jamovi.coms.AnalysisOption)
+            tmpPB$d <- inpVar
+            return(tmpPB)
+        } else {
+            stop("Not yet implemented: decimal (length > 1)")
+        }
+    # STRING (s) ==============================================================
+    } else if (is.character(inpVar)) {
+        if (length(inpVar) == 1) {
+            return(RProtoBuf::new(jamovi.coms.AnalysisOption, s = inpVar))
+        } else {
+            stop("Not yet implemented: string (length > 1)")
+        }
+    # CONTAINER (c) ===========================================================
+    } else if (is.list(inpVar)) {
+        resLst <- list()
+        for (i in seq_along(inpVar)) {
+            resLst[[i]] <- var2PB(inpVar[[i]])
+        }
+        tmpPB <- RProtoBuf::new(jamovi.coms.AnalysisOptions, options = resLst)
+        if (!is.null(names(inpVar))) {
+            tmpPB$hasNames <- TRUE
+            tmpPB$names    <- names(inpVar)
+        }
+        return(RProtoBuf::new(jamovi.coms.AnalysisOption, c = tmpPB))
+    # otherwise, throw error ==================================================
+    } else {
+        stop("Element not implemented for conversion to protocol buffer.")
     }
 }
 

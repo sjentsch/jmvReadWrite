@@ -5,7 +5,7 @@
 #' @param fleOut Name of the data file to be written (including the path, if required; "FILE_OUT.omv"; default: ""); if empty, the resulting data frame is
 #'               returned instead
 #' @param dtaTtl Character vector with the title to be added to the data set (see Details; default: "")
-#' @param dtaDsc HTML-formatted description of the data set (see Details; default: "")
+#' @param dtaDsc Character vector with a HTML-formatted description of the data set (see Details; default: "")
 #' @param usePkg Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata and SAS files; "foreign" is the default (it comes with
 #'               base R), but "haven" is newer and more comprehensive
 #' @param selSet Name of the data set that is to be selected from the workspace (only applies when reading .RData-files)
@@ -70,16 +70,44 @@ describe_omv <- function(dtaInp = NULL, fleOut = "", dtaTtl = c(), dtaDsc = c(),
 #    <p style=\"text-align:left;padding:0px 0px 0px 0px;\"></p>
 # ->
 #    <h1 contenteditable=\"\" spellcheck=\"false\">Album Sales</h1>
-#    <div class="note"><p><strong>Description:</strong></p><p>Imagine that you worked for a record company and that your boss was interested in predicting album sales from advertising. This data file has 200 rows, each one representing a different album.</p><p>&nbsp;</p><p><strong>Variables:</strong></p><ul><li><strong><em>Adverts</em></strong>: amount (in thousands of pounds) spent promoting the album before release</li><li><strong><em>Airplay</em></strong>: how many times songs from the album were played on a prominent national radio station in the week before release</li><li><strong><em>Image</em></strong>: how attractive people found the band&#x27;s image (out of 10)</li><li><strong><em>Sales</em></strong>: sales (in thousands) of each album in the week after release</li></ul><p>&nbsp;</p><p><strong>Reference:</strong></p><p>Field, A. P. (2017). <em>Discovering Statistics Using IBM SPSS Statistics</em> (5th ed.). Sage. [Fictional data set]</p><p><em>The data set was constructed by Andy Field who therefore owns the copyright. Andy Field generously agreed that we can include the data set in the jamovi Data Library. This data set is also publicly available on the website that accompanies Andy Field`s book, https:&#x2F;&#x2F;edge.sagepub.com&#x2F;field5e. Without Andy Field`s explicit consent, this data set may not be distributed for commercial purposes, this data set may not be edited, and this data set may not be presented without acknowledging its source (i.e., the terms of a CC BY-NC-ND license).</em></p> </div>
+#    <div class="note">[dtaDsc]</div>
 
     # as protobuf
-    if (nzchar(dtaDsc)) {
+    if (nzchar(dtaTtl)) {
         ttlPtB <- RProtoBuf::new(jamovi.coms.AnalysisOption, s = dtaTtl)
     } else {
         ttlPtB <- NULL
     }
     if (nzchar(dtaDsc)) {
+        splDsc <- gsub("^\\s+\\n|\\n\\s+$", "\n", strsplit(gsub("^<p>|</p>$", "", gsub("</p>|<br\\s*/>|<br>", "\n", dtaDsc)), "(?=[<>])", perl = TRUE)[[1]])
+        rplDsc <- grep("<", splDsc)
+        if (!all(splDsc[rplDsc + 2] == ">")) stop("Error when decoding HTML. Please send the HTML-string the you used for dtaDsc to sebastian.jentschke@uib.no")
+        splDsc[rplDsc + 1] <- paste0("<", splDsc[rplDsc + 1], ">")
+        splDsc <- splDsc[-c(rplDsc, rplDsc + 2)]
+        tgtDsc <- which(!grepl("<.*?>", splDsc))
+        attDsc <- list()
         htmPtB <- list()
+        for (i in seq_along(splDsc)) {
+            if (i %in% tgtDsc) {
+# TO-DO: convert unicode
+                if (length(attDsc) > 0) {
+                    htmPtB[[which(i == tgtDsc)]] <- var2PB(list(attributes = attDsc, insert = splDsc[i]))
+                } else {
+                    htmPtB[[which(i == tgtDsc)]] <- var2PB(list(insert = splDsc[i]))
+                }
+            } else {
+                attDsc <- getAtt(splDsc, i, attDsc)
+				# formula
+				if (grepl("class=\".*?ql-formula", splDsc[i])) {
+					for (j in intersect(seq(i + 1, nxtAtt(splDsc, i, "class=") - 1), tgtDsc)) {
+						splDsc[j] <- list(formula = splDsc[j])
+					}
+					splDsc[nxtAtt(splDsc, i, "class=")] <- ""
+				}
+
+			}                        
+        }
+        
         dscPtB <- RProtoBuf::new(jamovi.coms.AnalysisOption, c = RProtoBuf::new(jamovi.coms.AnalysisOptions, options =
                       RProtoBuf::new(jamovi.coms.AnalysisOption, c = RProtoBuf::new(jamovi.coms.AnalysisOptions, options = htmPtB)),
                     hasNames = TRUE, names = "ops"))
@@ -91,60 +119,90 @@ describe_omv <- function(dtaInp = NULL, fleOut = "", dtaTtl = c(), dtaDsc = c(),
     attr(dtaFrm, "protobuf")[["01 empty/analysis"]] <-
       RProtoBuf::new(jamovi.coms.AnalysisResponse, analysisId = 1, name = "empty", ns = "jmv", options = O, status = 3)
 
-    # re-arrange the order of variables in the data set (varOrd)
-    if (length(varOrd) > 0) {
-        # [1] check whether all variables in varOrd are not empty and exist in the data set
-        chkVar(dtaFrm, varOrd)
-        # [2] check whether any variable of the original data set is not contained in varOrd, if so issue a warning but proceed
-        if (!all(names(dtaFrm) %in% varOrd)) {
-            warning(sprintf("The following variable(s) from the original data set are not contained in varOrd: %s", paste(setdiff(names(dtaFrm), varOrd), collapse = ", ")))
-        }
-    }
-    if (length(varMve) > 0 && length(varOrd) == 0) {
-        # [1] assign the original order of variables to varOrd
-        varOrd <- names(dtaFrm)
-        # [2] check whether all variables in varMve are not empty and exist in the data set
-        chkVar(dtaFrm, names(varMve))
-        for (crrVar in names(varMve)) {
-            crrPos <- which(varOrd == crrVar)
-            if (crrPos + varMve[[crrVar]] < 1 || crrPos + varMve[[crrVar]] > dim(dtaFrm)[2]) {
-                stop("The value given in varMve must be chosen so that the element isn't moved before the first or after the last column.")
-            }
-            allPos <- seq(dim(dtaFrm)[2])
-            if (varMve[[crrVar]] < 0) {
-                rplPos <- seq(crrPos + varMve[[crrVar]], crrPos)
-                allPos[allPos %in% rplPos] <- c(crrPos, setdiff(rplPos, crrPos))
-            } else {
-                rplPos <- seq(crrPos, crrPos + varMve[[crrVar]])
-                allPos[allPos %in% rplPos] <- c(setdiff(rplPos, crrPos), crrPos)
-            }
-            varOrd <- varOrd[allPos]
-        }
-    } else if (length(varMve) > 0 && length(varOrd) > 0) {
-        warning("Both, varOrd and varMve given as input parameters. varOrd takes precedence.")
-    }
-
-    # re-arrange to order of variables, while storing and restoring the attributes attached to the whole data frame (column attributes are not affected)
-    attMem <- attributes(dtaFrm)
-    dtaFrm <- dtaFrm[, varOrd]
-    dtaFrm <- setAtt(setdiff(names(attMem), c("names", "row.names", "class", "fltLst")), attMem, dtaFrm)
-
     # write the resulting data frame to the output file or, if no output file
     # name was given, return the data frame
     if (!is.null(fleOut) && nzchar(fleOut)) {
         fleOut <- fmtFlO(fleOut)
         write_omv(dtaFrm, fleOut)
-        # transfer analyses from input to output file
-        if (psvAnl) {
-            if (is.character(dtaInp)) {
-                xfrAnl(dtaInp, fleOut)
-            } else {
-                warning("psvAnl is only possible if dtaInp is a file name (analyses are not stored in data frames, only in the jamovi files).")
-            }
-        }
         return(invisible(NULL))
     } else {
-        if (psvAnl) warning("psvAnl is only possible if fleOut is a file name (analyses are not stored in data frames, only in the jamovi files).")
         dtaFrm
     }
+}
+
+nxtAtt <- function(vecChr = c(), vecPos = NA, addTrm = c()) {
+    grep(paste(c(paste0(c("</", "<"), gsub("<(\\w+)\\s+.*", "\\1", vecChr[vecPos])), addTrm), collapse = "|"),
+      vecChr[seq(vecPos + 1, length(vecChr))])[1] + vecPos
+}
+
+getAtt <- function(vecChr = c(), vecPos = NA, lstAtt = list()) {
+    if (!nzchar(vecChr[vecPos])) return(lstAtt)
+    prvAtt <- lstAtt
+    
+    # bold
+    if (grepl("<strong>|<b>",   vecChr[vecPos])) lstAtt[["bold"]] <- TRUE
+    if (grepl("</strong>|</b>", vecChr[vecPos])) lstAtt[["bold"]] <- NULL
+    # italic
+    if (grepl("<em>|<i>",       vecChr[vecPos])) lstAtt[["italic"]] <- TRUE
+    if (grepl("</em>|</i>",     vecChr[vecPos])) lstAtt[["italic"]] <- NULL
+    # underline
+    if (grepl("<u>",            vecChr[vecPos])) lstAtt[["underline"]] <- TRUE
+    if (grepl("</u>",           vecChr[vecPos])) lstAtt[["underline"]] <- NULL
+    # strikethrough
+    if (grepl("<s>",            vecChr[vecPos])) lstAtt[["strike"]] <- TRUE
+    if (grepl("</s>",           vecChr[vecPos])) lstAtt[["strike"]] <- NULL
+    # preformatted / code-block
+    if (grepl("<pre.*?>",       vecChr[vecPos])) lstAtt[["code-block"]] <- TRUE
+    if (grepl("</pre>",         vecChr[vecPos])) lstAtt[["code-block"]] <- NULL
+    # superscript
+    if (grepl("<sup>",          vecChr[vecPos])) lstAtt[["script"]] <- "super"
+    if (grepl("</sup>",         vecChr[vecPos])) lstAtt[["script"]] <- NULL
+    # subscript
+    if (grepl("<sub>",          vecChr[vecPos])) lstAtt[["script"]] <- "sub"
+    if (grepl("</sub>",         vecChr[vecPos])) lstAtt[["script"]] <- NULL
+    # heading
+    if (grepl("<h\\d.*?>",      vecChr[vecPos])) lstAtt[["header"]] <- as.integer(gsub("<h(\\d).*?>", "\\1", vecChr[vecPos]))
+    if (grepl("</h\\d>",        vecChr[vecPos])) lstAtt[["header"]] <- NULL
+    # links
+    if (grepl("<a href=.*?>",   vecChr[vecPos])) lstAtt[["link"]] <- gsub("<a href=\"(.*)\"\\s+.*?>", "\\1", vecChr[vecPos])
+    if (grepl("</a>",           vecChr[vecPos])) lstAtt[["link"]] <- NULL
+    # ordered list
+    if (grepl("<ol>",           vecChr[vecPos])) lstAtt[["list"]] <- "ordered"
+    if (grepl("</ol>",          vecChr[vecPos])) lstAtt[["list"]] <- NULL
+    # bullet list
+    if (grepl("<ul>",           vecChr[vecPos])) lstAtt[["list"]] <- "bullet"
+    if (grepl("</ul>",          vecChr[vecPos])) lstAtt[["list"]] <- NULL
+    # alignment
+	if (grepl("class=\".*?ql-align-\\w+", vecChr[vecPos])) {
+        lstAtt[["align"]] <- gsub(".*?ql-align-(\\w+).*", "\\1", vecChr[vecPos])
+        attr(lstAtt[["align"]], "endPos") <- nxtAtt(vecChr, vecPos, "class=")
+    } else if (chkAtt(lstAtt[["align"]], "endPos") && attr(lstAtt[["align"]], "endPos") <= vecPos) {
+        lstAtt[["align"]] <- NULL
+    }
+    # indent
+	if (grepl("class=\".*?ql-indent-\\d", vecChr[vecPos])) {
+        lstAtt[["indent"]] <- as.integer(gsub(".*?ql-indent-(\\d+).*", "\\1", vecChr[vecPos]))
+        attr(lstAtt[["indent"]], "endPos") <- nxtAtt(vecChr, vecPos, "class=")
+    } else if (chkAtt(lstAtt[["indent"]], "endPos") && attr(lstAtt[["indent"]], "endPos") <= vecPos) {
+        lstAtt[["indent"]] <- NULL
+    }
+    # colours
+	if (grepl("style=\".*?background-color:", vecChr[vecPos])) {
+        lstAtt[["background"]] <- gsub(".*?background-color:.*(\\#[0-9,a-f]+).*", "\\1", vecChr[vecPos])
+        attr(lstAtt[["background"]], "endPos") <- nxtAtt(vecChr, vecPos, "style=")
+    } else if (chkAtt(lstAtt[["background"]], "endPos") && attr(lstAtt[["background"]], "endPos") <= vecPos) {
+        lstAtt[["background"]] <- NULL
+    }
+	if (grepl("style=\".*?color:", vecChr[vecPos]) && !grepl("style=\".*?background-color:", vecChr[vecPos])) {
+        lstAtt[["color"]] <- gsub(".*?color:.*(\\#[0-9,a-f]+).*", "\\1", vecChr[vecPos])
+        attr(lstAtt[["color"]], "endPos") <- nxtAtt(vecChr, vecPos, "style=")
+    } else if (chkAtt(lstAtt[["color"]], "endPos") && attr(lstAtt[["color"]], "endPos") <= vecPos) {
+        lstAtt[["color"]] <- NULL
+    }
+
+    if (identical(prvAtt, lstAtt)) {
+        cat(sprintf("Attributes unchanged - entry %d\n", vecPos))
+    }
+    
+    return(lstAtt)
 }

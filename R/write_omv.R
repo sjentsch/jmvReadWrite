@@ -276,38 +276,38 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", wrtPBf = FALSE, retDbg = FALSE
     rm(strHdl, strPos)
 
     # create meta, write it and add it to ZIP file
-    mnfHdl <- file(file.path(tempdir(), "meta"),         open = "wb")
+    mnfHdl <- file(file.path(tempdir(), "meta"),          open = "wb")
     add2ZIP(fleOut, mnfHdl, txtOut = mnfTxt())
     rm(mnfHdl)
 
     # write metadata.json
-    mtaHdl <- file(file.path(tempdir(), "metadata.json"), open = "w")
+    mtaHdl <- file(file.path(tempdir(), "metadata.json"),  open = "w")
     add2ZIP(fleOut, mtaHdl, txtOut = fmtJSON(list(dataSet = mtaDta)))
     rm(mtaHdl)
 
     # write xdata.json
-    xtdHdl <- file(file.path(tempdir(), "xdata.json"),    open = "w")
+    xtdHdl <- file(file.path(tempdir(), "xdata.json"),     open = "w")
     add2ZIP(fleOut, xtdHdl, txtOut = fmtJSON(xtdDta))
     rm(xtdHdl)
-    
+
     if (wrtPBf) {
         # write ProtoBuffers
 #
-        pbfHdl <- file(file.path(tempdir(), ),    open = "w")
-        add2ZIP(fleOut, htmHdl, txtOut = htmTxt())
+        pbfHdl <- file(file.path(tempdir(), ""),    open = "w")
+        add2ZIP(fleOut, pbfHdl)
         rm(htmHdl)
 # TO-DO
 
-		# write index.html and add it to ZIP file
-		htmHdl <- file(file.path(tempdir(), "index.html"),    open = "w")
-		if (!is.null(attr(dtaFrm, "HTML"))) {
-		   # currently, the HTML that is stored in the HTML attribute can't be
-		   # saved because it is only a "front" that doesn't work without the
-		   # analyses and images contained in it being stored too
-		   add2ZIP(fleOut, htmHdl, txtOut = attr(dtaFrm, "HTML"))
-		} else {
-		   add2ZIP(fleOut, htmHdl, txtOut = htmTxt())
-		}
+        # write index.html and add it to ZIP file
+        htmHdl <- file(file.path(tempdir(), "index.html"), open = "w")
+        if (!is.null(attr(dtaFrm, "HTML"))) {
+           # currently, the HTML that is stored in the HTML attribute can't be
+           # saved because it is only a "front" that doesn't work without the
+           # analyses and images contained in it being stored too
+           add2ZIP(fleOut, htmHdl, txtOut = attr(dtaFrm, "HTML"))
+        } else {
+           add2ZIP(fleOut, htmHdl, txtOut = htmTxt())
+        }
     } else {
         add2ZIP(fleOut, htmHdl, txtOut = htmTxt())
     }

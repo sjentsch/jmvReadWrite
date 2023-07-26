@@ -153,8 +153,8 @@ jmvPtB <- function() {
         # try reading the protobuffer-file (if it can be read / parsed, tryCatch returns TRUE and the syntax can be extracted)
         # the is.null() is a way to enforce one-liners: either command readProtoFiles and message returns NULL and hence, either
         # TRUE (first line - is.null = TRUE) or FALSE (second line - !is.null = FALSE) are returned
-        tryCatch(expr  =             return( is.null(RProtoBuf::readProtoFiles(flePtB))),
-                 error = function(e) return(!is.null(message("Error when loading protocol definition, syntax can\'t be extracted:\n", e))) )
+        tryCatch(expr  =             return(is.null(RProtoBuf::readProtoFiles(flePtB))),
+                 error = function(e) return(!is.null(message("Error when loading protocol definition, syntax can\'t be extracted:\n", e))))
     }
 }
 

@@ -1,6 +1,6 @@
 Package: jmvReadWrite
 Title: Read and Write 'jamovi' Files ('.omv')
-Version: 0.3.8
+Version: 0.3.9
 Author: Sebastian Jentschke [aut, cre]
     (<https://orcid.org/0000-0003-2576-5432>)
 Authors@R:

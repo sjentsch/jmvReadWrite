@@ -44,9 +44,9 @@ data <- read_omv(fleInp = fleOMV, getSyn = TRUE)
 if (length(attr(data, "syntax")) >= 1) {
     print(attr(data, "syntax"))
     # the print-function is only used to force devtools::run_examples() to show output
-    eval(parse(text=paste0("result = ", attr(data, "syntax")[[1]])))
+    eval(parse(text=paste0("result = ", attr(data, "syntax")[1])))
     # without assigning the output to a variable, the command would be:
-    # eval(parse(text=attr(data, "syntax")[[1]]))
+    # eval(parse(text=attr(data, "syntax")[1]))
     print(names(result))
     print(result$main)
     # -> "main"      "assump"    "contrasts" "postHoc"   "emm"       "residsOV"

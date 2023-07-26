@@ -192,11 +192,12 @@ read_omv <- function(fleInp = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = TRUE,
         savPtB <- list()
         if (length(anlLst) > 0 && jmvPtB()) {
             for (anlNme in anlLst) {
-                if (grepl("empty$", dirname(anlNme))) next
                 anlPtB <- RProtoBuf::read(jamovi.coms.AnalysisResponse, anlHdl <- getHdl(fleInp, anlNme, "rb"))
                 clsHdl(anlHdl)
                 rm(anlHdl)
-                savSyn <- c(savSyn, gsub("\\( ", "\\(", gsub("\\n\\s+", " ", fndSyn(anlPtB$results))))
+                if (!grepl("empty$", dirname(anlNme))) {
+                    savSyn <- c(savSyn, gsub("\\( ", "\\(", gsub("\\n\\s+", " ", fndSyn(anlPtB$results))))
+                }
                 anlPtB$results <- NULL
                 savPtB[[anlNme]] <- anlPtB
             }

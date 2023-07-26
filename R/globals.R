@@ -159,6 +159,8 @@ jmvPtB <- function() {
 }
 
 var2PB <- function(inpVar = NULL) {
+    # ensure that the jamovi protocol buffers are initiailized
+    jmvPtB()
     # the protocol buffers in jamovi actually only support lists as data
     # structures, hence the as.list() conversions for converting vectors
 

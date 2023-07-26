@@ -37,6 +37,23 @@ test_that("globals work", {
     expect_error(fmtFlO(fleOut = "Trial"),     regexp = "^fleOut needs to be a valid non-empty file name \\(character\\), and the file extension for output file needs to be \\.omv\\.")
     expect_error(fmtFlO(fleOut = "Trial.rds"), regexp = "^fleOut needs to be a valid non-empty file name \\(character\\), and the file extension for output file needs to be \\.omv\\.")
     expect_error(fcnArg(c("stats::sd", "stats::mean", "C")), regexp = "^The argument to fcnArg must be a character \\(vector\\) with 1 or 2 elements.")
+    expect_true(jmvPtB())
+    tmpPB <- var2PB(inpVar = list(list(A = NULL, B = TRUE, C = 1, D = 0.01, E = "Trial", F = c(TRUE, FALSE, TRUE), G = c(1, 2, 3), H = c(0.01, 0.02, 0.03), I = c("A", "B"))))
+    expect_s4_class(tmpPB, "Message")
+    expect_equal(length(tmpPB), 1)
+    expect_equal(length(tmpPB$c$options[[1]]$c$options), 9)
+    expect_equal(tmpPB$as.character(), paste0("c {\n  options {\n    c {\n      options {\n        o: NONE\n      }\n      options {\n        o: TRUE\n      }\n      options {\n",
+                                              "        i: 1\n      }\n      options {\n        d: 0.01\n      }\n      options {\n        s: \"Trial\"\n      }\n      options {\n",
+                                              "        c {\n          options {\n            o: TRUE\n          }\n          options {\n            o: FALSE\n          }\n",
+                                              "          options {\n            o: TRUE\n          }\n        }\n      }\n      options {\n        c {\n          options {\n",
+                                              "            i: 1\n          }\n          options {\n            i: 2\n          }\n          options {\n            i: 3\n",
+                                              "          }\n        }\n      }\n      options {\n        c {\n          options {\n            d: 0.01\n          }\n",
+                                              "          options {\n            d: 0.02\n          }\n          options {\n            d: 0.03\n          }\n        }\n",
+                                              "      }\n      options {\n        c {\n          options {\n            s: \"A\"\n          }\n          options {\n",
+                                              "            s: \"B\"\n          }\n        }\n      }\n      hasNames: true\n      names: \"A\"\n      names: \"B\"\n",
+                                              "      names: \"C\"\n      names: \"D\"\n      names: \"E\"\n      names: \"F\"\n      names: \"G\"\n      names: \"H\"\n",
+                                              "      names: \"I\"\n    }\n  }\n}\n"))
+    expect_error(var2PB(inpVar = as.complex(pi)), regexp = "^Element not implemented for conversion to protocol buffer.")
     suppressMessages(expect_error(capture_output(setAtt(attLst = "Trial", inpObj = list(),       outObj = list())),
       regexp = "^Error when storing or accessing meta-data information\\. Please send the file"))
     suppressMessages(expect_error(capture_output(setAtt(attLst = "Trial", inpObj = data.frame(), outObj = data.frame())),

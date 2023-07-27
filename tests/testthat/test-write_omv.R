@@ -2,7 +2,7 @@ test_that("write_omv works", {
     # check whether writing the data is working (file existence, size, contents [.omv-files are ZIP archives and must contain files that include meta, metadata.json, data.bin])
     dtaOut <- jmvReadWrite::ToothGrowth
     colOut <- dim(dtaOut)[1]
-    nmeOut <- paste0(tempfile(), ".omv")
+    nmeOut <- tempfile(fileext = ".omv")
     dtaDbg <- write_omv(dtaFrm = dtaOut, fleOut = nmeOut, retDbg = TRUE)
     expect_true(file.exists(nmeOut))
     expect_gt(file.info(nmeOut)$size, 1)
@@ -31,7 +31,9 @@ test_that("write_omv works", {
     expect_error(write_omv(data.frame(T1 = sample(9999, 100), T2 = as.complex(rnorm(100))), nmeOut),
       regexp = "Variable type \\w+ not implemented\\. Please send the data file that caused this problem to sebastian\\.jentschke@uib\\.no")
     expect_error(write_omv(dtaDbg$dtaFrm), regexp = "^Output file name needs to be given as parameter \\(fleOut = \\.\\.\\.\\)\\.")
-    suppressMessages(expect_error(capture_output(add2ZIP(fleZIP = nmeOut, crrHdl = NULL)),
+    expect_error(add2ZIP(fleZIP = nmeOut, crrHdl = NULL),
+      regexp = "fleZIP \\(a character with a file name\\), and either crrHdl \\(with a connection\\) or crrFle \\(with a file name and \\[optionally\\] a writing mode\\) need to be given as arguments.")
+    suppressMessages(expect_error(capture_output(add2ZIP(fleZIP = nmeOut, crrHdl = 1)),
       regexp = "^Parameter isn't a file handle pointing to a file to be zipped\\."))
 
     attr(dtaDbg$dtaFrm, "label.table") <- c("A", "B", "C")
@@ -49,7 +51,7 @@ test_that("write_omv works", {
 
     tmpDF <- read_omv(file.path("..", "ToothGrowth.omv"))
     attr(tmpDF[[4]], "values") <- as.integer(c(0, 1))
-    expect_error(write_omv(tmpDF, nmeOut),
+    expect_error(write_omv(dtaFrm = tmpDF, fleOut = nmeOut),
       regexp = "\"values\"-attribute with unexpected values found for column \"supp - Transform 1\"\\. Please send the file to sebastian\\.jentschke@uib\\.no for debugging\\.")
     attr(tmpDF[[4]], "values") <- as.integer(c(1, 2))
     expect_null(write_omv(tmpDF, nmeOut))
@@ -70,7 +72,7 @@ test_that("write_omv works", {
     dtaOut <- read_omv(file.path("..", "ToothGrowth.omv"))
     attr(dtaOut, "jmv-weights-name") <- "weights"
     attr(dtaOut, "jmv-weights") <- as.vector(dtaOut[, "weights"])
-    expect_warning(dtaDbg <- write_omv(dtaOut, nmeOut, TRUE), regexp = "Handling of weights not yet implemented\\.")
+    expect_warning(dtaDbg <- write_omv(dtaFrm = dtaOut, fleOut = nmeOut, retDbg = TRUE), regexp = "Handling of weights not yet implemented\\.")
     expect_equal(dtaDbg$mtaDta$weights, "weights")
     # this actually tests read_omv
     dtaInp <- read_omv(nmeOut)

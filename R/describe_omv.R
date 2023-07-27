@@ -17,8 +17,14 @@
 #'
 #' @details
 #' * The aim of this function is to help
-#'   The main use of it is likely to help creating data sets to be used in teaching (or provide ”properly described“ data when publishing in a repository
-#'   such as the OSF).
+#'   Two typical use cases would be (1) to help creating data sets to be used in teaching, and (2) to provide ”properly described“ data when publishing in a
+#'   repository such as the OSF).
+#' * `dtaTtl` is a title for the dataset (replacing in most cases “Results” at the top of the results output).
+#' * `dtaDcs` can be either a character vector (with length = 1) containing HTML-formatted text which shall be used to describe the data set (putting
+#'   “unformatted” text is not a problem in itself, but then the result is just plain text without formatting). Alternatively, `dtaDcs` can be a named list
+#'   with the entries `description`, `variables`, `references`, `license`. All entries except from `variables` contain character vectors (length = 1);
+#'   `references` and `license` can be left blank (""; but the names must be present in the list). `variables` is a named list with the variable name as name
+#'   and a description what the variable contains as entry. An example for a dtaDsc as named list can be found in the examples below.
 #' * The ellipsis-parameter (`...`) can be used to submit arguments / parameters to the functions that are used for reading the data. By clicking on the
 #'   respective function under “See also”, you can get a more detailed overview over which parameters each of those functions take. The functions are:
 #'   `read_omv` (for jamovi-files), `read.table` (for CSV / TSV files; using similar defaults as `read.csv` for CSV and `read.delim` for TSV which both are
@@ -35,9 +41,25 @@
 #' @examples
 #' \dontrun{
 #' library(jmvReadWrite)
-#' fleOMV <- system.file("extdata", "AlbumSales.omv", package = "jmvReadWrite")
-#' fleTmp <- paste0(tempfile(), ".omv")
-#' unlink(fleTmp)
+#' dtaFrm <- jmvReadWrite::ToothGrowth
+#' nmeOut <- tempfile(fileext = ".omv")
+#' # the paste's underneath are only for readability (without them, the vignettes are misformatted)
+#' lstDsc <- list(description = paste("The response is the length of odontoblasts (cells responsible",
+#'                                    "for tooth growth) in 60 guinea pigs. Each animal received one",
+#'                                    "of three dose levels of vitamin C (0.5, 1, and 2 mg/day) by one",
+#'                                    "of two delivery methods, orange juice or ascorbic acid (a form",
+#'                                    "of vitamin C and coded as VC)."),
+#'                variables = list(len = "Tooth length",
+#'                                 supp = "Supplement type (VC or OJ)",
+#'                                 dose = "Dose in milligrams / day"),
+#'                references = paste("Crampton, E. W. (1947). The growth of the odontoblast of the",
+#'                                   "incisor teeth as a criterion of vitamin C intake of the guinea",
+#'                                   "pig. <em>The Journal of Nutrition, 33</em>(5), 491-504.",
+#'                                   "https://doi.org/10.1093/jn/33.5.491"),
+#'                license = "")
+#' describe_omv(dtaInp = dtaFrm, fleOut = nmeOut, dtaTtl = "ToothGrowth", dtaDsc = lstDsc)
+#' # don't include the unlink, if you copy the code and want to have a look at the resulting output file
+#' unlink(nmeOut)
 #' }
 #'
 #' @export describe_omv
@@ -74,19 +96,19 @@ describe_omv <- function(dtaInp = NULL, fleOut = "", dtaTtl = c(), dtaDsc = c(),
     attr(dtaFrm, "HTML") <- addHTM(attr(dtaFrm, "HTML"), dtaTtl, dtaDsc)
 
     # add title and description as protobuf
-    if (nzchar(dtaTtl)) {
-        ttlPtB <- RProtoBuf::new(jamovi.coms.AnalysisOption, s = dtaTtl)
+    if (length(dtaTtl) > 0 && nzchar(dtaTtl)) {
+        ttlPtB <- var2PB(dtaTtl)
     } else {
         ttlPtB <- NULL
     }
-    if (nzchar(dtaDsc)) {
-        splDsc <- splHTM(gsub("<br\\s*/>|<br>", "\n", gsub("^\\s*<p.*?>|</p>\\s*$", "", dtaDsc)))
+    if (length(dtaDsc) > 0 && nzchar(dtaDsc)) {
+        splDsc <- splHTM(gsub("</li>", "</li>\n", gsub("</p>|<br\\s*/>|<br>", "\n", gsub("^\\s*<p.*?>|</p>\\s*$", "", dtaDsc))))
         tgtDsc <- which(!grepl("<.*?>", splDsc))
         attDsc <- htmPtB <- list()
         for (i in seq_along(splDsc)) {
             if (i %in% tgtDsc) {
 # TO-DO: convert unicode
-                htmPtB[[which(i == tgtDsc)]] <- var2PB(c(rep(list(attributes = attDsc), min(length(attDsc), 1)), list(insert = splDsc[i])))
+                htmPtB[[which(i == tgtDsc)]] <- var2PB(c(prpAtt(attDsc), list(insert = splDsc[i])))
             } else {
                 attDsc <- getAtt(splDsc, i, attDsc)
                 if (grepl("class=\".*?ql-formula", splDsc[i])) splDsc <- fmtFrm(splDsc, i)
@@ -108,13 +130,14 @@ describe_omv <- function(dtaInp = NULL, fleOut = "", dtaTtl = c(), dtaDsc = c(),
     # name was given, return the data frame
     if (!is.null(fleOut) && nzchar(fleOut)) {
         fleOut <- fmtFlO(fleOut)
-        write_omv(dtaFrm, fleOut)
+        write_omv(dtaFrm = dtaFrm, fleOut = fleOut, wrtPtB = TRUE)
         return(invisible(NULL))
     } else {
         dtaFrm
     }
 }
 
+# split HTML into constituents (i.e., tags and content)
 splHTM <- function(vecChr = "") {
         splChr <- gsub("^\\s+\\n|\\n\\s+$", "\n", strsplit(vecChr, "(?=[<>])", perl = TRUE)[[1]])
         rplDsc <- grep("<", splChr)
@@ -124,6 +147,7 @@ splHTM <- function(vecChr = "") {
         return(splChr[-c(rplDsc, rplDsc + 2)])
 }
 
+# create HTML from the list-version of dtaDsc
 crtHTM <- function(inpDsc = NULL) {
     outDsc <- c()
     outDsc <- paste0(outDsc, "<p><strong>Description:</strong></p>", addPgp(inpDsc[["description"]]), "<p>&nbsp;</p>")
@@ -142,18 +166,21 @@ crtHTM <- function(inpDsc = NULL) {
     return(outDsc)
 }
 
+# add leading and trailing <p> / </p> tags (if missing)
 addPgp <- function(inpLne = c()) {
-    # add leading and trailing <p> / </p> tags (if missing)
     paste0(ifelse(grepl("^\\s*<p.*?>", inpLne), "", "<p>"), inpLne, ifelse(grepl("</p.*?>\\s*$", inpLne), "", "</p>"))
 }
 
+# find the next HTML tag of a particular type
 nxtAtt <- function(vecChr = c(), vecPos = NA, addTrm = c()) {
     grep(paste(c(paste0(c("</", "<"), gsub("<(\\w+)\\s+.*", "\\1", vecChr[vecPos])), addTrm), collapse = "|"),
       vecChr[seq(vecPos + 1, length(vecChr))])[1] + vecPos
 }
 
+# transform HTML tags into attributes (bold, italic, heading, etc.)
 getAtt <- function(vecChr = c(), vecPos = NA, lstAtt = list()) {
     if (!nzchar(vecChr[vecPos])) return(lstAtt)
+    if (grepl("<p>", vecChr[vecPos])) return(lstAtt)
     prvAtt <- lstAtt
 
     # bold
@@ -189,6 +216,9 @@ getAtt <- function(vecChr = c(), vecPos = NA, lstAtt = list()) {
     # bullet list
     if (grepl("<ul>",           vecChr[vecPos])) lstAtt[["list"]] <- "bullet"
     if (grepl("</ul>",          vecChr[vecPos])) lstAtt[["list"]] <- NULL
+    # list entries
+    if (grepl("<li>",           vecChr[vecPos])) attr(lstAtt[["list"]], "lstEnt") <- TRUE
+    if (grepl("</li>",          vecChr[vecPos])) attr(lstAtt[["list"]], "lstEnt") <- FALSE
     # alignment
     if (grepl("class=\".*?ql-align-\\w+", vecChr[vecPos])) {
         lstAtt[["align"]] <- gsub(".*?ql-align-(\\w+).*", "\\1", vecChr[vecPos])
@@ -224,6 +254,17 @@ getAtt <- function(vecChr = c(), vecPos = NA, lstAtt = list()) {
     return(lstAtt)
 }
 
+prpAtt <- function(lstAtt = NULL) {
+    # for list entries, the attribute "list" needs to be removed (it is only attached to the "\n" at the end)
+    # [1] assign attDsc to a temporary variable, [2] remove the "list" entry if inside a list, [3] wrap the
+    # arguments in a named list (under the name "attributes"), if crrArg is empty, nothing is added in
+    # c(crrAtt, ...)
+    crrAtt <- lstAtt
+    if (hasName(lstAtt, "list") && identical(attr(lstAtt[["list"]], "lstEnt"), TRUE)) crrAtt[["list"]] <- NULL
+    if (length(crrAtt) > 0) return(list(attributes = crrAtt)) else return(NULL)
+}
+
+# format formulas
 fmtFrm <- function(vecChr = c(), vecPos = NA, vecTgt = c()) {
     vecNxt <- nxtAtt(vecChr, vecPos, "class=")
     for (i in intersect(seq(vecPos + 1, vecNxt - 1), vecTgt)) {
@@ -234,6 +275,7 @@ fmtFrm <- function(vecChr = c(), vecPos = NA, vecTgt = c()) {
     return(vecChr)
 }
 
+# add / replace HTML for title and description within index.html
 addHTM <- function(crrHTM = "", dtaTtl = "", dtaDsc = "") {
     vldHTM <- which(!grepl("^\\s*$", crrHTM))
     fndTtl <- grep("<h1.*?>", crrHTM[vldHTM])[1]
@@ -250,4 +292,6 @@ addHTM <- function(crrHTM = "", dtaTtl = "", dtaDsc = "") {
         # assign description embedded in <div> / </div> tags
         crrHTM[vldHTM[fndTtl + 1]] <- paste0("<div class=\"note\">", addPgp(dtaDsc), "</div>")
     }
+
+    return(crrHTM)
 }

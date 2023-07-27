@@ -47,7 +47,7 @@
 #' library(jmvReadWrite)
 #' dtaInp <- bfi_sample2
 #' nmeInp <- paste0(tempfile(), "_", 1:3, ".rds")
-#' nmeOut <- paste0(tempfile(), ".omv")
+#' nmeOut <- tempfile(fileext = ".omv")
 #' for (i in seq_along(nmeInp)) saveRDS(dtaInp[-i - 1], nmeInp[i])
 #' # save dtaInp three times (i.e., the length of nmeInp), removing one data columns in
 #' # each data set (for demonstration purposes, A1 in the first, A2 in the second, ...)

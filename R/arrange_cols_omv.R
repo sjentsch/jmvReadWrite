@@ -42,7 +42,7 @@
 #' \dontrun{
 #' library(jmvReadWrite)
 #' fleOMV <- system.file("extdata", "AlbumSales.omv", package = "jmvReadWrite")
-#' fleTmp <- paste0(tempfile(), ".omv")
+#' fleTmp <- tempfile(fileext = ".omv")
 #' # the original file has the variables in the order: "Adverts", "Airplay", "Image", "Sales"
 #' names(read_omv(fleOMV))
 #' # first, we move the variable "Sales" to the first place using the varOrd-parameter

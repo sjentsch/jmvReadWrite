@@ -69,8 +69,8 @@
 #' #  $ X_7: num  ...
 #' #  $ X_8: num  ...
 #' # this data set is stored as (temporary) RDS-file and later processed by wide2long
-#' nmeInp <- paste0(tempfile(), ".rds")
-#' nmeOut <- paste0(tempfile(), ".omv")
+#' nmeInp <- tempfile(fileext = ".rds")
+#' nmeOut <- tempfile(fileext = ".omv")
 #' saveRDS(dtaInp, nmeInp)
 #' wide2long_omv(dtaInp = nmeInp, fleOut = nmeOut, varID = "ID", varTme = "measure",
 #'     varLst = setdiff(names(dtaInp), "ID"), varSrt = c("ID", "measure"))

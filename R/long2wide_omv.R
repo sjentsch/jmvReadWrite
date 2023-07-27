@@ -59,8 +59,8 @@
 #' #  $ measure: int  1 2 3 4 5 6 7 8 1 2 ...
 #' #  $ X      : num  ...
 #' # this data set is stored as (temporary) RDS-file and later processed by long2wide
-#' nmeInp <- paste0(tempfile(), ".rds")
-#' nmeOut <- paste0(tempfile(), ".omv")
+#' nmeInp <- tempfile(fileext = ".rds")
+#' nmeOut <- tempfile(fileext = ".omv")
 #' saveRDS(dtaInp, nmeInp)
 #' long2wide_omv(dtaInp = nmeInp, fleOut = nmeOut, varTgt = "X", varID = "ID", varTme = "measure")
 #' # it is required to give at least the arguments dtaInp, varID and varTme

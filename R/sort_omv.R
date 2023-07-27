@@ -34,7 +34,7 @@
 #' \dontrun{
 #' library(jmvReadWrite)
 #' fleOMV <- system.file("extdata", "AlbumSales.omv", package = "jmvReadWrite")
-#' fleTmp <- paste0(tempfile(), ".omv")
+#' fleTmp <- tempfile(fileext = ".omv")
 #' sort_omv(dtaInp = fleOMV, fleOut = fleTmp, varSrt = "Image")
 #' dtaFrm <- read_omv(fleTmp)
 #' cat(dtaFrm$Image)

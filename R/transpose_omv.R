@@ -39,7 +39,7 @@
 #' # Data sets that were extracted, e.g., from PsychoPy, may look like this (trials as rows
 #' # and participants as columns, one for each participant, manually assmebled / copy-and-pasted).
 #' # However, for analyses, one wants the data set transposed (units / participants as columns)...
-#' fleTmp <- paste0(tempfile(), ".omv")
+#' fleTmp <- tempfile(fileext = ".omv")
 #' transpose_omv(dtaInp = tmpDF, fleOut = fleTmp)
 #' dtaFrm <- read_omv(fleTmp)
 #' str(dtaFrm)

@@ -53,7 +53,7 @@
 #' library(jmvReadWrite)
 #' dtaInp <- bfi_sample2
 #' nmeInp <- paste0(tempfile(), "_", 1:3, ".rds")
-#' nmeOut <- paste0(tempfile(), ".omv")
+#' nmeOut <- tempfile(fileext = ".omv")
 #' for (i in seq_along(nmeInp)) {
 #'     saveRDS(stats::setNames(dtaInp, c("ID", paste0(names(dtaInp)[-1], "_", i))), nmeInp[i])
 #' }

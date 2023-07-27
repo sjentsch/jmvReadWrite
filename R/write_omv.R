@@ -20,8 +20,8 @@
 #'   attribute `jmv-id` (e.g., `attr(dtaFrm$column, "jmv-id") = TRUE`).
 #' * CAUTION: Setting wrtPBf to TRUE currently overwrites analyses that already
 #'   exist in a data file. It is meant to be used for `describe_omv` only. If
-#'   you are setting wrtPBf to TRUE, ensure to use a file name that isn't the
-#'   same as those of any existing file.
+#'   you set wrtPBf to TRUE, ensure to use an output file name that isn't would
+#'   not overwrite any existing file.
 #'
 #' @examples
 #' \dontrun{
@@ -30,7 +30,7 @@
 #' # use the data set "ToothGrowth" and, if it exists, write it as
 #' # jamovi-file using write_omv()
 #' data("ToothGrowth")
-#' fleOMV <- paste0(tempfile(), ".omv")
+#' fleOMV <- tempfile(fileext = ".omv")
 #' # typically, one would use a "real" file name instead of tempfile(),
 #' # e.g., "Data1.omv"
 #' dtaDbg = write_omv(ToothGrowth, fleOMV, retDbg = TRUE)
@@ -54,7 +54,7 @@
 #'
 #' @export write_omv
 
-write_omv <- function(dtaFrm = NULL, fleOut = "", wrtPBf = FALSE, retDbg = FALSE) {
+write_omv <- function(dtaFrm = NULL, fleOut = "", wrtPtB = FALSE, retDbg = FALSE) {
     if (is.null(dtaFrm)) stop("The data frame to be written needs to be given as parameter (dtaFrm = ...).")
     if (!nzchar(fleOut)) stop("Output file name needs to be given as parameter (fleOut = ...).")
 
@@ -149,7 +149,8 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", wrtPBf = FALSE, retDbg = FALSE
             # above must be kept at crrCol as the original column might be character and was converted above
             facOrd <- is.ordered(dtaFrm[[i]])
             if (chkAtt(dtaFrm[[i]], "values") && !identical(attr(dtaFrm[[i]], "values"), as.integer(attr(dtaFrm[[i]], "levels")))) {
-                clsRmv(list(binHdl, strHdl))
+                clsRmv(binHdl)
+                clsRmv(strHdl)
                 stop(sprintf(paste("\"values\"-attribute with unexpected values found for column \"%s\".",
                                    "Please send the file to sebastian.jentschke@uib.no for debugging."), names(dtaFrm[i])))
             }
@@ -205,7 +206,8 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", wrtPBf = FALSE, retDbg = FALSE
             mtaDta$fields[[i]][["description"]] <- paste(c(ifelse(nzchar(mtaDta$fields[[i]][["description"]]), mtaDta$fields[[i]][["description"]], names(dtaFrm[i])),
                                                          "(time converted to numeric; sec since 00:00)"), collapse = " ")
         } else {
-            clsRmv(list(binHdl, strHdl))
+            clsRmv(binHdl)
+            clsRmv(strHdl)
             stop(sprintf("Variable type %s not implemented. Please send the data file that caused this problem to sebastian.jentschke@uib.no", class(crrCol)))
         }
 
@@ -250,7 +252,8 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", wrtPBf = FALSE, retDbg = FALSE
             }
             wrtCol <- as.integer(wrtCol)
         } else {
-            clsRmv(list(binHdl, strHdl))
+            clsRmv(binHdl)
+            clsRmv(strHdl)
             stop(sprintf("Variable type %s not implemented. Please send the data file that caused this problem to sebastian.jentschke@uib.no", mtaDta$fields[[i]][["type"]]))
         }
         writeBin(wrtCol, binHdl, endian = "little")
@@ -268,50 +271,37 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", wrtPBf = FALSE, retDbg = FALSE
     }
 
     # compress data.bin and discard the temporary file
-    add2ZIP(fleOut, binHdl, newFle = TRUE)
-    rm(binHdl)
+    add2ZIP(fleOut, crrHdl = binHdl)
 
     # compress strings.bin (only if it contains data) and discard the temporary file
-    add2ZIP(fleOut, strHdl, blnZIP = (strPos > 0))
-    rm(strHdl, strPos)
+    add2ZIP(fleOut, crrHdl = strHdl, incZIP = (strPos > 0))
+    rm(strPos)
 
     # create meta, write it and add it to ZIP file
-    mnfHdl <- file(file.path(tempdir(), "meta"),          open = "wb")
-    add2ZIP(fleOut, mnfHdl, txtOut = mnfTxt())
-    rm(mnfHdl)
+    add2ZIP(fleOut, crrFle = c("meta", "wb"), txtOut = mnfTxt())
 
     # write metadata.json
-    mtaHdl <- file(file.path(tempdir(), "metadata.json"),  open = "w")
-    add2ZIP(fleOut, mtaHdl, txtOut = fmtJSON(list(dataSet = mtaDta)))
-    rm(mtaHdl)
+    add2ZIP(fleOut, crrFle = "metadata.json", txtOut = fmtJSON(list(dataSet = mtaDta)))
 
     # write xdata.json
-    xtdHdl <- file(file.path(tempdir(), "xdata.json"),     open = "w")
-    add2ZIP(fleOut, xtdHdl, txtOut = fmtJSON(xtdDta))
-    rm(xtdHdl)
+    add2ZIP(fleOut, crrFle = "xdata.json",    txtOut = fmtJSON(xtdDta))
 
-    if (wrtPBf) {
-        # write ProtoBuffers
-#
-        pbfHdl <- file(file.path(tempdir(), ""),    open = "w")
-        add2ZIP(fleOut, pbfHdl)
-        rm(htmHdl)
-# TO-DO
-
-        # write index.html and add it to ZIP file
-        htmHdl <- file(file.path(tempdir(), "index.html"), open = "w")
-        if (!is.null(attr(dtaFrm, "HTML"))) {
-           # currently, the HTML that is stored in the HTML attribute can't be
-           # saved because it is only a "front" that doesn't work without the
-           # analyses and images contained in it being stored too
-           add2ZIP(fleOut, htmHdl, txtOut = attr(dtaFrm, "HTML"))
-        } else {
-           add2ZIP(fleOut, htmHdl, txtOut = htmTxt())
-        }
+    # if "HTML" attribute exists (e.g., because functions such as describe_omv
+    # did modify it), this attribute is written; otherwise, htmTxt (a clean
+    # "index.html", i.e., without any results) is written
+    if (!is.null(attr(dtaFrm, "HTML"))) {
+        add2ZIP(fleOut, crrFle = "index.html", txtOut = attr(dtaFrm, "HTML"))
     } else {
-        add2ZIP(fleOut, htmHdl, txtOut = htmTxt())
+        add2ZIP(fleOut, crrFle = "index.html", txtOut = htmTxt())
     }
-    rm(htmHdl)
+
+    if (wrtPtB) {
+        if (is.null(attr(dtaFrm, "protobuf")) || length(attr(dtaFrm, "protobuf")) < 1 || class(attr(dtaFrm, "protobuf")[[1]]) != "Message") {
+            stop("The data frame (dtaFrm) must contain the attribute \"protobuf\", there has to be at least one of them, and it has to be of the correct type (a RProtoBuf).")
+        }
+        # write ProtoBuffers
+        add2ZIP(fleOut, crrFle = c(names(attr(dtaFrm, "protobuf")[1]), "wb"), ptbOut = attr(dtaFrm, "protobuf")[[1]])
+    }
 
     # handle weights
     if (chkAtt(dtaFrm, "weights", "\\w+")) {
@@ -324,20 +314,24 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", wrtPBf = FALSE, retDbg = FALSE
     }
 }
 
+# close and remove files, and remove the file handles
 clsRmv <- function(fleHdl = NULL) {
-    for (crrHdl in fleHdl) {
-        crrFle <- summary(crrHdl)[["description"]]
-        close(crrHdl)
-        unlink(crrFle)
-        rm(crrFle)
-    }
+    crrFle <- summary(fleHdl)[["description"]]
+    close(fleHdl)
+    unlink(crrFle)
+    rm(crrFle)
+    rm(list = deparse(substitute(fleHdl)), envir = sys.frame(-1))
+
+    return(TRUE)
 }
 
+# convert to JSON and do some beatifying (adding spaces for increased legibility)
 fmtJSON <- function(txtJSON = "") {
     gsub("\"weights\": \\{\\}", "\"weights\": null", gsub("00: 00", "00:00", gsub("  ", " ", gsub(":", ": ", gsub(",", ", ",
       jsonlite::toJSON(txtJSON, auto_unbox = TRUE))))))
 }
 
+# generates an “empty” index.html (i.e., an index.html not containing any results output)
 htmTxt <- function() {
     c("<!DOCTYPE html>",
       "<html>",
@@ -393,6 +387,7 @@ htmTxt <- function() {
       "</html>")
 }
 
+# creates the text output for the manifest file
 mnfTxt <- function() {
     crrTxt <- paste0(sapply(lstMnf, "[[", 1), ":")
     for (i in seq_along(lstMnf)) {
@@ -405,31 +400,44 @@ mnfTxt <- function() {
     enc2utf8(crrTxt)
 }
 
-add2ZIP <- function(fleZIP = "", crrHdl = NULL, newFle = FALSE, blnZIP = TRUE, txtOut = "") {
-
-    if (!all(class(crrHdl) == c("file", "connection"))) {
-        cat(utils::str(crrHdl))
-        stop("Parameter isn\'t a file handle pointing to a file to be zipped.")
+# adds an input file to the .omv-file (which is a ZIP-archive)
+add2ZIP <- function(fleZIP = "", crrHdl = NULL, crrFle = c(), txtOut = "", ptbOut = NULL, incZIP = TRUE) {
+    if ((!is.character(fleZIP) || length(fleZIP) < 1 || !nzchar(fleZIP)) ||
+        ((is.null(crrHdl) || length(crrHdl) < 1) && (!is.character(crrFle) || length(crrFle) < 1 || !all(nzchar(crrFle))))) {
+        stop("fleZIP (a character with a file name), and either crrHdl (with a connection) or crrFle (with a file name and [optionally] a writing mode) need to be given as arguments.")
     }
 
-    if (all(nchar(txtOut) > 0)) {
-        # writing the manifest requires a bit of special handling because of \r\n on Windows vs. \n on Mac / Linux
-        # thanks to MAgojam for figuring out a solution
-        # for the other files (metadata.json, xdata.json, index.html), it doesn't matter, therefore sep = "\n" is added for all
-        writeLines(txtOut, crrHdl, sep = "\n")
-    }
-
-    crrFle <- summary(crrHdl)[["description"]]
-    close(crrHdl)
-
-    if (blnZIP) {
-        if (newFle) {
-            zip::zip(fleZIP,        basename(crrFle), root = dirname(crrFle))
-        } else {
-            zip::zip_append(fleZIP, basename(crrFle), root = dirname(crrFle))
+    # if a file handle is given, determine the file name, close the handle and remove it (from the calling environment)
+    if (!is.null(crrHdl)) {
+        if (!all(class(crrHdl) == c("file", "connection"))) {
+            cat(utils::str(crrHdl))
+            stop("Parameter isn\'t a file handle pointing to a file to be zipped.")
         }
+        crrFle <- gsub(file.path(tempdir(), ""), "", summary(crrHdl)[["description"]])
+        close(crrHdl)
+        rm(list = deparse(substitute(crrHdl)), envir = sys.frame(-1))
+    # if a file name is given, open a connection, write whatever is required
+    } else if (is.character(crrFle)) {
+        crrFle[1] <- gsub(file.path(tempdir(), ""), "", crrFle[1])
+        if (dirname(crrFle[1]) != "." && !dir.exists(file.path(tempdir(), dirname(crrFle[1])))) dir.create(file.path(tempdir(), dirname(crrFle[1])))
+        crrHdl <- file(file.path(tempdir(), crrFle[1]), open = ifelse(length(crrFle) > 1, crrFle[2], "w"))
+        if        (all(nzchar(txtOut))) {
+            # writing the manifest requires a bit of special handling because of \r\n on Windows vs. \n on Mac / Linux
+            # for the other files (metadata.json, xdata.json, index.html), it doesn't matter, therefore sep = "\n" is added for all
+            writeLines(txtOut, crrHdl, sep = "\n")
+        } else if (!is.null(ptbOut)) {
+            ptbOut$serialize(crrHdl)
+        }
+        close(crrHdl)
     }
 
-    unlink(crrFle)
-    rm(crrFle)
+    if (incZIP) {
+        crrPrm <- list(zipfile = fleZIP, files = crrFle[1], root = tempdir())
+        if (file.exists(fleZIP)) do.call(zip::zip_append, crrPrm) else do.call(zip::zip, crrPrm)
+    }
+
+    if (dirname(crrFle[1]) == ".") unlink(file.path(tempdir(), crrFle[1])) else unlink(file.path(tempdir(), dirname(crrFle[1])), recursive = TRUE)
+    rm(crrFle, crrHdl)
+
+    return(TRUE)
 }

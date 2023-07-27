@@ -91,9 +91,7 @@ test_that("read_omv works", {
 
     # invalid manifest (wrong version number)
     nmeTmp <- paste0(tempfile(), ".omv")
-    mnfHdl <- file(file.path(tempdir(), "meta"), open = "wb")
-    add2ZIP(nmeTmp, mnfHdl, txtOut = gsub("jamovi-Archive-Version: 11.0", "jamovi-Archive-Version: 99.0", mnfTxt()), newFle = TRUE)
-    rm(mnfHdl)
+    add2ZIP(nmeTmp, crrFle = c("meta", "wb"), txtOut = gsub("jamovi-Archive-Version: 11.0", "jamovi-Archive-Version: 99.0", mnfTxt()))
     suppressMessages(expect_warning(expect_error(read_omv(nmeTmp), regexp = "^'con' is not a connection"),
       regexp = "^The file that you are trying to read \\(.*\\) was written with a version of jamovi that currently is not implemented"))
     suppressMessages(expect_null(getHdl(fleOMV = nmeTmp, crrFle = "MANIFEST.MF")))

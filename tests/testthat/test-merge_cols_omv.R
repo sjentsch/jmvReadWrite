@@ -54,7 +54,7 @@ test_that("merge_cols_omv works", {
 
     nmeInp <- paste0(tempfile(), ".rds")
     saveRDS(data.frame(ID = seq(60), A = rnorm(60), B = rnorm(60)), nmeInp)
-    expect_null(merge_cols_omv(c("../ToothGrowth.omv", nmeInp), fleOut = nmeOut, typMrg = "outer", varBy = "ID", psvAnl = TRUE))
+    expect_null(merge_cols_omv(c(file.path("..", "ToothGrowth.omv"), nmeInp), fleOut = nmeOut, typMrg = "outer", varBy = "ID", psvAnl = TRUE))
     expect_true(chkFle(nmeOut))
     expect_gt(file.info(nmeOut)$size, 1)
     expect_true(chkFle(nmeOut, isZIP = TRUE))
@@ -70,7 +70,7 @@ test_that("merge_cols_omv works", {
       c("integer", "logical", "double", "integer", "double", "integer", "double", "integer", "integer", "double", "double", "double", "integer", "integer", "double", "double"))
     expect_equal(sort(zip::zip_list(nmeOut)$filename),
       c("01 empty/analysis", "02 anova/analysis", "02 anova/resources/61c33c657d5e31f1.png", "02 anova/resources/dd0ce025a00dad1b.png", "03 empty/analysis",
-        "04 ancova/analysis", "05 empty/analysis", "data.bin", "index.html", "meta", "metadata.json", "xdata.json"))
+        "04 ancova/analysis", "05 empty/analysis", "data.bin", "index.html", "meta", "metadata.json", "strings.bin", "xdata.json"))
     expect_equal(attr(df4Chk, "syntax"),
       c(paste("jmv::ANOVA(formula = len ~ supp + dose2 + supp:dose2, data = data, effectSize = \"partEta\", modelTest = TRUE, qq = TRUE,",
               "contrasts = list(list(var=\"supp\", type=\"none\"), list(var=\"dose2\", type=\"polynomial\")), postHoc = ~ supp + dose2, emMeans = ~ dose2:supp)"),

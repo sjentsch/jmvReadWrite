@@ -65,9 +65,12 @@ test_that("sort_omv works", {
       c(paste("jmv::ANOVA(formula = len ~ supp + dose2 + supp:dose2, data = data, effectSize = \"partEta\", modelTest = TRUE, qq = TRUE,",
               "contrasts = list(list(var=\"supp\", type=\"none\"), list(var=\"dose2\", type=\"polynomial\")), postHoc = ~ supp + dose2, emMeans = ~ dose2:supp)"),
            "jmv::ancova(formula = len ~ supp + dose, data = data, effectSize = \"partEta\", modelTest = TRUE)"))
+    unlink(nmeOut)
+
     expect_warning(sort_omv(dtaInp = jmvReadWrite::AlbumSales, fleOut = nmeOut, varSrt = "Sales", psvAnl = TRUE),
       regexp = "^psvAnl is only possible if dtaInp is a file name \\(analyses are not stored in data frames, only in the jamovi files\\)\\.")
     unlink(nmeOut)
     expect_warning(sort_omv(dtaInp = jmvReadWrite::AlbumSales, varSrt = "Sales", psvAnl = TRUE),
       regexp = "^psvAnl is only possible if fleOut is a file name \\(analyses are not stored in data frames, only in the jamovi files\\)\\.")
+    unlink(nmeOut)
 })

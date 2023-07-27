@@ -43,8 +43,12 @@ test_that("write_omv works", {
 
     attr(dtaDbg$dtaFrm, "variable.labels") <- stats::setNames(c("Label for ID", "Label for supp", "Label for supp2"), c("ID", "supp", "supp2"))
     dtaDbg$dtaFrm$supp <- as.character(dtaDbg$dtaFrm$supp)
-    expect_equal(sapply(c(1, 3), function(n) write_omv(dtaDbg$dtaFrm, nmeOut, retDbg = TRUE)[["mtaDta"]][["fields"]][[n]][["description"]]), c("Label for ID", "Label for supp2"))
-    expect_identical(sapply(c("dataType", "type"), function(f) write_omv(dtaDbg$dtaFrm, nmeOut, retDbg = TRUE)[["mtaDta"]][["fields"]][[2]][[f]], USE.NAMES = FALSE), c("Text", "integer"))
+    expect_equal(sapply(c(1, 3), function(n) write_omv(dtaDbg$dtaFrm, nmeOut, frcWrt = TRUE, retDbg = TRUE)[["mtaDta"]][["fields"]][[n]][["description"]]),
+      c("Label for ID", "Label for supp2"))
+    unlink(nmeOut)
+    expect_identical(sapply(c("dataType", "type"), function(f) write_omv(dtaDbg$dtaFrm, nmeOut, frcWrt = TRUE, retDbg = TRUE)[["mtaDta"]][["fields"]][[2]][[f]], USE.NAMES = FALSE),
+      c("Text", "integer"))
+    unlink(nmeOut)
 
     expect_error(write_omv(data.frame(T1 = sample(9999, 100), T2 = as.complex(rnorm(100))), paste0(tempfile(), ".omv")),
       regexp = "Variable type complex not implemented\\. Please send the data file that caused this problem to sebastian\\.jentschke@uib\\.no")
@@ -76,6 +80,7 @@ test_that("write_omv works", {
     expect_equal(dtaDbg$mtaDta$weights, "weights")
     # this actually tests read_omv
     dtaInp <- read_omv(nmeOut)
+    unlink(nmeOut)
     expect_equal(names(attributes(dtaInp)), c("names", "row.names", "class", "fltLst", "removedRows", "addedRows", "transforms", "jmv-weights-name", "jmv-weights"))
     expect_equal(attr(dtaInp, "jmv-weights-name"), "weights")
     expect_equal(attr(dtaInp, "jmv-weights"), rep(1, 60))

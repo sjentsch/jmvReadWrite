@@ -39,18 +39,19 @@
 #' # Data sets that were extracted, e.g., from PsychoPy, may look like this (trials as rows
 #' # and participants as columns, one for each participant, manually assmebled / copy-and-pasted).
 #' # However, for analyses, one wants the data set transposed (units / participants as columns)...
-#' fleTmp <- tempfile(fileext = ".omv")
-#' transpose_omv(dtaInp = tmpDF, fleOut = fleTmp)
-#' dtaFrm <- read_omv(fleTmp)
+#' nmeOut <- tempfile(fileext = ".omv")
+#' transpose_omv(dtaInp = tmpDF, fleOut = nmeOut)
+#' dtaFrm <- read_omv(nmeOut)
+#' unlink(nmeOut)
 #' str(dtaFrm)
 #' # if no varNme-parameter is given, generic variable names are created (V_...)
-#' transpose_omv(dtaInp = tmpDF, fleOut = fleTmp, varNme = sprintf("Trl_%02d", seq(16)))
-#' dtaFrm <- read_omv(fleTmp)
+#' transpose_omv(dtaInp = tmpDF, fleOut = nmeOut, varNme = sprintf("Trl_%02d", seq(16)))
+#' dtaFrm <- read_omv(nmeOut)
+#' unlink(nmeOut)
 #' str(dtaFrm)
 #' # alternatively, the character vector with the desired variable names (of the same length as
 #' # the number of rows in tmpDF) may be given, "Trl" can easily be exchanged by the name of your
 #' # questionnaire, experimental conditions, etc.
-#' unlink(fleTmp)
 #' }
 #'
 #' @export transpose_omv

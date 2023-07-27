@@ -55,6 +55,7 @@
 #' cat(file.info(nmeOut)$size)
 #' # -> 10767 (size may differ on different OSes)
 #' dtaOut <- read_omv(nmeOut, sveAtt = FALSE)
+#' unlink(nmeOut)
 #' # read the data set where the three original datasets were added as rows and show
 #' # the variable names
 #' cat(names(dtaInp))
@@ -73,6 +74,7 @@
 #' # the argument typMrg = "common" removes the columns that are not present in all of
 #' # the input data sets (i.e., A1, A2, A3)
 #' dtaOut <- read_omv(nmeOut, sveAtt = FALSE)
+#' unlink(nmeOut)
 #' # read the data set where the three original datasets were added as rows and show
 #' # the variable names
 #' cat(names(dtaInp))
@@ -85,7 +87,6 @@
 #' # reduced by 3 (i.e., "A1", "A2", "A3")
 #'
 #' unlink(nmeInp)
-#' unlink(nmeOut)
 #' }
 #'
 #' @export merge_rows_omv

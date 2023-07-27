@@ -41,18 +41,19 @@
 #' @examples
 #' \dontrun{
 #' library(jmvReadWrite)
-#' fleOMV <- system.file("extdata", "AlbumSales.omv", package = "jmvReadWrite")
-#' fleTmp <- tempfile(fileext = ".omv")
+#' nmeInp <- system.file("extdata", "AlbumSales.omv", package = "jmvReadWrite")
+#' nmeOut <- tempfile(fileext = ".omv")
 #' # the original file has the variables in the order: "Adverts", "Airplay", "Image", "Sales"
-#' names(read_omv(fleOMV))
+#' names(read_omv(nmeInp))
 #' # first, we move the variable "Sales" to the first place using the varOrd-parameter
-#' arrange_cols_omv(dtaInp = fleOMV, fleOut = fleTmp,
+#' arrange_cols_omv(dtaInp = nmeInp, fleOut = nmeOut,
 #'   varOrd = c("Sales", "Adverts", "Airplay", "Image"))
-#' names(read_omv(fleTmp))
+#' names(read_omv(nmeOut))
+#' unlink(nmeOut)
 #' # now, we move the variable "Sales" to the first place using the varMve-parameter
-#' arrange_cols_omv(dtaInp = fleOMV, fleOut = fleTmp, varMve = list(Sales = -3))
-#' names(read_omv(fleTmp))
-#' unlink(fleTmp)
+#' arrange_cols_omv(dtaInp = nmeInp, fleOut = nmeOut, varMve = list(Sales = -3))
+#' names(read_omv(nmeOut))
+#' unlink(nmeOut)
 #' }
 #'
 #' @export arrange_cols_omv

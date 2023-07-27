@@ -33,17 +33,19 @@
 #' @examples
 #' \dontrun{
 #' library(jmvReadWrite)
-#' fleOMV <- system.file("extdata", "AlbumSales.omv", package = "jmvReadWrite")
-#' fleTmp <- tempfile(fileext = ".omv")
-#' sort_omv(dtaInp = fleOMV, fleOut = fleTmp, varSrt = "Image")
-#' dtaFrm <- read_omv(fleTmp)
+#' nmeInp <- system.file("extdata", "AlbumSales.omv", package = "jmvReadWrite")
+#' nmeOut <- tempfile(fileext = ".omv")
+#' sort_omv(dtaInp = nmeInp, fleOut = nmeOut, varSrt = "Image")
+#' dtaFrm <- read_omv(nmeOut)
+#' unlink(nmeOut)
 #' cat(dtaFrm$Image)
 #' # shows that the variable "Image" is sorted in ascending order
 #' cat(is.unsorted(dtaFrm$Image))
 #' # is.unsorted (which checks for whether the variable is NOT sorted) returns FALSE
-#' sort_omv(dtaInp = fleOMV, fleOut = fleTmp, varSrt = "-Image")
+#' sort_omv(dtaInp = nmeInp, fleOut = nmeOut, varSrt = "-Image")
 #' # variables can also be sorted in descending order by preceding them with "-"
-#' dtaFrm <- read_omv(fleTmp)
+#' dtaFrm <- read_omv(nmeOut)
+#' unlink(nmeOut)
 #' cat(dtaFrm$Image)
 #' # shows that the variable "Image" is now sorted in descending order
 #' cat(is.unsorted(dtaFrm$Image))
@@ -51,7 +53,6 @@
 #' cat(is.unsorted(-dtaFrm$Image))
 #' # if the sign of the variable is changed, it returns FALSE (i.e., the variable is
 #' # NOT unsorted)
-#' unlink(fleTmp)
 #' }
 #'
 #' @export sort_omv

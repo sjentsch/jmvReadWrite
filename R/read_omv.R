@@ -13,8 +13,8 @@
 #' @examples
 #' \dontrun{
 #' library(jmvReadWrite)
-#' fleOMV <- system.file("extdata", "ToothGrowth.omv", package = "jmvReadWrite")
-#' data <- read_omv(fleInp = fleOMV, getSyn = TRUE)
+#' nmeInp <- system.file("extdata", "ToothGrowth.omv", package = "jmvReadWrite")
+#' data <- read_omv(fleInp = nmeInp, getSyn = TRUE)
 #' # if the syntax couldn't be extracted, an empty list - length = 0 - is returned,
 #' # otherwise, the commands are shown and the first analysis is run, with the output
 #' # from the second analysis being assigned to the variable result

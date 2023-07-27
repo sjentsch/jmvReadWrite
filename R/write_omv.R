@@ -4,7 +4,8 @@
 #' @param dtaFrm Data frame to be exported (default: NULL)
 #' @param fleOut Name / position of the output file to be generated
 #'               ("FILENAME.omv"; default: "")
-#' @param wrtPBf Whether to write protobuffers (see Details; default: FALSE)
+#' @param wrtPtB Whether to write protocol buffers (see Details; default: FALSE)
+#' @param frcWrt Whether to overwrite existing files with the same name (see Details; default: FALSE)
 #' @param retDbg Whether to return a list with debugging information (see
 #'               Value; default: FALSE)
 #'
@@ -18,10 +19,15 @@
 #'   columns that contain some form of ID (e.g., a participant code). In order
 #'   to set a variable of your data frame to "ID", you have to manually set an
 #'   attribute `jmv-id` (e.g., `attr(dtaFrm$column, "jmv-id") = TRUE`).
-#' * CAUTION: Setting wrtPBf to TRUE currently overwrites analyses that already
+#' * CAUTION: Setting wrtPtB to TRUE currently overwrites analyses that already
 #'   exist in a data file. It is meant to be used for `describe_omv` only. If
-#'   you set wrtPBf to TRUE, ensure to use an output file name that isn't would
-#'   not overwrite any existing file.
+#'   you set wrtPtB to TRUE, ensure to use an output file name that isn't would
+#'   not overwrite any existing file. Protocol buffers are used to exchange
+#'   data between the different parts of jamovi (the server and the client) and
+#'   also the format in which analyses are stored in the jamovi data files.
+#' * `write_omv` checks whether the output file already exists and throws an
+#'   error if this is the case. frcWrt permits you to overwrite the existing
+#'   file.
 #'
 #' @examples
 #' \dontrun{
@@ -30,10 +36,10 @@
 #' # use the data set "ToothGrowth" and, if it exists, write it as
 #' # jamovi-file using write_omv()
 #' data("ToothGrowth")
-#' fleOMV <- tempfile(fileext = ".omv")
+#' nmeOut <- tempfile(fileext = ".omv")
 #' # typically, one would use a "real" file name instead of tempfile(),
 #' # e.g., "Data1.omv"
-#' dtaDbg = write_omv(ToothGrowth, fleOMV, retDbg = TRUE)
+#' dtaDbg = write_omv(dtaFrm = ToothGrowth, fleOut = nmeOut, retDbg = TRUE)
 #' print(names(dtaDbg))
 #' # the print-function is only used to force devtools::run_examples()
 #' # to show output
@@ -45,16 +51,16 @@
 #'
 #' # check whether the file was written to the disk, get the file informa-
 #' # tion (size, etc.) and delete the file afterwards
-#' print(list.files(dirname(fleOMV), basename(fleOMV)))
+#' print(list.files(dirname(nmeOut), basename(nmeOut)))
 #' # -> "file[...].omv" ([...] is a combination of random numbers / characters
-#' print(file.info(fleOMV)$size)
-#' # -> approx. 2500 (size may differ on different OSes)
-#' unlink(fleOMV)
+#' print(file.info(nmeOut)$size)
+#' # -> approx. 2600 (size may differ on different OSes)
+#' unlink(nmeOut)
 #' }
 #'
 #' @export write_omv
 
-write_omv <- function(dtaFrm = NULL, fleOut = "", wrtPtB = FALSE, retDbg = FALSE) {
+write_omv <- function(dtaFrm = NULL, fleOut = "", wrtPtB = FALSE, frcWrt = FALSE, retDbg = FALSE) {
     if (is.null(dtaFrm)) stop("The data frame to be written needs to be given as parameter (dtaFrm = ...).")
     if (!nzchar(fleOut)) stop("Output file name needs to be given as parameter (fleOut = ...).")
 
@@ -62,6 +68,13 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", wrtPtB = FALSE, retDbg = FALSE
     fleOut <- nrmFle(fleOut)
     chkDir(fleOut)
     chkExt(fleOut, "omv")
+    if (file.exists(fleOut)) {
+        if (frcWrt) {
+            unlink(fleOut)
+        } else {
+            stop("The output file already exists, either remove the file manually or set the parameter frcWrt to TRUE.")
+        }
+    }
 
     # check whether dtaFrm is a data frame
     # attach dataType and measureType attributes when inside jamovi

@@ -55,8 +55,8 @@ library(jmvReadWrite)
 
 # Example 1: Convert from RDS
 # (use ToothGrowth as example, save it as RDS)
-nmeInp <- paste0(tempfile(), ".rds")
-nmeOut <- paste0(tempfile(), ".omv")
+nmeInp <- tempfile(fileext = ".rds")
+nmeOut <- tempfile(fileext = ".omv")
 saveRDS(jmvReadWrite::ToothGrowth, nmeInp)
 convert_to_omv(fleInp = nmeInp, fleOut = nmeOut)
 cat(list.files(dirname(nmeOut), basename(nmeOut)))
@@ -71,8 +71,8 @@ unlink(nmeOut)
 
 # Example 2: Convert from CSV
 # (use ToothGrowth again as example, this time save it as CSV)
-nmeInp <- paste0(tempfile(), ".csv")
-nmeOut <- paste0(tempfile(), ".omv")
+nmeInp <- tempfile(fileext = ".csv")
+nmeOut <- tempfile(fileext = ".omv")
 write.csv(jmvReadWrite::ToothGrowth, nmeInp)
 convert_to_omv(fleInp = nmeInp, fleOut = nmeOut)
 cat(list.files(dirname(nmeOut), basename(nmeOut)))

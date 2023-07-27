@@ -76,7 +76,7 @@ manually (i.e., \code{install.packages("haven", dep = TRUE)}).
 library(jmvReadWrite)
 dtaInp <- bfi_sample2
 nmeInp <- paste0(tempfile(), "_", 1:3, ".rds")
-nmeOut <- paste0(tempfile(), ".omv")
+nmeOut <- tempfile(fileext = ".omv")
 for (i in seq_along(nmeInp)) saveRDS(dtaInp[-i - 1], nmeInp[i])
 # save dtaInp three times (i.e., the length of nmeInp), removing one data columns in
 # each data set (for demonstration purposes, A1 in the first, A2 in the second, ...)
@@ -84,6 +84,7 @@ merge_rows_omv(dtaInp = nmeInp, fleOut = nmeOut, colInd = TRUE)
 cat(file.info(nmeOut)$size)
 # -> 10767 (size may differ on different OSes)
 dtaOut <- read_omv(nmeOut, sveAtt = FALSE)
+unlink(nmeOut)
 # read the data set where the three original datasets were added as rows and show
 # the variable names
 cat(names(dtaInp))
@@ -102,6 +103,7 @@ merge_rows_omv(dtaInp = nmeInp, fleOut = nmeOut, typMrg = "common")
 # the argument typMrg = "common" removes the columns that are not present in all of
 # the input data sets (i.e., A1, A2, A3)
 dtaOut <- read_omv(nmeOut, sveAtt = FALSE)
+unlink(nmeOut)
 # read the data set where the three original datasets were added as rows and show
 # the variable names
 cat(names(dtaInp))
@@ -114,7 +116,6 @@ cat(dim(dtaInp), dim(dtaOut))
 # reduced by 3 (i.e., "A1", "A2", "A3")
 
 unlink(nmeInp)
-unlink(nmeOut)
 }
 
 }

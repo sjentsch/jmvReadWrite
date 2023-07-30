@@ -1,6 +1,6 @@
 test_that("arrange_cols_omv works", {
-    nmeInp <- paste0(tempfile(), ".rds")
-    nmeOut <- paste0(tempfile(), "_A.omv")
+    nmeInp <- tempfile(fileext = ".rds")
+    nmeOut <- tempfile(fileext = "_A.omv")
     saveRDS(jmvReadWrite::AlbumSales, nmeInp)
 
     expect_null(arrange_cols_omv(dtaInp = nmeInp, fleOut = nmeOut, varOrd = c("selSbj", "Sales", "Adverts", "Airplay", "Image")))

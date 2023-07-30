@@ -1,5 +1,5 @@
 test_that("globals work", {
-    nmeOMV <- paste0(tempfile(), ".omv")
+    nmeOMV <- tempfile(fileext = ".omv")
     write_omv(stats::setNames(as.data.frame(matrix(runif(200, -10, 10), ncol = 8)), paste0("X_", sprintf("%02d", 1:8))), nmeOMV)
     expect_equal(adjArg("read_omv", list(fleInp = "Trial_dflArg.omv", getSyn = TRUE, getHTM = TRUE),
                                     list(fleInp = "Trial_varArg.omv", sveAtt = FALSE, getSyn = FALSE, getHTM = FALSE),

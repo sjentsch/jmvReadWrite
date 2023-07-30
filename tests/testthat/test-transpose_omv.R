@@ -1,8 +1,8 @@
 test_that("arrange_cols_omv works", {
     set.seed(1)
     tmpDF <- stats::setNames(as.data.frame(matrix(sample(6, 1200, replace = TRUE), nrow = 16)), sprintf("sbj_%03d", seq(75)))
-    nmeInp <- paste0(tempfile(), ".rds")
-    nmeOut <- paste0(tempfile(), "_T.omv")
+    nmeInp <- tempfile(fileext = ".rds")
+    nmeOut <- tempfile(fileext = "_T.omv")
     saveRDS(tmpDF, nmeInp)
 
     expect_null(transpose_omv(dtaInp = tmpDF, fleOut = nmeOut))

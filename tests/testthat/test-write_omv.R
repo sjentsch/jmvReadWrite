@@ -50,7 +50,7 @@ test_that("write_omv works", {
       c("Text", "integer"))
     unlink(nmeOut)
 
-    expect_error(write_omv(data.frame(T1 = sample(9999, 100), T2 = as.complex(rnorm(100))), paste0(tempfile(), ".omv")),
+    expect_error(write_omv(data.frame(T1 = sample(9999, 100), T2 = as.complex(rnorm(100))), fleOut = tempfile(fileext = ".omv")),
       regexp = "Variable type complex not implemented\\. Please send the data file that caused this problem to sebastian\\.jentschke@uib\\.no")
 
     tmpDF <- read_omv(file.path("..", "ToothGrowth.omv"))

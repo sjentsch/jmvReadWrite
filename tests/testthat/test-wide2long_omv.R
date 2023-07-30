@@ -3,8 +3,8 @@ test_that("wide2long_omv works", {
     set.seed(1)
     dtaTmp <- cbind(data.frame(Year = 1900:2020), as.data.frame(matrix(runif(121 * 12, 0, 100), nrow = 121, dimnames = list(1:121, paste0("X_", month.abb[1:12])))))
     for (i in 1:12) attr(dtaTmp[[i + 1]], "jmv-desc") <- paste0("Test variable (Month: ", month.abb[i], ")")
-    nmeInp <- paste0(tempfile(), ".rds")
-    nmeOut <- gsub(".rds", "_L.omv", nmeInp)
+    nmeInp <- tempfile(fileext = ".rds")
+    nmeOut <- tempfile(fileext = "_L.omv")
     saveRDS(dtaTmp, nmeInp)
 
     expect_null(wide2long_omv(dtaInp = nmeInp, fleOut = nmeOut, varLst = setdiff(names(dtaTmp), "Year"), varID = "Year", varTme = "Month", varSep = "_"))

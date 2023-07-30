@@ -1,6 +1,6 @@
 test_that("sort_omv works", {
-    nmeInp <- paste0(tempfile(), ".rds")
-    nmeOut <- paste0(tempfile(), "_S.omv")
+    nmeInp <- tempfile(fileext = ".rds")
+    nmeOut <- tempfile(fileext = "_S.omv")
     saveRDS(jmvReadWrite::AlbumSales, nmeInp)
 
     expect_null(sort_omv(dtaInp = nmeInp, fleOut = nmeOut, varSrt = "Image"))

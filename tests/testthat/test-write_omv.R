@@ -84,4 +84,40 @@ test_that("write_omv works", {
     expect_equal(names(attributes(dtaInp)), c("names", "row.names", "class", "fltLst", "removedRows", "addedRows", "transforms", "jmv-weights-name", "jmv-weights"))
     expect_equal(attr(dtaInp, "jmv-weights-name"), "weights")
     expect_equal(attr(dtaInp, "jmv-weights"), rep(1, 60))
+
+    dtaOut <- jmvReadWrite::ToothGrowth[, 1, drop = FALSE]
+    dtaOut[c(5, 7, 10), 1] <- as.character(NA)
+    write_omv(dtaFrm = dtaOut, fleOut = nmeOut)
+    expect_true(chkFle(nmeOut, isZIP = TRUE))
+    expect_true(chkFle(nmeOut, fleCnt = "strings.bin"))
+    unlink(nmeOut)
+    dtaOut[, 1] <- as.character(NA)
+    attr(dtaOut[, 1], "jmv-id") <- TRUE
+    write_omv(dtaFrm = dtaOut, fleOut = nmeOut)
+    expect_true(chkFle(nmeOut, isZIP = TRUE))
+    expect_error(chkFle(nmeOut, fleCnt = "strings.bin"), regexp = "chkFle: File \".*?\" doesn't contain the file \"strings.bin\".")
+    unlink(nmeOut)
+
+    Sys.setenv(JAMOVI_R_VERSION = paste0(R.version$major, ".", R.version$minor))
+    df4Chk <- write_omv(dtaFrm = jmvReadWrite::ToothGrowth, fleOut = nmeOut, retDbg = TRUE)$dtaFrm
+    Sys.unsetenv("JAMOVI_R_VERSION")
+    expect_true(all(sapply(df4Chk, function(x) identical(c("measureType", "dataType") %in% names(attributes(x)), c(TRUE, TRUE)))))
+    expect_equal(unname(sapply(df4Chk, function(x) attr(x, "dataType"))), c("Text", "Text", "Text", "Decimal", "Text", "Decimal", "Decimal"))
+    expect_equal(unname(sapply(df4Chk, function(x) attr(x, "measureType"))), c("ID", "Nominal", "Nominal", "Continuous", "Ordinal", "Continuous", "Continuous"))
+    # do not unlink to provoke the error underneath
+    expect_error(write_omv(dtaFrm = jmvReadWrite::ToothGrowth, fleOut = nmeOut),
+      regexp = "The output file already exists\\. Either remove the file manually or set the parameter frcWrt to TRUE\\.")
+    unlink(nmeOut)
+
+    dtaOut <- jmvReadWrite::ToothGrowth
+    expect_error(write_omv(dtaFrm = dtaOut, fleOut = nmeOut, wrtPtB = TRUE), regexp = 
+      "The data frame \\(dtaFrm\\) must contain the attribute \"protobuf\", there has to be at least one of them, and it has to be of the correct type \\(a RProtoBuf\\)\\.")
+    attr(dtaOut, "protobuf")[["01 empty/analysis"]] <- TRUE
+    expect_error(write_omv(dtaFrm = dtaOut, fleOut = nmeOut, wrtPtB = TRUE), regexp = 
+      "The data frame \\(dtaFrm\\) must contain the attribute \"protobuf\", there has to be at least one of them, and it has to be of the correct type \\(a RProtoBuf\\)\\.")
+    attr(dtaOut, "protobuf")[["01 empty/analysis"]] <- RProtoBuf::new(jamovi.coms.AnalysisRequest)
+    write_omv(dtaFrm = dtaOut, fleOut = nmeOut, wrtPtB = TRUE)
+    expect_true(chkFle(nmeOut, isZIP = TRUE))
+    expect_true(chkFle(nmeOut, fleCnt = "01 empty/analysis"))
+    unlink(nmeOut)
 })

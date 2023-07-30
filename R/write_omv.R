@@ -72,7 +72,7 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", wrtPtB = FALSE, frcWrt = FALSE
         if (frcWrt) {
             unlink(fleOut)
         } else {
-            stop("The output file already exists, either remove the file manually or set the parameter frcWrt to TRUE.")
+            stop("The output file already exists. Either remove the file manually or set the parameter frcWrt to TRUE.")
         }
     }
 
@@ -264,10 +264,6 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", wrtPtB = FALSE, frcWrt = FALSE
                 strPos <- strPos + length(charToRaw(crrCol[j])) + 1
             }
             wrtCol <- as.integer(wrtCol)
-        } else {
-            clsRmv(binHdl)
-            clsRmv(strHdl)
-            stop(sprintf("Variable type %s not implemented. Please send the data file that caused this problem to sebastian.jentschke@uib.no", mtaDta$fields[[i]][["type"]]))
         }
         writeBin(wrtCol, binHdl, endian = "little")
 
@@ -310,6 +306,7 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", wrtPtB = FALSE, frcWrt = FALSE
 
     if (wrtPtB) {
         if (is.null(attr(dtaFrm, "protobuf")) || length(attr(dtaFrm, "protobuf")) < 1 || class(attr(dtaFrm, "protobuf")[[1]]) != "Message") {
+            unlink(fleOut)
             stop("The data frame (dtaFrm) must contain the attribute \"protobuf\", there has to be at least one of them, and it has to be of the correct type (a RProtoBuf).")
         }
         # write ProtoBuffers

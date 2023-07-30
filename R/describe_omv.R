@@ -62,24 +62,26 @@
 #'                                   "https://doi.org/10.1093/jn/33.5.491"),
 #'                license = "")
 #' describe_omv(dtaInp = dtaFrm, fleOut = nmeOut, dtaTtl = "ToothGrowth", dtaDsc = lstDsc)
-#' # don't include the unlink, if you copy the code and want to have a look at the resulting output file
+#' # don't include the unlink, if you copy the code and want to look at the resulting output file
 #' unlink(nmeOut)
 #'
-#' # the code underneath should cover all formatting options jamovi is able to use (paste0 is only for readability)
-#' chrDsc <- paste0("<p><strong>Trial – all formattings:</strong><br/><strong>bold</strong><br/><strong>",
-#'                  "<em>bold, italics</em></strong><br/><em>italics</em><br/><u>underlined</u><br/>link:",
-#'                  "<a href=\"https://jamovi.org﻿﻿﻿\" target=\"_blank\">https://jamovi.org﻿﻿﻿</a><br/><s>",
-#'                  "strikethrough</s><br/>C<sub>2</sub>H<sub>5</sub>OH<br/>R<sup>2</sup><br/>",
-#'                  "<span style=\"background-color:#e60000\">background colour: red</span><br/>",
-#'                  "<span style=\"color:#e60000\">foreground color: red</span></p><p class=\"ql-align-center\">",
-#'                  "centered</p><p class=\"ql-align-right\">right</p><p class=\"ql-align-justify\">justify ",
-#'                  "justify justify justify justify justify justify justify justify justify justify justify ",
-#'                  "justify justify justify justify justify justify justify justify justify justify justify ",
-#'                  "justify justify</p><p><br/></p><ol><li>numbered list</li><li>numbered list</li></ol><p><br/>",
-#'                  "</p><ul><li>bullet point</li><li>bullet point</li></ul><p class=\"ql-indent-1\">indented ",
-#'                  "once</p><p class=\"ql-indent-2\">indented twice</p><p class=\"ql-indent-1\">indented once</p>",
-#'                  "<p>Formula: <span class=\"ql-formula\">e=mc^2</span></p><pre>Preformatted</pre><p>normal ",
-#'                  "again</p><h2>Heading</h2>")
+#' # the code underneath should cover all formatting options jamovi is able to use (paste0 is only
+#' # for readability)
+#' chrDsc <- paste0("<p><strong>Trial – all formattings:</strong><br/><strong>bold</strong><br/>",
+#'                  "<strong><em>bold, italics</em></strong><br/><em>italics</em><br/><u>underlined",
+#'                  "</u><br/>link:<a href=\"https://jamovi.org﻿﻿﻿\" target=\"_blank\">https://",
+#'                  "jamovi.org﻿﻿﻿</a><br/><s>strikethrough</s><br/>C<sub>2</sub>H<sub>5</sub>",
+#'                  "OH<br/>R<sup>2</sup><br/><span style=\"background-color:#e60000\">background ",
+#'                  "colour: red</span><br/><span style=\"color:#e60000\">foreground color: red",
+#'                  "</span></p><p class=\"ql-align-center\">centered</p><p class=\"ql-align-right\">",
+#'                  "right</p><p class=\"ql-align-justify\">justify justify justify justify justify ",
+#'                  "justify justify justify justify justify justify justify justify justify justify ",
+#'                  "justify justify justify justify justify justify justify justify justify justify",
+#'                  "</p><p><br/></p><ol><li>numbered list</li><li>numbered list</li></ol><p><br/>",
+#'                  "</p><ul><li>bullet point</li><li>bullet point</li></ul><p class=\"ql-indent-1\">",
+#'                  "indented once</p><p class=\"ql-indent-2\">indented twice</p><p ",
+#'                  "class=\"ql-indent-1\">indented once</p><p>Formula: <span class=\"ql-formula\">",
+#'                  "e=mc^2</span></p><pre>Preformatted</pre><p>normal again</p><h2>Heading</h2>")
 #' describe_omv(dtaInp = dtaFrm, fleOut = nmeOut, dtaTtl = "ToothGrowth", dtaDsc = chrDsc)
 #' unlink(nmeOut)
 #' }
@@ -318,8 +320,8 @@ prpAtt <- function(lstAtt = NULL) {
     # [3] remove the formula attribute (if present), [4] wrap the arguments in a named list (under the name
     # "attributes"), if crrArg is empty, nothing is added in c(crrAtt, ...)
     crrAtt <- lstAtt
-    if (hasName(lstAtt, "list") && identical(attr(lstAtt[["list"]], "lstEnt"), TRUE)) crrAtt[["list"]] <- NULL
-    if (hasName(lstAtt, "formula")) crrAtt[["formula"]] <- NULL
+    if (utils::hasName(lstAtt, "list") && identical(attr(lstAtt[["list"]], "lstEnt"), TRUE)) crrAtt[["list"]] <- NULL
+    if (utils::hasName(lstAtt, "formula")) crrAtt[["formula"]] <- NULL
     if (length(crrAtt) > 0) return(list(attributes = crrAtt)) else return(NULL)
 }
 

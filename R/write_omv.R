@@ -225,18 +225,19 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", wrtPtB = FALSE, frcWrt = FALSE
         }
 
         # remove atrributes that are only used with specific columnTypes
-        if (all(class(dtaFrm[[i]]) != c("logical", "factor"))) {
+        if (chkFld(mtaDta$fields[[i]], "columnType", "Filter")) {
+            # if the variable is a filter, trimLevels is removed in any case
             mtaDta$fields[[i]][["trimLevels"]]               <- NULL
-        }
-        if (! chkFld(mtaDta$fields[[i]], "columnType", "Filter")) {
+        } else {
+            # if the variable isn't a filter, trimLevels is only removed
+            # if the original variable was a factor / logical
+            if (all(class(dtaFrm[[i]]) != c("logical", "factor"))) {
+                mtaDta$fields[[i]][["trimLevels"]]           <- NULL
+            }
             mtaDta$fields[[i]][["filterNo"]]                 <- NULL
             mtaDta$fields[[i]][["active"]]                   <- NULL
-        } else {
-            # if the variable is a filter, trimLevels is removed even in cases
-            # where the original variable was a factor / logical
-            mtaDta$fields[[i]][["trimLevels"]]               <- NULL
         }
-        if (! chkFld(mtaDta$fields[[i]], "columnType", "Output")) {
+        if (!chkFld(mtaDta$fields[[i]], "columnType", "Output")) {
             mtaDta$fields[[i]][["outputAnalysisId"]]         <- NULL
             mtaDta$fields[[i]][["outputOptionName"]]         <- NULL
             mtaDta$fields[[i]][["outputName"]]               <- NULL
@@ -305,7 +306,7 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", wrtPtB = FALSE, frcWrt = FALSE
     }
 
     if (wrtPtB) {
-        if (is.null(attr(dtaFrm, "protobuf")) || length(attr(dtaFrm, "protobuf")) < 1 || class(attr(dtaFrm, "protobuf")[[1]]) != "Message") {
+        if (is.null(attr(dtaFrm, "protobuf")) || length(attr(dtaFrm, "protobuf")) < 1 || !inherits(attr(dtaFrm, "protobuf")[[1]], "Message")) {
             unlink(fleOut)
             stop("The data frame (dtaFrm) must contain the attribute \"protobuf\", there has to be at least one of them, and it has to be of the correct type (a RProtoBuf).")
         }

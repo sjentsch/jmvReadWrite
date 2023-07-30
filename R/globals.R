@@ -1,9 +1,11 @@
 # binds the protcol buffer variables jamovi.coms.AnalysisResponse, jamovi.coms.AnalysisOptions,
-# and jamovi.coms.AnalysisOption locally to the function, otherwise devtools::check() - required
-# before submitting to CRAN - throws an error
+# jamovi.coms.AnalysisOption, jamovi.coms.ResultsElement, and jamovi.coms.ResultsGroup locally
+# to the function, otherwise devtools::check() - required before submitting to CRAN - throws an
+# error
 if (getRversion() >= "2.15.1") {
     utils::globalVariables(c("jamovi.coms.AnalysisResponse", "jamovi.coms.AnalysisOptions",
-                             "jamovi.coms.AnalysisOption"))
+                             "jamovi.coms.AnalysisOption", "jamovi.coms.ResultsElement",
+                             "jamovi.coms.ResultsGroup"))
 }
 
 # =================================================================================================

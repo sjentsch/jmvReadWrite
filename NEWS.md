@@ -1,15 +1,17 @@
-# jmvReadWrite 0.3.9
+# jmvReadWrite 0.4.0
 
 ## Enhancements and bug fixes:
+* added `describe_omv` (put a title and a description at the top of a data
+  set), `search_omv` (finding values in a data set) and `replace_omv`
+  (replacing values in a data set with other values)
 * improved handling of the jamovi protocol buffers (currently used for
-  extracting `jmv`-syntax in the data sets, but in perspective for creating
-  analyses from `jmv`-syntax)
+  extracting `jmv`-syntax in the data sets, but with the perspective of
+  creating analyses from `jmv`-syntax)
 * update the content of `index.html` (generated when writing data set with
   `write_omv` to be in line with more recent versions of jamovi)
-* added attaching dataType and measureType attributes to a data frame (while
-  ensuring not to overwrite existing measureType / dataType attributes) when
-  `write_omv` is called from within jamovi, as well as to `long2wide_omv` and
-  `transpose_omv`
+* added attaching `dataType` and `measureType` attributes to a data frame when
+  `write_omv` is called from within jamovi (while ensuring not to overwrite
+  existing `measureType` / `dataType` attributes)
 * enforce `jmv-id`-status for ID-variable if the variable is unique in
   `long2wide_omv`
 * removed `fleOut` from `inp2DF` (making it impossible to attach `fleOut` as
@@ -17,10 +19,11 @@
   “assembled” by adding a suffix to the input file name, with leaving `fleOut`
   empty to return the resulting data frame that became obsolete
 * added `drop = FALSE` in sort_omv to prevent reduction to a vector
-* added unit-tests for `globals` and `read_omv`
+* added further unit-tests for `globals`, `read_omv`, and `write_omv` 
 * improved the documentation (adding missing information, better formatting,
   etc.)
 
+---
 
 # jmvReadWrite 0.3.8
 

@@ -31,15 +31,15 @@
 #' * The ellipsis-parameter (`...`) can be used to submit arguments / parameters to the functions that are used for merging or reading the data. By clicking on
 #'   the respective function under “See also”, you can get a more detailed overview over which parameters each of those functions take.
 #' * Adding columns uses `rbind` (with some further operation, adding missing columns (filled with NAs), if `typMrg` is "all").
-#' * The functions for reading the data are: `read_omv` (for jamovi-files), `read.table` (for CSV / TSV files; using similar defaults as `read.csv` for CSV and
-#'   `read.delim` for TSV which both are based upon `read.table`), `load` (for .RData-files), `readRDS` (for .rds-files), `read_sav` (needs R-package `haven`)
-#'   or `read.spss` (needs R-package `foreign`) for SPSS-files, `read_dta` (`haven`) / `read.dta` (`foreign`) for Stata-files, `read_sas` (`haven`) for
-#'   SAS-data-files, and `read_xpt` (`haven`) / `read.xport` (`foreign`) for SAS-transport-files. If you would like to use `haven`, you may need to install it
-#'   manually (i.e., `install.packages("haven", dep = TRUE)`).
+#' * The functions for reading and writing the data are: `read_omv` and `write_omv` (for jamovi-files), `read.table` (for CSV / TSV files; using similar
+#'   defaults as `read.csv` for CSV and `read.delim` for TSV which both are based upon `read.table`), `load` (for .RData-files), `readRDS` (for .rds-files),
+#'   `read_sav` (needs R-package `haven`) or `read.spss` (needs R-package `foreign`) for SPSS-files, `read_dta` (`haven`) / `read.dta` (`foreign`) for
+#'   Stata-files, `read_sas` (`haven`) for SAS-data-files, and `read_xpt` (`haven`) / `read.xport` (`foreign`) for SAS-transport-files. If you would like to
+#'   use `haven`, you may need to install it using `install.packages("haven", dep = TRUE)`.
 #'
-#' @seealso `merge_rows_omv` internally uses the following functions: Adding columns uses [rbind()]. For reading data files in different formats, the following
-#'   functions are used: [jmvReadWrite::read_omv()] for jamovi-files, [utils::read.table()] for CSV / TSV files, [load()] for reading .RData-files, [readRDS()]
-#'   for .rds-files, [haven::read_sav()] or [foreign::read.spss()] for SPSS-files, [haven::read_dta()] or [foreign::read.dta()] for Stata-files,
+#' @seealso `merge_rows_omv` internally uses the following functions: Adding columns uses [rbind()]. For reading and writing data files in different formats:
+#'   [jmvReadWrite::read_omv()] and [jmvReadWrite::write_omv()] for jamovi-files, [utils::read.table()] for CSV / TSV files, [load()] for reading .RData-files,
+#'   [readRDS()] for .rds-files, [haven::read_sav()] or [foreign::read.spss()] for SPSS-files, [haven::read_dta()] or [foreign::read.dta()] for Stata-files,
 #'   [haven::read_sas()] for SAS-data-files, and [haven::read_xpt()] or [foreign::read.xport()] for SAS-transport-files.
 #'
 #' @examples
@@ -158,7 +158,7 @@ merge_rows_omv <- function(dtaInp = NULL, fleOut = "", typMrg = c("all", "common
     # name was given, return the data frame
     if (!is.null(fleOut) && nzchar(fleOut)) {
         fleOut <- fmtFlO(fleOut)
-        write_omv(dtaFrm, fleOut)
+        write_omv(dtaFrm = dtaFrm, fleOut = fleOut, ...)
         return(invisible(NULL))
     } else {
         dtaFrm

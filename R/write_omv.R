@@ -17,7 +17,7 @@
 #' * jamovi has a specific measurement level / type "ID" (in addition to the
 #'   "standard" ones "Nominal", "Ordinal", and "Continuous"). "ID" is used for
 #'   columns that contain some form of ID (e.g., a participant code). In order
-#'   to set a variable of your data frame to "ID", you have to manually set an
+#'   to set a variable of your data frame to "ID", you have to set the
 #'   attribute `jmv-id` (e.g., `attr(dtaFrm$column, "jmv-id") = TRUE`).
 #' * CAUTION: Setting wrtPtB to TRUE currently overwrites analyses that already
 #'   exist in a data file. It is meant to be used for `describe_omv` only. If
@@ -72,7 +72,7 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", wrtPtB = FALSE, frcWrt = FALSE
         if (frcWrt) {
             unlink(fleOut)
         } else {
-            stop("The output file already exists. Either remove the file manually or set the parameter frcWrt to TRUE.")
+            stop("The output file already exists. Either remove the file or set the parameter frcWrt to TRUE.")
         }
     }
 

@@ -42,7 +42,7 @@
 #' attitude. Responses were collected using a 6-point scale: 1 - Very inaccurate, 2 - Moderately inaccurate,
 #' 3 - Slightly inaccurate, 4 - Slightly accurate, 5 - Moderately accurate, 6 - Very accurate.
 #'
-#'@format A data.frame with 254 rows (250 original respondents, 4 manually generated for testing) and 33 variables
+#'@format A data.frame with 254 rows (250 original respondents, 4 generated for testing) and 33 variables
 #'\describe{
 #'   \item{ID}{character}{Respondent ID}
 #'   \item{A1}{integer}{Am indifferent to the feelings of others. (reversed)}

@@ -52,12 +52,12 @@ repository such as the OSF).
 with the entries \code{description}, \code{variables}, \code{references}, \code{license}. All entries except from \code{variables} contain character vectors (length = 1);
 \code{references} and \code{license} can be left blank (""; but the names must be present in the list). \code{variables} is a named list with the variable name as name
 and a description what the variable contains as entry. An example for a dtaDsc as named list can be found in the examples below.
-\item The ellipsis-parameter (\code{...}) can be used to submit arguments / parameters to the functions that are used for reading the data. By clicking on the
-respective function under “See also”, you can get a more detailed overview over which parameters each of those functions take. The functions are:
-\code{read_omv} (for jamovi-files), \code{read.table} (for CSV / TSV files; using similar defaults as \code{read.csv} for CSV and \code{read.delim} for TSV which both are
-based upon \code{read.table}), \code{load} (for .RData-files), \code{readRDS} (for .rds-files), \code{read_sav} (needs R-package \code{haven}) or \code{read.spss} (needs R-package
-\code{foreign}) for SPSS-files, \code{read_dta} (\code{haven}) / \code{read.dta} (\code{foreign}) for Stata-files, \code{read_sas} (\code{haven}) for SAS-data-files, and \code{read_xpt}
-(\code{haven}) / \code{read.xport} (\code{foreign}) for SAS-transport-files. If you would like to use \code{haven}, you may need to install it manually (i.e.,
+\item The ellipsis-parameter (\code{...}) can be used to submit arguments / parameters to the functions that are used for reading and writing the data. By clicking
+on the respective function under “See also”, you can get a more detailed overview over which parameters each of those functions take. The functions are:
+\code{read_omv} and \code{write_omv} (for jamovi-files), \code{read.table} (for CSV / TSV files; using similar defaults as \code{read.csv} for CSV and \code{read.delim} for TSV
+which both are based upon \code{read.table}), \code{load} (for .RData-files), \code{readRDS} (for .rds-files), \code{read_sav} (needs the R-package \code{haven}) or \code{read.spss}
+(needs the R-package \code{foreign}) for SPSS-files, \code{read_dta} (\code{haven}) / \code{read.dta} (\code{foreign}) for Stata-files, \code{read_sas} (\code{haven}) for SAS-data-files,
+and \code{read_xpt} (\code{haven}) / \code{read.xport} (\code{foreign}) for SAS-transport-files. If you would like to use \code{haven}, you may need to install it manually (i.e.,
 \code{install.packages("haven", dep = TRUE)}).
 }
 }
@@ -66,15 +66,16 @@ based upon \code{read.table}), \code{load} (for .RData-files), \code{readRDS} (f
 library(jmvReadWrite)
 dtaFrm <- jmvReadWrite::ToothGrowth
 nmeOut <- tempfile(fileext = ".omv")
+
 # the paste's underneath are only for readability (without them, the vignettes are misformatted)
 lstDsc <- list(description = paste("The response is the length of odontoblasts (cells responsible",
                                    "for tooth growth) in 60 guinea pigs. Each animal received one",
-                                   "of three dose levels of vitamin C (0.5, 1, and 2 mg/day) by one",
-                                   "of two delivery methods, orange juice or ascorbic acid (a form",
-                                   "of vitamin C and coded as VC)."),
+                                   "of three dose levels of vitamin C (0.5, 1, and 2 mg / day) by",
+                                   "one of two delivery methods, orange juice or ascorbic acid (a",
+                                   "form of vitamin C and coded as VC)."),
                variables = list(len = "Tooth length",
                                 supp = "Supplement type (VC or OJ)",
-                                dose = "Dose in milligrams / day"),
+                                dose = "Dose (in milligrams / day"),
                references = paste("Crampton, E. W. (1947). The growth of the odontoblast of the",
                                   "incisor teeth as a criterion of vitamin C intake of the guinea",
                                   "pig. <em>The Journal of Nutrition, 33</em>(5), 491-504.",
@@ -83,12 +84,30 @@ lstDsc <- list(description = paste("The response is the length of odontoblasts (
 describe_omv(dtaInp = dtaFrm, fleOut = nmeOut, dtaTtl = "ToothGrowth", dtaDsc = lstDsc)
 # don't include the unlink, if you copy the code and want to have a look at the resulting output file
 unlink(nmeOut)
+
+# the code underneath should cover all formatting options jamovi is able to use (paste0 is only for readability)
+chrDsc <- paste0("<p><strong>Trial – all formattings:</strong><br/><strong>bold</strong><br/><strong>",
+                 "<em>bold, italics</em></strong><br/><em>italics</em><br/><u>underlined</u><br/>link:",
+                 "<a href=\"https://jamovi.org﻿﻿﻿\" target=\"_blank\">https://jamovi.org﻿﻿﻿</a><br/><s>",
+                 "strikethrough</s><br/>H<sub>2</sub>CO<sub>3</sub><br/>R<sup>2</sup><br/>",
+                 "<span style=\"background-color:#e60000\">background colour: red</span><br/>",
+                 "<span style=\"color:#e60000\">foreground color: red</span></p><p class=\"ql-align-center\">",
+                 "centered</p><p class=\"ql-align-right\">right</p><p class=\"ql-align-justify\">justify ",
+                 "justify justify justify justify justify justify justify justify justify justify justify ",
+                 "justify justify justify justify justify justify justify justify justify justify justify ",
+                 "justify justify</p><p><br/></p><ol><li>numbered list</li><li>numbered list</li></ol><p><br/>",
+                 "</p><ul><li>bullet point</li><li>bullet point</li></ul><p class=\"ql-indent-1\">indented ",
+                 "once</p><p class=\"ql-indent-2\">indented twice</p><p class=\"ql-indent-1\">indented once</p>",
+                 "<p>Formula: <span class=\"ql-formula\">e=mc^2</span></p><pre>Preformatted</pre><p>normal ",
+                 "again</p><h2>Heading</h2>")
+describe_omv(dtaInp = dtaFrm, fleOut = nmeOut, dtaTtl = "ToothGrowth", dtaDsc = chrDsc)
+unlink(nmeOut)
 }
 
 }
 \seealso{
-\code{annotate_omv} internally uses the following functions to read data files in different formats: \code{\link[=read_omv]{read_omv()}} for jamovi-files,
-\code{\link[utils:read.table]{utils::read.table()}} for CSV / TSV files, \code{\link[=load]{load()}} for reading .RData-files, \code{\link[=readRDS]{readRDS()}} for .rds-files, \code{\link[haven:read_spss]{haven::read_sav()}} or \code{\link[foreign:read.spss]{foreign::read.spss()}}
-for SPSS-files, \code{\link[haven:read_dta]{haven::read_dta()}} or \code{\link[foreign:read.dta]{foreign::read.dta()}} for Stata-files, \code{\link[haven:read_sas]{haven::read_sas()}} for SAS-data-files, and \code{\link[haven:read_xpt]{haven::read_xpt()}} or
-\code{\link[foreign:read.xport]{foreign::read.xport()}} for SAS-transport-files.
+\code{describe_omv} internally uses the following functions to read data files in different formats: \code{\link[=read_omv]{read_omv()}} and
+\code{\link[=write_omv]{write_omv()}} for jamovi-files, \code{\link[utils:read.table]{utils::read.table()}} for CSV / TSV files, \code{\link[=load]{load()}} for reading .RData-files, \code{\link[=readRDS]{readRDS()}} for .rds-files,
+\code{\link[haven:read_spss]{haven::read_sav()}} or \code{\link[foreign:read.spss]{foreign::read.spss()}} for SPSS-files, \code{\link[haven:read_dta]{haven::read_dta()}} or \code{\link[foreign:read.dta]{foreign::read.dta()}} for Stata-files, \code{\link[haven:read_sas]{haven::read_sas()}} for
+SAS-data-files, and \code{\link[haven:read_xpt]{haven::read_xpt()}} or \code{\link[foreign:read.xport]{foreign::read.xport()}} for SAS-transport-files.
 }

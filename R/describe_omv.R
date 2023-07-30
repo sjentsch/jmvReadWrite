@@ -179,7 +179,7 @@ crtHTM <- function(inpDsc = NULL) {
     if (length(inpDsc[["license"]]) > 0    && all(nzchar(inpDsc[["license"]]))) {
         outDsc <- paste0(outDsc, "<p><br/>", clnHTM(paste0("<em>", inpDsc[["license"]], "</em>")))
     }
-    
+
     return(outDsc)
 }
 
@@ -194,7 +194,7 @@ splHTM <- function(vecChr = "") {
                            "If it is valid, send it to sebastian.jentschke@uib.no"))
             }
             splChr[rplDsc + 1] <- paste0("<", splChr[rplDsc + 1], ">")
-            return(splChr[-c(rplDsc, rplDsc + 2)])    
+            return(splChr[-c(rplDsc, rplDsc + 2)])
         } else {
             return(splChr)
         }
@@ -204,13 +204,14 @@ splHTM <- function(vecChr = "") {
 # then split the input (into HTML tags and content) and replace characters that have a HTML-function (e.g., "/")
 # in the content
 clnHTM <- function(inpLne = c(), toHTM = FALSE) {
-    inpLne <- sapply(inpLne, function(x) paste0(ifelse(grepl("^\\s*<p.*?>|^\\s*<li.*?>", x), "", "<p>"), x,
-                                                ifelse(grepl("</p.*?>\\s*$|</li.*?>\\s*$", x), "", "</p>")), USE.NAMES = FALSE)
-#                    paste0(inpLne, collapse = "<br/>")
+    inpLne <- sapply(inpLne, function(x) {
+                                           paste0(ifelse(grepl("^\\s*<p.*?>|^\\s*<li.*?>", x), "", "<p>"), x,
+                                                  ifelse(grepl("</p.*?>\\s*$|</li.*?>\\s*$", x), "", "</p>"))
+                                         }, USE.NAMES = FALSE)
     splLne <- splHTM(paste0(inpLne, collapse = ""))
     selCnt <- !grepl("<.*?>", splLne)
     splLne[selCnt] <- rplHTM(splLne[selCnt], toHTM)
-    return(paste0(splLne, collapse = ""))    
+    return(paste0(splLne, collapse = ""))
 }
 
 rplHTM <- function(inpVec = c(), toHTM = FALSE) {

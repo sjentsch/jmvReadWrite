@@ -73,11 +73,11 @@ would exclude those variable types / categories from being transformed into long
 clicking on the respective function under “See also”, you can get a more detailed overview over which parameters each of those functions take.
 \item The transformation from long to wide uses \code{reshape}: \code{varID} matches (~) \code{idvar} in \code{reshape}, \code{varTme} ~ \code{timevar}, \code{varLst} ~ \code{varying}, and \code{varSep} ~
 \code{sep}. The help for \code{reshape} is very explanatory, click on the link under “See also” to access it, particularly what is explained under “Details”.
-\item The functions for reading the data are: \code{read_omv} (for jamovi-files), \code{read.table} (for CSV / TSV files; using similar defaults as \code{read.csv} for CSV and
-\code{read.delim} for TSV which both are based upon \code{read.table}), \code{load} (for .RData-files), \code{readRDS} (for .rds-files), \code{read_sav} (needs R-package \code{haven})
-or \code{read.spss} (needs R-package \code{foreign}) for SPSS-files, \code{read_dta} (\code{haven}) / \code{read.dta} (\code{foreign}) for Stata-files, \code{read_sas} (\code{haven}) for
-SAS-data-files, and \code{read_xpt} (\code{haven}) / \code{read.xport} (\code{foreign}) for SAS-transport-files. If you would like to use \code{haven}, you may need to install it
-manually (i.e., \code{install.packages("haven", dep = TRUE)}).
+\item The functions for reading and writing the data are: \code{read_omv} and \code{write_omv} (for jamovi-files), \code{read.table} (for CSV / TSV files; using similar
+defaults as \code{read.csv} for CSV and \code{read.delim} for TSV which both are based upon \code{read.table}), \code{load} (for .RData-files), \code{readRDS} (for .rds-files),
+\code{read_sav} (needs R-package \code{haven}) or \code{read.spss} (needs R-package \code{foreign}) for SPSS-files, \code{read_dta} (\code{haven}) / \code{read.dta} (\code{foreign}) for
+Stata-files, \code{read_sas} (\code{haven}) for SAS-data-files, and \code{read_xpt} (\code{haven}) / \code{read.xport} (\code{foreign}) for SAS-transport-files. If you would like to
+use \code{haven}, you may need to install it using \code{install.packages("haven", dep = TRUE)}.
 }
 }
 \examples{
@@ -137,8 +137,8 @@ unlink(nmeOut)
 
 }
 \seealso{
-\code{long2wide_omv} internally uses the following functions: The transformation from long to wide uses \code{\link[stats:reshape]{stats::reshape()}}. For reading data files in
-different formats, the following functions are used: \code{\link[=read_omv]{read_omv()}} for jamovi-files, \code{\link[utils:read.table]{utils::read.table()}} for CSV / TSV files, \code{\link[=load]{load()}} for
-reading .RData-files, \code{\link[=readRDS]{readRDS()}} for .rds-files, \code{\link[haven:read_spss]{haven::read_sav()}} or \code{\link[foreign:read.spss]{foreign::read.spss()}} for SPSS-files, \code{\link[haven:read_dta]{haven::read_dta()}} or
+\code{long2wide_omv} internally uses the following functions: The transformation from long to wide uses \code{\link[stats:reshape]{stats::reshape()}}. For reading and writing data
+files in different formats: \code{\link[=read_omv]{read_omv()}} and \code{\link[=write_omv]{write_omv()}} for jamovi-files, \code{\link[utils:read.table]{utils::read.table()}} for CSV / TSV files,
+\code{\link[=load]{load()}} for reading .RData-files, \code{\link[=readRDS]{readRDS()}} for .rds-files, \code{\link[haven:read_spss]{haven::read_sav()}} or \code{\link[foreign:read.spss]{foreign::read.spss()}} for SPSS-files, \code{\link[haven:read_dta]{haven::read_dta()}} or
 \code{\link[foreign:read.dta]{foreign::read.dta()}} for Stata-files, \code{\link[haven:read_sas]{haven::read_sas()}} for SAS-data-files, and \code{\link[haven:read_xpt]{haven::read_xpt()}} or \code{\link[foreign:read.xport]{foreign::read.xport()}} for SAS-transport-files.
 }

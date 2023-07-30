@@ -5,7 +5,7 @@
 \alias{bfi_sample}
 \title{Twenty-five personality self-report items taken from the International Personality Item Pool}
 \format{
-A data.frame with 254 rows (250 original respondents, 4 manually generated for testing) and 33 variables
+A data.frame with 254 rows (250 original respondents, 4 generated for testing) and 33 variables
 \describe{
 \item{ID}{character}{Respondent ID}
 \item{A1}{integer}{Am indifferent to the feelings of others. (reversed)}

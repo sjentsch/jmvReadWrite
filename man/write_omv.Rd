@@ -40,7 +40,7 @@ Write files to be used with the statistical spreadsheet 'jamovi'
 \item jamovi has a specific measurement level / type "ID" (in addition to the
 "standard" ones "Nominal", "Ordinal", and "Continuous"). "ID" is used for
 columns that contain some form of ID (e.g., a participant code). In order
-to set a variable of your data frame to "ID", you have to manually set an
+to set a variable of your data frame to "ID", you have to set the
 attribute \code{jmv-id} (e.g., \code{attr(dtaFrm$column, "jmv-id") = TRUE}).
 \item CAUTION: Setting wrtPtB to TRUE currently overwrites analyses that already
 exist in a data file. It is meant to be used for \code{describe_omv} only. If

@@ -110,11 +110,11 @@ test_that("write_omv works", {
     unlink(nmeOut)
 
     dtaOut <- jmvReadWrite::ToothGrowth
-    expect_error(write_omv(dtaFrm = dtaOut, fleOut = nmeOut, wrtPtB = TRUE), regexp = 
-      "The data frame \\(dtaFrm\\) must contain the attribute \"protobuf\", there has to be at least one of them, and it has to be of the correct type \\(a RProtoBuf\\)\\.")
+    expect_error(write_omv(dtaFrm = dtaOut, fleOut = nmeOut, wrtPtB = TRUE),
+      regexp = "The data frame \\(dtaFrm\\) must contain the attribute \"protobuf\", there has to be at least one of them, and it has to be of the correct type \\(a RProtoBuf\\)\\.")
     attr(dtaOut, "protobuf")[["01 empty/analysis"]] <- TRUE
-    expect_error(write_omv(dtaFrm = dtaOut, fleOut = nmeOut, wrtPtB = TRUE), regexp = 
-      "The data frame \\(dtaFrm\\) must contain the attribute \"protobuf\", there has to be at least one of them, and it has to be of the correct type \\(a RProtoBuf\\)\\.")
+    expect_error(write_omv(dtaFrm = dtaOut, fleOut = nmeOut, wrtPtB = TRUE),
+      regexp = "The data frame \\(dtaFrm\\) must contain the attribute \"protobuf\", there has to be at least one of them, and it has to be of the correct type \\(a RProtoBuf\\)\\.")
     attr(dtaOut, "protobuf")[["01 empty/analysis"]] <- RProtoBuf::new(jamovi.coms.AnalysisRequest)
     write_omv(dtaFrm = dtaOut, fleOut = nmeOut, wrtPtB = TRUE)
     expect_true(chkFle(nmeOut, isZIP = TRUE))

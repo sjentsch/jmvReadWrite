@@ -58,7 +58,7 @@
 #'
 #' @export arrange_cols_omv
 #'
-arrange_cols_omv <- function(dtaInp = "", fleOut = "", varOrd = c(), varMve = list(), psvAnl = FALSE, usePkg = c("foreign", "haven"), selSet = "", ...) {
+arrange_cols_omv <- function(dtaInp = NULL, fleOut = "", varOrd = c(), varMve = list(), psvAnl = FALSE, usePkg = c("foreign", "haven"), selSet = "", ...) {
 
     # check the input parameters: either varOrd or varMve need to be given; if varOrd is given, the given character vectore and all of its elements need to be not empty;
     # if varMve is given, it needs to be a list, the names can't be empty, and the values need to be integers and can't be zero

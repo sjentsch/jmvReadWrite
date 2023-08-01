@@ -41,9 +41,11 @@ vldExt <- c("omv",  "csv", "tsv", "rdata", "rda", "rds", "sav", "zsav", "dta", "
 # REMEMBER: requires the full file name, NOT the directory
 chkDir <- function(fleNme = "", wrtPrm = TRUE) {
     if (! utils::file_test("-d", dirname(fleNme))) {
+        clsRmv()
         stop(sprintf("Directory (%s) doesn\'t exist.", dirname(fleNme)))
     }
     if (file.access(dirname(fleNme), mode = 2) != 0) {
+        clsRmv()
         stop(sprintf("The directory (%s) exists, but you don\'t have writing permissions in that directory.", dirname(fleNme)))
     }
     TRUE
@@ -52,8 +54,10 @@ chkDir <- function(fleNme = "", wrtPrm = TRUE) {
 chkDtF <- function(dtaFrm = NULL, minSze = c(1, 1)) {
     if (length(minSze) != 2) minSze <- rep(minSze[1], 2)
     if (is.null(dtaFrm) || !is.data.frame(dtaFrm) || length(dim(dtaFrm)) != 2) {
+        clsRmv()
         stop("Input data are either not a data frame or have incorrect (only one or more than two) dimensions.")
     } else if (any(dim(dtaFrm) < minSze)) {
+        clsRmv()
         stop(sprintf("The %s dimension of the input data frame has not the required size (%d < %d).",
                      ifelse(which(dim(dtaFrm) < minSze)[1] == 1, "first", "second"), dim(dtaFrm)[dim(dtaFrm) < minSze][1], minSze[dim(dtaFrm) < minSze][1]))
     }
@@ -62,6 +66,7 @@ chkDtF <- function(dtaFrm = NULL, minSze = c(1, 1)) {
 
 chkExt <- function(fleNme = "", extNme = c("")) {
     if (! hasExt(fleNme, extNme)) {
+        clsRmv()
         stop(sprintf("File name (%s) contains an unsupported file extension (%s).", basename(fleNme), paste(paste0(".", extNme[tools::file_ext(fleNme) != extNme]), collapse = ", ")))
     }
     TRUE
@@ -69,9 +74,11 @@ chkExt <- function(fleNme = "", extNme = c("")) {
 
 chkFle <- function(fleNme = "", isZIP = FALSE, fleCnt = "") {
     if (!is.character(fleNme) || !is.logical(isZIP) || !is.character(fleCnt)) {
+        clsRmv()
         stop("chkFle: Unsupported input parameter type.")
     }
     if (!utils::file_test("-f", fleNme)) {
+        clsRmv()
         stop(sprintf("File \"%s\" not found.", fleNme))
     }
     if (isZIP) {
@@ -79,11 +86,13 @@ chkFle <- function(fleNme = "", isZIP = FALSE, fleCnt = "") {
         close(tmpHdl)
         # only "PK\003\004" is considered, not "PK\005\006" (empty ZIP) or "PK\007\008" (spanned [over several files])
         if (! hdrStr == "PK\003\004\024") {
+            clsRmv()
             stop(sprintf("chkFle: File \"%s\" has not the correct file format (is not a ZIP archive).", basename(fleNme)))
         }
     }
     if (nchar(fleCnt) > 0) {
         if (!any(grepl(fleCnt, zip::zip_list(fleNme)$filename))) {
+            clsRmv()
             stop(sprintf("chkFle: File \"%s\" doesn\'t contain the file \"%s\".", basename(fleNme), fleCnt))
         }
     }
@@ -93,6 +102,7 @@ chkFle <- function(fleNme = "", isZIP = FALSE, fleCnt = "") {
 chkVar <- function(dtaFrm = NULL, varNme = c()) {
     if (is.null(varNme) || length(varNme) == 0 || !all(nzchar(varNme))) return(FALSE)
     if (!all(varNme %in% names(dtaFrm))) {
+        clsRmv()
         stop(sprintf("The variable(s) %s are not contained in the current data set.", paste(varNme[! (varNme %in% names(dtaFrm))], collapse = ", ")))
     }
     TRUE
@@ -113,6 +123,7 @@ nrmFle <- function(fleNme = "") {
 fmtFlI <- function(fleInp = c(), minLng = 1, maxLng = Inf, excExt = "") {
     # normalize the path of the input file and then check whether the file exists and whether it is of a supported file type
     if (length(fleInp) < minLng || length(fleInp) > maxLng) {
+        clsRmv()
         stop(sprintf("The fleInp-argument is supposed to be a character vector with a minimal length of %.0f and a maximal length of %.0f (current length is %.0f).%s",
                      minLng, maxLng, length(fleInp), ifelse(length(fleInp) > maxLng, "\n  If you would like to process several files, call the function individually for each.", "")))
     }
@@ -124,11 +135,25 @@ fmtFlI <- function(fleInp = c(), minLng = 1, maxLng = Inf, excExt = "") {
 
 fmtFlO <- function(fleOut = "") {
     if (!nzchar(fleOut) || (nzchar(fleOut) && !hasExt(fleOut, "omv"))) {
+        clsRmv()
         stop("fleOut needs to be a valid non-empty file name (character), and the file extension for output file needs to be .omv.")
     }
     nrmFle(fleOut)
 }
 
+# close and remove files, and remove the file handles
+clsRmv <- function() {
+    for (i in getAllConnections()) {
+        if (i < 3) next # on all OSes: stdin [0], stdout [1], stderr [2]
+        fleHdl <- getConnection(i)
+        crrFle <- summary(fleHdl)[["description"]]
+        close(fleHdl)
+        unlink(crrFle)
+        rm(crrFle)
+    }
+
+    return(TRUE)
+}
 
 # =================================================================================================
 # initializing and handling ProtoBuffers
@@ -217,6 +242,7 @@ var2PB <- function(inpVar = NULL) {
         return(RProtoBuf::new(jamovi.coms.AnalysisOption, c = tmpPB))
     # otherwise, throw error ==================================================
     } else {
+        clsRmv()
         stop("Element not implemented for conversion to protocol buffer.")
     }
 }
@@ -236,6 +262,7 @@ fcnArg <- function(fcnNme = c()) {
     } else if (is.character(fcnNme) && length(fcnNme) == 2) {
         eval(parse(text = paste0("formalArgs(getS3method(\"", fcnNme[1], "\", \"", fcnNme[2], "\"))")))
     } else {
+        clsRmv()
         stop("The argument to fcnArg must be a character (vector) with 1 or 2 elements.")
     }
 }
@@ -245,9 +272,18 @@ fcnArg <- function(fcnNme = c()) {
 # functions for handling setting and storing metadata-information
 
 setAtt <- function(attLst = c(), inpObj = NULL, outObj = NULL) {
-    if (!is.character(attLst)) stop("setAtt: The parameter attLst is supposed to be a character vector.")
-    if (!is.list(inpObj))      stop("setAtt: The parameter inpObj is supposed to be either a list or a data frame.")
-    if (!is.list(outObj))      stop("setAtt: The parameter outObj is supposed to be either a list or a data frame.")
+    if (!is.character(attLst)) {
+        clsRmv()
+        stop("setAtt: The parameter attLst is supposed to be a character vector.")
+    }
+    if (!is.list(inpObj)) {
+        clsRmv()
+        stop("setAtt: The parameter inpObj is supposed to be either a list or a data frame.")
+    }
+    if (!is.list(outObj)) {
+        clsRmv()
+        stop("setAtt: The parameter outObj is supposed to be either a list or a data frame.")
+    }
 
     for (attNme in attLst) {
         # ensure that we have one data frame and one list; the problem is that data frames
@@ -286,6 +322,7 @@ setAtt <- function(attLst = c(), inpObj = NULL, outObj = NULL) {
             cat("\n\noutObj:\n")
             cat(utils::str(outObj))
             cat("\n\n")
+            clsRmv()
             stop("Error when storing or accessing meta-data information. Please send the file causing the error to sebastian.jentschke@uib.no")
         }
     }
@@ -327,6 +364,7 @@ inp2DF <- function(dtaInp = NULL, minDF = 1, maxDF = 1, usePkg = c("foreign", "h
     } else if (is.character(dtaInp)) {
         lstDF <-              lapply(fmtFlI(dtaInp,                 minLng = minDF - 0, maxLng = maxDF - 0), function(x) read_all(fleInp = x, usePkg = usePkg, selSet = selSet, ...))
     } else {
+        clsRmv()
         stop("dtaInp must either be a data frame or a character (pointing to a location where the input file can be found).")
     }
     # most functions expect only one data frame to be returned, thus, the list
@@ -364,8 +402,21 @@ xfrAnl <- function(fleOrg = "", fleTgt = "") {
 }
 
 # =================================================================================================
-# function for checking whether running inside jamovi and for adding attributes used by jamovi to
-# data frames (e.g., those opened in Rj or via jTransform)
+# function for checking which OS is running, whether we are running inside jamovi, for adding
+# attributes used by jamovi to data frames (e.g., those opened in Rj or via jTransform), and for
+# opening a data set in jamovi (if fleOut is left blank, typically a data frame is returned; if we
+# are running inside jamovi, a new data set is opened)
+
+getOS <- function() {
+    sysInf <- Sys.info()
+    if (!is.null(sysInf)) {
+        return(tolower(gsub("Darwin", "mac", sysInf[['sysname']])))
+    } else {
+        return(ifelse(grepl("^darwin",   R.version$os), "mac",
+               ifelse(grepl("linux-gnu", R.version$os), "linux",
+               tolower(.Platform$OS.type))))
+    }
+}
 
 isJmv <- function() {
     nzchar(Sys.getenv("JAMOVI_R_VERSION"))
@@ -409,9 +460,50 @@ jmvAtt <- function(dtaFrm = NULL) {
          } else {
              cat("\n")
              cat(utils::str(dtaFrm[[crrNme]]), "\n")
+             clsRmv()
              stop(sprintf("\n%s: Variable type %s not implemented.\n\n", crrNme, class(dtaFrm[[crrNme]])))
          }
     }
 
     dtaFrm
+}
+
+jmvOpn <- function(dtaFrm = NULL, sfxTtl = "") {
+    # on both Windows and Linux, jamovi is in the path, and, hence, 
+    # Sys.which should give the full location
+    jmvEXE <- Sys.which("jamovi")
+    # if not, we have to determine the position of jamovi under the
+    # current OS
+    if (!nzchar(jmvEXE)) {    
+        crrOS <- getOS()
+        if        (crrOS == "windows") {
+            jmvEXE <- normalizePath(file.path(jmvPth(R.home(), "Frameworks", TRUE), "bin", "jamovi.exe"))
+        } else if (crrOS == "macos")   {
+            jmvEXE <- file.path(jmvPth(R.home(), "Contents", FALSE),  "MacOS", "jamovi")
+        } else if (crrOS == "linux")   {
+            jmvEXE <- file.path(jmvPth(R.home(), "lib", TRUE), "bin", "jamovi")
+        } else {
+            clsRmv()
+            stop(sprintf("Your OS (%s) is currently not implemented. Please report more details to sebastian.jentschke@uib.no to fix that.", crrOS))
+        }
+    }
+    if (file.exists(jmvEXE)) {
+        tmpOut <- tempfile(fileext = ".omv")
+        jmvReadWrite::write_omv(dtaFrm, fleOut = tmpOut)
+# TO-DO: replace Dataset with the name of the current data set
+        system2(jmvEXE(), args = paste0(" --temp --title=\"", "Dataset", sfxTtl, "\" ", tmpOut), stderr = TRUE, stdout = TRUE)
+    } else {
+        clsRmv()
+        stop(sprintf("The position of the jamovi executable could not be determined or it was not found at the determined position. Determined position: %s", jmvEXE))
+    }
+}
+
+jmvPth <- function(inpPth = "", strTgt, bfrTgt = TRUE) {
+    mtcTgt <- gregexpr(strTgt, inpPth)[[1]][1]
+    if (mtcTgt > 0) {
+        return(substr(inpPth, 1, mtcTgt + ifelse(bfrTgt, -2, nchar(strTgt) - 1)))
+    } else {
+        clsRmv()
+        stop(sprintf("jamovi-path couldn't be assembled - input path: %s - target string: %s.", inpPth, strTgt))
+    }
 }

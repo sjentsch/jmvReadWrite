@@ -23,6 +23,8 @@ reference:
   - wide2long_omv
   - merge_cols_omv
   - merge_rows_omv
+  - replace_omv
+  - search_omv
   - sort_omv
   - transpose_omv
 - title: Example datasets

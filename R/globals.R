@@ -380,7 +380,7 @@ inp2DF <- function(dtaInp = NULL, minDF = 1, maxDF = 1, usePkg = c("foreign", "h
 #   - open the data frame in a new session (only in jamovi, and if fleOut is an empty character vector)
 #   - return the data frame (in R in any case, or in jamovi if fleOut is NULL)
 #   NB: this makes opening the data frame in a new session the default, if in jamovi
-rtnDta <- function(dtaFrm = NULL, fleOut = "", psvAnl = FALSE, sfxTtl = "", ...) {
+rtnDta <- function(dtaFrm = NULL, fleOut = "", sfxTtl = "", psvAnl = FALSE, dtaInp = NULL, ...) {
     if (!is.null(fleOut) && nzchar(fleOut[1])) {
         fleOut <- fmtFlO(fleOut[1])
         write_omv(dtaFrm = dtaFrm, fleOut = fleOut, ...)
@@ -440,7 +440,7 @@ xfrAnl <- function(fleOrg = "", fleTgt = "") {
 getOS <- function() {
     sysInf <- Sys.info()
     if (!is.null(sysInf)) {
-        return(tolower(gsub("Darwin", "mac", sysInf[['sysname']])))
+        return(tolower(gsub("Darwin", "mac", sysInf[["sysname"]])))
     } else {
         return(ifelse(grepl("^darwin",   R.version$os), "mac",
                ifelse(grepl("linux-gnu", R.version$os), "linux",
@@ -499,12 +499,12 @@ jmvAtt <- function(dtaFrm = NULL) {
 }
 
 jmvOpn <- function(dtaFrm = NULL, sfxTtl = "") {
-    # on both Windows and Linux, jamovi is in the path, and, hence, 
+    # on both Windows and Linux, jamovi is in the path, and, hence,
     # Sys.which should give the full location
     jmvEXE <- Sys.which("jamovi")
     # if not, we have to determine the position of jamovi under the
     # current OS
-    if (!nzchar(jmvEXE)) {    
+    if (!nzchar(jmvEXE)) {
         crrOS <- getOS()
         if        (crrOS == "windows") {
             jmvEXE <- normalizePath(file.path(jmvPth(R.home(), "Frameworks", TRUE), "bin", "jamovi.exe"))

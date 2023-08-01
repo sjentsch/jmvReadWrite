@@ -15,7 +15,7 @@
 #'         numbers within that variable / column)
 #'
 #'
-#' 
+#'
 #' @examples
 #' \dontrun{
 #' library(jmvReadWrite)
@@ -34,21 +34,21 @@ search_omv <- function(dtaInp = NULL, srcTrm = c(), whlTrm = FALSE, incNum = TRU
 
     # check and import input data set (either as data frame or from a file)
     if (!is.null(list(...)[["fleInp"]])) stop("Please use the argument dtaInp instead of fleInp.")
-    dtaFrm <- inp2DF(dtaInp = dtaInp, usePkg = usePkg, selSet = selSet, ...)
+    dtaFrm <- inp2DF(dtaInp = dtaInp, ...)
     dtaFrm <- jmvAtt(dtaFrm)
 
+    incClT <- c("Data", rep("Computed", incCmp), rep("Recoded", incRcd))
+    incMsT <- c(rep("ID", incID), rep("Nominal", incNom), rep("Ordinal", incOrd), rep("Continuous", incNum))
     srcNme <- names(dtaFrm)
-    srcNme <- srcNme[sapply(dtaFrm[srcNme], function(x) is.null(attr(x,  "columnType")) ||
-                any(attr(x,  "columnType") == c("Data", rep("Computed", incCmp), rep("Recoded", incRcd))))]
-    srcNme <- srcNme[sapply(dtaFrm[srcNme], function(x) is.null(attr(x, "measureType")) ||
-                any(attr(x, "measureType") == c(rep("ID", incID), rep("Nominal", incNom), rep("Ordinal", incOrd), rep("Continuous", incNum))))]
+    srcNme <- srcNme[sapply(dtaFrm[srcNme], function(x) is.null(attr(x,  "columnType")) || any(attr(x,  "columnType") == incClT))]
+    srcNme <- srcNme[sapply(dtaFrm[srcNme], function(x) is.null(attr(x, "measureType")) || any(attr(x, "measureType") == incMsT))]
     srcRes <- setNames(rep(list(NULL), length(srcNme)), srcNme)
     nmeRow <- row.names(dtaFrm)
 # warning if ID is not unique
     for (i in seq_along(srcRes)) {
         srcRes[[i]] <- nmeRow[do_Src(dtaFrm[[srcNme[i]]], srcTrm, whlTrm)]
     }
-    
+
     return(srcRes[])
 }
 

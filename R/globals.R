@@ -380,7 +380,7 @@ inp2DF <- function(dtaInp = NULL, minDF = 1, maxDF = 1, usePkg = c("foreign", "h
 #   - open the data frame in a new session (only in jamovi, and if fleOut is an empty character vector)
 #   - return the data frame (in R in any case, or in jamovi if fleOut is NULL)
 #   NB: this makes opening the data frame in a new session the default, if in jamovi
-rtnDta <- function(dtaFrm = NULL, fleOut = "", psvAnl = FALSE, sfxTtl = "") {
+rtnDta <- function(dtaFrm = NULL, fleOut = "", psvAnl = FALSE, sfxTtl = "", ...) {
     if (!is.null(fleOut) && nzchar(fleOut[1])) {
         fleOut <- fmtFlO(fleOut[1])
         write_omv(dtaFrm = dtaFrm, fleOut = fleOut, ...)

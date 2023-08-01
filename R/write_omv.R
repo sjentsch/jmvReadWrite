@@ -129,13 +129,14 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", wrtPtB = FALSE, frcWrt = FALSE
         crrCol <- dtaFrm[[i]]
 
         # ID variables represent a special case and are therefore treated first
-        # if the jmv-id marker is set or if the measureType is set to "ID" in the original data or if it is the first column with the values
-        # being unique and being either a factor or an integer (rounded equals the original value; integers may be stored as doubles)
-        if (chkAtt(dtaFrm[[i]], "jmv-id", TRUE) || chkAtt(dtaFrm[[i]], "measureType", "ID") ||
-          (i == 1 && length(unique(crrCol)) == length(crrCol)) && (is.factor(crrCol) || (is.double(crrCol) && all(crrCol %% 1 == 0)))) {
+        # if the jmv-id marker is set or if the measureType is set to "ID" in the original data, or if it is the first column that hasn't the attribute
+        # measureType attached, has values that are unique and not NA and is either a factor or an integer (rounded equals the original value)
+        if (chkAtt(crrCol, "jmv-id", TRUE) || chkAtt(crrCol, "measureType", "ID") ||
+             (i == 1 && !chkAtt(crrCol, "measureType") && !any(duplicated(crrCol) | is.na(crrCol)) &&
+               (is.character(crrCol) || is.factor(crrCol) || (is.numeric(crrCol) && all(crrCol %% 1 == 0))))) {
             mtaDta$fields[[i]][["measureType"]] <- "ID"
-            mtaDta$fields[[i]][["dataType"]]    <- ifelse(is.integer(crrCol), "Integer", "Text")
-            mtaDta$fields[[i]][["type"]]        <- ifelse(is.integer(crrCol), "integer", "string")
+            mtaDta$fields[[i]][["dataType"]]    <- ifelse(is.numeric(crrCol), "Integer", "Text")
+            mtaDta$fields[[i]][["type"]]        <- ifelse(is.numeric(crrCol), "integer", "string")
         # afterwards, the different variable types for each column of the original data frame are tested
         # an overview about how jamovi treats variable types internally and as which types they are written
         # can be found in the function jmvAtt under globals.R
@@ -162,8 +163,7 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", wrtPtB = FALSE, frcWrt = FALSE
             # above must be kept at crrCol as the original column might be character and was converted above
             facOrd <- is.ordered(dtaFrm[[i]])
             if (chkAtt(dtaFrm[[i]], "values") && !identical(attr(dtaFrm[[i]], "values"), as.integer(attr(dtaFrm[[i]], "levels")))) {
-                clsRmv(binHdl)
-                clsRmv(strHdl)
+                clsRmv()
                 stop(sprintf(paste("\"values\"-attribute with unexpected values found for column \"%s\".",
                                    "Please send the file to sebastian.jentschke@uib.no for debugging."), names(dtaFrm[i])))
             }
@@ -219,8 +219,7 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", wrtPtB = FALSE, frcWrt = FALSE
             mtaDta$fields[[i]][["description"]] <- paste(c(ifelse(nzchar(mtaDta$fields[[i]][["description"]]), mtaDta$fields[[i]][["description"]], names(dtaFrm[i])),
                                                          "(time converted to numeric; sec since 00:00)"), collapse = " ")
         } else {
-            clsRmv(binHdl)
-            clsRmv(strHdl)
+            clsRmv()
             stop(sprintf("Variable type %s not implemented. Please send the data file that caused this problem to sebastian.jentschke@uib.no", class(crrCol)))
         }
 
@@ -256,6 +255,7 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", wrtPtB = FALSE, frcWrt = FALSE
         } else if (chkFld(mtaDta$fields[[i]], "type", "number"))  {
             wrtCol <- as.double(crrCol)
         } else if (chkFld(mtaDta$fields[[i]], "type", "string"))  {
+            if (!is.character(crrCol)) crrCol <- as.character(crrCol)
             crrCol[is.na(crrCol)] <- ""
             wrtCol <- rep(NA, length(crrCol))
             for (j in seq_along(crrCol)) {
@@ -323,17 +323,6 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", wrtPtB = FALSE, frcWrt = FALSE
     if (retDbg) {
         list(mtaDta = mtaDta, xtdDta = xtdDta, dtaFrm = dtaFrm)
     }
-}
-
-# close and remove files, and remove the file handles
-clsRmv <- function(fleHdl = NULL) {
-    crrFle <- summary(fleHdl)[["description"]]
-    close(fleHdl)
-    unlink(crrFle)
-    rm(crrFle)
-    rm(list = deparse(substitute(fleHdl)), envir = sys.frame(-1))
-
-    return(TRUE)
 }
 
 # convert to JSON and do some beatifying (adding spaces for increased legibility)
@@ -415,6 +404,7 @@ mnfTxt <- function() {
 add2ZIP <- function(fleZIP = "", crrHdl = NULL, crrFle = c(), txtOut = "", ptbOut = NULL, incZIP = TRUE) {
     if ((!is.character(fleZIP) || length(fleZIP) < 1 || !nzchar(fleZIP)) ||
         ((is.null(crrHdl) || length(crrHdl) < 1) && (!is.character(crrFle) || length(crrFle) < 1 || !all(nzchar(crrFle))))) {
+        clsRmv()
         stop("fleZIP (a character with a file name), and either crrHdl (with a connection) or crrFle (with a file name and [optionally] a writing mode) need to be given as arguments.")
     }
 
@@ -422,6 +412,7 @@ add2ZIP <- function(fleZIP = "", crrHdl = NULL, crrFle = c(), txtOut = "", ptbOu
     if (!is.null(crrHdl)) {
         if (!all(class(crrHdl) == c("file", "connection"))) {
             cat(utils::str(crrHdl))
+            clsRmv()
             stop("Parameter isn\'t a file handle pointing to a file to be zipped.")
         }
         crrFle <- gsub(file.path(tempdir(), ""), "", summary(crrHdl)[["description"]])

@@ -68,25 +68,9 @@ sort_omv <- function(dtaInp = NULL, fleOut = "", varSrt = c(), psvAnl = FALSE, u
 
     # sort data set
     dtaFrm <- srtFrm(dtaFrm, varSrt)
-
-    # write the resulting data frame to the output file or, if no output file
-    # name was given, return the data frame
-    if (!is.null(fleOut) && nzchar(fleOut)) {
-        fleOut <- fmtFlO(fleOut)
-        write_omv(dtaFrm = dtaFrm, fleOut = fleOut, ...)
-        # transfer analyses from input to output file
-        if (psvAnl) {
-            if (is.character(dtaInp)) {
-                xfrAnl(dtaInp, fleOut)
-            } else {
-                warning("psvAnl is only possible if dtaInp is a file name (analyses are not stored in data frames, only in the jamovi files).")
-            }
-        }
-        return(invisible(NULL))
-    } else {
-        if (psvAnl) warning("psvAnl is only possible if fleOut is a file name (analyses are not stored in data frames, only in the jamovi files).")
-        dtaFrm
-    }
+    
+    # rtnDta in globals.R (unified function to either write the data frame, open it in a new jamovi session or return it)
+    rtnDta(dtaFrm = dtaFrm, fleOut = fleOut, psvAnl = psvAnl, sfxTtl = "_sort")
 }
 
 srtFrm <- function(dtaFrm = NULL, varSrt = c()) {

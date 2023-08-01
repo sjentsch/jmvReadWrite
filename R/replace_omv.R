@@ -36,7 +36,7 @@
 #'
 #' @export replace_omv
 #'
-replace_omv <- function(dtaInp = NULL, fleOut = "", rplLst = list(), whlTrm = TRUE, incNum = TRUE, incOrd = TRUE, incNom = TRUE, incID = TRUE, ...) {
+replace_omv <- function(dtaInp = NULL, fleOut = "", rplLst = list(), whlTrm = TRUE, incNum = TRUE, incOrd = TRUE, incNom = TRUE, incID = TRUE, psvAnl = FALSE, ...) {
 
     # check the input parameter:
     if (length(rplLst) < 1 || !is.list(rplLst) || !all(sapply(rplLst, length) == 2)) {
@@ -61,13 +61,6 @@ replace_omv <- function(dtaInp = NULL, fleOut = "", rplLst = list(), whlTrm = TR
         }
     }
     
-    # write the resulting data frame to the output file or, if no output file
-    # name was given, return the data frame
-    if (!is.null(fleOut) && nzchar(fleOut)) {
-        fleOut <- fmtFlO(fleOut)
-        write_omv(dtaFrm = dtaFrm, fleOut = fleOut, ...)
-        return(invisible(NULL))
-    } else {
-        dtaFrm
-    }
+    # rtnDta in globals.R (unified function to either write the data frame, open it in a new jamovi session or return it)
+    rtnDta(dtaFrm = dtaFrm, fleOut = fleOut, psvAnl = psvAnl, sfxTtl = "_rplc")
 }

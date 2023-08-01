@@ -374,6 +374,36 @@ inp2DF <- function(dtaInp = NULL, minDF = 1, maxDF = 1, usePkg = c("foreign", "h
 }
 
 # =================================================================================================
+# Unified function to handle data frames at the end of the helper functions
+# * if the output file name is not empty, the data frame is written to the output file
+# * if no output file name was given:
+#   - open the data frame in a new session (only in jamovi, and if fleOut is an empty character vector)
+#   - return the data frame (in R in any case, or in jamovi if fleOut is NULL)
+#   NB: this makes opening the data frame in a new session the default, if in jamovi
+rtnDta <- function(dtaFrm = NULL, fleOut = "", psvAnl = FALSE, sfxTtl = "") {
+    if (!is.null(fleOut) && nzchar(fleOut[1])) {
+        fleOut <- fmtFlO(fleOut[1])
+        write_omv(dtaFrm = dtaFrm, fleOut = fleOut, ...)
+        # transfer analyses from input to output file
+        if (psvAnl) {
+            if (is.character(dtaInp)) {
+                xfrAnl(dtaInp, fleOut)
+            } else {
+                warning("psvAnl is only possible if dtaInp is a file name (analyses are not stored in data frames, only in the jamovi files).")
+            }
+        }
+        return()
+    } else if (isJmv() && is.character(fleOut)) {
+        if (psvAnl) warning("psvAnl is only possible if fleOut is a file name (analyses are not stored in data frames, only in the jamovi files).")
+        jmvOpn(dtaFrm, sfxTtl = sfxTtl)
+        return()
+    } else {
+        if (psvAnl) warning("psvAnl is only possible if fleOut is a file name (analyses are not stored in data frames, only in the jamovi files).")
+        return(dtaFrm)
+    }
+}
+
+# =================================================================================================
 # function for copying analyses from one data file to another
 
 xfrAnl <- function(fleOrg = "", fleTgt = "") {

@@ -155,15 +155,8 @@ describe_omv <- function(dtaInp = NULL, fleOut = "", dtaTtl = c(), dtaDsc = c(),
         results = RProtoBuf::new(jamovi.coms.ResultsElement, title = "Results", status = 3, group = RProtoBuf::new(jamovi.coms.ResultsGroup)),
         status = 3, index = 1, title = "Results", hasTitle = TRUE)
 
-    # write the resulting data frame to the output file or, if no output file
-    # name was given, return the data frame
-    if (!is.null(fleOut) && nzchar(fleOut)) {
-        fleOut <- fmtFlO(fleOut)
-        write_omv(dtaFrm = dtaFrm, fleOut = fleOut, wrtPtB = TRUE, ...)
-        return(invisible(NULL))
-    } else {
-        dtaFrm
-    }
+    # rtnDta in globals.R (unified function to either write the data frame, open it in a new jamovi session or return it)
+    rtnDta(dtaFrm = dtaFrm, fleOut = fleOut, psvAnl = FALSE, sfxTtl = "_desc")
 }
 
 # create HTML from the list-version of dtaDsc

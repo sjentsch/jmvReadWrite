@@ -97,13 +97,6 @@ transpose_omv <- function(dtaInp = NULL, fleOut = "", varNme = "", usePkg = c("f
     attr(dtaFrm[, "ID"], "jmv-id") <- TRUE
     row.names(dtaFrm) <- NULL
 
-    # write the resulting data frame to the output file or, if no output file
-    # name was given, return the data frame
-    if (!is.null(fleOut) && nzchar(fleOut)) {
-        fleOut <- fmtFlO(fleOut)
-        write_omv(dtaFrm = dtaFrm, fleOut = fleOut, ...)
-        return(invisible(NULL))
-    } else {
-        jmvAtt(dtaFrm)
-    }
+    # rtnDta in globals.R (unified function to either write the data frame, open it in a new jamovi session or return it)
+    rtnDta(dtaFrm = dtaFrm, fleOut = fleOut, psvAnl = FALSE, sfxTtl = "_xpsd")
 }

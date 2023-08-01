@@ -5,7 +5,7 @@
 \title{Re-arrange columns / variables in .omv-files for the statistical spreadsheet 'jamovi' (\url{https://www.jamovi.org})}
 \usage{
 arrange_cols_omv(
-  dtaInp = "",
+  dtaInp = NULL,
   fleOut = "",
   varOrd = c(),
   varMve = list(),
@@ -27,7 +27,7 @@ returned instead}
 \item{varMve}{Named list defining to how much a particular variable (name of a list entry) should be moved up (neg. value of a list entry) or down (pos.
 value) in the data frame (see Details; default: c())}
 
-\item{psvAnl}{Whether analyses that are contained in the input file shall be transferred to the output file (TRUE / FALSE; default: FALSE)}
+\item{psvAnl}{Whether analyses that are contained in the input file shall be transferred to the output file (default: FALSE)}
 
 \item{usePkg}{Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata and SAS files; "foreign" is the default (it comes with
 base R), but "haven" is newer and more comprehensive}

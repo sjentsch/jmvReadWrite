@@ -7,7 +7,7 @@
 #' @param varOrd Character vector with the desired order of variable(s) in the data frame (see Details; default: c())
 #' @param varMve Named list defining to how much a particular variable (name of a list entry) should be moved up (neg. value of a list entry) or down (pos.
 #'               value) in the data frame (see Details; default: c())
-#' @param psvAnl Whether analyses that are contained in the input file shall be transferred to the output file (TRUE / FALSE; default: FALSE)
+#' @param psvAnl Whether analyses that are contained in the input file shall be transferred to the output file (default: FALSE)
 #' @param usePkg Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata and SAS files; "foreign" is the default (it comes with
 #'               base R), but "haven" is newer and more comprehensive
 #' @param selSet Name of the data set that is to be selected from the workspace (only applies when reading .RData-files)

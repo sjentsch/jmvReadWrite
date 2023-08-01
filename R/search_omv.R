@@ -9,6 +9,7 @@
 #' @param incID  Whether to include ID variables in the search (default: TRUE)
 #' @param incCmp Whether to include Computed variables in the search (default: TRUE)
 #' @param incRcd Whether to include Recoded variables in the search (default: TRUE)
+#' @param ...    Additional arguments passed on to methods; see Details below
 #'
 #' @return a named list with the places where the search term was found (names in the list are the variables / columns, the entries the respective row
 #'         numbers within that variable / column)

@@ -10,6 +10,7 @@
 #' @param incOrd Whether to include ordinal variables in the search (default: TRUE)
 #' @param incNom Whether to include nominal variables in the search (default: TRUE)
 #' @param incID  Whether to include ID variables in the search (default: TRUE)
+#' @param psvAnl Whether analyses that are contained in the input file shall be transferred to the output file (default: FALSE)
 #' @param ...    Additional arguments passed on to methods; see Details below
 #'
 #' @return a data frame (only returned if `fleOut` is empty) with the replaced values

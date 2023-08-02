@@ -159,8 +159,11 @@ jmvPtB <- function() {
         return(FALSE)
     }
     # check the two possible places for the jamovi.proto file
-    flePtB <- system.file("jamovi.proto", package = "jmvcore")
-    if (!nzchar(flePtB)) flePtB <- system.file("inst", "jamovi.proto", package = "jmvcore")
+# currently, the jmvcore package is behind, thus, I need to carry jamovi.proto myself
+#   flePtB <- system.file("jamovi.proto", package = "jmvcore")
+#   if (!nzchar(flePtB)) flePtB <- system.file("inst", "jamovi.proto", package = "jmvReadWrite")
+    flePtB <- system.file("jamovi.proto", package = "jmvReadWrite")
+    if (!nzchar(flePtB)) flePtB <- system.file("inst", "jamovi.proto", package = "jmvReadWrite")
     if (!nzchar(flePtB)) {
         warning("For using protocol buffers, the protocol file \"jamovi.proto\" (from the jmvcore-package) is required.\n\n")
         return(FALSE)

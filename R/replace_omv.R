@@ -63,7 +63,11 @@ replace_omv <- function(dtaInp = NULL, fleOut = "", rplLst = list(), whlTrm = TR
                 if (rplLst[[j]][1] %in% levels(dtaFrm[[srcNme[i]]])) levels(dtaFrm[[srcNme[i]]]) <- gsub(rplLst[[j]][1], rplLst[[j]][2], levels(dtaFrm[[srcNme[i]]]))
             } else if (is.numeric(dtaFrm[[srcNme[i]]]) || is.character(dtaFrm[[srcNme[i]]])) {
                 srcSel <- srcClm(dtaFrm[[srcNme[i]]], as.character(rplLst[[j]][1]), whlTrm)
-                if (any(srcSel)) dtaFrm[srcSel, srcNme[i]] <- methods::as(rplLst[[j]][2], typClm)
+                if (any(srcSel)) {
+                    dtaFrm[srcSel, srcNme[i]] <- ifelse(identical(class(rplLst[[j]][2]), typClm),
+                                                          rplLst[[j]][2],
+                                                          eval(parse(text = paste0("as.", typClm, "(rplLst[[j]][2])"))))
+                }
             }
             # other variable types are already caught by jmvAtt() above
         }

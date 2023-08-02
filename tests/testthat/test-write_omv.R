@@ -54,7 +54,7 @@ test_that("write_omv works", {
       regexp = "Variable type complex not implemented\\. Please send the data file that caused this problem to sebastian\\.jentschke@uib\\.no")
     expect_equal(write_omv(data.frame(ID = as.factor(seq(100)), T1 = sample(9999, 100), T2 = rnorm(100)), nmeOut, retDbg = TRUE)$mtaDta$field[[1]]$type, "string")
     unlink(nmeOut)
-    
+
     tmpDF <- read_omv(file.path("..", "ToothGrowth.omv"))
     attr(tmpDF[[4]], "values") <- as.integer(c(0, 1))
     expect_error(write_omv(dtaFrm = tmpDF, fleOut = nmeOut),

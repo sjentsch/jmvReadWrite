@@ -18,7 +18,7 @@ test_that("search_omv works", {
     for (i in sample(33, 10)) tmpDF[sample(254, 2), i] <-  NA
     expect_equal(search_omv(dtaInp = tmpDF, srcTrm = NA,  whlTrm = TRUE),  list(A1 = c("16", "17", "44", "121", "253", "254"), A4 = c("33", "84"), C3 = c("70", "163"), C4 = c("70", "87"),
       E3 = c("111", "166"), E4 = c("89", "126"), N5 = c("172", "207"), O4 = c("42", "74"), gender = c("20", "250"), AG = c("148", "156")))
-    
+
     expect_error(search_omv(fleInp = tmpDF),                       regexp = "^Calling search_omv requires the parameter srcTrm \\(a character vector with length 1\\)\\.")
     expect_error(search_omv(fleInp = tmpDF, srcTrm = c("1", "2")), regexp = "^Calling search_omv requires the parameter srcTrm \\(a character vector with length 1\\)\\.")
     expect_error(search_omv(fleInp = tmpDF, srcTrm = "A64365"),    regexp = "^Please use the argument dtaInp instead of fleInp\\.")

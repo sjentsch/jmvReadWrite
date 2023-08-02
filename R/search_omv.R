@@ -43,7 +43,7 @@ search_omv <- function(dtaInp = NULL, srcTrm = c(), whlTrm = FALSE, incNum = TRU
     srcNme <- names(dtaFrm)
     srcNme <- srcNme[sapply(dtaFrm[srcNme], function(x) is.null(attr(x,  "columnType")) || any(attr(x,  "columnType") == incClT))]
     srcNme <- srcNme[sapply(dtaFrm[srcNme], function(x) is.null(attr(x, "measureType")) || any(attr(x, "measureType") == incMsT))]
-    srcRes <- setNames(rep(list(NULL), length(srcNme)), srcNme)
+    srcRes <- stats::setNames(rep(list(NULL), length(srcNme)), srcNme)
     nmeRow <- row.names(dtaFrm)
     for (i in seq_along(srcRes)) {
         srcRes[[i]] <- nmeRow[srcClm(dtaFrm[[srcNme[i]]], srcTrm, whlTrm)]

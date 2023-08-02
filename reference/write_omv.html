@@ -20,7 +20,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">jmvReadWrite</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.9</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.4.0</span>
       </span>
     </div>
 
@@ -61,7 +61,13 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">write_omv</span><span class="op">(</span>dtaFrm <span class="op">=</span> <span class="cn">NULL</span>, fleOut <span class="op">=</span> <span class="st">""</span>, retDbg <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">write_omv</span><span class="op">(</span></span>
+<span>  dtaFrm <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  fleOut <span class="op">=</span> <span class="st">""</span>,</span>
+<span>  wrtPtB <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  frcWrt <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  retDbg <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -71,26 +77,48 @@
 
 
 <dt>fleOut</dt>
-<dd><p>Name / position of the output file to be generated ("FILENAME.omv"; default: "")</p></dd>
+<dd><p>Name / position of the output file to be generated
+("FILENAME.omv"; default: "")</p></dd>
+
+
+<dt>wrtPtB</dt>
+<dd><p>Whether to write protocol buffers (see Details; default: FALSE)</p></dd>
+
+
+<dt>frcWrt</dt>
+<dd><p>Whether to overwrite existing files with the same name (see Details; default: FALSE)</p></dd>
 
 
 <dt>retDbg</dt>
-<dd><p>Whether to return a list with debugging information (see Value; default: FALSE)</p></dd>
+<dd><p>Whether to return a list with debugging information (see
+Value; default: FALSE)</p></dd>
 
 </dl></div>
     <div id="value">
     <h2>Value</h2>
     
 
-<p>a list (if retDbg == TRUE), containing the meta data (mtaDta, metadata.json in the OMV-file), the extended data (xtdDta, xdata.json in the OMV-file)
-and the original data frame (dtaFrm)</p>
+<p>a list (if retDbg == TRUE), containing the meta data (mtaDta,
+metadata.json in the OMV-file), the extended data (xtdDta,
+xdata.json in the OMV-file) and the original data frame (dtaFrm)</p>
     </div>
     <div id="details">
     <h2>Details</h2>
     
-<ul><li><p>jamovi has a specific measurement level / type "ID" (in addition to the "standard" ones "Nominal", "Ordinal", and "Continuous"). "ID" is used for columns
-that contain some form of ID (e.g., a participant code). In order to set a variable of your data frame to "ID", you have to manually set an attribute
-<code>jmv-id</code> (e.g., <code>attr(dtaFrm$column, "jmv-id") = TRUE</code>).</p></li>
+<ul><li><p>jamovi has a specific measurement level / type "ID" (in addition to the
+"standard" ones "Nominal", "Ordinal", and "Continuous"). "ID" is used for
+columns that contain some form of ID (e.g., a participant code). In order
+to set a variable of your data frame to "ID", you have to set the
+attribute <code>jmv-id</code> (e.g., <code>attr(dtaFrm$column, "jmv-id") = TRUE</code>).</p></li>
+<li><p>CAUTION: Setting wrtPtB to TRUE currently overwrites analyses that already
+exist in a data file. It is meant to be used for <code>describe_omv</code> only. If
+you set wrtPtB to TRUE, ensure to use an output file name that isn't would
+not overwrite any existing file. Protocol buffers are used to exchange
+data between the different parts of jamovi (the server and the client) and
+also the format in which analyses are stored in the jamovi data files.</p></li>
+<li><p><code>write_omv</code> checks whether the output file already exists and throws an
+error if this is the case. frcWrt permits you to overwrite the existing
+file.</p></li>
 </ul></div>
 
     <div id="ref-examples">
@@ -101,10 +129,10 @@ that contain some form of ID (e.g., a participant code). In order to set a varia
 <span class="r-in"><span><span class="co"># use the data set "ToothGrowth" and, if it exists, write it as</span></span></span>
 <span class="r-in"><span><span class="co"># jamovi-file using write_omv()</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"ToothGrowth"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">fleOMV</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">".omv"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">nmeOut</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".omv"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># typically, one would use a "real" file name instead of tempfile(),</span></span></span>
 <span class="r-in"><span><span class="co"># e.g., "Data1.omv"</span></span></span>
-<span class="r-in"><span><span class="va">dtaDbg</span> <span class="op">=</span> <span class="fu">write_omv</span><span class="op">(</span><span class="va">ToothGrowth</span>, <span class="va">fleOMV</span>, retDbg <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">dtaDbg</span> <span class="op">=</span> <span class="fu">write_omv</span><span class="op">(</span>dtaFrm <span class="op">=</span> <span class="va">ToothGrowth</span>, fleOut <span class="op">=</span> <span class="va">nmeOut</span>, retDbg <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">dtaDbg</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># the print-function is only used to force devtools::run_examples()</span></span></span>
 <span class="r-in"><span><span class="co"># to show output</span></span></span>
@@ -116,11 +144,11 @@ that contain some form of ID (e.g., a participant code). In order to set a varia
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># check whether the file was written to the disk, get the file informa-</span></span></span>
 <span class="r-in"><span><span class="co"># tion (size, etc.) and delete the file afterwards</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/basename.html" class="external-link">dirname</a></span><span class="op">(</span><span class="va">fleOMV</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/basename.html" class="external-link">basename</a></span><span class="op">(</span><span class="va">fleOMV</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/basename.html" class="external-link">dirname</a></span><span class="op">(</span><span class="va">nmeOut</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/basename.html" class="external-link">basename</a></span><span class="op">(</span><span class="va">nmeOut</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># -&gt; "file[...].omv" ([...] is a combination of random numbers / characters</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.info.html" class="external-link">file.info</a></span><span class="op">(</span><span class="va">fleOMV</span><span class="op">)</span><span class="op">$</span><span class="va">size</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="co"># -&gt; approx. 2500 (size may differ on different OSes)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="va">fleOMV</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.info.html" class="external-link">file.info</a></span><span class="op">(</span><span class="va">nmeOut</span><span class="op">)</span><span class="op">$</span><span class="va">size</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># -&gt; approx. 2600 (size may differ on different OSes)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="va">nmeOut</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

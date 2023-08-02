@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">jmvReadWrite</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.9</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.4.0</span>
       </span>
     </div>
 
@@ -148,21 +148,21 @@ that the variable names in <code>varExc</code> and <code>varID</code> should not
 <li><p><code>varSrt</code> can be either a character or a character vector (with one or more variables respectively). The sorting order for a particular variable can be
 inverted with preceding the variable name with "-". Please note that this doesn't make sense and hence throws a warning for certain variable types (e.g.,
 factors).</p></li>
-<li><p>The ellipsis-parameter (<code>...</code>) can be used to submit arguments / parameters to the functions that are used for transforming or reading the data. By
-clicking on the respective function under “See also”, you can get a more detailed overview over which parameters each of those functions take.</p></li>
+<li><p>The ellipsis-parameter (<code>...</code>) can be used to submit arguments / parameters to the functions that are used for transforming, reading or writing the data.
+By clicking on the respective function under “See also”, you can get a more detailed overview over which parameters each of those functions take.</p></li>
 <li><p>The transformation from long to wide uses <code>reshape</code>. <code>varTgt</code> matches (~) <code>v.names</code> in <code>reshape</code>, <code>varID</code> ~ <code>idvar</code>, <code>varTme</code> ~ <code>timevar</code>, and <code>varSep</code> ~
 <code>sep</code>. The help for <code>reshape</code> is very explanatory, click on the link under “See also” to access it, particularly what is explained under “Details”.</p></li>
-<li><p>The functions for reading the data are: <code>read_omv</code> (for jamovi-files), <code>read.table</code> (for CSV / TSV files; using similar defaults as <code>read.csv</code> for CSV and
-<code>read.delim</code> for TSV which both are based upon <code>read.table</code>), <code>load</code> (for .RData-files), <code>readRDS</code> (for .rds-files), <code>read_sav</code> (needs R-package <code>haven</code>)
-or <code>read.spss</code> (needs R-package <code>foreign</code>) for SPSS-files, <code>read_dta</code> (<code>haven</code>) / <code>read.dta</code> (<code>foreign</code>) for Stata-files, <code>read_sas</code> (<code>haven</code>) for
-SAS-data-files, and <code>read_xpt</code> (<code>haven</code>) / <code>read.xport</code> (<code>foreign</code>) for SAS-transport-files. If you would like to use <code>haven</code>, you may need to install it
-manually (i.e., <code>install.packages("haven", dep = TRUE)</code>).</p></li>
+<li><p>The functions for reading and writing the data are: <code>read_omv</code> and <code>write_omv</code> (for jamovi-files), <code>read.table</code> (for CSV / TSV files; using similar
+defaults as <code>read.csv</code> for CSV and <code>read.delim</code> for TSV which both are based upon <code>read.table</code>), <code>load</code> (for .RData-files), <code>readRDS</code> (for .rds-files),
+<code>read_sav</code> (needs R-package <code>haven</code>) or <code>read.spss</code> (needs R-package <code>foreign</code>) for SPSS-files, <code>read_dta</code> (<code>haven</code>) / <code>read.dta</code> (<code>foreign</code>) for
+Stata-files, <code>read_sas</code> (<code>haven</code>) for SAS-data-files, and <code>read_xpt</code> (<code>haven</code>) / <code>read.xport</code> (<code>foreign</code>) for SAS-transport-files. If you would like to
+use <code>haven</code>, you may need to install it using <code>install.packages("haven", dep = TRUE)</code>.</p></li>
 </ul></div>
     <div id="see-also">
     <h2>See also</h2>
-    <div class="dont-index"><p><code>long2wide_omv</code> internally uses the following functions: The transformation from long to wide uses <code><a href="https://rdrr.io/r/stats/reshape.html" class="external-link">stats::reshape()</a></code>. For reading data files in
-different formats, the following functions are used: <code><a href="read_omv.html">read_omv()</a></code> for jamovi-files, <code><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">utils::read.table()</a></code> for CSV / TSV files, <code><a href="https://rdrr.io/r/base/load.html" class="external-link">load()</a></code> for
-reading .RData-files, <code><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS()</a></code> for .rds-files, <code><a href="https://haven.tidyverse.org/reference/read_spss.html" class="external-link">haven::read_sav()</a></code> or <code><a href="https://rdrr.io/pkg/foreign/man/read.spss.html" class="external-link">foreign::read.spss()</a></code> for SPSS-files, <code><a href="https://haven.tidyverse.org/reference/read_dta.html" class="external-link">haven::read_dta()</a></code> or
+    <div class="dont-index"><p><code>long2wide_omv</code> internally uses the following functions: The transformation from long to wide uses <code><a href="https://rdrr.io/r/stats/reshape.html" class="external-link">stats::reshape()</a></code>. For reading and writing data
+files in different formats: <code><a href="read_omv.html">read_omv()</a></code> and <code><a href="write_omv.html">write_omv()</a></code> for jamovi-files, <code><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">utils::read.table()</a></code> for CSV / TSV files,
+<code><a href="https://rdrr.io/r/base/load.html" class="external-link">load()</a></code> for reading .RData-files, <code><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS()</a></code> for .rds-files, <code><a href="https://haven.tidyverse.org/reference/read_spss.html" class="external-link">haven::read_sav()</a></code> or <code><a href="https://rdrr.io/pkg/foreign/man/read.spss.html" class="external-link">foreign::read.spss()</a></code> for SPSS-files, <code><a href="https://haven.tidyverse.org/reference/read_dta.html" class="external-link">haven::read_dta()</a></code> or
 <code><a href="https://rdrr.io/pkg/foreign/man/read.dta.html" class="external-link">foreign::read.dta()</a></code> for Stata-files, <code><a href="https://haven.tidyverse.org/reference/read_sas.html" class="external-link">haven::read_sas()</a></code> for SAS-data-files, and <code><a href="https://haven.tidyverse.org/reference/read_xpt.html" class="external-link">haven::read_xpt()</a></code> or <code><a href="https://rdrr.io/pkg/foreign/man/read.xport.html" class="external-link">foreign::read.xport()</a></code> for SAS-transport-files.</p></div>
     </div>
 
@@ -182,8 +182,8 @@ reading .RData-files, <code><a href="https://rdrr.io/r/base/readRDS.html" class=
 <span class="r-in"><span><span class="co">#  $ measure: int  1 2 3 4 5 6 7 8 1 2 ...</span></span></span>
 <span class="r-in"><span><span class="co">#  $ X      : num  ...</span></span></span>
 <span class="r-in"><span><span class="co"># this data set is stored as (temporary) RDS-file and later processed by long2wide</span></span></span>
-<span class="r-in"><span><span class="va">nmeInp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">".rds"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">nmeOut</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">".omv"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">nmeInp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".rds"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">nmeOut</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".omv"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="va">dtaInp</span>, <span class="va">nmeInp</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">long2wide_omv</span><span class="op">(</span>dtaInp <span class="op">=</span> <span class="va">nmeInp</span>, fleOut <span class="op">=</span> <span class="va">nmeOut</span>, varTgt <span class="op">=</span> <span class="st">"X"</span>, varID <span class="op">=</span> <span class="st">"ID"</span>, varTme <span class="op">=</span> <span class="st">"measure"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># it is required to give at least the arguments dtaInp, varID and varTme</span></span></span>

@@ -43,6 +43,9 @@
     <loc>https://sjentsch.github.io/jmvReadWrite/reference/convert_to_omv.html</loc>
   </url>
   <url>
+    <loc>https://sjentsch.github.io/jmvReadWrite/reference/describe_omv.html</loc>
+  </url>
+  <url>
     <loc>https://sjentsch.github.io/jmvReadWrite/reference/index.html</loc>
   </url>
   <url>
@@ -56,6 +59,12 @@
   </url>
   <url>
     <loc>https://sjentsch.github.io/jmvReadWrite/reference/read_omv.html</loc>
+  </url>
+  <url>
+    <loc>https://sjentsch.github.io/jmvReadWrite/reference/replace_omv.html</loc>
+  </url>
+  <url>
+    <loc>https://sjentsch.github.io/jmvReadWrite/reference/search_omv.html</loc>
   </url>
   <url>
     <loc>https://sjentsch.github.io/jmvReadWrite/reference/sort_omv.html</loc>

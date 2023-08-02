@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">jmvReadWrite</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.9</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.4.0</span>
       </span>
     </div>
 
@@ -107,20 +107,20 @@ base R), but "haven" is newer and more comprehensive</p></dd>
 <ul><li><p>If <code>varNme</code> empty, the row names of the input data set are used (preceded by "V_" if all row names are numbers); if <code>varNme</code> has length 1, then it is
 supposed to point to a variable in the input data frame; if <code>varNme</code> has the same length as the number of rows in the input data frame, then the values
 in <code>varNme</code> are assigned as column names to the output data frame.</p></li>
-<li><p>The ellipsis-parameter (<code>...</code>) can be used to submit arguments / parameters to the functions that are used for reading the data. By clicking on the
-respective function under “See also”, you can get a more detailed overview over which parameters each of those functions take. The functions are:
-<code>read_omv</code> (for jamovi-files), <code>read.table</code> (for CSV / TSV files; using similar defaults as <code>read.csv</code> for CSV and <code>read.delim</code> for TSV which both are
-based upon <code>read.table</code>), <code>load</code> (for .RData-files), <code>readRDS</code> (for .rds-files), <code>read_sav</code> (needs R-package <code>haven</code>) or <code>read.spss</code> (needs R-package
-<code>foreign</code>) for SPSS-files, <code>read_dta</code> (<code>haven</code>) / <code>read.dta</code> (<code>foreign</code>) for Stata-files, <code>read_sas</code> (<code>haven</code>) for SAS-data-files, and <code>read_xpt</code>
-(<code>haven</code>) / <code>read.xport</code> (<code>foreign</code>) for SAS-transport-files. If you would like to use <code>haven</code>, you may be need to install it manually (i.e.,
-<code>install.packages("haven", dep = TRUE)</code>).</p></li>
+<li><p>The ellipsis-parameter (<code>...</code>) can be used to submit arguments / parameters to the functions that are used for reading and writing the data. By clicking
+on the respective function under “See also”, you can get a more detailed overview over which parameters each of those functions take. The functions are:
+<code>read_omv</code> and <code>write_omv</code> (for jamovi-files), <code>read.table</code> (for CSV / TSV files; using similar defaults as <code>read.csv</code> for CSV and <code>read.delim</code> for TSV
+which both are based upon <code>read.table</code>), <code>load</code> (for .RData-files), <code>readRDS</code> (for .rds-files), <code>read_sav</code> (needs the R-package <code>haven</code>) or <code>read.spss</code>
+(needs the R-package <code>foreign</code>) for SPSS-files, <code>read_dta</code> (<code>haven</code>) / <code>read.dta</code> (<code>foreign</code>) for Stata-files, <code>read_sas</code> (<code>haven</code>) for SAS-data-files,
+and <code>read_xpt</code> (<code>haven</code>) / <code>read.xport</code> (<code>foreign</code>) for SAS-transport-files. If you would like to use <code>haven</code>, you may need to install it using
+<code>install.packages("haven", dep = TRUE)</code>.</p></li>
 </ul></div>
     <div id="see-also">
     <h2>See also</h2>
-    <div class="dont-index"><p><code>sort_omv</code> internally uses the following functions to read data files in different formats: <code><a href="read_omv.html">read_omv()</a></code> for jamovi-files,
-<code><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">utils::read.table()</a></code> for CSV / TSV files, <code><a href="https://rdrr.io/r/base/load.html" class="external-link">load()</a></code> for reading .RData-files, <code><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS()</a></code> for .rds-files, <code><a href="https://haven.tidyverse.org/reference/read_spss.html" class="external-link">haven::read_sav()</a></code> or <code><a href="https://rdrr.io/pkg/foreign/man/read.spss.html" class="external-link">foreign::read.spss()</a></code>
-for SPSS-files, <code><a href="https://haven.tidyverse.org/reference/read_dta.html" class="external-link">haven::read_dta()</a></code> or <code><a href="https://rdrr.io/pkg/foreign/man/read.dta.html" class="external-link">foreign::read.dta()</a></code> for Stata-files, <code><a href="https://haven.tidyverse.org/reference/read_sas.html" class="external-link">haven::read_sas()</a></code> for SAS-data-files, and <code><a href="https://haven.tidyverse.org/reference/read_xpt.html" class="external-link">haven::read_xpt()</a></code> or
-<code><a href="https://rdrr.io/pkg/foreign/man/read.xport.html" class="external-link">foreign::read.xport()</a></code> for SAS-transport-files.</p></div>
+    <div class="dont-index"><p><code>transpose_omv</code> internally uses the following functions for reading and writing data files in different formats: <code><a href="read_omv.html">read_omv()</a></code> and
+<code><a href="write_omv.html">write_omv()</a></code> for jamovi-files, <code><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">utils::read.table()</a></code> for CSV / TSV files, <code><a href="https://rdrr.io/r/base/load.html" class="external-link">load()</a></code> for reading .RData-files, <code><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS()</a></code> for .rds-files,
+<code><a href="https://haven.tidyverse.org/reference/read_spss.html" class="external-link">haven::read_sav()</a></code> or <code><a href="https://rdrr.io/pkg/foreign/man/read.spss.html" class="external-link">foreign::read.spss()</a></code> for SPSS-files, <code><a href="https://haven.tidyverse.org/reference/read_dta.html" class="external-link">haven::read_dta()</a></code> or <code><a href="https://rdrr.io/pkg/foreign/man/read.dta.html" class="external-link">foreign::read.dta()</a></code> for Stata-files, <code><a href="https://haven.tidyverse.org/reference/read_sas.html" class="external-link">haven::read_sas()</a></code> for
+SAS-data-files, and <code><a href="https://haven.tidyverse.org/reference/read_xpt.html" class="external-link">haven::read_xpt()</a></code> or <code><a href="https://rdrr.io/pkg/foreign/man/read.xport.html" class="external-link">foreign::read.xport()</a></code> for SAS-transport-files.</p></div>
     </div>
 
     <div id="ref-examples">
@@ -132,20 +132,21 @@ for SPSS-files, <code><a href="https://haven.tidyverse.org/reference/read_dta.ht
 <span class="r-in"><span>                         <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"sbj_%03d"</span>, <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">75</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">tmpDF</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># Data sets that were extracted, e.g., from PsychoPy, may look like this (trials as rows</span></span></span>
-<span class="r-in"><span><span class="co"># and participants as columns, one for each participant, manually assmebled / copy-and-pasted).</span></span></span>
+<span class="r-in"><span><span class="co"># and participants as columns, one for each participant, manually assembled / copy-and-pasted).</span></span></span>
 <span class="r-in"><span><span class="co"># However, for analyses, one wants the data set transposed (units / participants as columns)...</span></span></span>
-<span class="r-in"><span><span class="va">fleTmp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">".omv"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">transpose_omv</span><span class="op">(</span>dtaInp <span class="op">=</span> <span class="va">tmpDF</span>, fleOut <span class="op">=</span> <span class="va">fleTmp</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">dtaFrm</span> <span class="op">&lt;-</span> <span class="fu"><a href="read_omv.html">read_omv</a></span><span class="op">(</span><span class="va">fleTmp</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">nmeOut</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".omv"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">transpose_omv</span><span class="op">(</span>dtaInp <span class="op">=</span> <span class="va">tmpDF</span>, fleOut <span class="op">=</span> <span class="va">nmeOut</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">dtaFrm</span> <span class="op">&lt;-</span> <span class="fu"><a href="read_omv.html">read_omv</a></span><span class="op">(</span><span class="va">nmeOut</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="va">nmeOut</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">dtaFrm</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># if no varNme-parameter is given, generic variable names are created (V_...)</span></span></span>
-<span class="r-in"><span><span class="fu">transpose_omv</span><span class="op">(</span>dtaInp <span class="op">=</span> <span class="va">tmpDF</span>, fleOut <span class="op">=</span> <span class="va">fleTmp</span>, varNme <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"Trl_%02d"</span>, <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">16</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">dtaFrm</span> <span class="op">&lt;-</span> <span class="fu"><a href="read_omv.html">read_omv</a></span><span class="op">(</span><span class="va">fleTmp</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">transpose_omv</span><span class="op">(</span>dtaInp <span class="op">=</span> <span class="va">tmpDF</span>, fleOut <span class="op">=</span> <span class="va">nmeOut</span>, varNme <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"Trl_%02d"</span>, <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">16</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">dtaFrm</span> <span class="op">&lt;-</span> <span class="fu"><a href="read_omv.html">read_omv</a></span><span class="op">(</span><span class="va">nmeOut</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="va">nmeOut</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">dtaFrm</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># alternatively, the character vector with the desired variable names (of the same length as</span></span></span>
 <span class="r-in"><span><span class="co"># the number of rows in tmpDF) may be given, "Trl" can easily be exchanged by the name of your</span></span></span>
 <span class="r-in"><span><span class="co"># questionnaire, experimental conditions, etc.</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="va">fleTmp</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

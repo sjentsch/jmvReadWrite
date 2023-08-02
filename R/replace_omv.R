@@ -43,7 +43,7 @@ replace_omv <- function(dtaInp = NULL, fleOut = "", rplLst = list(), whlTrm = TR
 
     # check the input parameter:
     if (length(rplLst) < 1 || !is.list(rplLst) || !all(sapply(rplLst, length) == 2)) {
-        stop("Calling replace_omv requires the parameter rplLSt (a list where each entry is a vector with length 2) (see Details in help).")
+        stop("Calling replace_omv requires the parameter rplLSt (a list where each entry is a vector with length 2; see Details in help).")
     }
 
     # check and import input data set (either as data frame or from a file)
@@ -57,10 +57,15 @@ replace_omv <- function(dtaInp = NULL, fleOut = "", rplLst = list(), whlTrm = TR
     srcNme <- srcNme[sapply(dtaFrm[srcNme], function(x) is.null(attr(x,  "columnType")) || any(attr(x,  "columnType") == incClT))]
     srcNme <- srcNme[sapply(dtaFrm[srcNme], function(x) is.null(attr(x, "measureType")) || any(attr(x, "measureType") == incMsT))]
     for (i in seq_along(srcNme)) {
-        clmTyp <- class(dtaFrm[[srcNme[i]]])
-        for (j in length(rplLst)) {
-            srcSel <- do_Src(dtaFrm[[srcNme[i]]], as.character(rplLst[[j]][1]), whlTrm)
-            dtaFrm[srcSel, srcNme[i]] <- as(rplLst[[j]][2], clmTyp)
+        typClm <- class(dtaFrm[[srcNme[i]]])
+        for (j in seq_along(rplLst)) {
+            if (is.factor(dtaFrm[[srcNme[i]]])) {
+                if (rplLst[[j]][1] %in% levels(dtaFrm[[srcNme[i]]])) levels(dtaFrm[[srcNme[i]]]) <- gsub(rplLst[[j]][1], rplLst[[j]][2], levels(dtaFrm[[srcNme[i]]]))
+            } else if (is.numeric(dtaFrm[[srcNme[i]]]) || is.character(dtaFrm[[srcNme[i]]])) {
+                srcSel <- srcClm(dtaFrm[[srcNme[i]]], as.character(rplLst[[j]][1]), whlTrm)
+                if (any(srcSel)) dtaFrm[srcSel, srcNme[i]] <- as(rplLst[[j]][2], typClm)
+            }
+            # other variable types are already caught by jmvAtt() above
         }
     }
 

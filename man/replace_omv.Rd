@@ -13,6 +13,8 @@ replace_omv(
   incOrd = TRUE,
   incNom = TRUE,
   incID = TRUE,
+  incCmp = TRUE,
+  incRcd = TRUE,
   psvAnl = FALSE,
   ...
 )
@@ -35,6 +37,10 @@ TRUE)}
 \item{incNom}{Whether to include nominal variables in the search (default: TRUE)}
 
 \item{incID}{Whether to include ID variables in the search (default: TRUE)}
+
+\item{incCmp}{Whether to include Computed variables in the search (default: TRUE)}
+
+\item{incRcd}{Whether to include Recoded variables in the search (default: TRUE)}
 
 \item{psvAnl}{Whether analyses that are contained in the input file shall be transferred to the output file (default: FALSE)}
 

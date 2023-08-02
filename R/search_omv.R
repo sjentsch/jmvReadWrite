@@ -31,6 +31,7 @@ search_omv <- function(dtaInp = NULL, srcTrm = c(), whlTrm = FALSE, incNum = TRU
     if (length(srcTrm) != 1 || !nzchar(srcTrm)) {
         stop("Calling search_omv requires the parameter srcTrm (a character vector with length 1).")
     }
+    srcTrm <- gsub("\\(", "\\\\(", gsub("\\)", "\\\\)", gsub("\\.", "\\\\.", srcTrm)))
 
     # check and import input data set (either as data frame or from a file)
     if (!is.null(list(...)[["fleInp"]])) stop("Please use the argument dtaInp instead of fleInp.")
@@ -44,14 +45,16 @@ search_omv <- function(dtaInp = NULL, srcTrm = c(), whlTrm = FALSE, incNum = TRU
     srcNme <- srcNme[sapply(dtaFrm[srcNme], function(x) is.null(attr(x, "measureType")) || any(attr(x, "measureType") == incMsT))]
     srcRes <- setNames(rep(list(NULL), length(srcNme)), srcNme)
     nmeRow <- row.names(dtaFrm)
-# warning if ID is not unique
     for (i in seq_along(srcRes)) {
-        srcRes[[i]] <- nmeRow[do_Src(dtaFrm[[srcNme[i]]], srcTrm, whlTrm)]
+        srcRes[[i]] <- nmeRow[srcClm(dtaFrm[[srcNme[i]]], srcTrm, whlTrm)]
     }
-
-    return(srcRes[])
+    return(srcRes[sapply(srcRes, length) > 0])
 }
 
-do_Src <- function(inpClm = NULL, srcTrm = "", whlTrm = FALSE) {
-    grepl(paste0(rep("^", whlTrm), srcTrm, rep("$", whlTrm)), as.character(inpClm), fixed = TRUE)
+srcClm <- function(inpClm = NULL, srcTrm = "", whlTrm = FALSE) {
+    if (!is.na(srcTrm)) {
+        return(grepl(paste0(rep("^", whlTrm), srcTrm, rep("$", whlTrm)), as.character(inpClm)))
+    } else if (is.na(srcTrm)) {
+        return(is.na(inpClm))
+    }
 }

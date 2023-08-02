@@ -132,8 +132,8 @@ wide2long_omv <- function(dtaInp = NULL, fleOut = "", varLst = c(), varExc = c()
         varSpl <- strsplit(varLst, varSep)
         lngSpl <- unique(unlist(lapply(varSpl, length)))
         if (length(lngSpl) != 1) {
-            cat(paste0(paste0(varLst, collapse = ", "), "\n\n"))
-            stop("The variable names in varLst need to have the same structure, i.e., the same number of separators within all variable names.")
+            stop(sprintf("The variable names in varLst need to have the same structure, i.e., the same number of separators within all variable names:\n%s\n\n",
+              paste0(varLst, collapse = ", ")))
         }
     } else {
         varSpl <- as.list(varLst)

@@ -295,15 +295,12 @@ setAtt <- function(attLst = c(), inpObj = NULL, outObj = NULL) {
         # the case which is critical is if both input and output objects are lists (then the first
         # part of the if-conditions above - is.list - wouldn't work)
         } else {
-            cat("\nOne input object (inpObj or outObj) must be a list, the other must be a data frame.\n\n")
-            cat(paste0("attNme: ", attNme, "\n"))
-            cat(paste0("attLst: ", paste0(attLst, collapse = ", "), "\n\n"))
-            cat("inpObj:\n")
-            cat(utils::str(inpObj))
-            cat("\n\noutObj:\n")
-            cat(utils::str(outObj))
-            cat("\n\n")
-            stop("Error when storing or accessing meta-data information. Please send the file causing the error to sebastian.jentschke@uib.no")
+            errDsc <- paste0("\nOne input object (inpObj or outObj) must be a list, the other must be a data frame.\n\n",
+                             "attNme: ", attNme, "\n",
+                             "attLst: ", paste0(attLst, collapse = ", "), "\n\n",
+                             "inpObj:\n", utils::capture.output(utils::str(inpObj)), "\n\n",
+                             "outObj:\n", utils::capture.output(utils::str(outObj)), "\n\n")
+            stop(sprintf("Error when storing or accessing meta-data information. Please send the file causing the error to sebastian.jentschke@uib.no\n%s", errDsc))
         }
     }
 
@@ -440,37 +437,35 @@ jmvAtt <- function(dtaFrm = NULL) {
          if (chkAtt(dtaFrm[[crrNme]], "measureType") && chkAtt(dtaFrm[[crrNme]], "measureType")) next
          # jmv-id
          if (!is.null(attr(dtaFrm[[crrNme]], "jmv-id")) && attr(dtaFrm[[crrNme]], "jmv-id")) {
-             attr(dtaFrm[[crrNme]], "measureType") <- "ID"
-             attr(dtaFrm[[crrNme]], "dataType")    <- ifelse(is.integer(dtaFrm[[crrNme]]), "Integer", "Text")
+             attr(dtaFrm[[crrNme]], "measureType")  <- "ID"
+             attr(dtaFrm[[crrNme]], "dataType")     <- ifelse(is.integer(dtaFrm[[crrNme]]), "Integer", "Text")
          } else if (is.integer(dtaFrm[[crrNme]])) {
-             attr(dtaFrm[[crrNme]], "measureType") <- "Continuous"
-             attr(dtaFrm[[crrNme]], "dataType")    <- "Integer"
+             attr(dtaFrm[[crrNme]], "measureType")  <- "Continuous"
+             attr(dtaFrm[[crrNme]], "dataType")     <- "Integer"
          } else if (is.numeric(dtaFrm[[crrNme]])) {
-             attr(dtaFrm[[crrNme]], "measureType") <- "Continuous"
-             attr(dtaFrm[[crrNme]], "dataType")    <- "Decimal"
+             attr(dtaFrm[[crrNme]], "measureType")  <- "Continuous"
+             attr(dtaFrm[[crrNme]], "dataType")     <- "Decimal"
          } else if (is.ordered(dtaFrm[[crrNme]]) &&  is.null(attr(dtaFrm[[crrNme]], "values"))) {
-             attr(dtaFrm[[crrNme]], "measureType") <- "Ordinal"
-             attr(dtaFrm[[crrNme]], "dataType")    <- "Text"
+             attr(dtaFrm[[crrNme]], "measureType")  <- "Ordinal"
+             attr(dtaFrm[[crrNme]], "dataType")     <- "Text"
          } else if (is.ordered(dtaFrm[[crrNme]]) && !is.null(attr(dtaFrm[[crrNme]], "values"))) {
-             attr(dtaFrm[[crrNme]], "measureType") <- "Ordinal"
-             attr(dtaFrm[[crrNme]], "dataType")    <- "Integer"
+             attr(dtaFrm[[crrNme]], "measureType")  <- "Ordinal"
+             attr(dtaFrm[[crrNme]], "dataType")     <- "Integer"
          } else if (is.factor(dtaFrm[[crrNme]]) &&  is.null(attr(dtaFrm[[crrNme]], "values"))) {
-             attr(dtaFrm[[crrNme]], "measureType") <- "Nominal"
-             attr(dtaFrm[[crrNme]], "dataType")    <- "Text"
+             attr(dtaFrm[[crrNme]], "measureType")  <- "Nominal"
+             attr(dtaFrm[[crrNme]], "dataType")     <- "Text"
          } else if (is.factor(dtaFrm[[crrNme]]) && !is.null(attr(dtaFrm[[crrNme]], "values"))) {
-             attr(dtaFrm[[crrNme]], "measureType") <- "Nominal"
-             attr(dtaFrm[[crrNme]], "dataType")    <- "Integer"
+             attr(dtaFrm[[crrNme]], "measureType")  <- "Nominal"
+             attr(dtaFrm[[crrNme]], "dataType")     <- "Integer"
          } else if (is.character(dtaFrm[[crrNme]])) {
              crrAtt <- attributes(dtaFrm[[crrNme]])
              dtaFrm[[crrNme]] <- as.factor(dtaFrm[[crrNme]])
-             dtaFrm[crrNme]   <- setAtt(attLst = setdiff(names(crrAtt), c("levels", "class")),
-                                        inpObj = crrAtt, outObj = dtaFrm[crrNme])
-             attr(dtaFrm[[crrNme]], "measureType") <- "Nominal"
-             attr(dtaFrm[[crrNme]], "dataType")    <- "Text"
+             dffAtt <- setdiff(names(crrAtt), c("levels", "class"))
+             if (length(dffAtt) > 0) dtaFrm[crrNme] <- setAtt(attLst = dffAtt, inpObj = crrAtt, outObj = dtaFrm[crrNme])
+             attr(dtaFrm[[crrNme]], "measureType")  <- "Nominal"
+             attr(dtaFrm[[crrNme]], "dataType")     <- "Text"
          } else {
-             cat("\n")
-             cat(utils::str(dtaFrm[[crrNme]]), "\n")
-             stop(sprintf("\n%s: Variable type %s not implemented.\n\n", crrNme, class(dtaFrm[[crrNme]])))
+             stop(sprintf("\n\n%s: Variable type %s not implemented:\n%s\n\n", crrNme, class(dtaFrm[[crrNme]]), trimws(utils::capture.output(utils::str(dtaFrm[[crrNme]])))))
          }
     }
 

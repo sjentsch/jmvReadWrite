@@ -54,10 +54,10 @@ test_that("globals work", {
                                               "      names: \"C\"\n      names: \"D\"\n      names: \"E\"\n      names: \"F\"\n      names: \"G\"\n      names: \"H\"\n",
                                               "      names: \"I\"\n    }\n  }\n}\n"))
     expect_error(var2PB(inpVar = as.complex(pi)), regexp = "^Element not implemented for conversion to protocol buffer.")
-    suppressMessages(expect_error(capture_output(setAtt(attLst = "Trial", inpObj = list(),       outObj = list())),
-      regexp = "^Error when storing or accessing meta-data information\\. Please send the file"))
-    suppressMessages(expect_error(capture_output(setAtt(attLst = "Trial", inpObj = data.frame(), outObj = data.frame())),
-      regexp = "^Error when storing or accessing meta-data information\\. Please send the file"))
+    expect_error(setAtt(attLst = "Trial", inpObj = list(),       outObj = list()),
+      regexp = "^Error when storing or accessing meta-data information\\. Please send the file")
+    expect_error(setAtt(attLst = "Trial", inpObj = data.frame(), outObj = data.frame()),
+      regexp = "^Error when storing or accessing meta-data information\\. Please send the file")
     expect_error(setAtt(attLst = NULL,    inpObj = data.frame(), outObj = data.frame()), regexp = "^setAtt: The parameter attLst is supposed to be a character vector\\.")
     expect_error(setAtt(attLst = "Trial", inpObj = NULL,         outObj = data.frame()), regexp = "^setAtt: The parameter inpObj is supposed to be either a list or a data frame\\.")
     expect_error(setAtt(attLst = "Trial", inpObj = data.frame(), outObj = NULL),         regexp = "^setAtt: The parameter outObj is supposed to be either a list or a data frame\\.")
@@ -121,6 +121,6 @@ test_that("globals work", {
     expect_equal(attributes(jmvAtt(tmpCR)[["CR"]]), list(`jmv-desc` = "Trial (is description kept?)", dataType = "Trial", measureType = "Trial"))
     expect_error(jmvAtt("Trial"),      regexp = "^Input data are either not a data frame or have incorrect \\(only one or more than two\\) dimensions\\.")
     expect_error(jmvAtt(data.frame()), regexp = "^The first dimension of the input data frame has not the required size \\(0 < 1\\)\\.")
-    suppressMessages(expect_error(capture_output(jmvAtt(cbind(tmpDF, data.frame(ER = sample(seq(as.Date("2000/01/01"), as.Date("2019/12/31"), by = "day"), 100))))),
-      regexp = "^\\s+\\w+: Variable type Date not implemented\\."))
+    expect_error(jmvAtt(cbind(tmpDF, data.frame(ER = sample(seq(as.Date("2000/01/01"), as.Date("2019/12/31"), by = "day"), 100)))),
+      regexp = "^\\s+\\w+: Variable type \\w+ not implemented:")
 })

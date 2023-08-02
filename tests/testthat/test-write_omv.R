@@ -33,8 +33,8 @@ test_that("write_omv works", {
     expect_error(write_omv(dtaDbg$dtaFrm), regexp = "^Output file name needs to be given as parameter \\(fleOut = \\.\\.\\.\\)\\.")
     expect_error(add2ZIP(fleZIP = nmeOut, crrHdl = NULL),
       regexp = "fleZIP \\(a character with a file name\\), and either crrHdl \\(with a connection\\) or crrFle \\(with a file name and \\[optionally\\] a writing mode\\) need to be given as arguments.")
-    suppressMessages(expect_error(capture_output(add2ZIP(fleZIP = nmeOut, crrHdl = 1)),
-      regexp = "^Parameter isn't a file handle pointing to a file to be zipped\\."))
+    expect_error(add2ZIP(fleZIP = nmeOut, crrHdl = 1),
+      regexp = "^Parameter isn't a file handle pointing to a file to be zipped\\:")
 
     attr(dtaDbg$dtaFrm, "label.table") <- c("A", "B", "C")
     expect_error(write_omv(dtaDbg$dtaFrm, nmeOut),
@@ -52,7 +52,9 @@ test_that("write_omv works", {
 
     expect_error(write_omv(data.frame(T1 = sample(9999, 100), T2 = as.complex(rnorm(100))), fleOut = tempfile(fileext = ".omv")),
       regexp = "Variable type complex not implemented\\. Please send the data file that caused this problem to sebastian\\.jentschke@uib\\.no")
-
+    expect_equal(write_omv(data.frame(ID = as.factor(seq(100)), T1 = sample(9999, 100), T2 = rnorm(100)), nmeOut, retDbg = TRUE)$mtaDta$field[[1]]$type, "string")
+    unlink(nmeOut)
+    
     tmpDF <- read_omv(file.path("..", "ToothGrowth.omv"))
     attr(tmpDF[[4]], "values") <- as.integer(c(0, 1))
     expect_error(write_omv(dtaFrm = tmpDF, fleOut = nmeOut),

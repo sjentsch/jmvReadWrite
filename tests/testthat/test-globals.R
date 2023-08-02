@@ -86,6 +86,13 @@ test_that("globals work", {
     expect_equal(names(attributes(df4Chk[[1]])), c("datalabel", "names", "var.labels", "class", "row.names", "fleInp"))
     expect_equal(attr(df4Chk[[1]], "fleInp"), file.path("..", "ToothGrowth.omv"))
 
+    Sys.setenv(JAMOVI_R_VERSION = paste0(R.version$major, ".", R.version$minor))
+    expect_warning(expect_error(rtnDta(fleOut = "", psvAnl = TRUE),
+      regexp = "The position of the jamovi executable could not be determined or it was not found at the determined position\\. Determined position:"),
+      regexp = "psvAnl is only possible if fleOut is a file name \\(analyses are not stored in data frames, only in the jamovi files\\)\\.")
+    Sys.unsetenv("JAMOVI_R_VERSION")
+    expect_error(jmvPth(inpPth = R.home(), strTgt = "not_in_path", bfrTgt = TRUE), regexp = "^jamovi-path couldn't be assembled - input path:")
+
     tmpDF <- data.frame(ID = sprintf("P_%04d", sample(9999, 100)), I = as.integer(sample(1e6, 100)), D = rnorm(100),
                         OT = factor(sample(c("low", "middle", "high"), 100, replace = TRUE), levels = c("low", "middle", "high"), ordered = TRUE),
                         ON = factor(sample(seq(7), 100, replace = TRUE), levels = seq(7), ordered = TRUE),

@@ -411,9 +411,8 @@ add2ZIP <- function(fleZIP = "", crrHdl = NULL, crrFle = c(), txtOut = "", ptbOu
     # if a file handle is given, determine the file name, close the handle and remove it (from the calling environment)
     if (!is.null(crrHdl)) {
         if (!all(class(crrHdl) == c("file", "connection"))) {
-            cat(utils::str(crrHdl))
             clsRmv()
-            stop("Parameter isn\'t a file handle pointing to a file to be zipped.")
+            stop(sprintf("Parameter isn\'t a file handle pointing to a file to be zipped:\n%s", trimws(utils::capture.output(utils::str(crrHdl)))))
         }
         crrFle <- gsub(file.path(tempdir(), ""), "", summary(crrHdl)[["description"]])
         close(crrHdl)

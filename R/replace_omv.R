@@ -6,7 +6,6 @@
 #' @param rplLst A list where each entry is a vector (with length 2) containing the original value and the to-replace-value (default: list())
 #' @param whlTrm Whether the search term (first entry in the vectors) must be found exactly (TRUE) or whether a partial match is sufficient (FALSE; default:
 #'               TRUE)
-#' @param incNum Whether to ignore the case of the original value (default: FALSE)
 #' @param incNum Whether to include continuous variables in the search (default: TRUE)
 #' @param incOrd Whether to include ordinal variables in the search (default: TRUE)
 #' @param incNom Whether to include nominal variables in the search (default: TRUE)
@@ -40,8 +39,7 @@
 #'
 #' @export replace_omv
 #'
-replace_omv <- function(dtaInp = NULL, fleOut = "", rplLst = list(), whlTrm = TRUE, ignCse = FALSE, incNum = TRUE, incOrd = TRUE, incNom = TRUE, incID = TRUE,
-                        incCmp = TRUE, incRcd = TRUE, psvAnl = FALSE, ...) {
+replace_omv <- function(dtaInp = NULL, fleOut = "", rplLst = list(), whlTrm = TRUE, incNum = TRUE, incOrd = TRUE, incNom = TRUE, incID = TRUE, incCmp = TRUE, incRcd = TRUE, psvAnl = FALSE, ...) {
 
     # check the input parameter:
     if (length(rplLst) < 1 || !is.list(rplLst) || !all(sapply(rplLst, length) == 2)) {
@@ -62,11 +60,9 @@ replace_omv <- function(dtaInp = NULL, fleOut = "", rplLst = list(), whlTrm = TR
         typClm <- class(dtaFrm[[srcNme[i]]])
         for (j in seq_along(rplLst)) {
             if (is.factor(dtaFrm[[srcNme[i]]])) {
-                if (grepl(rplLst[[j]][1], levels(dtaFrm[[srcNme[i]]]), ignore.case = ignCse)) {
-                    levels(dtaFrm[[srcNme[i]]]) <- gsub(rplLst[[j]][1], rplLst[[j]][2], levels(dtaFrm[[srcNme[i]]]), ignore.case = ignCse)
-                }
+                if (rplLst[[j]][1] %in% levels(dtaFrm[[srcNme[i]]])) levels(dtaFrm[[srcNme[i]]]) <- gsub(rplLst[[j]][1], rplLst[[j]][2], levels(dtaFrm[[srcNme[i]]]))
             } else if (is.numeric(dtaFrm[[srcNme[i]]]) || is.character(dtaFrm[[srcNme[i]]])) {
-                srcSel <- srcClm(dtaFrm[[srcNme[i]]], as.character(rplLst[[j]][1]), whlTrm, ignCse)
+                srcSel <- srcClm(dtaFrm[[srcNme[i]]], as.character(rplLst[[j]][1]), whlTrm)
                 if (any(srcSel)) {
                     dtaFrm[srcSel, srcNme[i]] <- ifelse(identical(class(rplLst[[j]][2]), typClm),
                                                           rplLst[[j]][2],

@@ -64,7 +64,7 @@ replace_omv <- function(dtaInp = NULL, fleOut = "", rplLst = list(), whlTrm = TR
             if (is.factor(dtaFrm[[srcNme[i]]])) {
                 if (rplLst[[j]][1] %in% levels(dtaFrm[[srcNme[i]]])) levels(dtaFrm[[srcNme[i]]]) <- gsub(rplLst[[j]][1], rplLst[[j]][2], levels(dtaFrm[[srcNme[i]]]))
             } else if (is.numeric(dtaFrm[[srcNme[i]]]) || is.character(dtaFrm[[srcNme[i]]])) {
-                srcSel <- srcClm(dtaFrm[[srcNme[i]]], as.character(rplLst[[j]][1]), whlTrm)
+                srcSel <- srcClm(dtaFrm[[srcNme[i]]], as.character(rplLst[[j]][1]), whlTrm, ignCse)
                 if (any(srcSel)) {
                     dtaFrm[srcSel, srcNme[i]] <- ifelse(identical(class(rplLst[[j]][2]), typClm),
                                                           rplLst[[j]][2],

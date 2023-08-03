@@ -6,6 +6,7 @@
 #' @param rplLst A list where each entry is a vector (with length 2) containing the original value and the to-replace-value (default: list())
 #' @param whlTrm Whether the search term (first entry in the vectors) must be found exactly (TRUE) or whether a partial match is sufficient (FALSE; default:
 #'               TRUE)
+#' @param incNum Whether to ignore the case of the original value (default: FALSE)
 #' @param incNum Whether to include continuous variables in the search (default: TRUE)
 #' @param incOrd Whether to include ordinal variables in the search (default: TRUE)
 #' @param incNom Whether to include nominal variables in the search (default: TRUE)
@@ -39,7 +40,8 @@
 #'
 #' @export replace_omv
 #'
-replace_omv <- function(dtaInp = NULL, fleOut = "", rplLst = list(), whlTrm = TRUE, incNum = TRUE, incOrd = TRUE, incNom = TRUE, incID = TRUE, incCmp = TRUE, incRcd = TRUE, psvAnl = FALSE, ...) {
+replace_omv <- function(dtaInp = NULL, fleOut = "", rplLst = list(), whlTrm = TRUE, ignCse = FALSE, incNum = TRUE, incOrd = TRUE, incNom = TRUE, incID = TRUE,
+                        incCmp = TRUE, incRcd = TRUE, psvAnl = FALSE, ...) {
 
     # check the input parameter:
     if (length(rplLst) < 1 || !is.list(rplLst) || !all(sapply(rplLst, length) == 2)) {

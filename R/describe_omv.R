@@ -101,7 +101,7 @@ describe_omv <- function(dtaInp = NULL, fleOut = "", dtaTtl = c(), dtaDsc = c(),
     if (!is.null(list(...)[["fleInp"]])) stop("Please use the argument dtaInp instead of fleInp.")
     dtaFrm <- inp2DF(dtaInp = dtaInp, getSyn = TRUE, getHTM = TRUE, usePkg = usePkg, selSet = selSet, ...)
 
-    if (packageVersion("jmvcore") < "2.4.3") {
+    if (utils::packageVersion("jmvcore") < "2.4.3") {
         warning("jmvcore version 2.4.3 (or higher) is required for using describe_omv.\n\n")
         return()
     }

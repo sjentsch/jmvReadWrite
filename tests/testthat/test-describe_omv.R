@@ -133,7 +133,7 @@ test_that("describe_omv works", {
         expect_warning(expect_null(describe_omv(dtaInp = jmvReadWrite::ToothGrowth[, c("len", "supp", "dose")], fleOut = nmeOut, dtaTtl = "ToothGrowth", dtaDsc = chrDsc)))
         expect_false(file.exists(nmeOut))
     }
-        
+
     # code coverage
     expect_error(describe_omv(dtaInp = jmvReadWrite::ToothGrowth[, c("len", "supp", "dose")], fleOut = nmeOut),
       regexp = "^Calling describe_omv requires either the parameter dtaTtl \\(character vector\\) or the parameter dtaDsc \\(character vector or named list\\)\\.")

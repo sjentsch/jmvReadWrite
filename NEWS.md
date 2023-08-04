@@ -4,9 +4,9 @@
 * added `describe_omv` (put a title and a description at the top of a data
   set), `search_omv` (finding values in a data set) and `replace_omv`
   (replacing values in a data set with other values)
-* improved handling in jamovi (if jvmReadWrite is run in jamovi modules, e.g.,
-  Rj, a new jamovi session is opened with the data set that was modified by one
-  of the helper functions)
+* improved handling in jamovi (if jmvReadWrite is run in jamovi modules, e.g.,
+  `Rj`, a new jamovi session is opened with the data set that was modified by
+  one of the helper functions)
 * improved handling of the jamovi protocol buffers (currently used for
   extracting `jmv`-syntax in the data sets, but with the perspective of
   creating analyses from `jmv`-syntax)

@@ -414,12 +414,12 @@ add2ZIP <- function(fleZIP = "", crrHdl = NULL, crrFle = c(), txtOut = "", ptbOu
             clsRmv()
             stop(sprintf("Parameter isn\'t a file handle pointing to a file to be zipped:\n%s", trimws(utils::capture.output(utils::str(crrHdl)))))
         }
-        crrFle <- gsub(file.path(tempdir(), ""), "", summary(crrHdl)[["description"]])
+        crrFle <- rmvTmp(summary(crrHdl)[["description"]])
         close(crrHdl)
         rm(list = deparse(substitute(crrHdl)), envir = sys.frame(-1))
     # if a file name is given, open a connection, write whatever is required
     } else if (is.character(crrFle)) {
-        crrFle[1] <- gsub(file.path(tempdir(), ""), "", crrFle[1])
+        crrFle[1] <- rmvTmp(crrFle[1])
         if (dirname(crrFle[1]) != "." && !dir.exists(file.path(tempdir(), dirname(crrFle[1])))) dir.create(file.path(tempdir(), dirname(crrFle[1])))
         crrHdl <- file(file.path(tempdir(), crrFle[1]), open = ifelse(length(crrFle) > 1, crrFle[2], "w"))
         if        (all(nzchar(txtOut))) {
@@ -441,4 +441,8 @@ add2ZIP <- function(fleZIP = "", crrHdl = NULL, crrFle = c(), txtOut = "", ptbOu
     rm(crrFle, crrHdl)
 
     return(TRUE)
+}
+
+rmvTmp <- function(fleNme = "") {
+    return(sub("^/|^\\\\", "", sub(tempdir(), "", fleNme, fixed = TRUE)))
 }

@@ -493,7 +493,7 @@ jmvOpn <- function(dtaFrm = NULL, sfxTtl = "") {
             stop(sprintf("Your OS (%s) is currently not implemented. Please report more details to sebastian.jentschke@uib.no to fix that.", crrOS))
         }
     }
-    if (!nzchar(jmvEXE) && file.exists(jmvEXE)) {
+    if (nzchar(jmvEXE) && file.exists(jmvEXE)) {
         tmpOut <- tempfile(fileext = ".omv")
         jmvReadWrite::write_omv(dtaFrm, fleOut = tmpOut)
 # TO-DO: replace Dataset with the name of the current data set

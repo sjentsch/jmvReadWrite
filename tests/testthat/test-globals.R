@@ -91,7 +91,7 @@ test_that("globals work", {
       regexp = "The position of the jamovi executable could not be determined or it was not found at the determined position\\. Determined position:"),
       regexp = "psvAnl is only possible if fleOut is a file name \\(analyses are not stored in data frames, only in the jamovi files\\)\\.")
     Sys.unsetenv("JAMOVI_R_VERSION")
-    expect_error(jmvPth(inpPth = R.home(), strTgt = "not_in_path", bfrTgt = TRUE), regexp = "^jamovi-path couldn't be assembled - input path:")
+    expect_null(jmvPth(inpPth = R.home(), strTgt = "not_in_path", bfrTgt = TRUE))
 
     tmpDF <- data.frame(ID = sprintf("P_%04d", sample(9999, 100)), I = as.integer(sample(1e6, 100)), D = rnorm(100),
                         OT = factor(sample(c("low", "middle", "high"), 100, replace = TRUE), levels = c("low", "middle", "high"), ordered = TRUE),

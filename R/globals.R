@@ -417,9 +417,9 @@ xfrAnl <- function(fleOrg = "", fleTgt = "") {
 getOS <- function() {
     sysInf <- Sys.info()
     if (!is.null(sysInf)) {
-        return(tolower(gsub("Darwin", "mac", sysInf[["sysname"]])))
+        return(tolower(gsub("Darwin", "macos", sysInf[["sysname"]])))
     } else {
-        return(ifelse(grepl("^darwin",   R.version$os), "mac",
+        return(ifelse(grepl("^darwin",   R.version$os), "macos",
                ifelse(grepl("linux-gnu", R.version$os), "linux",
                tolower(.Platform$OS.type))))
     }
@@ -481,16 +481,19 @@ jmvOpn <- function(dtaFrm = NULL, sfxTtl = "") {
     if (!nzchar(jmvEXE)) {
         crrOS <- getOS()
         if        (crrOS == "windows") {
-            jmvEXE <- normalizePath(file.path(jmvPth(R.home(), "Frameworks", TRUE), "bin", "jamovi.exe"))
+            jmvHme <- jmvPth(R.home(), "Frameworks", TRUE)
+            if (!is.null(jmvHme)) jmvEXE <- normalizePath(file.path(jmvHme, "bin", "jamovi.exe"))
         } else if (crrOS == "macos")   {
-            jmvEXE <- file.path(jmvPth(R.home(), "Contents", FALSE),  "MacOS", "jamovi")
+            jmvHme <- jmvPth(R.home(), "Contents", FALSE)
+            if (!is.null(jmvHme)) jmvEXE <- file.path(jmvHme,  "MacOS", "jamovi")
         } else if (crrOS == "linux")   {
-            jmvEXE <- file.path(jmvPth(R.home(), "lib", TRUE), "bin", "jamovi")
+            jmvHme <- jmvPth(R.home(), "lib", TRUE)
+            if (!is.null(jmvHme)) jmvEXE <- file.path(jmvHme, "bin", "jamovi")
         } else {
             stop(sprintf("Your OS (%s) is currently not implemented. Please report more details to sebastian.jentschke@uib.no to fix that.", crrOS))
         }
     }
-    if (file.exists(jmvEXE)) {
+    if (!nzchar(jmvEXE) && file.exists(jmvEXE)) {
         tmpOut <- tempfile(fileext = ".omv")
         jmvReadWrite::write_omv(dtaFrm, fleOut = tmpOut)
 # TO-DO: replace Dataset with the name of the current data set
@@ -505,6 +508,6 @@ jmvPth <- function(inpPth = "", strTgt = "", bfrTgt = TRUE) {
     if (mtcTgt > 0) {
         return(substr(inpPth, 1, mtcTgt + ifelse(bfrTgt, -2, nchar(strTgt) - 1)))
     } else {
-        stop(sprintf("jamovi-path couldn't be assembled - input path: %s - target string: %s.", inpPth, strTgt))
+        return()
     }
 }

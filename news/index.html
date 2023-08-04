@@ -55,6 +55,7 @@
 <div class="section level3">
 <h3 id="enhancements-and-bug-fixes-0-4-0">Enhancements and bug fixes:<a class="anchor" aria-label="anchor" href="#enhancements-and-bug-fixes-0-4-0"></a></h3>
 <ul><li>added <code>describe_omv</code> (put a title and a description at the top of a data set), <code>search_omv</code> (finding values in a data set) and <code>replace_omv</code> (replacing values in a data set with other values)</li>
+<li>improved handling in jamovi (if jvmReadWrite is run in jamovi modules, e.g., Rj, a new jamovi session is opened with the data set that was modified by one of the helper functions)</li>
 <li>improved handling of the jamovi protocol buffers (currently used for extracting <code>jmv</code>-syntax in the data sets, but with the perspective of creating analyses from <code>jmv</code>-syntax)</li>
 <li>update the content of <code>index.html</code> (generated when writing data set with <code>write_omv</code> to be in line with more recent versions of jamovi)</li>
 <li>added attaching <code>dataType</code> and <code>measureType</code> attributes to a data frame when <code>write_omv</code> is called from within jamovi (while ensuring not to overwrite existing <code>measureType</code> / <code>dataType</code> attributes)</li>

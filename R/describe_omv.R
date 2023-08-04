@@ -97,14 +97,18 @@ describe_omv <- function(dtaInp = NULL, fleOut = "", dtaTtl = c(), dtaDsc = c(),
         stop("Calling describe_omv requires either the parameter dtaTtl (character vector) or the parameter dtaDsc (character vector or named list).")
     }
 
+    # check and import input data set (either as data frame or from a file)
+    if (!is.null(list(...)[["fleInp"]])) stop("Please use the argument dtaInp instead of fleInp.")
+    dtaFrm <- inp2DF(dtaInp = dtaInp, getSyn = TRUE, getHTM = TRUE, usePkg = usePkg, selSet = selSet, ...)
+
+    if (packageVersion("jmvcore") < "2.4.3") {
+        warning("jmvcore version 2.4.3 (or higher) is required for using describe_omv.\n\n")
+        return()
+    }
     if (!jmvPtB()) stop("The R-packages RProtoBuf and jmvcore must be installed for using describe_omv (see warnings() for further details).")
 
     # check whether dtaDsc is a list, and if so, convert it to a HTML desription
     if (is.list(dtaDsc)) dtaDsc <- crtHTM(dtaDsc)
-
-    # check and import input data set (either as data frame or from a file)
-    if (!is.null(list(...)[["fleInp"]])) stop("Please use the argument dtaInp instead of fleInp.")
-    dtaFrm <- inp2DF(dtaInp = dtaInp, getSyn = TRUE, getHTM = TRUE, usePkg = usePkg, selSet = selSet, ...)
 
     # check whether the data set contains analyses and, if so warn that they will be overwritten
     if (!is.null(attr(dtaFrm, "syntax")) && length(attr(dtaFrm, "syntax")) > 0) {
@@ -134,7 +138,6 @@ describe_omv <- function(dtaInp = NULL, fleOut = "", dtaTtl = c(), dtaDsc = c(),
         attDsc <- htmPtB <- list()
         for (i in seq_along(splDsc)) {
             if (tgtDsc[i]) {
-# TO-DO: convert unicode
                 if (is.null(attDsc[["formula"]]) || attDsc[["formula"]] == FALSE) crrIns <- splDsc[i] else crrIns <- list(formula = splDsc[i])
                 htmPtB[[sum(tgtDsc[seq(i)])]] <- var2PB(c(prpAtt(attDsc), list(insert = crrIns)))
             } else {

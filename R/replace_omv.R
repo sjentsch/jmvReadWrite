@@ -20,21 +20,33 @@
 #' @details
 #' * `rplLst` is a list. Each list entry contains a vector (with length 2), where the first entry is the original value, and the second entry is the value the
 #'   original value is to be replaced with.
-#' * ``
-#' * The ellipsis-parameter (`...`) can be used to submit arguments / parameters to the function that is used for writing the data. Clicking on the respective
-#'   function under “See also”, you can get a more detailed overview over which parameters each of those functions take. The functions are:
-#'   `read_omv` and `write_omv` (for jamovi-files), `read.table` (for CSV / TSV files; using similar defaults as `read.csv` for CSV and `read.delim` for TSV
-#'   which both are based upon `read.table`), `load` (for .RData-files), `readRDS` (for .rds-files), `read_sav` (needs the R-package `haven`) or `read.spss`
-#'   (needs the R-package `foreign`) for SPSS-files, `read_dta` (`haven`) / `read.dta` (`foreign`) for Stata-files, `read_sas` (`haven`) for SAS-data-files,
-#'   and `read_xpt` (`haven`) / `read.xport` (`foreign`) for SAS-transport-files. If you would like to use `haven`, you may need to install it using
-#'   `install.packages("haven", dep = TRUE)`.
+#' * `whlTrm` indicates whether partial matches of the original value(s) shall replaced (e.g., for original: 24 and replacement: 34, 241 will be changed into
+#'   341).
+#' * The ellipsis-parameter (`...`) can be used to submit arguments / parameters to the function that is used for reading and writing the data. Clicking on the
+#'   respective function under “See also”, you can get a more detailed overview over which parameters each of those functions take. The functions are:
+#'   `read_omv` and `write_omv` (for jamovi-files).
 #'
-#' @seealso `replace_omv` uses [jmvReadWrite::write_omv()] for writing jamovi-files.
+#' @seealso `replace_omv` uses [jmvReadWrite::read_omv()] and [jmvReadWrite::write_omv()] for reading and writing jamovi-files.
 #'
 #' @examples
 #' \dontrun{
 #' library(jmvReadWrite)
-#' rplLst = list(c(), c())
+#' # the gender in the original data file is plural...
+#' table(bfi_sample$gender)
+#' # and shall be converted to singular
+#' rplDF <- replace_omv(bfi_sample, rplLst = list(c("Females", "Female"), c("Males", "Male")))
+#' table(rplDF$gender)
+#' # with giving an output file name, the data set is written
+#' nmeOut <- tempfile(fileext = ".omv")
+#' replace_omv(bfi_sample, fleOut = nmeOut, rplLst = list(c("Females", "Female"), c("Males", "Male")))
+#' file.exists(nmeOut)
+#' rplDF <- read_omv(nmeOut)
+#' table(rplDF$gender)
+#' unlink(nmeOut)
+#' # it is sensible to check / search for the original values before running replace_omv
+#' search_omv(bfi_sample, 24, whlTrm = TRUE)
+#' rplDF <- replace_omv(bfi_sample, rplLst = list(c(24, NA)))
+#' table(rplDF$age)
 #' }
 #'
 #' @export replace_omv
@@ -43,7 +55,7 @@ replace_omv <- function(dtaInp = NULL, fleOut = "", rplLst = list(), whlTrm = TR
 
     # check the input parameter:
     if (length(rplLst) < 1 || !is.list(rplLst) || !all(sapply(rplLst, length) == 2)) {
-        stop("Calling replace_omv requires the parameter rplLSt (a list where each entry is a vector with length 2; see Details in help).")
+        stop("Calling replace_omv requires the parameter rplLst (a list where each entry is a vector with length 2; see Details in help).")
     }
 
     # check and import input data set (either as data frame or from a file)

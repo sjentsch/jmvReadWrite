@@ -8,11 +8,11 @@ test_that("replace_omv works", {
     expect_false(any(replace_omv(dtaInp = tmpDF, rplLst = list(c(24, NA)))$age == 24, na.rm = TRUE))
 
     expect_error(replace_omv(dtaInp = tmpDF),
-      regexp = "^Calling replace_omv requires the parameter rplLSt \\(a list where each entry is a vector with length 2; see Details in help\\)\\.")
+      regexp = "^Calling replace_omv requires the parameter rplLst \\(a list where each entry is a vector with length 2; see Details in help\\)\\.")
     expect_error(replace_omv(dtaInp = tmpDF, rplLst = c()),
-      regexp = "^Calling replace_omv requires the parameter rplLSt \\(a list where each entry is a vector with length 2; see Details in help\\)\\.")
+      regexp = "^Calling replace_omv requires the parameter rplLst \\(a list where each entry is a vector with length 2; see Details in help\\)\\.")
     expect_error(replace_omv(dtaInp = tmpDF, rplLst = list(c(1, 2), c(3, 4, 5), c(6, 7))),
-      regexp = "^Calling replace_omv requires the parameter rplLSt \\(a list where each entry is a vector with length 2; see Details in help\\)\\.")
+      regexp = "^Calling replace_omv requires the parameter rplLst \\(a list where each entry is a vector with length 2; see Details in help\\)\\.")
     expect_error(replace_omv(fleInp = tmpDF, rplLst = list(c(1, 2))),    regexp = "^Please use the argument dtaInp instead of fleInp\\.")
     expect_error(replace_omv(dtaInp = cbind(tmpDF, data.frame(AD2 = as.complex(tmpDF$AD))), rplLst = list(c(24, NA))), regexp = "Variable type \\w+ not implemented:")
 

@@ -8,6 +8,7 @@ search_omv(
   dtaInp = NULL,
   srcTrm = c(),
   whlTrm = FALSE,
+  ignCse = FALSE,
   incNum = TRUE,
   incOrd = TRUE,
   incNom = TRUE,
@@ -24,6 +25,8 @@ search_omv(
 
 \item{whlTrm}{Whether the exact search term shall be found (TRUE) or whether a partial match is sufficient (FALSE; default: FALSE)}
 
+\item{ignCse}{Whether to ignore the case of the search term (default: FALSE)}
+
 \item{incNum}{Whether to include continuous variables in the search (default: TRUE)}
 
 \item{incOrd}{Whether to include ordinal variables in the search (default: TRUE)}
@@ -39,8 +42,9 @@ search_omv(
 \item{...}{Additional arguments passed on to methods; see Details below}
 }
 \value{
-a named list with the places where the search term was found (names in the list are the variables / columns, the entries the respective row
-numbers within that variable / column)
+a named list with the places where the search term was found: names in the list are the variables / columns, the entries the respective row names
+within that variable / column (row names are used for being tolerant to filtered-out cases in jamovi, if a filter is used, row numbers would be
+incorrect)
 }
 \description{
 Search values in .omv-files for the statistical spreadsheet 'jamovi' (\url{https://www.jamovi.org})
@@ -48,7 +52,17 @@ Search values in .omv-files for the statistical spreadsheet 'jamovi' (\url{https
 \examples{
 \dontrun{
 library(jmvReadWrite)
-nmeInp <- system.file("extdata", "AlbumSales.omv", package = "jmvReadWrite")
+# the exact value 24 appears 13 times in age
+search_omv(bfi_sample, 24, whlTrm = TRUE)
+# taking the fifth entry from the search results
+bfi_sample[61, "age"]
+# with the following search, both Males and Females are found
+# (the M of Males, wouldn't be matched if ignCse were FALSE and males is
+#  only a partial match within Females, thus whlTrm must be set to FALSE)
+search_omv(bfi_sample, "males", whlTrm = FALSE, ignCse = TRUE)
+# the first entry is a female, the first entry is a male
+bfi_sample[1, "gender"] # Females
+bfi_sample[6, "gender"] # Males
 }
 
 }

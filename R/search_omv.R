@@ -3,7 +3,7 @@
 #' @param dtaInp Either a data frame or the name of a jamovi data file to be read (including the path, if required; "FILENAME.omv"; default: NULL)
 #' @param srcTrm (Character or numeric) Vector (with length = 1) with a search term to be found in the data frame (default: c())
 #' @param whlTrm Whether the exact search term shall be found (TRUE) or whether a partial match is sufficient (FALSE; default: FALSE)
-#' @param incNum Whether to ignore the case of the search term (default: FALSE)
+#' @param ignCse Whether to ignore the case of the search term (default: FALSE)
 #' @param incNum Whether to include continuous variables in the search (default: TRUE)
 #' @param incOrd Whether to include ordinal variables in the search (default: TRUE)
 #' @param incNom Whether to include nominal variables in the search (default: TRUE)
@@ -12,15 +12,24 @@
 #' @param incRcd Whether to include Recoded variables in the search (default: TRUE)
 #' @param ...    Additional arguments passed on to methods; see Details below
 #'
-#' @return a named list with the places where the search term was found (names in the list are the variables / columns, the entries the respective row
-#'         numbers within that variable / column)
-#'
-#'
+#' @return a named list with the places where the search term was found: names in the list are the variables / columns, the entries the respective row names
+#'         within that variable / column (row names are used for being tolerant to filtered-out cases in jamovi, if a filter is used, row numbers would be
+#'         incorrect)
 #'
 #' @examples
 #' \dontrun{
 #' library(jmvReadWrite)
-#' nmeInp <- system.file("extdata", "AlbumSales.omv", package = "jmvReadWrite")
+#' # the exact value 24 appears 13 times in age
+#' search_omv(bfi_sample, 24, whlTrm = TRUE)
+#' # taking the fifth entry from the search results
+#' bfi_sample[61, "age"]
+#' # with the following search, both Males and Females are found
+#' # (the M of Males, wouldn't be matched if ignCse were FALSE and males is
+#' #  only a partial match within Females, thus whlTrm must be set to FALSE)
+#' search_omv(bfi_sample, "males", whlTrm = FALSE, ignCse = TRUE)
+#' # the first entry is a female, the first entry is a male
+#' bfi_sample[1, "gender"] # Females
+#' bfi_sample[6, "gender"] # Males
 #' }
 #'
 #' @export search_omv

@@ -64,6 +64,7 @@
 <span>  varID <span class="op">=</span> <span class="st">"ID"</span>,</span>
 <span>  varTme <span class="op">=</span> <span class="st">"cond"</span>,</span>
 <span>  varSep <span class="op">=</span> <span class="st">"_"</span>,</span>
+<span>  varOrd <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  varSrt <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  excLvl <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  usePkg <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"foreign"</span>, <span class="st">"haven"</span><span class="op">)</span>,</span>
@@ -107,6 +108,10 @@ for each time-varying part)</p></dd>
 "VAR_1", "VAR_2", default: "</em>")</p></dd>
 
 
+<dt>varOrd</dt>
+<dd><p>Whether to arrange the variables before the transformation, so that they are in accordance with the different split levels (default: TRUE)</p></dd>
+
+
 <dt>varSrt</dt>
 <dd><p>Variable(s) that are used to sort the data frame (see Details; if empty, the order returned from reshape is kept; default: c())</p></dd>
 
@@ -141,6 +146,9 @@ base R), but "haven" is newer and more comprehensive</p></dd>
 <ul><li><p>If <code>varLst</code> is empty, it is tried to generate it using all variables in the data frame except those defined by <code>varExc</code> and <code>varID</code>. The variable(s) in
 <code>varID</code> need to be unique identifiers (in the original dataset), those in <code>varExc</code> don't have this requirement. It is generally recommended that the
 variable names in <code>varExc</code> and <code>varID</code> should not contain the variable separator (defined in <code>varSep</code>; default: "_").</p></li>
+<li><p><code>varOrd</code> determines whether the variables are rearranged to match the order of split levels. Consider the <code>varLst</code> X_1, Y_1, X_2, Y_2. If <code>varOrd</code> were
+set to FALSE, the original order would be preserved and the second part of the variable name (1, 2, ...) would become condition 1, and the first part
+condition 2. In most cases, leaving <code>varOrd</code> set to TRUE is recommended.</p></li>
 <li><p><code>varSrt</code> can be either a character or a character vector (with one or more variables respectively). The sorting order for a particular variable can be
 inverted with preceding the variable name with "-". Please note that this doesn't make sense and hence throws a warning for certain variable types (e.g.,
 factors).</p></li>

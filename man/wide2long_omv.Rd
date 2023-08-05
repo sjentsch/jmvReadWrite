@@ -12,6 +12,7 @@ wide2long_omv(
   varID = "ID",
   varTme = "cond",
   varSep = "_",
+  varOrd = TRUE,
   varSrt = c(),
   excLvl = NULL,
   usePkg = c("foreign", "haven"),
@@ -39,6 +40,8 @@ for each time-varying part)}
 \item{varSep}{Character that separates the variables in varLst into a time-varying part and a part that forms the variable name in long format ("\emph{" in
 "VAR_1", "VAR_2", default: "}")}
 
+\item{varOrd}{Whether to arrange the variables before the transformation, so that they are in accordance with the different split levels (default: TRUE)}
+
 \item{varSrt}{Variable(s) that are used to sort the data frame (see Details; if empty, the order returned from reshape is kept; default: c())}
 
 \item{excLvl}{Integer (or vector of integers) determining which parts of the variable names in varLst shall not be transformed (default: NULL), see Details
@@ -62,6 +65,9 @@ Converts .omv-files for the statistical spreadsheet 'jamovi' (\url{https://www.j
 \item If \code{varLst} is empty, it is tried to generate it using all variables in the data frame except those defined by \code{varExc} and \code{varID}. The variable(s) in
 \code{varID} need to be unique identifiers (in the original dataset), those in \code{varExc} don't have this requirement. It is generally recommended that the
 variable names in \code{varExc} and \code{varID} should not contain the variable separator (defined in \code{varSep}; default: "_").
+\item \code{varOrd} determines whether the variables are rearranged to match the order of split levels. Consider the \code{varLst} X_1, Y_1, X_2, Y_2. If \code{varOrd} were
+set to FALSE, the original order would be preserved and the second part of the variable name (1, 2, ...) would become condition 1, and the first part
+condition 2. In most cases, leaving \code{varOrd} set to TRUE is recommended.
 \item \code{varSrt} can be either a character or a character vector (with one or more variables respectively). The sorting order for a particular variable can be
 inverted with preceding the variable name with "-". Please note that this doesn't make sense and hence throws a warning for certain variable types (e.g.,
 factors).

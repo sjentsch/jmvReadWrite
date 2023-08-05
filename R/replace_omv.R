@@ -6,12 +6,14 @@
 #' @param rplLst A list where each entry is a vector (with length 2) containing the original value and the to-replace-value (default: list())
 #' @param whlTrm Whether the search term (first entry in the vectors) must be found exactly (TRUE) or whether a partial match is sufficient (FALSE; default:
 #'               TRUE)
-#' @param incNum Whether to include continuous variables in the search (default: TRUE)
-#' @param incOrd Whether to include ordinal variables in the search (default: TRUE)
-#' @param incNom Whether to include nominal variables in the search (default: TRUE)
-#' @param incID  Whether to include ID variables in the search (default: TRUE)
-#' @param incCmp Whether to include Computed variables in the search (default: TRUE)
-#' @param incRcd Whether to include Recoded variables in the search (default: TRUE)
+#' @param varInc Names of variables (character vector) to be included in the replacement (default: c())
+#' @param varExc Names of variables (character vector) to be excluded from the replacement (default: c())
+#' @param incNum Whether to include continuous variables in the replacement (default: TRUE)
+#' @param incOrd Whether to include ordinal variables in the replacement (default: TRUE)
+#' @param incNom Whether to include nominal variables in the replacement (default: TRUE)
+#' @param incID  Whether to include ID variables in the replacement (default: TRUE)
+#' @param incCmp Whether to include Computed variables in the replacement (default: TRUE)
+#' @param incRcd Whether to include Recoded variables in the replacement (default: TRUE)
 #' @param psvAnl Whether analyses that are contained in the input file shall be transferred to the output file (default: FALSE)
 #' @param ...    Additional arguments passed on to methods; see Details below
 #'
@@ -22,6 +24,9 @@
 #'   original value is to be replaced with.
 #' * `whlTrm` indicates whether partial matches of the original value(s) shall replaced (e.g., for original: 24 and replacement: 34, 241 will be changed into
 #'   341).
+#' * `varInc` and `varExc` determine which variables are included or excluded from the replacement. If both are given, a warning is issued and `varInc` takes
+#'   precedence. `varInc` makes that only in these variables, the replacement requested by `rplLst` is carried out, if `varExc` is given, for all variables of
+#'   the input data set, except those defined in `varExc`, the replacement is carried out.
 #' * The ellipsis-parameter (`...`) can be used to submit arguments / parameters to the function that is used for reading and writing the data. Clicking on the
 #'   respective function under “See also”, you can get a more detailed overview over which parameters each of those functions take. The functions are:
 #'   `read_omv` and `write_omv` (for jamovi-files).

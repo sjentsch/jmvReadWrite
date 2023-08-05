@@ -9,6 +9,8 @@ replace_omv(
   fleOut = "",
   rplLst = list(),
   whlTrm = TRUE,
+  varInc = c(),
+  varExc = c(),
   incNum = TRUE,
   incOrd = TRUE,
   incNom = TRUE,
@@ -30,17 +32,21 @@ returned instead}
 \item{whlTrm}{Whether the search term (first entry in the vectors) must be found exactly (TRUE) or whether a partial match is sufficient (FALSE; default:
 TRUE)}
 
-\item{incNum}{Whether to include continuous variables in the search (default: TRUE)}
+\item{varInc}{Names of variables (character vector) to be included in the replacement (default: c())}
 
-\item{incOrd}{Whether to include ordinal variables in the search (default: TRUE)}
+\item{varExc}{Names of variables (character vector) to be excluded from the replacement (default: c())}
 
-\item{incNom}{Whether to include nominal variables in the search (default: TRUE)}
+\item{incNum}{Whether to include continuous variables in the replacement (default: TRUE)}
 
-\item{incID}{Whether to include ID variables in the search (default: TRUE)}
+\item{incOrd}{Whether to include ordinal variables in the replacement (default: TRUE)}
 
-\item{incCmp}{Whether to include Computed variables in the search (default: TRUE)}
+\item{incNom}{Whether to include nominal variables in the replacement (default: TRUE)}
 
-\item{incRcd}{Whether to include Recoded variables in the search (default: TRUE)}
+\item{incID}{Whether to include ID variables in the replacement (default: TRUE)}
+
+\item{incCmp}{Whether to include Computed variables in the replacement (default: TRUE)}
+
+\item{incRcd}{Whether to include Recoded variables in the replacement (default: TRUE)}
 
 \item{psvAnl}{Whether analyses that are contained in the input file shall be transferred to the output file (default: FALSE)}
 
@@ -58,6 +64,9 @@ Search values in .omv-files for the statistical spreadsheet 'jamovi' (\url{https
 original value is to be replaced with.
 \item \code{whlTrm} indicates whether partial matches of the original value(s) shall replaced (e.g., for original: 24 and replacement: 34, 241 will be changed into
 341).
+\item \code{varInc} and \code{varExc} determine which variables are included or excluded from the replacement. If both are given, a warning is issued and \code{varInc} takes
+precedence. \code{varInc} makes that only in these variables, the replacement requested by \code{rplLst} is carried out, if \code{varExc} is given, for all variables of
+the input data set, except those defined in \code{varExc}, the replacement is carried out.
 \item The ellipsis-parameter (\code{...}) can be used to submit arguments / parameters to the function that is used for reading and writing the data. Clicking on the
 respective function under “See also”, you can get a more detailed overview over which parameters each of those functions take. The functions are:
 \code{read_omv} and \code{write_omv} (for jamovi-files).

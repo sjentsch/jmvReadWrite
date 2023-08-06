@@ -10,6 +10,7 @@ com
 CR
 csv
 dataType
+dtaDsc
 dtaInp
 delim
 dta
@@ -19,6 +20,7 @@ etc
 extdata
 fleInp
 fleOut
+frcWrt
 idvar
 incl
 ipip
@@ -39,6 +41,7 @@ OMV
 omv
 org
 ori
+OSF
 pkgdown
 pos
 rda
@@ -74,6 +77,7 @@ varSep
 varSrt
 varTme
 VC
+wrtPtB
 www
 xdata
 xport

@@ -4,8 +4,8 @@ test_that("long2wide_omv works", {
     dtaTmp <- data.frame(Year = sort(rep(1900:2020, 12)), Month = rep(month.abb[1:12], 121), X = runif(n = 121 * 12, 0, 100), Y = runif(n = 121 * 12, 0, 100))
     attr(dtaTmp[["X"]], "jmv-desc") <- "Variable X"
     attr(dtaTmp[["Y"]], "jmv-desc") <- "Variable Y"
-    nmeInp <- paste0(tempfile(), ".rds")
-    nmeOut <- gsub(".rds", "_W.omv", nmeInp)
+    nmeInp <- tempfile(fileext = ".rds")
+    nmeOut <- tempfile(fileext = "_W.omv")
     saveRDS(dtaTmp, nmeInp)
 
     expect_null(long2wide_omv(dtaInp = nmeInp, fleOut = nmeOut, varID = "Year", varTme = "Month"))

@@ -3,8 +3,8 @@ test_that("wide2long_omv works", {
     set.seed(1)
     dtaTmp <- cbind(data.frame(Year = 1900:2020), as.data.frame(matrix(runif(121 * 12, 0, 100), nrow = 121, dimnames = list(1:121, paste0("X_", month.abb[1:12])))))
     for (i in 1:12) attr(dtaTmp[[i + 1]], "jmv-desc") <- paste0("Test variable (Month: ", month.abb[i], ")")
-    nmeInp <- paste0(tempfile(), ".rds")
-    nmeOut <- gsub(".rds", "_L.omv", nmeInp)
+    nmeInp <- tempfile(fileext = ".rds")
+    nmeOut <- tempfile(fileext = "_L.omv")
     saveRDS(dtaTmp, nmeInp)
 
     expect_null(wide2long_omv(dtaInp = nmeInp, fleOut = nmeOut, varLst = setdiff(names(dtaTmp), "Year"), varID = "Year", varTme = "Month", varSep = "_"))
@@ -47,6 +47,44 @@ test_that("wide2long_omv works", {
     expect_true(all(df4Chk[["Month"]] == rep(sort(month.abb), length(unique(df4Chk[["Year"]])))))
 
 
+    # test cases for code coverage ============================================================================================================================
+    expect_error(wide2long_omv(fleInp = nmeInp, varID = "Year", varTme = "Month", varSep = "_"), regexp = "Please use the argument dtaInp instead of fleInp\\.")
+    expect_error(wide2long_omv(dtaInp = dtaTmp, fleOut = nmeOut, varLst = names(dtaTmp), varTme = "Month", varSep = "_", varSrt = c("Year", "Month")),
+      regexp = "^\\s+The variable separator \\(.*\\) must be contained in all variables in the variable list \\(varLst\\)\\.")
+    expect_error(wide2long_omv(dtaInp = dtaTmp, fleOut = nmeOut, varLst = setdiff(names(dtaTmp), "Year"), varID = "Year", varSep = "x"),
+      regexp = "^\\s+The variable separator \\(.*\\) must be contained in all variables in the variable list \\(varLst\\)\\.")
+    expect_error(wide2long_omv(dtaInp = dtaTmp, fleOut = nmeOut, varLst = setdiff(names(dtaTmp), "Year"), varID = "Year", varSep = "."),
+      regexp = "^\\s+The variable separator \\(.*\\) must be contained in all variables in the variable list \\(varLst\\)\\.")
+#   expect_warning(wide2long_omv(dtaInp = nmeInp, nmeOut, varID = "Year", varTme = "Month", varSrt = c("Year", "Month")))
+
+    expect_error(wide2long_omv(dtaInp = data.frame(Year = 1900:2020, X_1 = runif(121), X.2 = runif(121)), fleOut = nmeOut, varLst = c("X_1", "X.2"), varID = "Year", varSep = "_"),
+      regexp = "^\\s+The variable separator \\(.*\\) must be contained in all variables in the variable list \\(varLst\\)\\.")
+    expect_error(wide2long_omv(dtaInp = data.frame(Year = 1900:2020, X_1 = runif(121), X_2 = runif(121), X_2_A = runif(121)),
+      fleOut = nmeOut, varLst = c("X_1", "X_2", "X_2_A"), varID = "Year", varSep = "_"),
+      regexp = "^The variable names in varLst need to have the same structure, i\\.e\\., the same number of separators within all variable names\\:")
+    expect_error(wide2long_omv(dtaInp = dtaTmp, varLst = setdiff(names(dtaTmp), "Year"), varID = "Year", varTme = "Month", varSep = "_", excLvl = 0),
+      regexp = "^excLvl must be numeric and must not be less \\(excLvl < 1\\) or more then the number of available levels \\(excLvl > \\d\\)\\.")
+    expect_error(wide2long_omv(dtaInp = dtaTmp, varLst = setdiff(names(dtaTmp), "Year"), varID = "Year", varTme = "Month", varSep = "_", excLvl = Inf),
+      regexp = "^excLvl must be numeric and must not be less \\(excLvl < 1\\) or more then the number of available levels \\(excLvl > \\d\\)\\.")
+
+    expect_error(ordCol(varNme = c("Year", "Month", "X"), dtaNmV = c(names(dtaTmp), "Trial"), varID = "Year", varLst = names(dtaTmp)[-1]),
+      regexp = "^Mismatch between old and new variable order - old: .*; new: .*\\.")
+    expect_error(ordCol(varNme = c("Year", "Month", "X"), dtaNmV = names(dtaTmp), varID = c("Year", "Trial"), varLst = names(dtaTmp)[-1]),
+      regexp = "^Mismatch between old and new variable order - old: .*; new: .*\\.")
+
+
+    dtaTmp <- data.frame(ID = as.character(1:121), A = runif(121), B = runif(121), C = runif(121))
+    attributes(dtaTmp[[1]]) <- list(`jmv-id` = TRUE, measureType = "ID")
+    expect_output(wide2long_omv(dtaInp = dtaTmp, fleOut = nmeOut, varSep = "", varID = "ID"),
+                  "Variable list \\(varLst\\) was generated using all variables in the data frame except those defined in varExc or varID \\(ID\\).")
+    df4Chk <- read_omv(nmeOut)
+    expect_s3_class(df4Chk, "data.frame")
+    expect_equal(dim(df4Chk), c(363, 3))
+    expect_equal(names(df4Chk), c("ID", "cond", "measure"))
+    expect_equal(as.vector(sapply(df4Chk, class)), c("factor", "factor", "numeric"))
+    expect_equal(table(df4Chk$cond), table(c(rep("A", 121), rep("B", 121), rep("C", 121))))
+
+
     # more complex data set ===================================================================================================================================
     set.seed(1)
     tgtTmp <- c(0.002, 0.03, 0.02, 0.450, 0.530, 0.510)
@@ -78,43 +116,6 @@ test_that("wide2long_omv works", {
     expect_equal(df4Chk[, "cond4"], as.factor(rep(c("1", "2"), times = 2400)))
     expect_equal(unname(colMeans(dtaTmp[3:50])), aggregate(x = df4Chk[, "measure", drop = FALSE], by = df4Chk[, c("cond4", "cond3", "cond2", "cond1")], FUN = mean)[, 5])
 
-
-    # test cases for code coverage ============================================================================================================================
-    expect_error(wide2long_omv(fleInp = nmeInp, varID = "Year", varTme = "Month", varSep = "_"), regexp = "Please use the argument dtaInp instead of fleInp\\.")
-    suppressMessages(expect_error(capture_output(wide2long_omv(dtaInp = nmeInp, fleOut = nmeOut, varTme = "Month", varSep = "_", varSrt = c("Year", "Month"))),
-      regexp = "^\\s+The variable separator \\(.*\\) must be contained in all variables in the variable list \\(varLst\\)\\."))
-    suppressMessages(expect_error(capture_output(wide2long_omv(dtaInp = nmeInp, fleOut = nmeOut, varSep = "x", varID = "Year")),
-      regexp = "^\\s+The variable separator \\(.*\\) must be contained in all variables in the variable list \\(varLst\\)\\."))
-#   suppressMessages(expect_error(wide2long_omv(dtaInp = nmeInp, nmeOut, varSep = ".", varID = "Year")))
-#   expect_warning(wide2long_omv(dtaInp = nmeInp, nmeOut, varID = "Year", varTme = "Month", varSrt = c("Year", "Month")))
-
-    suppressMessages(expect_error(capture_output(wide2long_omv(dtaInp = data.frame(Year = 1900:2020, X_1 = runif(121), X.2 = runif(121)),
-      fleOut = nmeOut, varSep = "_", varID = "Year")),
-      regexp = "^\\s+The variable separator \\(.*\\) must be contained in all variables in the variable list \\(varLst\\)\\."))
-    suppressMessages(expect_error(capture_output(wide2long_omv(dtaInp = data.frame(Year = 1900:2020, X_1 = runif(121), X_2 = runif(121),
-      X_2_A = runif(121)), fleOut = nmeOut, varSep = "_", varID = "Year")),
-      regexp = "^The variable names in varLst need to have the same structure, i\\.e\\., the same number of separators within all variable names\\."))
-    expect_error(capture_output(wide2long_omv(dtaInp = nmeInp, varID = "Year", varTme = "Month", varSep = "_", excLvl = 0)),
-      regexp = "^excLvl must be numeric and must not be less \\(excLvl < 1\\) or more then the number of available levels \\(excLvl > \\d\\)\\.")
-    expect_error(capture_output(wide2long_omv(dtaInp = nmeInp, varID = "Year", varTme = "Month", varSep = "_", excLvl = Inf)),
-      regexp = "^excLvl must be numeric and must not be less \\(excLvl < 1\\) or more then the number of available levels \\(excLvl > \\d\\)\\.")
-
-    expect_error(ordCol(varNme = c("Year", "Month", "X"), dtaNmV = c(names(dtaTmp), "Trial"), varID = "Year", varLst = names(dtaTmp)[-1]),
-      regexp = "^Mismatch between old and new variable order - old: .*; new: .*\\.")
-    expect_error(ordCol(varNme = c("Year", "Month", "X"), dtaNmV = names(dtaTmp), varID = c("Year", "Trial"), varLst = names(dtaTmp)[-1]),
-      regexp = "^Mismatch between old and new variable order - old: .*; new: .*\\.")
-
-
-    dtaTmp <- data.frame(ID = as.character(1:121), A = runif(121), B = runif(121), C = runif(121))
-    attributes(dtaTmp[[1]]) <- list(`jmv-id` = TRUE, measureType = "ID")
-    expect_output(wide2long_omv(dtaInp = dtaTmp, fleOut = nmeOut, varSep = "", varID = "ID"),
-                  "Variable list \\(varLst\\) was generated using all variables in the data frame except those defined in varExc or varID \\(ID\\).")
-    df4Chk <- read_omv(nmeOut)
-    expect_s3_class(df4Chk, "data.frame")
-    expect_equal(dim(df4Chk), c(363, 3))
-    expect_equal(names(df4Chk), c("ID", "cond", "measure"))
-    expect_equal(as.vector(sapply(df4Chk, class)), c("factor", "factor", "numeric"))
-    expect_equal(table(df4Chk$cond), table(c(rep("A", 121), rep("B", 121), rep("C", 121))))
 
     unlink(nmeOut)
     unlink(nmeInp)

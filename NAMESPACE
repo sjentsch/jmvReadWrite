@@ -2,10 +2,13 @@
 
 export(arrange_cols_omv)
 export(convert_to_omv)
+export(describe_omv)
 export(long2wide_omv)
 export(merge_cols_omv)
 export(merge_rows_omv)
 export(read_omv)
+export(replace_omv)
+export(search_omv)
 export(sort_omv)
 export(transpose_omv)
 export(wide2long_omv)

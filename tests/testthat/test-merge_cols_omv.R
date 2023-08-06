@@ -1,10 +1,10 @@
 test_that("merge_cols_omv works", {
-    nmeOut <- paste0(tempfile(), "_W.omv")
+    nmeOut <- tempfile(fileext = "_W.omv")
     nmeInp <- vector(mode = "character", length = 3)
     dtaTmp <- rmvAtt(jmvReadWrite::bfi_sample2)
     varTmp <- names(dtaTmp)[-1]
     for (i in seq_along(nmeInp)) {
-        nmeInp[i] <- gsub("_W.omv", paste0("_", i, ".rds"), nmeOut)
+        nmeInp[i] <- tempfile(fileext = ".rds")
         names(dtaTmp)[-1] <- paste0(varTmp, "_", i)
         saveRDS(dtaTmp[sample(seq_len(dim(dtaTmp)[1]), size = round(dim(dtaTmp)[1] * (0.97 + 0.01 * i))), ], nmeInp[i])
     }
@@ -40,6 +40,7 @@ test_that("merge_cols_omv works", {
     attr(dtaTmp, "fleInp") <- nmeInp
     expect_warning(merge_cols_omv(dtaInp = dtaTmp, fleOut = nmeOut, typMrg = "outer", varBy = "ID", psvAnl = TRUE),
       regexp = "psvAnl is only possible if dtaInp is a file name \\(analyses are not stored in data frames, only in the jamovi files\\)\\.")
+    unlink(nmeOut)
     unlink(nmeInp)
 
     dtaFrm <- list(data.frame(ID = runif(10), A = runif(10)), data.frame(ID = runif(10), B = runif(10)), data.frame(ID = runif(10), C = runif(10)), data.frame(ID = runif(10), D = runif(10)))
@@ -52,9 +53,9 @@ test_that("merge_cols_omv works", {
     expect_error(chkByV(rep(list("ID"), 3), dtaFrm),
       regexp = "^varBy must be either a list \\(with the same length as dtaInp\\), a character vector, or a string\\.")
 
-    nmeInp <- paste0(tempfile(), ".rds")
+    nmeInp <- tempfile(fileext = ".rds")
     saveRDS(data.frame(ID = seq(60), A = rnorm(60), B = rnorm(60)), nmeInp)
-    expect_null(merge_cols_omv(c("../ToothGrowth.omv", nmeInp), fleOut = nmeOut, typMrg = "outer", varBy = "ID", psvAnl = TRUE))
+    expect_null(merge_cols_omv(c(file.path("..", "ToothGrowth.omv"), nmeInp), fleOut = nmeOut, typMrg = "outer", varBy = "ID", psvAnl = TRUE))
     expect_true(chkFle(nmeOut))
     expect_gt(file.info(nmeOut)$size, 1)
     expect_true(chkFle(nmeOut, isZIP = TRUE))
@@ -72,7 +73,9 @@ test_that("merge_cols_omv works", {
       c("01 empty/analysis", "02 anova/analysis", "02 anova/resources/61c33c657d5e31f1.png", "02 anova/resources/dd0ce025a00dad1b.png", "03 empty/analysis",
         "04 ancova/analysis", "05 empty/analysis", "data.bin", "index.html", "meta", "metadata.json", "xdata.json"))
     expect_equal(attr(df4Chk, "syntax"),
-      list(paste("jmv::ANOVA(formula = len ~ supp + dose2 + supp:dose2, data = data, effectSize = \"partEta\", modelTest = TRUE, qq = TRUE,",
-                 "contrasts = list(list(var=\"supp\", type=\"none\"), list(var=\"dose2\", type=\"polynomial\")), postHoc = ~ supp + dose2, emMeans = ~ dose2:supp)"),
+      c(paste("jmv::ANOVA(formula = len ~ supp + dose2 + supp:dose2, data = data, effectSize = \"partEta\", modelTest = TRUE, qq = TRUE,",
+              "contrasts = list(list(var=\"supp\", type=\"none\"), list(var=\"dose2\", type=\"polynomial\")), postHoc = ~ supp + dose2, emMeans = ~ dose2:supp)"),
            "jmv::ancova(formula = len ~ supp + dose, data = data, effectSize = \"partEta\", modelTest = TRUE)"))
+    unlink(nmeOut)
+    unlink(nmeInp)
 })

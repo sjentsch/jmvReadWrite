@@ -5,14 +5,15 @@
 \title{Converts .omv-files for the statistical spreadsheet 'jamovi' (\url{https://www.jamovi.org}) from long to wide format}
 \usage{
 long2wide_omv(
-  fleInp = "",
+  dtaInp = NULL,
   fleOut = "",
+  varTgt = c(),
+  varExc = c(),
   varID = "ID",
   varTme = c(),
-  varExc = c(),
-  varTgt = c(),
   varSep = "_",
   varOrd = c("times", "vars"),
+  varAgg = c("mean", "first"),
   varSrt = c(),
   usePkg = c("foreign", "haven"),
   selSet = "",
@@ -20,39 +21,62 @@ long2wide_omv(
 )
 }
 \arguments{
-\item{fleInp}{Name (including the path, if required) of the data file to be read (e.g., "FILE_IN.omv"; default: ""); can be any supported file type, see Details below}
+\item{dtaInp}{Either a data frame or the name of a data file to be read (including the path, if required; "FILENAME.ext"; default: NULL); files can be of
+any supported file type, see Details below}
 
-\item{fleOut}{Name (including the path, if required) of the data file to be written (e.g., "FILE_OUT.omv"; default: ""); if empty, FILE_IN from fleInp is extended with "_wide(file extension -> .omv)"}
+\item{fleOut}{Name of the data file to be written (including the path, if required; "FILE_OUT.omv"; default: ""); if empty, the resulting data frame is
+returned instead}
+
+\item{varTgt}{Names of one or more variables to be transformed / reshaped (other variables are excluded, if empty(c()) all variables except \code{varTme},
+\code{varID} and \code{varExc} are included; default: c())}
+
+\item{varExc}{Name of the variable(s) should be excluded from the transformation, typically this will be between-subject-variable(s) (default: c())}
 
 \item{varID}{Names of one or more variables that identify the same group / individual (default: c())}
 
 \item{varTme}{Name of the variable(s) that differentiates multiple records from the same group / individual (default: c())}
 
-\item{varExc}{Name of the variable(s) should be excluded from the transformation, typically this will be between-subject-variable(s) (default: c())}
-
-\item{varTgt}{Names of one or more variables to be transformed / reshaped (other variables are excluded, if empty(c()) all variables except varTme, varID and varExc are included; default: c())}
-
 \item{varSep}{Separator character when concatenating the fixed and time-varying part of the variable name ("VAR1_1", "VAR1_2"; default: "_")}
 
-\item{varOrd}{How variables / columns are organized: for "times" (default) the steps of the time varying variable are adjacent, for "vars" the steps of the original columns in the long dataset}
+\item{varOrd}{How variables / columns are organized: for "times" (default) the steps of the time varying variable are adjacent, for "vars" the steps of
+the original columns in the long dataset}
+
+\item{varAgg}{How multiple occurrences of particular combinations of time varying variables are aggregated: either "mean" (calculate the mean over
+occurrences), or "first" (take the first occurrence)}
 
 \item{varSrt}{Variable(s) that are used to sort the data frame (see Details; if empty, the order returned from reshape is kept; default: c())}
 
-\item{usePkg}{Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata and SAS files; "foreign" is the default (it comes with base R), but "haven" is newer and more comprehensive}
+\item{usePkg}{Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata and SAS files; "foreign" is the default (it comes with
+base R), but "haven" is newer and more comprehensive}
 
 \item{selSet}{Name of the data set that is to be selected from the workspace (only applies when reading .RData-files)}
 
 \item{...}{Additional arguments passed on to methods; see Details below}
 }
+\value{
+a data frame (only returned if \code{fleOut} is empty) where the input data set is converted from long to wide format
+}
 \description{
 Converts .omv-files for the statistical spreadsheet 'jamovi' (\url{https://www.jamovi.org}) from long to wide format
 }
 \details{
-The ellipsis-parameter (...) can be used to submit arguments / parameters to the functions that are used for transforming or reading the data. The transformation uses \code{reshape}. When reading the
-data, the functions are: \code{read_omv} (for jamovi-files), \code{read.table} (for CSV / TSV files; using similar defaults as \code{read.csv} for CSV and \code{read.delim} for TSV which both are based upon
-\code{read.table} but with adjusted defaults for the respective file types), \code{readRDS} (for rds-files), \code{read_sav} (needs R-package "haven") or \code{read.spss} (needs R-package "foreign") for SPSS-files,
-\code{read_dta} ("haven") / \code{read.dta} ("foreign") for Stata-files, \code{read_sas} ("haven") for SAS-data-files, and \code{read_xpt} ("haven") / \code{read.xport} ("foreign") for SAS-transport-files. If you would
-like to use "haven", it may be needed to install it manually (i.e., \code{install.packages("haven", dep = TRUE)}).
+\itemize{
+\item If \code{varTgt} is empty, it is tried to generate it using all variables in the data frame except those defined by \code{varID}, \code{varTme} and \code{varExc}. The
+variable(s) in \code{varID} need to be unique identifiers (in the original dataset), those in \code{varExc} don't have this requirement. It is generally recommended
+that the variable names in \code{varExc} and \code{varID} should not contain the variable separator (defined in \code{varSep}; default: "_").
+\item \code{varSrt} can be either a character or a character vector (with one or more variables respectively). The sorting order for a particular variable can be
+inverted with preceding the variable name with "-". Please note that this doesn't make sense and hence throws a warning for certain variable types (e.g.,
+factors).
+\item The ellipsis-parameter (\code{...}) can be used to submit arguments / parameters to the functions that are used for transforming, reading or writing the data.
+By clicking on the respective function under “See also”, you can get a more detailed overview over which parameters each of those functions take.
+\item The transformation from long to wide uses \code{reshape}. \code{varTgt} matches (~) \code{v.names} in \code{reshape}, \code{varID} ~ \code{idvar}, \code{varTme} ~ \code{timevar}, and \code{varSep} ~
+\code{sep}. The help for \code{reshape} is very explanatory, click on the link under “See also” to access it, particularly what is explained under “Details”.
+\item The functions for reading and writing the data are: \code{read_omv} and \code{write_omv} (for jamovi-files), \code{read.table} (for CSV / TSV files; using similar
+defaults as \code{read.csv} for CSV and \code{read.delim} for TSV which both are based upon \code{read.table}), \code{load} (for .RData-files), \code{readRDS} (for .rds-files),
+\code{read_sav} (needs R-package \code{haven}) or \code{read.spss} (needs R-package \code{foreign}) for SPSS-files, \code{read_dta} (\code{haven}) / \code{read.dta} (\code{foreign}) for
+Stata-files, \code{read_sas} (\code{haven}) for SAS-data-files, and \code{read_xpt} (\code{haven}) / \code{read.xport} (\code{foreign}) for SAS-transport-files. If you would like to
+use \code{haven}, you may need to install it using \code{install.packages("haven", dep = TRUE)}.
+}
 }
 \examples{
 \dontrun{
@@ -69,11 +93,11 @@ cat(str(dtaInp))
 #  $ measure: int  1 2 3 4 5 6 7 8 1 2 ...
 #  $ X      : num  ...
 # this data set is stored as (temporary) RDS-file and later processed by long2wide
-nmeInp <- paste0(tempfile(), ".rds")
-nmeOut <- paste0(tempfile(), ".omv")
+nmeInp <- tempfile(fileext = ".rds")
+nmeOut <- tempfile(fileext = ".omv")
 saveRDS(dtaInp, nmeInp)
-long2wide_omv(fleInp = nmeInp, fleOut = nmeOut, varID = "ID", varTme = "measure", varTgt = "X")
-# it is required to give at least the arguments fleInp, varID and varTme
+long2wide_omv(dtaInp = nmeInp, fleOut = nmeOut, varTgt = "X", varID = "ID", varTme = "measure")
+# it is required to give at least the arguments dtaInp, varID and varTme
 # check whether the file was created and its size
 cat(list.files(dirname(nmeOut), basename(nmeOut)))
 # -> "file[...].omv" ([...] contains a random combination of numbers / characters
@@ -108,4 +132,10 @@ unlink(nmeInp)
 unlink(nmeOut)
 }
 
+}
+\seealso{
+\code{long2wide_omv} internally uses the following functions: The transformation from long to wide uses \code{\link[stats:reshape]{stats::reshape()}}. For reading and writing data
+files in different formats: \code{\link[=read_omv]{read_omv()}} and \code{\link[=write_omv]{write_omv()}} for jamovi-files, \code{\link[utils:read.table]{utils::read.table()}} for CSV / TSV files,
+\code{\link[=load]{load()}} for reading .RData-files, \code{\link[=readRDS]{readRDS()}} for .rds-files, \code{\link[haven:read_spss]{haven::read_sav()}} or \code{\link[foreign:read.spss]{foreign::read.spss()}} for SPSS-files, \code{\link[haven:read_dta]{haven::read_dta()}} or
+\code{\link[foreign:read.dta]{foreign::read.dta()}} for Stata-files, \code{\link[haven:read_sas]{haven::read_sas()}} for SAS-data-files, and \code{\link[haven:read_xpt]{haven::read_xpt()}} or \code{\link[foreign:read.xport]{foreign::read.xport()}} for SAS-transport-files.
 }

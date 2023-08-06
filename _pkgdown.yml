@@ -1,28 +1,33 @@
+url: https://sjentsch.github.io/jmvReadWrite/
 repo:
   url:
     home: https://github.com/sjentsch/jmvReadWrite/
     source: https://github.com/sjentsch/jmvReadWrite/blob/main/
     issue: https://github.com/sjentsch/jmvReadWrite/issues/
   branch: main
-
 reference:
-- title: "Functions"
-  desc: >
+- title: Functions
+  desc: |
     Functions for reading and writing jamovi's omv-files
-- contents: 
+- contents:
   - read_omv
   - write_omv
-- title: "Helper functions"
-  desc: >
+- title: Helper functions
+  desc: |
     Functions for carrying out often required data management tasks for jamovi's omv-files
 - contents:
+  - arrange_cols_omv
   - convert_to_omv
+  - describe_omv
   - long2wide_omv
   - wide2long_omv
   - merge_cols_omv
   - merge_rows_omv
+  - replace_omv
+  - search_omv
   - sort_omv
-- title: "Example datasets"
+  - transpose_omv
+- title: Example datasets
 - contents:
   - AlbumSales
   - ToothGrowth

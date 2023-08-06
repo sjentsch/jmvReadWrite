@@ -27,27 +27,28 @@ read_omv(
 \item{getHTM}{Store index.html in the attribute "HTML" (default: FALSE)?}
 }
 \value{
-data frame (can be directly used with functions included in the R-package 'jmv' and syntax from 'jamovi'; also compatible with the format of the R-package "foreign")
+data frame (can be directly used with functions included in the R-package \code{jmv} and syntax from 'jamovi'; also compatible with the format of the
+R-package \code{foreign})
 }
 \description{
 Read files created of the statistical spreadsheet 'jamovi' (\url{https://www.jamovi.org})
 }
 \examples{
 \dontrun{
-library(jmvReadWrite);
-fleOMV <- system.file("extdata", "ToothGrowth.omv", package = "jmvReadWrite");
-data <- read_omv(fleInp = fleOMV, getSyn = TRUE);
+library(jmvReadWrite)
+nmeInp <- system.file("extdata", "ToothGrowth.omv", package = "jmvReadWrite")
+data <- read_omv(fleInp = nmeInp, getSyn = TRUE)
 # if the syntax couldn't be extracted, an empty list - length = 0 - is returned,
 # otherwise, the commands are shown and the first analysis is run, with the output
 # from the second analysis being assigned to the variable result
 if (length(attr(data, "syntax")) >= 1) {
-    print(attr(data, "syntax"));
+    print(attr(data, "syntax"))
     # the print-function is only used to force devtools::run_examples() to show output
-    eval(parse(text=paste0("result = ", attr(data, "syntax")[[1]])));
+    eval(parse(text=paste0("result = ", attr(data, "syntax")[1])))
     # without assigning the output to a variable, the command would be:
-    # eval(parse(text=attr(data, "syntax")[[1]]))
-    print(names(result));
-    print(result$main);
+    # eval(parse(text=attr(data, "syntax")[1]))
+    print(names(result))
+    print(result$main)
     # -> "main"      "assump"    "contrasts" "postHoc"   "emm"       "residsOV"
     # (the names of the six output tables)
 }

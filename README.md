@@ -1,7 +1,11 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# jmvReadWrite
+# jmvReadWrite <a href="https://sjentsch.github.io/jmvReadWrite/"><img src="man/figures/logo.svg" align="right" width="20%" /></a>
+
+<!---
+<br clear="all">
+--->
 
 <!-- badges: start -->
 
@@ -10,7 +14,9 @@
 [![Downloads](https://cranlogs.r-pkg.org/badges/jmvReadWrite?color=brightgreen)](https://cran.r-project.org/package=jmvReadWrite)
 [![Dependencies](https://tinyverse.netlify.com/badge/jmvReadWrite)](https://cran.r-project.org/package=jmvReadWrite)
 [![Last
-commit](https://img.shields.io/github/last-commit/sjentsch/jmvReadWrite)](https://github.com/sjentsch/jmvReadWrite)
+commit](https://img.shields.io/github/last-commit/sjentsch/jmvReadWrite?logo=GitHub)](https://github.com/sjentsch/jmvReadWrite)
+[![Register an
+issue](https://img.shields.io/github/issues/sjentsch/jmvReadWrite?color=%23fa251e&logo=GitHub)](https://github.com/sjentsch/jmvReadWrite/issues)
 [![CI](https://github.com/sjentsch/jmvReadWrite/actions/workflows/ci.yml/badge.svg)](https://github.com/sjentsch/jmvReadWrite/actions/workflows/ci.yml)
 [![R-CMD-check](https://github.com/sjentsch/jmvReadWrite/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/sjentsch/jmvReadWrite/actions/workflows/R-CMD-check.yaml)
 [![code-coverage](https://github.com/sjentsch/jmvReadWrite/actions/workflows/codecov.yaml/badge.svg)](https://github.com/sjentsch/jmvReadWrite/actions/workflows/codecov.yaml)
@@ -25,12 +31,18 @@ coverage](https://codecov.io/gh/sjentsch/jmvReadWrite/branch/main/graph/badge.sv
 
 The R-package `jmvReadWrite` reads and writes the .omv-files that are
 used by the statistical spreadsheet `jamovi` (<https://www.jamovi.org>).
-It is supposed to ease using syntax for statistical analyses created
-using the GUI in `jamovi` in connection with the R-library `jmv`.
+It is supposed to ease using jamovi and R together, provide helper
+functions for some often required data management tasks, and to adjust
+and use syntax for statistical analyses that were created using the GUI
+in `jamovi` in R (in connection with the R-library `jmv`). More
+recently, `jmvReadWrite` became easily available from within `jamovi` by
+becoming part of the `Rj` module (where you can use it by writing R
+commands, documented below), and via the `jTransform` module that
+provides a graphical user interface for most helper functions.
 
 ## Installation
 
-You can either install a stable version of `jmvReadWrite` which is
+In R, you can either install a stable version of `jmvReadWrite` which is
 available on [CRAN](https://cran.r-project.org/package=jmvReadWrite)
 using the following command:
 
@@ -42,13 +54,11 @@ or you can install the development version of the `jmvReadWrite` package
 from [GitHub](https://github.com/sjentsch/jmvReadWrite/):
 
 ``` r
-if(!require(devtools)) install.packages("devtools")
+if (!require(devtools)) install.packages("devtools")
 devtools::install_github("sjentsch/jmvReadWrite")
 ```
 
 ## How to use the package?
-
-<br />
 
 [**read\_omv**](https://sjentsch.github.io/jmvReadWrite/reference/read_omv.html)
 
@@ -71,16 +81,16 @@ differences.
 
 If you want to copy the syntax generated in jamovi, you have to switch
 on the [`Syntax
-Mode`](https://jamovi.readthedocs.io/en/latest/usermanual/um_6_syntax_mode.html).
+Mode`](https://jamovi.readthedocs.io/en/latest/usermanual/um_6_jamovi_and_R.html#syntax-mode).
 Afterwards, the syntax is shown at the top of the analysis and can be
 copied from there.
 
 ``` r
-library(jmvReadWrite);
-library(jmv);
+library(jmvReadWrite)
+library(jmv)
 
-fleOMV = system.file("extdata", "ToothGrowth.omv", package = "jmvReadWrite");
-data = read_omv(fleOMV);
+fleOMV <- system.file("extdata", "ToothGrowth.omv", package = "jmvReadWrite")
+data <- read_omv(fleOMV)
 # if the "jmv"-package is installed, we can run a test analysis with the data
 if ("jmv" %in% rownames(installed.packages())) {
     jmv::ANOVA(
@@ -89,7 +99,7 @@ if ("jmv" %in% rownames(installed.packages())) {
         effectSize = c("omega"),
         modelTest = TRUE,
         homo = TRUE,
-        norm = TRUE);
+        norm = TRUE)
     }
 #> 
 #>  ANOVA
@@ -135,21 +145,21 @@ in the attribute `syntax`. They can be used as shown in the following
 examples:
 
 ``` r
-library(jmvReadWrite);
-fleOMV = system.file("extdata", "ToothGrowth.omv", package = "jmvReadWrite");
-data = read_omv(fleOMV, getSyn = TRUE);
+library(jmvReadWrite)
+fleOMV <- system.file("extdata", "ToothGrowth.omv", package = "jmvReadWrite")
+data <- read_omv(fleOMV, getSyn = TRUE)
 # shows the syntax of the analyses from the .omv-file
 # please note that syntax extraction may not work on all systems
 # if the syntax couldn't be extracted, an empty list (length = 0) is returned,
-# otherwise, the syntax of the analyses from the .omv-file is shown and  
+# otherwise, the syntax of the analyses from the .omv-file is shown and
 # the commands of the first and the second analysis are run, with the
 # output of the second analysis assigned to the variable result2
 if (length(attr(data, "syntax")) >= 2) {
     attr(data, "syntax")
-    # if the "jmv"-package is installed, we can run the analyses in "syntax"     
+    # if the "jmv"-package is installed, we can run the analyses in "syntax"
     if ("jmv" %in% rownames(installed.packages())) {
-        eval(parse(text=attr(data, "syntax")[[1]]))
-        eval(parse(text=paste0("result2 = ", attr(data, "syntax")[[2]])))
+        eval(parse(text = attr(data, "syntax")[[1]]))
+        eval(parse(text = paste0("result2 = ", attr(data, "syntax")[[2]])))
         names(result2)
         # -> "main"      "assump"    "contrasts" "postHoc"   "emm"
         # (the names of the five output tables)
@@ -175,10 +185,10 @@ library(jmvReadWrite)
 
 # use the data set "ToothGrowth" and, if it exists, write it as jamovi-file
 # using write_omv()
-data("ToothGrowth");
+data("ToothGrowth")
 # "retDbg" has to be set in order to return debug information to wrtDta
-wrtDta = write_omv(ToothGrowth, "Trial.omv", retDbg = TRUE);
-names(wrtDta);
+wrtDta <- write_omv(ToothGrowth, "Trial.omv", retDbg = TRUE)
+names(wrtDta)
 #> [1] "mtaDta" "xtdDta" "dtaFrm"
 # -> "mtaDta" "xtdDta" "dtaFrm"
 # this debug information contains a list with the metadata ("mtaDta", e.g.,
@@ -188,14 +198,14 @@ names(wrtDta);
 
 # check whether the file was written to the disk, get the file information (size, etc.)
 # and delete the file afterwards
-list.files(".", "Trial.omv");
+list.files(".", "Trial.omv")
 #> [1] "Trial.omv"
-file.info("Trial.omv");
+file.info("Trial.omv")
 #>           size isdir mode               mtime               ctime
-#> Trial.omv 1563 FALSE  664 2022-08-08 08:15:51 2022-08-08 08:15:51
+#> Trial.omv 1723 FALSE  664 2023-08-05 22:06:14 2023-08-05 22:06:14
 #>                         atime  uid  gid    uname   grname
-#> Trial.omv 2022-08-08 08:15:51 1000 1000 sjentsch sjentsch
-unlink("Trial.omv");
+#> Trial.omv 2023-08-05 22:06:14 1000 1000 sjentsch sjentsch
+unlink("Trial.omv")
 ```
 
 Although jamovi reads R-data files (.RData, .rda, .rds)
@@ -210,23 +220,23 @@ modifications), it is recommended to leave the `sveAtt`-attribute set to
 # reading and writing a file with the "sveAtt"-parameter permits you to keep
 # essential meta-data to ensure that the written file looks and works like the
 # original file (plus you modifications)
-fleOMV = system.file("extdata", "ToothGrowth.omv", package = "jmvReadWrite");
-data = read_omv(fleOMV, sveAtt = TRUE);
+fleOMV <- system.file("extdata", "ToothGrowth.omv", package = "jmvReadWrite")
+data <- read_omv(fleOMV, sveAtt = TRUE)
 # shows the names of the attributes for the whole data set (e.g., number of
 # rows and columns) and the names of the attributes of the first column
-names(attributes(data));
+names(attributes(data))
 #> [1] "names"       "row.names"   "class"       "fltLst"      "removedRows"
 #> [6] "addedRows"   "transforms"
-names(attributes(data[[1]]));
-#>  [1] "missingValues"  "name"           "id"             "columnType"    
-#>  [5] "dataType"       "measureType"    "formula"        "formulaMessage"
-#>  [9] "parentId"       "width"          "type"           "importName"    
-#> [13] "description"    "transform"      "edits"          "filterNo"      
+names(attributes(data[[1]]))
+#>  [1] "name"           "id"             "columnType"     "dataType"      
+#>  [5] "measureType"    "formula"        "formulaMessage" "parentId"      
+#>  [9] "width"          "type"           "importName"     "description"   
+#> [13] "transform"      "edits"          "missingValues"  "filterNo"      
 #> [17] "active"
 #
 # perhaps do some modifications to the file here and write it back afterwards
-write_omv(data, 'Trial.omv');
-unlink("Trial.omv");
+write_omv(data, "Trial.omv")
+unlink("Trial.omv")
 ```
 
 If `Trial.omv` in the example above would have been kept, it should look
@@ -237,8 +247,11 @@ are stored for other columns. <br /><br />
 
 **Helper functions**
 
-Since version 0.3.0, `jmvReadWrite` contains a number of helper
-functions that support you with commonly required data management tasks:
+`jmvReadWrite` contains a number of helper functions that assist you
+with data management tasks that are frequently required:
+
+  - [`arrange_cols_omv`](https://sjentsch.github.io/jmvReadWrite/reference/arrange_cols_omv.html):
+    Re-arranges the columns of your data file in a requested order.
 
   - [`convert_to_omv`](https://sjentsch.github.io/jmvReadWrite/reference/convert_to_omv.html):
     Converts data sets from other file formats into jamovi-format (this
@@ -256,16 +269,19 @@ functions that support you with commonly required data management tasks:
     converted into rows).
 
   - [`merge_cols_omv`](https://sjentsch.github.io/jmvReadWrite/reference/merge_cols_omv.html):
-    Add cases from several data sets (i.e., the cases / rows in the
-    second, etc. data set are added as rows to the first data set).
-
-  - [`merge_rows_omv`](https://sjentsch.github.io/jmvReadWrite/reference/merge_rows_omv.html):
     Add variables from several data sets (i.e., the variables / columns
     in the second, etc. input data set are added as columns to the first
     data set).
 
+  - [`merge_rows_omv`](https://sjentsch.github.io/jmvReadWrite/reference/merge_rows_omv.html):
+    Add cases from several data sets (i.e., the cases / rows in the
+    second, etc. data set are added as rows to the first data set).
+
   - [`sort_omv`](https://sjentsch.github.io/jmvReadWrite/reference/sort_omv.html):
     Sort a data set according to one or more variable(s).
+
+  - [`transpose_omv`](https://sjentsch.github.io/jmvReadWrite/reference/transpose_omv.html):
+    Transpose a data set (make rows into columns and vice versa).
 
 -----
 

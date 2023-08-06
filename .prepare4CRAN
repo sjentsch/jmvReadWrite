@@ -5,13 +5,13 @@ devtools::load_all()
 
 for (blnAtt in c(TRUE, FALSE)) {
     for (crrOMV in list.files('inst/extdata/')) {
-        data = read_omv(file.path('inst/extdata/', crrOMV), sveAtt = blnAtt)
-        write_omv(data, '~/Trial.omv')
-        data2 = read_omv('~/Trial.omv', sveAtt = blnAtt)
+        data <- read_omv(file.path('inst/extdata/', crrOMV), sveAtt = blnAtt)
+        write_omv(data, "~/Trial.omv")
+        data2 <- read_omv("~/Trial.omv", sveAtt = blnAtt)
         cat(sprintf('\n%s\n\n%s\n\n', strrep("=", 100), crrOMV))
         suppressWarnings(print(diffdf::diffdf(data, data2)))
-        unlink('Trial.omv')
-        rm('data', 'data2')
+        unlink("~/Trial.omv")
+        rm("data", "data2")
     }
     cat(sprintf('\n%s\n%s\n\n', strrep("=", 100), strrep("=", 100)))
 }

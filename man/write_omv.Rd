@@ -5,18 +5,31 @@
 \title{Write files to be used with the statistical spreadsheet 'jamovi'
 (\url{https://www.jamovi.org})}
 \usage{
-write_omv(dtaFrm = NULL, fleOut = "", retDbg = FALSE)
+write_omv(
+  dtaFrm = NULL,
+  fleOut = "",
+  wrtPtB = FALSE,
+  frcWrt = FALSE,
+  retDbg = FALSE
+)
 }
 \arguments{
 \item{dtaFrm}{Data frame to be exported (default: NULL)}
 
-\item{fleOut}{Name / position of the output file to be generated ("FILENAME.omv"; default: "")}
+\item{fleOut}{Name / position of the output file to be generated
+("FILENAME.omv"; default: "")}
 
-\item{retDbg}{Whether to return a list with debugging information (see Value; default: FALSE)}
+\item{wrtPtB}{Whether to write protocol buffers (see Details; default: FALSE)}
+
+\item{frcWrt}{Whether to overwrite existing files with the same name (see Details; default: FALSE)}
+
+\item{retDbg}{Whether to return a list with debugging information (see
+Value; default: FALSE)}
 }
 \value{
-a list (if retDbg == TRUE), containing the meta data (mtaDta, metadata.json in the OMV-file), the extended data (xtdDta, xdata.json in the OMV-file)
-and the original data frame (dtaFrm)
+a list (if retDbg == TRUE), containing the meta data (mtaDta,
+metadata.json in the OMV-file), the extended data (xtdDta,
+xdata.json in the OMV-file) and the original data frame (dtaFrm)
 }
 \description{
 Write files to be used with the statistical spreadsheet 'jamovi'
@@ -24,9 +37,20 @@ Write files to be used with the statistical spreadsheet 'jamovi'
 }
 \details{
 \itemize{
-\item jamovi has a specific measurement level / type "ID" (in addition to the "standard" ones "Nominal", "Ordinal", and "Continuous"). "ID" is used for columns
-that contain some form of ID (e.g., a participant code). In order to set a variable of your data frame to "ID", you have to manually set an attribute
-\code{jmv-id} (e.g., \code{attr(dtaFrm$column, "jmv-id") = TRUE}).
+\item jamovi has a specific measurement level / type "ID" (in addition to the
+"standard" ones "Nominal", "Ordinal", and "Continuous"). "ID" is used for
+columns that contain some form of ID (e.g., a participant code). In order
+to set a variable of your data frame to "ID", you have to set the
+attribute \code{jmv-id} (e.g., \code{attr(dtaFrm$column, "jmv-id") = TRUE}).
+\item CAUTION: Setting wrtPtB to TRUE currently overwrites analyses that already
+exist in a data file. It is meant to be used for \code{describe_omv} only. If
+you set wrtPtB to TRUE, ensure to use an output file name that isn't would
+not overwrite any existing file. Protocol buffers are used to exchange
+data between the different parts of jamovi (the server and the client) and
+also the format in which analyses are stored in the jamovi data files.
+\item \code{write_omv} checks whether the output file already exists and throws an
+error if this is the case. frcWrt permits you to overwrite the existing
+file.
 }
 }
 \examples{
@@ -36,10 +60,10 @@ library(jmvReadWrite)
 # use the data set "ToothGrowth" and, if it exists, write it as
 # jamovi-file using write_omv()
 data("ToothGrowth")
-fleOMV <- paste0(tempfile(), ".omv")
+nmeOut <- tempfile(fileext = ".omv")
 # typically, one would use a "real" file name instead of tempfile(),
 # e.g., "Data1.omv"
-dtaDbg = write_omv(ToothGrowth, fleOMV, retDbg = TRUE)
+dtaDbg = write_omv(dtaFrm = ToothGrowth, fleOut = nmeOut, retDbg = TRUE)
 print(names(dtaDbg))
 # the print-function is only used to force devtools::run_examples()
 # to show output
@@ -51,11 +75,11 @@ print(names(dtaDbg))
 
 # check whether the file was written to the disk, get the file informa-
 # tion (size, etc.) and delete the file afterwards
-print(list.files(dirname(fleOMV), basename(fleOMV)))
+print(list.files(dirname(nmeOut), basename(nmeOut)))
 # -> "file[...].omv" ([...] is a combination of random numbers / characters
-print(file.info(fleOMV)$size)
-# -> approx. 2500 (size may differ on different OSes)
-unlink(fleOMV)
+print(file.info(nmeOut)$size)
+# -> approx. 2600 (size may differ on different OSes)
+unlink(nmeOut)
 }
 
 }

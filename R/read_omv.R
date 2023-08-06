@@ -13,17 +13,17 @@
 #' @examples
 #' \dontrun{
 #' library(jmvReadWrite)
-#' fleOMV <- system.file("extdata", "ToothGrowth.omv", package = "jmvReadWrite")
-#' data <- read_omv(fleInp = fleOMV, getSyn = TRUE)
+#' nmeInp <- system.file("extdata", "ToothGrowth.omv", package = "jmvReadWrite")
+#' data <- read_omv(fleInp = nmeInp, getSyn = TRUE)
 #' # if the syntax couldn't be extracted, an empty list - length = 0 - is returned,
 #' # otherwise, the commands are shown and the first analysis is run, with the output
 #' # from the second analysis being assigned to the variable result
 #' if (length(attr(data, "syntax")) >= 1) {
 #'     print(attr(data, "syntax"))
 #'     # the print-function is only used to force devtools::run_examples() to show output
-#'     eval(parse(text=paste0("result = ", attr(data, "syntax")[[1]])))
+#'     eval(parse(text=paste0("result = ", attr(data, "syntax")[1])))
 #'     # without assigning the output to a variable, the command would be:
-#'     # eval(parse(text=attr(data, "syntax")[[1]]))
+#'     # eval(parse(text=attr(data, "syntax")[1]))
 #'     print(names(result))
 #'     print(result$main)
 #'     # -> "main"      "assump"    "contrasts" "postHoc"   "emm"       "residsOV"
@@ -187,45 +187,23 @@ read_omv <- function(fleInp = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = TRUE,
 
     # import and extract syntax from the analyses
     if (getSyn) {
-        anlLst <- fleLst[grepl("[0-9][0-9].*/analysis", fleLst)]
-        savSyn <- list()
-        savPBf <- list()
-        if (length(anlLst) > 0) {
-            synPkg <- c("RProtoBuf", "jmvcore", "rlang")
-            flePtB <- system.file("jamovi.proto", package = "jmvcore")
-            # check whether all required packages and files are present
-            if (hasPkg(synPkg) && file.exists(flePtB)) {
-                # try reading the protobuffer-file (if it can be read / parsed, tryCatch returns TRUE and the syntax can be extracted)
-                blnPtb <- tryCatch(expr  = {
-                                             RProtoBuf::readProtoFiles(flePtB)
-                                             TRUE
-                                           },
-                                   error = function(e) {
-                                                         message("Error when loading protocol definition, syntax can\'t be extracted:\n", e)
-                                                         FALSE
-                                                       }
-                                 )
-                if (blnPtb) {
-                    for (anlNme in anlLst) {
-                        anlPBf <- RProtoBuf::read(jamovi.coms.AnalysisResponse, anlHdl <- getHdl(fleInp, anlNme, "rb"))
-                        clsHdl(anlHdl)
-                        rm(anlHdl)
-                        # for (anlFld in names(anlPBf))         { print(paste0(anlFld, ": ", anlPBf[[anlFld]])) }         # helper function to show all fields
-                        # for (anlFld in names(anlPBf$options)) { print(paste0(anlFld, ": ", anlPBf$options[[anlFld]])) } # helper function to show all fields in options
-                        # for (anlFld in names(anlPBf$results)) { print(paste0(anlFld, ": ", anlPBf$results[[anlFld]])) } # helper function to show all fields in results
-                        # ..$bytesize() - size of the protocol buffer (or any field contained in it)
-                        savSyn <- c(savSyn, gsub("\\( ", "\\(", gsub("\\n\\s+", " ", fndSyn(anlPBf$results))))
-                        anlPBf$results <- NULL
-                        savPBf <- c(savPBf, anlPBf)
-                    }
+        anlLst <- fleLst[grepl("[0-9]+\\s\\w+/analysis", fleLst)]
+        savSyn <- c()
+        savPtB <- list()
+        if (length(anlLst) > 0 && jmvPtB()) {
+            for (anlNme in anlLst) {
+                anlPtB <- RProtoBuf::read(jamovi.coms.AnalysisResponse, anlHdl <- getHdl(fleInp, anlNme, "rb"))
+                clsHdl(anlHdl)
+                rm(anlHdl)
+                if (!grepl("empty$", dirname(anlNme))) {
+                    savSyn <- c(savSyn, gsub("\\( ", "\\(", gsub("\\n\\s+", " ", fndSyn(anlPtB$results))))
                 }
-            } else {
-                cat(paste0("WARNING: For extracting syntax, the package(s) \"", paste0(synPkg[!sapply(synPkg, function(X) nzchar(system.file(package = X)))],
-                                                                                       collapse = "\", \""), "\" need(s) to be installed.\n\n"))
+                anlPtB$results <- NULL
+                savPtB[[anlNme]] <- anlPtB
             }
         }
         attr(dtaFrm, "syntax")   <- savSyn
-        attr(dtaFrm, "protobuf") <- savPBf
+        attr(dtaFrm, "protobuf") <- savPtB
     }
 
     # import the HTML output

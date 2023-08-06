@@ -7,7 +7,7 @@
 #' @param varOrd Character vector with the desired order of variable(s) in the data frame (see Details; default: c())
 #' @param varMve Named list defining to how much a particular variable (name of a list entry) should be moved up (neg. value of a list entry) or down (pos.
 #'               value) in the data frame (see Details; default: c())
-#' @param psvAnl Whether analyses that are contained in the input file shall be transferred to the output file (TRUE / FALSE; default: FALSE)
+#' @param psvAnl Whether analyses that are contained in the input file shall be transferred to the output file (default: FALSE)
 #' @param usePkg Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata and SAS files; "foreign" is the default (it comes with
 #'               base R), but "haven" is newer and more comprehensive
 #' @param selSet Name of the data set that is to be selected from the workspace (only applies when reading .RData-files)
@@ -25,39 +25,40 @@
 #'   changed to order of variables.
 #' * Using `varOrd` makes more sense for changing the position of several variables, whereas using `varMve` makes more sense for one variable. If
 #'   both parameters are given, a warning is issued and `varOrd` takes precedence.
-#' * The ellipsis-parameter (`...`) can be used to submit arguments / parameters to the functions that are used for reading the data. By clicking on the
-#'   respective function under “See also”, you can get a more detailed overview over which parameters each of those functions take. The functions are:
-#'   `read_omv` (for jamovi-files), `read.table` (for CSV / TSV files; using similar defaults as `read.csv` for CSV and `read.delim` for TSV which both are
-#'   based upon `read.table`), `load` (for .RData-files), `readRDS` (for .rds-files), `read_sav` (needs R-package `haven`) or `read.spss` (needs R-package
-#'   `foreign`) for SPSS-files, `read_dta` (`haven`) / `read.dta` (`foreign`) for Stata-files, `read_sas` (`haven`) for SAS-data-files, and `read_xpt`
-#'   (`haven`) / `read.xport` (`foreign`) for SAS-transport-files. If you would like to use `haven`, you may need to install it manually (i.e.,
-#'   `install.packages("haven", dep = TRUE)`).
+#' * The ellipsis-parameter (`...`) can be used to submit arguments / parameters to the functions that are used for reading and writing the data. By clicking
+#'   on the respective function under “See also”, you can get a more detailed overview over which parameters each of those functions take. The functions are:
+#'   `read_omv` and `write_omv` (for jamovi-files), `read.table` (for CSV / TSV files; using similar defaults as `read.csv` for CSV and `read.delim` for TSV
+#'   which both are based upon `read.table`), `load` (for .RData-files), `readRDS` (for .rds-files), `read_sav` (needs the R-package `haven`) or `read.spss`
+#'   (needs the R-package `foreign`) for SPSS-files, `read_dta` (`haven`) / `read.dta` (`foreign`) for Stata-files, `read_sas` (`haven`) for SAS-data-files,
+#'   and `read_xpt` (`haven`) / `read.xport` (`foreign`) for SAS-transport-files. If you would like to use `haven`, you may need to install it using
+#'   `install.packages("haven", dep = TRUE)`.
 #'
-#' @seealso `arrange_cols_omv` internally uses the following functions to read data files in different formats: [jmvReadWrite::read_omv()] for jamovi-files,
-#'   [utils::read.table()] for CSV / TSV files, [load()] for reading .RData-files, [readRDS()] for .rds-files, [haven::read_sav()] or [foreign::read.spss()]
-#'   for SPSS-files, [haven::read_dta()] or [foreign::read.dta()] for Stata-files, [haven::read_sas()] for SAS-data-files, and [haven::read_xpt()] or
-#'   [foreign::read.xport()] for SAS-transport-files.
+#' @seealso `arrange_cols_omv` internally uses the following functions for reading and writing data files in different formats: [jmvReadWrite::read_omv()] and
+#'   [jmvReadWrite::write_omv()] for jamovi-files, [utils::read.table()] for CSV / TSV files, [load()] for reading .RData-files, [readRDS()] for .rds-files,
+#'   [haven::read_sav()] or [foreign::read.spss()] for SPSS-files, [haven::read_dta()] or [foreign::read.dta()] for Stata-files, [haven::read_sas()] for
+#'   SAS-data-files, and [haven::read_xpt()] or [foreign::read.xport()] for SAS-transport-files.
 #'
 #' @examples
 #' \dontrun{
 #' library(jmvReadWrite)
-#' fleOMV <- system.file("extdata", "AlbumSales.omv", package = "jmvReadWrite")
-#' fleTmp <- paste0(tempfile(), ".omv")
+#' nmeInp <- system.file("extdata", "AlbumSales.omv", package = "jmvReadWrite")
+#' nmeOut <- tempfile(fileext = ".omv")
 #' # the original file has the variables in the order: "Adverts", "Airplay", "Image", "Sales"
-#' names(read_omv(fleOMV))
+#' names(read_omv(nmeInp))
 #' # first, we move the variable "Sales" to the first place using the varOrd-parameter
-#' arrange_cols_omv(dtaInp = fleOMV, fleOut = fleTmp,
+#' arrange_cols_omv(dtaInp = nmeInp, fleOut = nmeOut,
 #'   varOrd = c("Sales", "Adverts", "Airplay", "Image"))
-#' names(read_omv(fleTmp))
+#' names(read_omv(nmeOut))
+#' unlink(nmeOut)
 #' # now, we move the variable "Sales" to the first place using the varMve-parameter
-#' arrange_cols_omv(dtaInp = fleOMV, fleOut = fleTmp, varMve = list(Sales = -3))
-#' names(read_omv(fleTmp))
-#' unlink(fleTmp)
+#' arrange_cols_omv(dtaInp = nmeInp, fleOut = nmeOut, varMve = list(Sales = -3))
+#' names(read_omv(nmeOut))
+#' unlink(nmeOut)
 #' }
 #'
 #' @export arrange_cols_omv
 #'
-arrange_cols_omv <- function(dtaInp = "", fleOut = "", varOrd = c(), varMve = list(), psvAnl = FALSE, usePkg = c("foreign", "haven"), selSet = "", ...) {
+arrange_cols_omv <- function(dtaInp = NULL, fleOut = "", varOrd = c(), varMve = list(), psvAnl = FALSE, usePkg = c("foreign", "haven"), selSet = "", ...) {
 
     # check the input parameters: either varOrd or varMve need to be given; if varOrd is given, the given character vectore and all of its elements need to be not empty;
     # if varMve is given, it needs to be a list, the names can't be empty, and the values need to be integers and can't be zero
@@ -68,8 +69,7 @@ arrange_cols_omv <- function(dtaInp = "", fleOut = "", varOrd = c(), varMve = li
 
     # check and import input data set (either as data frame or from a file)
     if (!is.null(list(...)[["fleInp"]])) stop("Please use the argument dtaInp instead of fleInp.")
-    dtaFrm <- inp2DF(dtaInp = dtaInp, fleOut = fleOut, usePkg = usePkg, selSet = selSet, ...)
-    fleOut <- attr(dtaFrm, "fleOut")
+    dtaFrm <- inp2DF(dtaInp = dtaInp, usePkg = usePkg, selSet = selSet, ...)
 
     # re-arrange the order of variables in the data set (varOrd)
     if (length(varOrd) > 0) {
@@ -107,23 +107,8 @@ arrange_cols_omv <- function(dtaInp = "", fleOut = "", varOrd = c(), varMve = li
     # re-arrange to order of variables, while storing and restoring the attributes attached to the whole data frame (column attributes are not affected)
     attMem <- attributes(dtaFrm)
     dtaFrm <- dtaFrm[, varOrd]
-    dtaFrm <- setAtt(setdiff(names(attMem), c("names", "row.names", "class", "fltLst", "fleOut")), attMem, dtaFrm)
+    dtaFrm <- setAtt(setdiff(names(attMem), c("names", "row.names", "class", "fltLst")), attMem, dtaFrm)
 
-    # write the resulting data frame to the output file or, if no output file
-    # name was given, return the data frame
-    if (!is.null(fleOut) && nzchar(fleOut)) {
-        write_omv(dtaFrm, fleOut)
-        # transfer analyses from input to output file
-        if (psvAnl) {
-            if (is.character(dtaInp)) {
-                xfrAnl(dtaInp, fleOut)
-            } else {
-                warning("psvAnl is only possible if dtaInp is a file name (analyses are not stored in data frames, only in the jamovi files).")
-            }
-        }
-        return(invisible(NULL))
-    } else {
-        if (psvAnl) warning("psvAnl is only possible if fleOut is a file name (analyses are not stored in data frames, only in the jamovi files).")
-        dtaFrm
-    }
+    # rtnDta in globals.R (unified function to either write the data frame, open it in a new jamovi session or return it)
+    rtnDta(dtaFrm = dtaFrm, fleOut = fleOut, sfxTtl = "_arr_cols", psvAnl = psvAnl, dtaInp = dtaInp, ...)
 }

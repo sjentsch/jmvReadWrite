@@ -5,7 +5,7 @@
 \title{Re-arrange columns / variables in .omv-files for the statistical spreadsheet 'jamovi' (\url{https://www.jamovi.org})}
 \usage{
 arrange_cols_omv(
-  dtaInp = "",
+  dtaInp = NULL,
   fleOut = "",
   varOrd = c(),
   varMve = list(),
@@ -27,7 +27,7 @@ returned instead}
 \item{varMve}{Named list defining to how much a particular variable (name of a list entry) should be moved up (neg. value of a list entry) or down (pos.
 value) in the data frame (see Details; default: c())}
 
-\item{psvAnl}{Whether analyses that are contained in the input file shall be transferred to the output file (TRUE / FALSE; default: FALSE)}
+\item{psvAnl}{Whether analyses that are contained in the input file shall be transferred to the output file (default: FALSE)}
 
 \item{usePkg}{Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata and SAS files; "foreign" is the default (it comes with
 base R), but "haven" is newer and more comprehensive}
@@ -53,36 +53,37 @@ note that the list entries are processed one after another, that is, for a secon
 changed to order of variables.
 \item Using \code{varOrd} makes more sense for changing the position of several variables, whereas using \code{varMve} makes more sense for one variable. If
 both parameters are given, a warning is issued and \code{varOrd} takes precedence.
-\item The ellipsis-parameter (\code{...}) can be used to submit arguments / parameters to the functions that are used for reading the data. By clicking on the
-respective function under “See also”, you can get a more detailed overview over which parameters each of those functions take. The functions are:
-\code{read_omv} (for jamovi-files), \code{read.table} (for CSV / TSV files; using similar defaults as \code{read.csv} for CSV and \code{read.delim} for TSV which both are
-based upon \code{read.table}), \code{load} (for .RData-files), \code{readRDS} (for .rds-files), \code{read_sav} (needs R-package \code{haven}) or \code{read.spss} (needs R-package
-\code{foreign}) for SPSS-files, \code{read_dta} (\code{haven}) / \code{read.dta} (\code{foreign}) for Stata-files, \code{read_sas} (\code{haven}) for SAS-data-files, and \code{read_xpt}
-(\code{haven}) / \code{read.xport} (\code{foreign}) for SAS-transport-files. If you would like to use \code{haven}, you may need to install it manually (i.e.,
-\code{install.packages("haven", dep = TRUE)}).
+\item The ellipsis-parameter (\code{...}) can be used to submit arguments / parameters to the functions that are used for reading and writing the data. By clicking
+on the respective function under “See also”, you can get a more detailed overview over which parameters each of those functions take. The functions are:
+\code{read_omv} and \code{write_omv} (for jamovi-files), \code{read.table} (for CSV / TSV files; using similar defaults as \code{read.csv} for CSV and \code{read.delim} for TSV
+which both are based upon \code{read.table}), \code{load} (for .RData-files), \code{readRDS} (for .rds-files), \code{read_sav} (needs the R-package \code{haven}) or \code{read.spss}
+(needs the R-package \code{foreign}) for SPSS-files, \code{read_dta} (\code{haven}) / \code{read.dta} (\code{foreign}) for Stata-files, \code{read_sas} (\code{haven}) for SAS-data-files,
+and \code{read_xpt} (\code{haven}) / \code{read.xport} (\code{foreign}) for SAS-transport-files. If you would like to use \code{haven}, you may need to install it using
+\code{install.packages("haven", dep = TRUE)}.
 }
 }
 \examples{
 \dontrun{
 library(jmvReadWrite)
-fleOMV <- system.file("extdata", "AlbumSales.omv", package = "jmvReadWrite")
-fleTmp <- paste0(tempfile(), ".omv")
+nmeInp <- system.file("extdata", "AlbumSales.omv", package = "jmvReadWrite")
+nmeOut <- tempfile(fileext = ".omv")
 # the original file has the variables in the order: "Adverts", "Airplay", "Image", "Sales"
-names(read_omv(fleOMV))
+names(read_omv(nmeInp))
 # first, we move the variable "Sales" to the first place using the varOrd-parameter
-arrange_cols_omv(dtaInp = fleOMV, fleOut = fleTmp,
+arrange_cols_omv(dtaInp = nmeInp, fleOut = nmeOut,
   varOrd = c("Sales", "Adverts", "Airplay", "Image"))
-names(read_omv(fleTmp))
+names(read_omv(nmeOut))
+unlink(nmeOut)
 # now, we move the variable "Sales" to the first place using the varMve-parameter
-arrange_cols_omv(dtaInp = fleOMV, fleOut = fleTmp, varMve = list(Sales = -3))
-names(read_omv(fleTmp))
-unlink(fleTmp)
+arrange_cols_omv(dtaInp = nmeInp, fleOut = nmeOut, varMve = list(Sales = -3))
+names(read_omv(nmeOut))
+unlink(nmeOut)
 }
 
 }
 \seealso{
-\code{arrange_cols_omv} internally uses the following functions to read data files in different formats: \code{\link[=read_omv]{read_omv()}} for jamovi-files,
-\code{\link[utils:read.table]{utils::read.table()}} for CSV / TSV files, \code{\link[=load]{load()}} for reading .RData-files, \code{\link[=readRDS]{readRDS()}} for .rds-files, \code{\link[haven:read_spss]{haven::read_sav()}} or \code{\link[foreign:read.spss]{foreign::read.spss()}}
-for SPSS-files, \code{\link[haven:read_dta]{haven::read_dta()}} or \code{\link[foreign:read.dta]{foreign::read.dta()}} for Stata-files, \code{\link[haven:read_sas]{haven::read_sas()}} for SAS-data-files, and \code{\link[haven:read_xpt]{haven::read_xpt()}} or
-\code{\link[foreign:read.xport]{foreign::read.xport()}} for SAS-transport-files.
+\code{arrange_cols_omv} internally uses the following functions for reading and writing data files in different formats: \code{\link[=read_omv]{read_omv()}} and
+\code{\link[=write_omv]{write_omv()}} for jamovi-files, \code{\link[utils:read.table]{utils::read.table()}} for CSV / TSV files, \code{\link[=load]{load()}} for reading .RData-files, \code{\link[=readRDS]{readRDS()}} for .rds-files,
+\code{\link[haven:read_spss]{haven::read_sav()}} or \code{\link[foreign:read.spss]{foreign::read.spss()}} for SPSS-files, \code{\link[haven:read_dta]{haven::read_dta()}} or \code{\link[foreign:read.dta]{foreign::read.dta()}} for Stata-files, \code{\link[haven:read_sas]{haven::read_sas()}} for
+SAS-data-files, and \code{\link[haven:read_xpt]{haven::read_xpt()}} or \code{\link[foreign:read.xport]{foreign::read.xport()}} for SAS-transport-files.
 }

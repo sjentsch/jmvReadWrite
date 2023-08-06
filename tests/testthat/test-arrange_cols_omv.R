@@ -1,6 +1,6 @@
 test_that("arrange_cols_omv works", {
-    nmeInp <- paste0(tempfile(), ".rds")
-    nmeOut <- paste0(tempfile(), "_A.omv")
+    nmeInp <- tempfile(fileext = ".rds")
+    nmeOut <- tempfile(fileext = "_A.omv")
     saveRDS(jmvReadWrite::AlbumSales, nmeInp)
 
     expect_null(arrange_cols_omv(dtaInp = nmeInp, fleOut = nmeOut, varOrd = c("selSbj", "Sales", "Adverts", "Airplay", "Image")))
@@ -114,9 +114,10 @@ test_that("arrange_cols_omv works", {
       c("01 empty/analysis", "02 anova/analysis", "02 anova/resources/61c33c657d5e31f1.png", "02 anova/resources/dd0ce025a00dad1b.png", "03 empty/analysis",
         "04 ancova/analysis", "05 empty/analysis", "data.bin", "index.html", "meta", "metadata.json", "xdata.json"))
     expect_equal(attr(df4Chk, "syntax"),
-      list(paste("jmv::ANOVA(formula = len ~ supp + dose2 + supp:dose2, data = data, effectSize = \"partEta\", modelTest = TRUE, qq = TRUE,",
-                 "contrasts = list(list(var=\"supp\", type=\"none\"), list(var=\"dose2\", type=\"polynomial\")), postHoc = ~ supp + dose2, emMeans = ~ dose2:supp)"),
+      c(paste("jmv::ANOVA(formula = len ~ supp + dose2 + supp:dose2, data = data, effectSize = \"partEta\", modelTest = TRUE, qq = TRUE,",
+              "contrasts = list(list(var=\"supp\", type=\"none\"), list(var=\"dose2\", type=\"polynomial\")), postHoc = ~ supp + dose2, emMeans = ~ dose2:supp)"),
            "jmv::ancova(formula = len ~ supp + dose, data = data, effectSize = \"partEta\", modelTest = TRUE)"))
+    unlink(nmeOut)
     expect_warning(arrange_cols_omv(dtaInp = jmvReadWrite::AlbumSales, fleOut = nmeOut, varOrd = c("selSbj", "Sales", "Adverts", "Airplay", "Image"), psvAnl = TRUE),
       regexp = "^psvAnl is only possible if dtaInp is a file name \\(analyses are not stored in data frames, only in the jamovi files\\)\\.")
     expect_warning(arrange_cols_omv(dtaInp = jmvReadWrite::AlbumSales, varOrd = c("selSbj", "Sales", "Adverts", "Airplay", "Image"), psvAnl = TRUE),

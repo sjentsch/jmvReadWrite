@@ -64,11 +64,11 @@ factors).
 \item The ellipsis-parameter (\code{...}) can be used to submit arguments / parameters to the functions that are used for merging or reading the data. By clicking on
 the respective function under “See also”, you can get a more detailed overview over which parameters each of those functions take.
 \item Adding columns uses \code{rbind} (with some further operation, adding missing columns (filled with NAs), if \code{typMrg} is "all").
-\item The functions for reading the data are: \code{read_omv} (for jamovi-files), \code{read.table} (for CSV / TSV files; using similar defaults as \code{read.csv} for CSV and
-\code{read.delim} for TSV which both are based upon \code{read.table}), \code{load} (for .RData-files), \code{readRDS} (for .rds-files), \code{read_sav} (needs R-package \code{haven})
-or \code{read.spss} (needs R-package \code{foreign}) for SPSS-files, \code{read_dta} (\code{haven}) / \code{read.dta} (\code{foreign}) for Stata-files, \code{read_sas} (\code{haven}) for
-SAS-data-files, and \code{read_xpt} (\code{haven}) / \code{read.xport} (\code{foreign}) for SAS-transport-files. If you would like to use \code{haven}, you may need to install it
-manually (i.e., \code{install.packages("haven", dep = TRUE)}).
+\item The functions for reading and writing the data are: \code{read_omv} and \code{write_omv} (for jamovi-files), \code{read.table} (for CSV / TSV files; using similar
+defaults as \code{read.csv} for CSV and \code{read.delim} for TSV which both are based upon \code{read.table}), \code{load} (for .RData-files), \code{readRDS} (for .rds-files),
+\code{read_sav} (needs R-package \code{haven}) or \code{read.spss} (needs R-package \code{foreign}) for SPSS-files, \code{read_dta} (\code{haven}) / \code{read.dta} (\code{foreign}) for
+Stata-files, \code{read_sas} (\code{haven}) for SAS-data-files, and \code{read_xpt} (\code{haven}) / \code{read.xport} (\code{foreign}) for SAS-transport-files. If you would like to
+use \code{haven}, you may need to install it using \code{install.packages("haven", dep = TRUE)}.
 }
 }
 \examples{
@@ -76,7 +76,7 @@ manually (i.e., \code{install.packages("haven", dep = TRUE)}).
 library(jmvReadWrite)
 dtaInp <- bfi_sample2
 nmeInp <- paste0(tempfile(), "_", 1:3, ".rds")
-nmeOut <- paste0(tempfile(), ".omv")
+nmeOut <- tempfile(fileext = ".omv")
 for (i in seq_along(nmeInp)) saveRDS(dtaInp[-i - 1], nmeInp[i])
 # save dtaInp three times (i.e., the length of nmeInp), removing one data columns in
 # each data set (for demonstration purposes, A1 in the first, A2 in the second, ...)
@@ -84,6 +84,7 @@ merge_rows_omv(dtaInp = nmeInp, fleOut = nmeOut, colInd = TRUE)
 cat(file.info(nmeOut)$size)
 # -> 10767 (size may differ on different OSes)
 dtaOut <- read_omv(nmeOut, sveAtt = FALSE)
+unlink(nmeOut)
 # read the data set where the three original datasets were added as rows and show
 # the variable names
 cat(names(dtaInp))
@@ -102,6 +103,7 @@ merge_rows_omv(dtaInp = nmeInp, fleOut = nmeOut, typMrg = "common")
 # the argument typMrg = "common" removes the columns that are not present in all of
 # the input data sets (i.e., A1, A2, A3)
 dtaOut <- read_omv(nmeOut, sveAtt = FALSE)
+unlink(nmeOut)
 # read the data set where the three original datasets were added as rows and show
 # the variable names
 cat(names(dtaInp))
@@ -114,13 +116,12 @@ cat(dim(dtaInp), dim(dtaOut))
 # reduced by 3 (i.e., "A1", "A2", "A3")
 
 unlink(nmeInp)
-unlink(nmeOut)
 }
 
 }
 \seealso{
-\code{merge_rows_omv} internally uses the following functions: Adding columns uses \code{\link[=rbind]{rbind()}}. For reading data files in different formats, the following
-functions are used: \code{\link[=read_omv]{read_omv()}} for jamovi-files, \code{\link[utils:read.table]{utils::read.table()}} for CSV / TSV files, \code{\link[=load]{load()}} for reading .RData-files, \code{\link[=readRDS]{readRDS()}}
-for .rds-files, \code{\link[haven:read_spss]{haven::read_sav()}} or \code{\link[foreign:read.spss]{foreign::read.spss()}} for SPSS-files, \code{\link[haven:read_dta]{haven::read_dta()}} or \code{\link[foreign:read.dta]{foreign::read.dta()}} for Stata-files,
+\code{merge_rows_omv} internally uses the following functions: Adding columns uses \code{\link[=rbind]{rbind()}}. For reading and writing data files in different formats:
+\code{\link[=read_omv]{read_omv()}} and \code{\link[=write_omv]{write_omv()}} for jamovi-files, \code{\link[utils:read.table]{utils::read.table()}} for CSV / TSV files, \code{\link[=load]{load()}} for reading .RData-files,
+\code{\link[=readRDS]{readRDS()}} for .rds-files, \code{\link[haven:read_spss]{haven::read_sav()}} or \code{\link[foreign:read.spss]{foreign::read.spss()}} for SPSS-files, \code{\link[haven:read_dta]{haven::read_dta()}} or \code{\link[foreign:read.dta]{foreign::read.dta()}} for Stata-files,
 \code{\link[haven:read_sas]{haven::read_sas()}} for SAS-data-files, and \code{\link[haven:read_xpt]{haven::read_xpt()}} or \code{\link[foreign:read.xport]{foreign::read.xport()}} for SAS-transport-files.
 }

@@ -16,18 +16,18 @@
 #' * If `varNme` empty, the row names of the input data set are used (preceded by "V_" if all row names are numbers); if `varNme` has length 1, then it is
 #'   supposed to point to a variable in the input data frame; if `varNme` has the same length as the number of rows in the input data frame, then the values
 #'   in `varNme` are assigned as column names to the output data frame.
-#' * The ellipsis-parameter (`...`) can be used to submit arguments / parameters to the functions that are used for reading the data. By clicking on the
-#'   respective function under “See also”, you can get a more detailed overview over which parameters each of those functions take. The functions are:
-#'   `read_omv` (for jamovi-files), `read.table` (for CSV / TSV files; using similar defaults as `read.csv` for CSV and `read.delim` for TSV which both are
-#'   based upon `read.table`), `load` (for .RData-files), `readRDS` (for .rds-files), `read_sav` (needs R-package `haven`) or `read.spss` (needs R-package
-#'   `foreign`) for SPSS-files, `read_dta` (`haven`) / `read.dta` (`foreign`) for Stata-files, `read_sas` (`haven`) for SAS-data-files, and `read_xpt`
-#'   (`haven`) / `read.xport` (`foreign`) for SAS-transport-files. If you would like to use `haven`, you may be need to install it manually (i.e.,
-#'   `install.packages("haven", dep = TRUE)`).
+#' * The ellipsis-parameter (`...`) can be used to submit arguments / parameters to the functions that are used for reading and writing the data. By clicking
+#'   on the respective function under “See also”, you can get a more detailed overview over which parameters each of those functions take. The functions are:
+#'   `read_omv` and `write_omv` (for jamovi-files), `read.table` (for CSV / TSV files; using similar defaults as `read.csv` for CSV and `read.delim` for TSV
+#'   which both are based upon `read.table`), `load` (for .RData-files), `readRDS` (for .rds-files), `read_sav` (needs the R-package `haven`) or `read.spss`
+#'   (needs the R-package `foreign`) for SPSS-files, `read_dta` (`haven`) / `read.dta` (`foreign`) for Stata-files, `read_sas` (`haven`) for SAS-data-files,
+#'   and `read_xpt` (`haven`) / `read.xport` (`foreign`) for SAS-transport-files. If you would like to use `haven`, you may need to install it using
+#'   `install.packages("haven", dep = TRUE)`.
 #'
-#' @seealso `sort_omv` internally uses the following functions to read data files in different formats: [jmvReadWrite::read_omv()] for jamovi-files,
-#'   [utils::read.table()] for CSV / TSV files, [load()] for reading .RData-files, [readRDS()] for .rds-files, [haven::read_sav()] or [foreign::read.spss()]
-#'   for SPSS-files, [haven::read_dta()] or [foreign::read.dta()] for Stata-files, [haven::read_sas()] for SAS-data-files, and [haven::read_xpt()] or
-#'   [foreign::read.xport()] for SAS-transport-files.
+#' @seealso `transpose_omv` internally uses the following functions for reading and writing data files in different formats: [jmvReadWrite::read_omv()] and
+#'   [jmvReadWrite::write_omv()] for jamovi-files, [utils::read.table()] for CSV / TSV files, [load()] for reading .RData-files, [readRDS()] for .rds-files,
+#'   [haven::read_sav()] or [foreign::read.spss()] for SPSS-files, [haven::read_dta()] or [foreign::read.dta()] for Stata-files, [haven::read_sas()] for
+#'   SAS-data-files, and [haven::read_xpt()] or [foreign::read.xport()] for SAS-transport-files.
 #'
 #' @examples
 #' \dontrun{
@@ -37,20 +37,21 @@
 #'                          sprintf("sbj_%03d", seq(75)))
 #' str(tmpDF)
 #' # Data sets that were extracted, e.g., from PsychoPy, may look like this (trials as rows
-#' # and participants as columns, one for each participant, manually assmebled / copy-and-pasted).
+#' # and participants as columns, one for each participant, manually assembled / copy-and-pasted).
 #' # However, for analyses, one wants the data set transposed (units / participants as columns)...
-#' fleTmp <- paste0(tempfile(), ".omv")
-#' transpose_omv(dtaInp = tmpDF, fleOut = fleTmp)
-#' dtaFrm <- read_omv(fleTmp)
+#' nmeOut <- tempfile(fileext = ".omv")
+#' transpose_omv(dtaInp = tmpDF, fleOut = nmeOut)
+#' dtaFrm <- read_omv(nmeOut)
+#' unlink(nmeOut)
 #' str(dtaFrm)
 #' # if no varNme-parameter is given, generic variable names are created (V_...)
-#' transpose_omv(dtaInp = tmpDF, fleOut = fleTmp, varNme = sprintf("Trl_%02d", seq(16)))
-#' dtaFrm <- read_omv(fleTmp)
+#' transpose_omv(dtaInp = tmpDF, fleOut = nmeOut, varNme = sprintf("Trl_%02d", seq(16)))
+#' dtaFrm <- read_omv(nmeOut)
+#' unlink(nmeOut)
 #' str(dtaFrm)
 #' # alternatively, the character vector with the desired variable names (of the same length as
 #' # the number of rows in tmpDF) may be given, "Trl" can easily be exchanged by the name of your
 #' # questionnaire, experimental conditions, etc.
-#' unlink(fleTmp)
 #' }
 #'
 #' @export transpose_omv
@@ -59,8 +60,7 @@ transpose_omv <- function(dtaInp = NULL, fleOut = "", varNme = "", usePkg = c("f
 
     # check and import input data set (either as data frame or from a file)
     if (!is.null(list(...)[["fleInp"]])) stop("Please use the argument dtaInp instead of fleInp.")
-    dtaFrm <- inp2DF(dtaInp = dtaInp, fleOut = fleOut, usePkg = usePkg, selSet = selSet, ...)
-    fleOut <- attr(dtaFrm, "fleOut")
+    dtaFrm <- inp2DF(dtaInp = dtaInp, usePkg = usePkg, selSet = selSet, ...)
 
     # create variable names for the output data frame: if varNme is empty (default), then the row names of the
     # original data frame are used (preceded by "V_" if they contain only numbers); if varNme has the length 1
@@ -97,12 +97,6 @@ transpose_omv <- function(dtaInp = NULL, fleOut = "", varNme = "", usePkg = c("f
     attr(dtaFrm[, "ID"], "jmv-id") <- TRUE
     row.names(dtaFrm) <- NULL
 
-    # write the resulting data frame to the output file or, if no output file
-    # name was given, return the data frame
-    if (!is.null(fleOut) && nzchar(fleOut)) {
-        write_omv(dtaFrm, fleOut)
-        return(invisible(NULL))
-    } else {
-        dtaFrm
-    }
+    # rtnDta in globals.R (unified function to either write the data frame, open it in a new jamovi session or return it)
+    rtnDta(dtaFrm = dtaFrm, fleOut = fleOut, sfxTtl = "_xpsd", ...)
 }

@@ -54,8 +54,12 @@ test_that("read_omv works", {
     df4Chk <- read_omv(fleInp = nmeInp, useFlt = FALSE, rmMsVl = FALSE, sveAtt = FALSE, getSyn = TRUE, getHTM = FALSE)
     expect_equal(names(attributes(df4Chk)), c("names", "row.names", "class", "fltLst", "syntax", "protobuf"))
     # the next two command actually work in both cases: when a list with "syntax" is filled with command and if it's empty
-    expect_vector(attr(df4Chk, "syntax"), list(), 2)
+    expect_vector(attr(df4Chk, "syntax"), c(), 2)
     expect_true(all(grepl("^jmv::", attr(df4Chk, "syntax"))))
+    expect_equal(attr(df4Chk, "syntax"),
+      c(paste("jmv::ANOVA(formula = len ~ supp + dose2 + supp:dose2, data = data, effectSize = \"partEta\", modelTest = TRUE, qq = TRUE,",
+              "contrasts = list(list(var=\"supp\", type=\"none\"), list(var=\"dose2\", type=\"polynomial\")), postHoc = ~ supp + dose2, emMeans = ~ dose2:supp)"),
+           "jmv::ancova(formula = len ~ supp + dose, data = data, effectSize = \"partEta\", modelTest = TRUE)"))
 
     # read the data set (with the getSyn-argument set TRUE) and test its properties: correct attributes (should contain "syntax" and "protobuf"), as well as the type, size and content of "syntax"
     df4Chk <- read_omv(fleInp = nmeInp, useFlt = FALSE, rmMsVl = FALSE, sveAtt = FALSE, getSyn = FALSE, getHTM = TRUE)
@@ -80,16 +84,14 @@ test_that("read_omv works", {
       regexp = "^The file you are trying to read \\(ToothGrowth\\.omv\\) has an improper manifest file \\(meta\\) and is likely corrupted\\.")
 
     # .omv-file isn't a ZIP
-    nmeTmp <- paste0(tempfile(), ".omv")
+    nmeTmp <- tempfile(fileext = ".omv")
     writeBin("", con = nmeTmp)
     expect_error(chkFle(nmeTmp, isZIP = TRUE), regexp = "^chkFle: File \".*\" has not the correct file format \\(is not a ZIP archive\\)\\.")
     unlink(nmeTmp)
 
     # invalid manifest (wrong version number)
-    nmeTmp <- paste0(tempfile(), ".omv")
-    mnfHdl <- file(file.path(tempdir(), "meta"), open = "wb")
-    add2ZIP(nmeTmp, mnfHdl, txtOut = gsub("jamovi-Archive-Version: 11.0", "jamovi-Archive-Version: 99.0", mnfTxt()), newFle = TRUE)
-    rm(mnfHdl)
+    nmeTmp <- tempfile(fileext = ".omv")
+    add2ZIP(nmeTmp, crrFle = c("meta", "wb"), txtOut = gsub("jamovi-Archive-Version: 11.0", "jamovi-Archive-Version: 99.0", mnfTxt()))
     suppressMessages(expect_warning(expect_error(read_omv(nmeTmp), regexp = "^'con' is not a connection"),
       regexp = "^The file that you are trying to read \\(.*\\) was written with a version of jamovi that currently is not implemented"))
     suppressMessages(expect_null(getHdl(fleOMV = nmeTmp, crrFle = "MANIFEST.MF")))
@@ -109,7 +111,7 @@ test_that("read_all works", {
                                                     "parentId", "width", "type", "importName", "description", "transform", "edits", "missingValues", "trimLevels"))
 
     # read_all for ToothGrowth as Rdata-set has fewer columns and attributes, check data frame, size, correct column type, and several attributes of the data frame and columns
-    nmeTmp <- paste0(tempfile(), ".rds")
+    nmeTmp <- tempfile(fileext = ".rds")
     saveRDS(jmvReadWrite::ToothGrowth, nmeTmp)
     df4Chk <- read_all(nmeTmp)
     expect_equal(dim(df4Chk), c(60, 7))
@@ -126,14 +128,21 @@ test_that("read_all works", {
     expect_error(read_all(""), regexp = "^File name to the input data file needs to be given as parameter \\(fleInp = \\.\\.\\.\\)\\.")
     # replace strings in attributes, etc.
     if (l10n_info()$`UTF-8`) {
+        # actual replacement
+        expect_equal(rplStr(strMod = "<c4><d6><dc><df><e4><f6><fc>", crrAtt = "Trial"), "ÄÖÜßäöü")
         expect_error(rplStr(strMod = "<c3><28>", crrAtt = "Trial"),
           regexp = "^The current data set still contains an invalid character \\(\".*\"\\) in attribute: \".*\"\\.")
+        # finding attributes that may contain such strings
+# TO-DO: need to figure out what rplAtt is actually supposed to do
+#        tmpDF <- read_omv(nmeInp)
+#        attr(tmpDF[["weights"]], "description") <- "<c4><d6><dc><df><e4><f6><fc>"
+#        rplAtt(dtaFrm = tmpDF)[["weights"]]
     }
 
     # more than one object when using Rdata
     D1 <- data.frame(A = runif(n = 100))
     D2 <- data.frame(B = runif(n = 100))
-    nmeInp <- paste0(tempfile(), ".rda")
+    nmeInp <- tempfile(fileext = ".rda")
     save(list = ls()[grepl("D[1-2]", ls())], file = nmeInp)
     # throw error when selSet is not sepcified
     suppressMessages(expect_error(read_all(nmeInp),
@@ -145,21 +154,21 @@ test_that("read_all works", {
     unlink(nmeInp)
 
     # test cases for CSV / TSV
-    nmeInp <- paste0(tempfile(), ".tsv")
+    nmeInp <- tempfile(fileext = ".tsv")
     write.table(D1, file = nmeInp, sep = "\t")
     df4Chk <- read_all(nmeInp)
     expect_s3_class(df4Chk, class = "data.frame")
     expect_equal(dim(df4Chk), c(100, 1))
     unlink(nmeInp)
 
-    nmeInp <- paste0(tempfile(), ".csv")
+    nmeInp <- tempfile(fileext = ".csv")
     write.table(D1, file = nmeInp, sep = ",")
     df4Chk <- read_all(nmeInp)
     expect_s3_class(df4Chk, class = "data.frame")
     expect_equal(dim(df4Chk), c(100, 1))
     unlink(nmeInp)
 
-    nmeInp <- paste0(tempfile(), ".csv")
+    nmeInp <- tempfile(fileext = ".csv")
     write.table(D1, file = nmeInp, sep = ";")
     # if the separator is not given, the input column can't be converted into a number
     expect_type(read_all(nmeInp)$A, "character")
@@ -169,13 +178,13 @@ test_that("read_all works", {
     expect_type(df4Chk$A, "double")
     unlink(nmeInp)
 
-    nmeInp <- paste0(tempfile(), ".csv")
+    nmeInp <- tempfile(fileext = ".csv")
     writeBin("X1,X2\n1.2,2.2\n7.1,3.2", nmeInp)
     suppressMessages(expect_error(read_all(nmeInp),
       regexp = "^Input data are either not a data frame or have incorrect \\(only one or more than two\\) dimensions\\."))
     unlink(nmeInp)
 
-    fleInp <- paste0(tempfile(), ".sav")
+    fleInp <- tempfile(fileext = ".sav")
     writeBin("$FL2@(#) IBM SPSS STATISTICS 64-bit Linux 25.0.0.0              \002", con = fleInp)
     suppressMessages(expect_error(read_all(fleInp, usePkg = "haven"),
       regexp = "^Input data are either not a data frame or have incorrect \\(only one or more than two\\) dimensions\\."))
@@ -183,7 +192,7 @@ test_that("read_all works", {
       regexp = "^Input data are either not a data frame or have incorrect \\(only one or more than two\\) dimensions\\."))
     unlink(fleInp)
 
-    fleInp <- paste0(tempfile(), ".dta")
+    fleInp <- tempfile(fileext = ".dta")
     writeBin("<stata_dta><header><release>117</release><byteorder>LSF</byteorder><K>\x8f", con = fleInp)
     suppressMessages(expect_error(read_all(fleInp, usePkg = "haven"),
       regexp = "^Input data are either not a data frame or have incorrect \\(only one or more than two\\) dimensions\\."))
@@ -192,7 +201,7 @@ test_that("read_all works", {
       regexp = "^Input data are either not a data frame or have incorrect \\(only one or more than two\\) dimensions\\."))
     unlink(fleInp)
 
-    fleInp <- paste0(tempfile(), ".sas7bdat")
+    fleInp <- tempfile(fileext = ".sas7bdat")
     writeBin("", con = fleInp)
     suppressMessages(expect_error(capture_output(read_all(fleInp, usePkg = "haven")),
       regexp = "^Input data are either not a data frame or have incorrect \\(only one or more than two\\) dimensions\\."))
@@ -200,7 +209,7 @@ test_that("read_all works", {
       regexp = "^Input data are either not a data frame or have incorrect \\(only one or more than two\\) dimensions\\."))
     unlink(fleInp)
 
-    fleInp <- paste0(tempfile(), ".xpt")
+    fleInp <- tempfile(fileext = ".xpt")
     writeBin("HEADER RECORD*******LIBRARY HEADER RECORD!!!!!!!", con = fleInp)
     suppressMessages(expect_error(read_all(fleInp, usePkg = "haven"),
       regexp = "^Input data are either not a data frame or have incorrect \\(only one or more than two\\) dimensions\\."))

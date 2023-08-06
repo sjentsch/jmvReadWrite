@@ -12,6 +12,9 @@
 #'               for each time-varying part)
 #' @param varSep Character that separates the variables in varLst into a time-varying part and a part that forms the variable name in long format ("_" in
 #'               "VAR_1", "VAR_2", default: "_")
+
+#' @param varOrd Whether to arrange the variables before the transformation, so that they are in accordance with the different split levels (default: TRUE)
+
 #' @param varSrt Variable(s) that are used to sort the data frame (see Details; if empty, the order returned from reshape is kept; default: c())
 #' @param excLvl Integer (or vector of integers) determining which parts of the variable names in varLst shall not be transformed (default: NULL), see Details
 #'               below
@@ -26,6 +29,9 @@
 #' * If `varLst` is empty, it is tried to generate it using all variables in the data frame except those defined by `varExc` and `varID`. The variable(s) in
 #'   `varID` need to be unique identifiers (in the original dataset), those in `varExc` don't have this requirement. It is generally recommended that the
 #'   variable names in `varExc` and `varID` should not contain the variable separator (defined in `varSep`; default: "_").
+#' * `varOrd` determines whether the variables are rearranged to match the order of split levels. Consider the `varLst` X_1, Y_1, X_2, Y_2. If `varOrd` were
+#'   set to FALSE, the original order would be preserved and the second part of the variable name (1, 2, ...) would become condition 1, and the first part
+#'   condition 2. In most cases, leaving `varOrd` set to TRUE is recommended.
 #' * `varSrt` can be either a character or a character vector (with one or more variables respectively). The sorting order for a particular variable can be
 #'   inverted with preceding the variable name with "-". Please note that this doesn't make sense and hence throws a warning for certain variable types (e.g.,
 #'   factors).
@@ -37,15 +43,15 @@
 #'   clicking on the respective function under “See also”, you can get a more detailed overview over which parameters each of those functions take.
 #' * The transformation from long to wide uses `reshape`: `varID` matches (~) `idvar` in `reshape`, `varTme` ~ `timevar`, `varLst` ~ `varying`, and `varSep` ~
 #'   `sep`. The help for `reshape` is very explanatory, click on the link under “See also” to access it, particularly what is explained under “Details”.
-#' * The functions for reading the data are: `read_omv` (for jamovi-files), `read.table` (for CSV / TSV files; using similar defaults as `read.csv` for CSV and
-#'   `read.delim` for TSV which both are based upon `read.table`), `load` (for .RData-files), `readRDS` (for .rds-files), `read_sav` (needs R-package `haven`)
-#'   or `read.spss` (needs R-package `foreign`) for SPSS-files, `read_dta` (`haven`) / `read.dta` (`foreign`) for Stata-files, `read_sas` (`haven`) for
-#'   SAS-data-files, and `read_xpt` (`haven`) / `read.xport` (`foreign`) for SAS-transport-files. If you would like to use `haven`, you may need to install it
-#'   manually (i.e., `install.packages("haven", dep = TRUE)`).
+#' * The functions for reading and writing the data are: `read_omv` and `write_omv` (for jamovi-files), `read.table` (for CSV / TSV files; using similar
+#'   defaults as `read.csv` for CSV and `read.delim` for TSV which both are based upon `read.table`), `load` (for .RData-files), `readRDS` (for .rds-files),
+#'   `read_sav` (needs R-package `haven`) or `read.spss` (needs R-package `foreign`) for SPSS-files, `read_dta` (`haven`) / `read.dta` (`foreign`) for
+#'   Stata-files, `read_sas` (`haven`) for SAS-data-files, and `read_xpt` (`haven`) / `read.xport` (`foreign`) for SAS-transport-files. If you would like to
+#'   use `haven`, you may need to install it using `install.packages("haven", dep = TRUE)`.
 #'
-#' @seealso `long2wide_omv` internally uses the following functions: The transformation from long to wide uses [stats::reshape()]. For reading data files in
-#'   different formats, the following functions are used: [jmvReadWrite::read_omv()] for jamovi-files, [utils::read.table()] for CSV / TSV files, [load()] for
-#'   reading .RData-files, [readRDS()] for .rds-files, [haven::read_sav()] or [foreign::read.spss()] for SPSS-files, [haven::read_dta()] or
+#' @seealso `long2wide_omv` internally uses the following functions: The transformation from long to wide uses [stats::reshape()]. For reading and writing data
+#'   files in different formats: [jmvReadWrite::read_omv()] and [jmvReadWrite::write_omv()] for jamovi-files, [utils::read.table()] for CSV / TSV files,
+#'   [load()] for reading .RData-files, [readRDS()] for .rds-files, [haven::read_sav()] or [foreign::read.spss()] for SPSS-files, [haven::read_dta()] or
 #'   [foreign::read.dta()] for Stata-files, [haven::read_sas()] for SAS-data-files, and [haven::read_xpt()] or [foreign::read.xport()] for SAS-transport-files.
 #'
 #' @examples
@@ -69,8 +75,8 @@
 #' #  $ X_7: num  ...
 #' #  $ X_8: num  ...
 #' # this data set is stored as (temporary) RDS-file and later processed by wide2long
-#' nmeInp <- paste0(tempfile(), ".rds")
-#' nmeOut <- paste0(tempfile(), ".omv")
+#' nmeInp <- tempfile(fileext = ".rds")
+#' nmeOut <- tempfile(fileext = ".omv")
 #' saveRDS(dtaInp, nmeInp)
 #' wide2long_omv(dtaInp = nmeInp, fleOut = nmeOut, varID = "ID", varTme = "measure",
 #'     varLst = setdiff(names(dtaInp), "ID"), varSrt = c("ID", "measure"))
@@ -105,12 +111,12 @@
 #'
 #' @export wide2long_omv
 #'
-wide2long_omv <- function(dtaInp = NULL, fleOut = "", varLst = c(), varExc = c(), varID = "ID", varTme = "cond", varSep = "_", varSrt = c(), excLvl = NULL, usePkg = c("foreign", "haven"), selSet = "", ...) {
+wide2long_omv <- function(dtaInp = NULL, fleOut = "", varLst = c(), varExc = c(), varID = "ID", varTme = "cond", varSep = "_", varOrd = TRUE, varSrt = c(),
+                          excLvl = NULL, usePkg = c("foreign", "haven"), selSet = "", ...) {
 
     # check and import input data set (either as data frame or from a file)
     if (!is.null(list(...)[["fleInp"]])) stop("Please use the argument dtaInp instead of fleInp.")
-    dtaFrm <- inp2DF(dtaInp, fleOut = fleOut, usePkg = usePkg, selSet = selSet, ...)
-    fleOut <- attr(dtaFrm, "fleOut")
+    dtaFrm <- inp2DF(dtaInp, usePkg = usePkg, selSet = selSet, ...)
     dtaNmV <- names(dtaFrm)
     hasID  <- all(varID %in% dtaNmV)
 
@@ -128,13 +134,16 @@ wide2long_omv <- function(dtaInp = NULL, fleOut = "", varLst = c(), varExc = c()
         stop(sprintf("\n\nThe variable separator (varSep, \"%s\") must be contained in all variables in the variable list (varLst).\nDeviating variables: %s\n",
                      varSep, paste(varLst[!grepl(varSep, varLst, fixed = TRUE)], collapse = ", ")))
     }
+    # re-arrange the variable in the variable list so that they are in accordance with the order
+    # of the splits in the variable names
+    if (varOrd) varLst <- sort(varLst)
     # use varSep to split the variable names in varLst
     if (nzchar(varSep)) {
         varSpl <- strsplit(varLst, varSep)
         lngSpl <- unique(unlist(lapply(varSpl, length)))
         if (length(lngSpl) != 1) {
-            cat(paste0(paste0(varLst, collapse = ", "), "\n\n"))
-            stop("The variable names in varLst need to have the same structure, i.e., the same number of separators within all variable names.")
+            stop(sprintf("The variable names in varLst need to have the same structure, i.e., the same number of separators within all variable names:\n%s\n\n",
+              paste0(varLst, collapse = ", ")))
         }
     } else {
         varSpl <- as.list(varLst)
@@ -208,14 +217,8 @@ wide2long_omv <- function(dtaInp = NULL, fleOut = "", varLst = c(), varExc = c()
     # in analyses, e.g. as random-effects-variable, and this wouldn't be possible if it were still marked as "ID")
     dtaFrm <- rmvID(dtaFrm, varID, hasID)
 
-    # write the resulting data frame to the output file or, if no output file
-    # name was given, return the data frame
-    if (!is.null(fleOut) && nzchar(fleOut)) {
-        write_omv(dtaFrm, fleOut)
-        return(invisible(NULL))
-    } else {
-        dtaFrm
-    }
+    # rtnDta in globals.R (unified function to either write the data frame, open it in a new jamovi session or return it)
+    rtnDta(dtaFrm = dtaFrm, fleOut = fleOut, sfxTtl = "_Long", ...)
 }
 
 ordCol <- function(varNme = c(), dtaNmV = c(), varID = c(), varLst = c()) {

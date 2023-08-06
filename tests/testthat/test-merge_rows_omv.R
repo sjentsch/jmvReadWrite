@@ -4,7 +4,7 @@ test_that("merge_rows_omv works", {
     for (i in seq_along(nmeInp)) saveRDS(tmpInp[[i]], nmeInp[i])
 
     # check merging rows with writing an output file and afterwards checking it (existence, size, whether it is a ZIP-file and content)
-    nmeOut <- paste0(tempfile(), ".omv")
+    nmeOut <- tempfile(fileext = ".omv")
     expect_null(merge_rows_omv(dtaInp = nmeInp, fleOut = nmeOut))
     expect_true(file.exists(nmeOut))
     expect_gt(file.info(nmeOut)$size, 1)

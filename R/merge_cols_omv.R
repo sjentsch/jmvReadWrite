@@ -37,15 +37,15 @@
 #'   clicking on the respective function under “See also”, you can get a more detailed overview over which parameters each of those functions take.
 #' * Adding columns uses `merge`. `typMrg` is implemented by setting `TRUE` or `FALSE` to `all.x` and `all.y` in `merge`, `varBy` matches `by.x` and `by.y`.
 #'   The help for `merge` can be accessed by clicking on the link under “See also”.
-#' * The functions for reading the data are: `read_omv` (for jamovi-files), `read.table` (for CSV / TSV files; using similar defaults as `read.csv` for CSV and
-#'   `read.delim` for TSV which both are based upon `read.table`), `load` (for .RData-files), `readRDS` (for .rds-files), `read_sav` (needs R-package `haven`)
-#'   or `read.spss` (needs R-package `foreign`) for SPSS-files, `read_dta` (`haven`) / `read.dta` (`foreign`) for Stata-files, `read_sas` (`haven`) for
-#'   SAS-data-files, and `read_xpt` (`haven`) / `read.xport` (`foreign`) for SAS-transport-files. If you would like to use `haven`, you may need to install it
-#'   manually (i.e., `install.packages("haven", dep = TRUE)`).
+#' * The functions for reading and writing the data are: `read_omv` and `write_omv` (for jamovi-files), `read.table` (for CSV / TSV files; using similar
+#'   defaults as `read.csv` for CSV and `read.delim` for TSV which both are based upon `read.table`), `load` (for .RData-files), `readRDS` (for .rds-files),
+#'   `read_sav` (needs R-package `haven`) or `read.spss` (needs R-package `foreign`) for SPSS-files, `read_dta` (`haven`) / `read.dta` (`foreign`) for
+#'   Stata-files, `read_sas` (`haven`) for SAS-data-files, and `read_xpt` (`haven`) / `read.xport` (`foreign`) for SAS-transport-files. If you would like to
+#'   use `haven`, you may need to install it using `install.packages("haven", dep = TRUE)`.
 #'
-#' @seealso `merge_cols_omv` internally uses the following functions: Adding columns uses [merge()]. For reading data files in different formats, the following
-#'   functions are used: [jmvReadWrite::read_omv()] for jamovi-files, [utils::read.table()] for CSV / TSV files, [load()] for reading .RData-files, [readRDS()]
-#'   for .rds-files, [haven::read_sav()] or [foreign::read.spss()] for SPSS-files, [haven::read_dta()] or [foreign::read.dta()] for Stata-files,
+#' @seealso `merge_cols_omv` internally uses the following functions: Adding columns uses [merge()]. For reading and writing data files in different formats:
+#'   [jmvReadWrite::read_omv()] and [jmvReadWrite::write_omv()] for jamovi-files, [utils::read.table()] for CSV / TSV files, [load()] for reading .RData-files,
+#'   [readRDS()] for .rds-files, [haven::read_sav()] or [foreign::read.spss()] for SPSS-files, [haven::read_dta()] or [foreign::read.dta()] for Stata-files,
 #'   [haven::read_sas()] for SAS-data-files, and [haven::read_xpt()] or [foreign::read.xport()] for SAS-transport-files.
 #'
 #' @examples
@@ -53,7 +53,7 @@
 #' library(jmvReadWrite)
 #' dtaInp <- bfi_sample2
 #' nmeInp <- paste0(tempfile(), "_", 1:3, ".rds")
-#' nmeOut <- paste0(tempfile(), ".omv")
+#' nmeOut <- tempfile(fileext = ".omv")
 #' for (i in seq_along(nmeInp)) {
 #'     saveRDS(stats::setNames(dtaInp, c("ID", paste0(names(dtaInp)[-1], "_", i))), nmeInp[i])
 #' }
@@ -89,8 +89,7 @@ merge_cols_omv <- function(dtaInp = NULL, fleOut = "", typMrg = c("outer", "inne
 
     # check and import input data set (either as data frame or from a file)
     if (!is.null(list(...)[["fleInp"]])) stop("Please use the argument dtaInp instead of fleInp.")
-    dtaFrm <- inp2DF(dtaInp = dtaInp, fleOut = fleOut, minDF = 2, maxDF = Inf, usePkg = usePkg, selSet = selSet, ...)
-    fleOut <- attr(dtaFrm[[1]], "fleOut")
+    dtaFrm <- inp2DF(dtaInp = dtaInp, minDF = 2, maxDF = Inf, usePkg = usePkg, selSet = selSet, ...)
 
     # store attributes
     attCol <- list()
@@ -121,23 +120,8 @@ merge_cols_omv <- function(dtaInp = NULL, fleOut = "", typMrg = c("outer", "inne
         }
     }
 
-    # write the resulting data frame to the output file or, if no output file
-    # name was given, return the data frame
-    if (!is.null(fleOut) && nzchar(fleOut)) {
-        write_omv(dtaFrm, fleOut)
-        # transfer analyses from input to output file
-        if (psvAnl) {
-            if (is.character(dtaInp)) {
-                xfrAnl(dtaInp[[1]], fleOut)
-            } else {
-                warning("psvAnl is only possible if dtaInp is a file name (analyses are not stored in data frames, only in the jamovi files).")
-            }
-        }
-        return(invisible(NULL))
-    } else {
-        if (psvAnl) warning("psvAnl is only possible if fleOut is a file name (analyses are not stored in data frames, only in the jamovi files).")
-        dtaFrm
-    }
+    # rtnDta in globals.R (unified function to either write the data frame, open it in a new jamovi session or return it)
+    rtnDta(dtaFrm = dtaFrm, fleOut = fleOut, sfxTtl = "_mrg_cols", psvAnl = psvAnl, dtaInp = dtaInp, ...)
 }
 
 chkByV <- function(varBy = list(), dtaFrm = NULL) {

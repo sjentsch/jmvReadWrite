@@ -206,9 +206,9 @@
 <span><span class="co">#&gt; [1] "Trial.omv"</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/file.info.html" class="external-link">file.info</a></span><span class="op">(</span><span class="st">"Trial.omv"</span><span class="op">)</span></span>
 <span><span class="co">#&gt;           size isdir mode               mtime               ctime</span></span>
-<span><span class="co">#&gt; Trial.omv 1723 FALSE  664 2023-08-05 22:06:14 2023-08-05 22:06:14</span></span>
+<span><span class="co">#&gt; Trial.omv 1723 FALSE  664 2023-08-16 13:31:10 2023-08-16 13:31:10</span></span>
 <span><span class="co">#&gt;                         atime  uid  gid    uname   grname</span></span>
-<span><span class="co">#&gt; Trial.omv 2023-08-05 22:06:14 1000 1000 sjentsch sjentsch</span></span>
+<span><span class="co">#&gt; Trial.omv 2023-08-16 13:31:10 1000 1000 sjentsch sjentsch</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="st">"Trial.omv"</span><span class="op">)</span></span></code></pre></div>
 <p>Although jamovi reads R-data files (.RData, .rda, .rds) <a href="https://sjentsch.github.io/jmvReadWrite/reference/write_omv.html"><code>write_omv</code></a> permits to store <code>jamovi</code>-specific attributes (such as variable labels) in addition. Please note that if you are reading from an <code>.omv</code>-file in order to write back to an <code>.omv</code>-file (perhaps after some modifications), it is recommended to leave the <code>sveAtt</code>-attribute set to <code>TRUE</code> (which is the default).</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">

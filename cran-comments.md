@@ -1,8 +1,8 @@
 # CRAN Notes - jmvReadWrite
 
 ## Current version
-0.3.8
-adjustments to use either data frames or file names as input to the helper functions, improvements to unit-tests, bug-fixes (0.3.7 -> 0.3.8)
+0.4.0
+added `describe_omv`, better integration when running in jamovi, other small improvements and bug-fixes (0.3.7 -> 0.4.0)
 
 ## Test environments
 * ``devtools::check()``

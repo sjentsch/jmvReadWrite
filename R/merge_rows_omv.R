@@ -155,7 +155,7 @@ merge_rows_omv <- function(dtaInp = NULL, fleOut = "", typMrg = c("all", "common
     dtaFrm <- srtFrm(dtaFrm, varSrt)
 
     # rtnDta in globals.R (unified function to either write the data frame, open it in a new jamovi session or return it)
-    rtnDta(dtaFrm = dtaFrm, fleOut = fleOut, sfxTtl = "_mrg_rows", ...)
+    rtnDta(dtaFrm = dtaFrm, fleOut = fleOut, dtaTtl = jmvTtl("_mrg_rows"), ...)
 }
 
 addCol <- function(dtaFrm = NULL, varNme = c(), varTyp = c()) {

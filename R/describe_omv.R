@@ -159,7 +159,7 @@ describe_omv <- function(dtaInp = NULL, fleOut = "", dtaTtl = c(), dtaDsc = c(),
         status = 3, index = 1, title = "Results", hasTitle = TRUE)
 
     # rtnDta in globals.R (unified function to either write the data frame, open it in a new jamovi session or return it)
-    rtnDta(dtaFrm = dtaFrm, fleOut = fleOut, sfxTtl = "_desc", wrtPtB = TRUE, ...)
+    rtnDta(dtaFrm = dtaFrm, fleOut = fleOut, dtaTtl = jmvTtl("_desc"), wrtPtB = TRUE, ...)
 }
 
 # create HTML from the list-version of dtaDsc

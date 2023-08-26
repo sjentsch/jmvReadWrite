@@ -121,7 +121,7 @@ merge_cols_omv <- function(dtaInp = NULL, fleOut = "", typMrg = c("outer", "inne
     }
 
     # rtnDta in globals.R (unified function to either write the data frame, open it in a new jamovi session or return it)
-    rtnDta(dtaFrm = dtaFrm, fleOut = fleOut, sfxTtl = "_mrg_cols", psvAnl = psvAnl, dtaInp = dtaInp, ...)
+    rtnDta(dtaFrm = dtaFrm, fleOut = fleOut, dtaTtl = jmvTtl("_mrg_cols"), psvAnl = psvAnl, dtaInp = dtaInp, ...)
 }
 
 chkByV <- function(varBy = list(), dtaFrm = NULL) {

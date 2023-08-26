@@ -110,5 +110,5 @@ arrange_cols_omv <- function(dtaInp = NULL, fleOut = "", varOrd = c(), varMve = 
     dtaFrm <- setAtt(setdiff(names(attMem), c("names", "row.names", "class", "fltLst")), attMem, dtaFrm)
 
     # rtnDta in globals.R (unified function to either write the data frame, open it in a new jamovi session or return it)
-    rtnDta(dtaFrm = dtaFrm, fleOut = fleOut, sfxTtl = "_arr_cols", psvAnl = psvAnl, dtaInp = dtaInp, ...)
+    rtnDta(dtaFrm = dtaFrm, fleOut = fleOut, dtaTtl = jmvTtl("_arr_cols"), psvAnl = psvAnl, dtaInp = dtaInp, ...)
 }

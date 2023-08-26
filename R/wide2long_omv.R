@@ -218,7 +218,7 @@ wide2long_omv <- function(dtaInp = NULL, fleOut = "", varLst = c(), varExc = c()
     dtaFrm <- rmvID(dtaFrm, varID, hasID)
 
     # rtnDta in globals.R (unified function to either write the data frame, open it in a new jamovi session or return it)
-    rtnDta(dtaFrm = dtaFrm, fleOut = fleOut, sfxTtl = "_Long", ...)
+    rtnDta(dtaFrm = dtaFrm, fleOut = fleOut, dtaTtl = jmvTtl("_Long"), ...)
 }
 
 ordCol <- function(varNme = c(), dtaNmV = c(), varID = c(), varLst = c()) {

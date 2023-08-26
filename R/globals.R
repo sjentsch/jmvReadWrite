@@ -357,7 +357,7 @@ inp2DF <- function(dtaInp = NULL, minDF = 1, maxDF = 1, usePkg = c("foreign", "h
 #   - open the data frame in a new session (only in jamovi, and if fleOut is an empty character vector)
 #   - return the data frame (in R in any case, or in jamovi if fleOut is NULL)
 #   NB: this makes opening the data frame in a new session the default, if in jamovi
-rtnDta <- function(dtaFrm = NULL, fleOut = "", sfxTtl = "", wrtPtB = FALSE, psvAnl = FALSE, dtaInp = NULL, ...) {
+rtnDta <- function(dtaFrm = NULL, fleOut = "", dtaTtl = "", wrtPtB = FALSE, psvAnl = FALSE, dtaInp = NULL, ...) {
     if (!is.null(fleOut) && nzchar(fleOut[1])) {
         fleOut <- fmtFlO(fleOut[1])
         write_omv(dtaFrm = dtaFrm, fleOut = fleOut, wrtPtB = wrtPtB, ...)
@@ -372,7 +372,7 @@ rtnDta <- function(dtaFrm = NULL, fleOut = "", sfxTtl = "", wrtPtB = FALSE, psvA
         return()
     } else if (isJmv() && is.character(fleOut)) {
         if (psvAnl) warning("psvAnl is only possible if fleOut is a file name (analyses are not stored in data frames, only in the jamovi files).")
-        jmvOpn(dtaFrm, sfxTtl = sfxTtl)
+        jmvOpn(dtaFrm, dtaTtl = dtaTtl)
         return()
     } else {
         if (psvAnl) warning("psvAnl is only possible if fleOut is a file name (analyses are not stored in data frames, only in the jamovi files).")
@@ -472,7 +472,7 @@ jmvAtt <- function(dtaFrm = NULL) {
     dtaFrm
 }
 
-jmvOpn <- function(dtaFrm = NULL, sfxTtl = "") {
+jmvOpn <- function(dtaFrm = NULL, dtaTtl = "") {
     # on both Windows and Linux, jamovi is in the path, and, hence,
     # Sys.which should give the full location
     jmvEXE <- Sys.which("jamovi")
@@ -496,8 +496,7 @@ jmvOpn <- function(dtaFrm = NULL, sfxTtl = "") {
     if (nzchar(jmvEXE) && file.exists(jmvEXE)) {
         tmpOut <- tempfile(fileext = ".omv")
         jmvReadWrite::write_omv(dtaFrm, fleOut = tmpOut)
-# TO-DO: replace Dataset with the name of the current data set
-        system2(jmvEXE, args = paste0(" --temp --title=\"", "Dataset", sfxTtl, "\" ", tmpOut), stderr = TRUE, stdout = TRUE)
+        system2(jmvEXE, args = paste0(" --temp --title=\"", dtaTtl, "\" ", tmpOut), stderr = TRUE, stdout = TRUE)
     } else {
         stop(sprintf("The position of the jamovi executable could not be determined or it was not found at the determined position. Determined position: %s", jmvEXE))
     }
@@ -510,4 +509,11 @@ jmvPth <- function(inpPth = "", strTgt = "", bfrTgt = TRUE) {
     } else {
         return()
     }
+}
+
+jmvTtl <- function(sfxTtl = "") {
+    # return empty string when not inside jamove (then the title is irrelevant)
+    if (!isJmv()) return("")
+# TO-DO: replace Dataset with the name of the current data set (once this is implemented)
+    return(paste0("Dataset", sfxTtl))
 }

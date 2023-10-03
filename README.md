@@ -86,11 +86,8 @@ Afterwards, the syntax is shown at the top of the analysis and can be
 copied from there.
 
 ``` r
-library(jmvReadWrite)
-library(jmv)
-
 fleOMV <- system.file("extdata", "ToothGrowth.omv", package = "jmvReadWrite")
-data <- read_omv(fleOMV)
+data <- jmvReadWrite::read_omv(fleOMV)
 # if the "jmv"-package is installed, we can run a test analysis with the data
 if ("jmv" %in% rownames(installed.packages())) {
     jmv::ANOVA(
@@ -145,9 +142,8 @@ in the attribute `syntax`. They can be used as shown in the following
 examples:
 
 ``` r
-library(jmvReadWrite)
 fleOMV <- system.file("extdata", "ToothGrowth.omv", package = "jmvReadWrite")
-data <- read_omv(fleOMV, getSyn = TRUE)
+data <- jmvReadWrite::read_omv(fleOMV, getSyn = TRUE)
 # shows the syntax of the analyses from the .omv-file
 # please note that syntax extraction may not work on all systems
 # if the syntax couldn't be extracted, an empty list (length = 0) is returned,
@@ -181,13 +177,11 @@ process (summarize, filter, etc.) in R in order to later analyse them in
 in jamovi afterwards.
 
 ``` r
-library(jmvReadWrite)
-
 # use the data set "ToothGrowth" and, if it exists, write it as jamovi-file
 # using write_omv()
-data("ToothGrowth")
+data("ToothGrowth", package = "jmvReadWrite")
 # "retDbg" has to be set in order to return debug information to wrtDta
-wrtDta <- write_omv(ToothGrowth, "Trial.omv", retDbg = TRUE)
+wrtDta <- jmvReadWrite::write_omv(ToothGrowth, "Trial.omv", retDbg = TRUE)
 names(wrtDta)
 #> [1] "mtaDta" "xtdDta" "dtaFrm"
 # -> "mtaDta" "xtdDta" "dtaFrm"
@@ -202,9 +196,9 @@ list.files(".", "Trial.omv")
 #> [1] "Trial.omv"
 file.info("Trial.omv")
 #>           size isdir mode               mtime               ctime
-#> Trial.omv 1723 FALSE  664 2023-08-16 13:31:10 2023-08-16 13:31:10
+#> Trial.omv 2610 FALSE  664 2023-10-03 13:32:01 2023-10-03 13:32:01
 #>                         atime  uid  gid    uname   grname
-#> Trial.omv 2023-08-16 13:31:10 1000 1000 sjentsch sjentsch
+#> Trial.omv 2023-10-03 13:32:01 1000 1000 sjentsch sjentsch
 unlink("Trial.omv")
 ```
 
@@ -221,7 +215,7 @@ modifications), it is recommended to leave the `sveAtt`-attribute set to
 # essential meta-data to ensure that the written file looks and works like the
 # original file (plus you modifications)
 fleOMV <- system.file("extdata", "ToothGrowth.omv", package = "jmvReadWrite")
-data <- read_omv(fleOMV, sveAtt = TRUE)
+data <- jmvReadWrite::read_omv(fleOMV, sveAtt = TRUE)
 # shows the names of the attributes for the whole data set (e.g., number of
 # rows and columns) and the names of the attributes of the first column
 names(attributes(data))
@@ -235,7 +229,7 @@ names(attributes(data[[1]]))
 #> [17] "active"
 #
 # perhaps do some modifications to the file here and write it back afterwards
-write_omv(data, "Trial.omv")
+jmvReadWrite::write_omv(data, "Trial.omv")
 unlink("Trial.omv")
 ```
 

@@ -79,11 +79,8 @@ Afterwards, the syntax is shown at the top of the analysis and can be copied
 from there.
 
 ```{r, echo=TRUE}
-library(jmvReadWrite)
-library(jmv)
-
 fleOMV <- system.file("extdata", "ToothGrowth.omv", package = "jmvReadWrite")
-data <- read_omv(fleOMV)
+data <- jmvReadWrite::read_omv(fleOMV)
 # if the "jmv"-package is installed, we can run a test analysis with the data
 if ("jmv" %in% rownames(installed.packages())) {
     jmv::ANOVA(
@@ -106,9 +103,8 @@ set the parameter `getSyn = TRUE` when calling
 attribute `syntax`. They can be used as shown in the following examples:
 
 ```{r, echo=TRUE}
-library(jmvReadWrite)
 fleOMV <- system.file("extdata", "ToothGrowth.omv", package = "jmvReadWrite")
-data <- read_omv(fleOMV, getSyn = TRUE)
+data <- jmvReadWrite::read_omv(fleOMV, getSyn = TRUE)
 # shows the syntax of the analyses from the .omv-file
 # please note that syntax extraction may not work on all systems
 # if the syntax couldn't be extracted, an empty list (length = 0) is returned,
@@ -139,13 +135,11 @@ those processed log-files stored in a data frame (called, e.g., `data`) which
 you then write to a file that you can open in jamovi afterwards.
 
 ```{r, echo=TRUE}
-library(jmvReadWrite)
-
 # use the data set "ToothGrowth" and, if it exists, write it as jamovi-file
 # using write_omv()
-data("ToothGrowth")
+data("ToothGrowth", package = "jmvReadWrite")
 # "retDbg" has to be set in order to return debug information to wrtDta
-wrtDta <- write_omv(ToothGrowth, "Trial.omv", retDbg = TRUE)
+wrtDta <- jmvReadWrite::write_omv(ToothGrowth, "Trial.omv", retDbg = TRUE)
 names(wrtDta)
 # -> "mtaDta" "xtdDta" "dtaFrm"
 # this debug information contains a list with the metadata ("mtaDta", e.g.,
@@ -173,14 +167,14 @@ default).
 # essential meta-data to ensure that the written file looks and works like the
 # original file (plus you modifications)
 fleOMV <- system.file("extdata", "ToothGrowth.omv", package = "jmvReadWrite")
-data <- read_omv(fleOMV, sveAtt = TRUE)
+data <- jmvReadWrite::read_omv(fleOMV, sveAtt = TRUE)
 # shows the names of the attributes for the whole data set (e.g., number of
 # rows and columns) and the names of the attributes of the first column
 names(attributes(data))
 names(attributes(data[[1]]))
 #
 # perhaps do some modifications to the file here and write it back afterwards
-write_omv(data, "Trial.omv")
+jmvReadWrite::write_omv(data, "Trial.omv")
 unlink("Trial.omv")
 ```
 

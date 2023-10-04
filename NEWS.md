@@ -1,7 +1,8 @@
 # jmvReadWrite 0.4.1
 
 ## Bug fix:
-* ensure that creating the vignette also works when `jmv` is not present
+* ensure that the examples, tests and creating the vignette also works when
+  `jmv` is not present
 
 ---
 

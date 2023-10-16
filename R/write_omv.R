@@ -31,15 +31,13 @@
 #'
 #' @examples
 #' \dontrun{
-#' library(jmvReadWrite)
-#'
 #' # use the data set "ToothGrowth" and, if it exists, write it as
 #' # jamovi-file using write_omv()
-#' data("ToothGrowth")
+#' jmvReadWrite::ToothGrowth
 #' nmeOut <- tempfile(fileext = ".omv")
 #' # typically, one would use a "real" file name instead of tempfile(),
 #' # e.g., "Data1.omv"
-#' dtaDbg = write_omv(dtaFrm = ToothGrowth, fleOut = nmeOut, retDbg = TRUE)
+#' dtaDbg = jmvReadWrite::write_omv(dtaFrm = ToothGrowth, fleOut = nmeOut, retDbg = TRUE)
 #' print(names(dtaDbg))
 #' # the print-function is only used to force devtools::run_examples()
 #' # to show output

@@ -51,19 +51,17 @@ and \code{read_xpt} (\code{haven}) / \code{read.xport} (\code{foreign}) for SAS-
 }
 \examples{
 \dontrun{
-library(jmvReadWrite)
-
 # Example 1: Convert from RDS
 # (use ToothGrowth as example, save it as RDS)
 nmeInp <- tempfile(fileext = ".rds")
 nmeOut <- tempfile(fileext = ".omv")
 saveRDS(jmvReadWrite::ToothGrowth, nmeInp)
-convert_to_omv(fleInp = nmeInp, fleOut = nmeOut)
+jmvReadWrite::convert_to_omv(fleInp = nmeInp, fleOut = nmeOut)
 cat(list.files(dirname(nmeOut), basename(nmeOut)))
 # -> "file[...].omv" ([...] contains a random combination of numbers / characters
 cat(file.info(nmeOut)$size)
 # -> 2448 (size may differ on different OSes)
-cat(str(read_omv(nmeOut, sveAtt = FALSE)))
+cat(str(jmvReadWrite::read_omv(nmeOut, sveAtt = FALSE)))
 # gives a overview of the dataframe (all columns and some attributes,
 # sveAtt is intentionally set to FALSE to make the output not too overwhelming)
 unlink(nmeInp)
@@ -74,12 +72,12 @@ unlink(nmeOut)
 nmeInp <- tempfile(fileext = ".csv")
 nmeOut <- tempfile(fileext = ".omv")
 write.csv(jmvReadWrite::ToothGrowth, nmeInp)
-convert_to_omv(fleInp = nmeInp, fleOut = nmeOut)
+jmvReadWrite::convert_to_omv(fleInp = nmeInp, fleOut = nmeOut)
 cat(list.files(dirname(nmeOut), basename(nmeOut)))
 cat(file.info(nmeOut)$size)
 # -> 2104 (size may differ acc. to OS; the size is smaller than for the RDS-file
 # because CSV can store fewer attributes, e.g., labels)
-cat(str(read_omv(nmeOut, sveAtt = FALSE)))
+cat(str(jmvReadWrite::read_omv(nmeOut, sveAtt = FALSE)))
 # gives a overview of the dataframe (all columns and some attributes)
 unlink(nmeInp)
 unlink(nmeOut)

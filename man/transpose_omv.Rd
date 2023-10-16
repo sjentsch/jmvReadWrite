@@ -51,7 +51,6 @@ and \code{read_xpt} (\code{haven}) / \code{read.xport} (\code{foreign}) for SAS-
 }
 \examples{
 \dontrun{
-library(jmvReadWrite)
 set.seed(1)
 tmpDF <- stats::setNames(as.data.frame(matrix(sample(6, 1200, replace = TRUE), nrow = 16)),
                          sprintf("sbj_\%03d", seq(75)))
@@ -60,13 +59,13 @@ str(tmpDF)
 # and participants as columns, one for each participant, manually assembled / copy-and-pasted).
 # However, for analyses, one wants the data set transposed (units / participants as columns)...
 nmeOut <- tempfile(fileext = ".omv")
-transpose_omv(dtaInp = tmpDF, fleOut = nmeOut)
-dtaFrm <- read_omv(nmeOut)
+jmvReadWrite::transpose_omv(dtaInp = tmpDF, fleOut = nmeOut)
+dtaFrm <- jmvReadWrite::read_omv(nmeOut)
 unlink(nmeOut)
 str(dtaFrm)
 # if no varNme-parameter is given, generic variable names are created (V_...)
-transpose_omv(dtaInp = tmpDF, fleOut = nmeOut, varNme = sprintf("Trl_\%02d", seq(16)))
-dtaFrm <- read_omv(nmeOut)
+jmvReadWrite::transpose_omv(dtaInp = tmpDF, fleOut = nmeOut, varNme = sprintf("Trl_\%02d", seq(16)))
+dtaFrm <- jmvReadWrite::read_omv(nmeOut)
 unlink(nmeOut)
 str(dtaFrm)
 # alternatively, the character vector with the desired variable names (of the same length as

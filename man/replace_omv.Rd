@@ -74,22 +74,24 @@ respective function under “See also”, you can get a more detailed overview o
 }
 \examples{
 \dontrun{
-library(jmvReadWrite)
+bfi_sample <- jmvReadWrite::bfi_sample
 # the gender in the original data file is plural...
 table(bfi_sample$gender)
 # and shall be converted to singular
-rplDF <- replace_omv(bfi_sample, rplLst = list(c("Females", "Female"), c("Males", "Male")))
+rplDF <- jmvReadWrite::replace_omv(dtaInp = bfi_sample,
+           rplLst = list(c("Females", "Female"), c("Males", "Male")))
 table(rplDF$gender)
 # with giving an output file name, the data set is written
 nmeOut <- tempfile(fileext = ".omv")
-replace_omv(bfi_sample, fleOut = nmeOut, rplLst = list(c("Females", "Female"), c("Males", "Male")))
+jmvReadWrite::replace_omv(bfi_sample, fleOut = nmeOut,
+  rplLst = list(c("Females", "Female"), c("Males", "Male")))
 file.exists(nmeOut)
-rplDF <- read_omv(nmeOut)
+rplDF <- jmvReadWrite::read_omv(nmeOut)
 table(rplDF$gender)
 unlink(nmeOut)
 # it is sensible to check / search for the original values before running replace_omv
-search_omv(bfi_sample, 24, whlTrm = TRUE)
-rplDF <- replace_omv(bfi_sample, rplLst = list(c(24, NA)))
+jmvReadWrite::search_omv(bfi_sample, 24, whlTrm = TRUE)
+rplDF <- jmvReadWrite::replace_omv(bfi_sample, rplLst = list(c(24, NA)))
 table(rplDF$age)
 }
 

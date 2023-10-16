@@ -88,7 +88,6 @@ use \code{haven}, you may need to install it using \code{install.packages("haven
 }
 \examples{
 \dontrun{
-library(jmvReadWrite)
 # generate a test dataframe with 100 (imaginary) participants / units of
 # observation (ID), and 8 repeated measurements of variable (X_1, X_2, ...)
 dtaInp <- cbind(data.frame(ID = as.character(seq(1:100))),
@@ -110,8 +109,9 @@ cat(str(dtaInp))
 nmeInp <- tempfile(fileext = ".rds")
 nmeOut <- tempfile(fileext = ".omv")
 saveRDS(dtaInp, nmeInp)
-wide2long_omv(dtaInp = nmeInp, fleOut = nmeOut, varID = "ID", varTme = "measure",
-    varLst = setdiff(names(dtaInp), "ID"), varSrt = c("ID", "measure"))
+jmvReadWrite::wide2long_omv(dtaInp = nmeInp, fleOut = nmeOut, varID = "ID",
+    varTme = "measure", varLst = setdiff(names(dtaInp), "ID"),
+    varSrt = c("ID", "measure"))
 # it is required to give at least the arguments dtaInp (if dtaInp is a data frame,
 # fleOut needs to be provided too) and varID
 # "reshape" then assigns all variables expect the variable defined by varID to
@@ -126,7 +126,7 @@ cat(list.files(dirname(nmeOut), basename(nmeOut)))
 cat(file.info(nmeOut)$size)
 # -> 6939 (approximate size; size may differ in every run [in dependence of how
 #          well the generated random data can be compressed])
-cat(str(read_omv(nmeOut, sveAtt = FALSE)))
+cat(str(jmvReadWrite::read_omv(nmeOut, sveAtt = FALSE)))
 # the data set is now transformed into long (and each the measurements is now
 # indicated by the "measure")
 # 'data.frame':	800 obs. of  3 variables:

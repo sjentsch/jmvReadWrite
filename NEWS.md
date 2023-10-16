@@ -1,3 +1,13 @@
+# jmvReadWrite 0.4.2
+
+## Bug fixes:
+* correct replacement for numerical values in `replace_omv`
+* replaced all occurrences of `library(jmvReadWrite)`
+* smaller corrections to the documentation (added parameter descriptions)
+* added unit tests for `replace` (replacement in character columns)
+
+---
+
 # jmvReadWrite 0.4.1
 
 ## Bug fix:

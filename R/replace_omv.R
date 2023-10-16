@@ -35,22 +35,24 @@
 #'
 #' @examples
 #' \dontrun{
-#' library(jmvReadWrite)
+#' bfi_sample <- jmvReadWrite::bfi_sample
 #' # the gender in the original data file is plural...
 #' table(bfi_sample$gender)
 #' # and shall be converted to singular
-#' rplDF <- replace_omv(bfi_sample, rplLst = list(c("Females", "Female"), c("Males", "Male")))
+#' rplDF <- jmvReadWrite::replace_omv(dtaInp = bfi_sample,
+#'            rplLst = list(c("Females", "Female"), c("Males", "Male")))
 #' table(rplDF$gender)
 #' # with giving an output file name, the data set is written
 #' nmeOut <- tempfile(fileext = ".omv")
-#' replace_omv(bfi_sample, fleOut = nmeOut, rplLst = list(c("Females", "Female"), c("Males", "Male")))
+#' jmvReadWrite::replace_omv(bfi_sample, fleOut = nmeOut,
+#'   rplLst = list(c("Females", "Female"), c("Males", "Male")))
 #' file.exists(nmeOut)
-#' rplDF <- read_omv(nmeOut)
+#' rplDF <- jmvReadWrite::read_omv(nmeOut)
 #' table(rplDF$gender)
 #' unlink(nmeOut)
 #' # it is sensible to check / search for the original values before running replace_omv
-#' search_omv(bfi_sample, 24, whlTrm = TRUE)
-#' rplDF <- replace_omv(bfi_sample, rplLst = list(c(24, NA)))
+#' jmvReadWrite::search_omv(bfi_sample, 24, whlTrm = TRUE)
+#' rplDF <- jmvReadWrite::replace_omv(bfi_sample, rplLst = list(c(24, NA)))
 #' table(rplDF$age)
 #' }
 #'
@@ -88,17 +90,15 @@ replace_omv <- function(dtaInp = NULL, fleOut = "", rplLst = list(), whlTrm = TR
     srcNme <- srcNme[sapply(dtaFrm[srcNme], function(x) is.null(attr(x,  "columnType")) || any(attr(x,  "columnType") == incClT))]
     srcNme <- srcNme[sapply(dtaFrm[srcNme], function(x) is.null(attr(x, "measureType")) || any(attr(x, "measureType") == incMsT))]
     for (i in seq_along(srcNme)) {
-        typClm <- class(dtaFrm[[srcNme[i]]])
         for (j in seq_along(rplLst)) {
             if (is.factor(dtaFrm[[srcNme[i]]])) {
                 if (rplLst[[j]][1] %in% levels(dtaFrm[[srcNme[i]]])) levels(dtaFrm[[srcNme[i]]]) <- gsub(rplLst[[j]][1], rplLst[[j]][2], levels(dtaFrm[[srcNme[i]]]))
-            } else if (is.numeric(dtaFrm[[srcNme[i]]]) || is.character(dtaFrm[[srcNme[i]]])) {
-                srcSel <- srcClm(dtaFrm[[srcNme[i]]], as.character(rplLst[[j]][1]), whlTrm)
-                if (any(srcSel)) {
-                    dtaFrm[srcSel, srcNme[i]] <- ifelse(identical(class(rplLst[[j]][2]), typClm),
-                                                          rplLst[[j]][2],
-                                                          eval(parse(text = paste0("as.", typClm, "(rplLst[[j]][2])"))))
-                }
+            } else if (is.numeric(dtaFrm[[srcNme[i]]])) {
+                srcSel <- srcClm(dtaFrm[[srcNme[i]]], gsub("\\.", "\\\\.", as.character(rplLst[[j]][1])), whlTrm)
+                if (any(srcSel)) dtaFrm[srcSel, srcNme[i]] <- dtaFrm[srcSel, srcNme[i]] + diff(as.numeric(rplLst[[j]]))
+            } else if (is.character(dtaFrm[[srcNme[i]]])) {
+                srcSel <- srcClm(dtaFrm[[srcNme[i]]], gsub("\\.", "\\\\.", as.character(rplLst[[j]][1])), whlTrm)
+                if (any(srcSel)) dtaFrm[srcSel, srcNme[i]] <- rplLst[[j]][2]
             }
             # other variable types are already caught by jmvAtt() above
         }

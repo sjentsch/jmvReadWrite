@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">jmvReadWrite</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.4.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.4.2</span>
       </span>
     </div>
 
@@ -81,7 +81,7 @@
                         <h4 data-toc-skip class="author">Sebastian
 Jentschke</h4>
             
-            <h4 data-toc-skip class="date">2023-08-26</h4>
+            <h4 data-toc-skip class="date">2023-10-16</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/sjentsch/jmvReadWrite/blob/main/vignettes/jmvReadWrite.Rmd" class="external-link"><code>vignettes/jmvReadWrite.Rmd</code></a></small>
       <div class="hidden name"><code>jmvReadWrite.Rmd</code></div>
@@ -144,11 +144,8 @@ switch on the <a href="https://jamovi.readthedocs.io/en/latest/usermanual/um_6_j
 Afterwards, the syntax is shown at the top of the analysis and can be
 copied from there.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://sjentsch.github.io/jmvReadWrite/">jmvReadWrite</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">jmv</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">fleOMV</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"ToothGrowth.omv"</span>, package <span class="op">=</span> <span class="st">"jmvReadWrite"</span><span class="op">)</span></span>
-<span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_omv.html">read_omv</a></span><span class="op">(</span><span class="va">fleOMV</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">fleOMV</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"ToothGrowth.omv"</span>, package <span class="op">=</span> <span class="st">"jmvReadWrite"</span><span class="op">)</span></span>
+<span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu">jmvReadWrite</span><span class="fu">::</span><span class="fu"><a href="../reference/read_omv.html">read_omv</a></span><span class="op">(</span><span class="va">fleOMV</span><span class="op">)</span></span>
 <span><span class="co"># if the "jmv"-package is installed, we can run a test analysis with the data</span></span>
 <span><span class="kw">if</span> <span class="op">(</span><span class="st">"jmv"</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/installed.packages.html" class="external-link">installed.packages</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="fu">jmv</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/jmv/man/ANOVA.html" class="external-link">ANOVA</a></span><span class="op">(</span></span>
@@ -198,9 +195,8 @@ you have to set the parameter <code>getSyn = TRUE</code> when calling <a href="h
 are stored in the attribute <code>syntax</code>. They can be used as
 shown in the following examples:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://sjentsch.github.io/jmvReadWrite/">jmvReadWrite</a></span><span class="op">)</span></span>
-<span><span class="va">fleOMV</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"ToothGrowth.omv"</span>, package <span class="op">=</span> <span class="st">"jmvReadWrite"</span><span class="op">)</span></span>
-<span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_omv.html">read_omv</a></span><span class="op">(</span><span class="va">fleOMV</span>, getSyn <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">fleOMV</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"ToothGrowth.omv"</span>, package <span class="op">=</span> <span class="st">"jmvReadWrite"</span><span class="op">)</span></span>
+<span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu">jmvReadWrite</span><span class="fu">::</span><span class="fu"><a href="../reference/read_omv.html">read_omv</a></span><span class="op">(</span><span class="va">fleOMV</span>, getSyn <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co"># shows the syntax of the analyses from the .omv-file</span></span>
 <span><span class="co"># please note that syntax extraction may not work on all systems</span></span>
 <span><span class="co"># if the syntax couldn't be extracted, an empty list (length = 0) is returned,</span></span>
@@ -230,13 +226,11 @@ those processed log-files stored in a data frame (called, e.g.,
 <code>data</code>) which you then write to a file that you can open in
 jamovi afterwards.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://sjentsch.github.io/jmvReadWrite/">jmvReadWrite</a></span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># use the data set "ToothGrowth" and, if it exists, write it as jamovi-file</span></span>
+<code class="sourceCode R"><span><span class="co"># use the data set "ToothGrowth" and, if it exists, write it as jamovi-file</span></span>
 <span><span class="co"># using write_omv()</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"ToothGrowth"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"ToothGrowth"</span>, package <span class="op">=</span> <span class="st">"jmvReadWrite"</span><span class="op">)</span></span>
 <span><span class="co"># "retDbg" has to be set in order to return debug information to wrtDta</span></span>
-<span><span class="va">wrtDta</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/write_omv.html">write_omv</a></span><span class="op">(</span><span class="va">ToothGrowth</span>, <span class="st">"Trial.omv"</span>, retDbg <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="va">wrtDta</span> <span class="op">&lt;-</span> <span class="fu">jmvReadWrite</span><span class="fu">::</span><span class="fu"><a href="../reference/write_omv.html">write_omv</a></span><span class="op">(</span><span class="va">ToothGrowth</span>, <span class="st">"Trial.omv"</span>, retDbg <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">wrtDta</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "mtaDta" "xtdDta" "dtaFrm"</span></span>
 <span><span class="co"># -&gt; "mtaDta" "xtdDta" "dtaFrm"</span></span>
@@ -251,9 +245,9 @@ jamovi afterwards.</p>
 <span><span class="co">#&gt; [1] "Trial.omv"</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/file.info.html" class="external-link">file.info</a></span><span class="op">(</span><span class="st">"Trial.omv"</span><span class="op">)</span></span>
 <span><span class="co">#&gt;           size isdir mode               mtime               ctime</span></span>
-<span><span class="co">#&gt; Trial.omv 1723 FALSE  644 2023-08-26 16:44:50 2023-08-26 16:44:50</span></span>
+<span><span class="co">#&gt; Trial.omv 2609 FALSE  644 2023-10-16 11:47:33 2023-10-16 11:47:33</span></span>
 <span><span class="co">#&gt;                         atime  uid gid  uname grname</span></span>
-<span><span class="co">#&gt; Trial.omv 2023-08-26 16:44:50 1001 999 runner docker</span></span>
+<span><span class="co">#&gt; Trial.omv 2023-10-16 11:47:33 1001 127 runner docker</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="st">"Trial.omv"</span><span class="op">)</span></span></code></pre></div>
 <p>Although jamovi reads R-data files (.RData, .rda, .rds) <a href="https://sjentsch.github.io/jmvReadWrite/reference/write_omv.html"><code>write_omv</code></a>
 permits to store <code>jamovi</code>-specific attributes (such as
@@ -267,7 +261,7 @@ recommended to leave the <code>sveAtt</code>-attribute set to
 <span><span class="co"># essential meta-data to ensure that the written file looks and works like the</span></span>
 <span><span class="co"># original file (plus you modifications)</span></span>
 <span><span class="va">fleOMV</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"ToothGrowth.omv"</span>, package <span class="op">=</span> <span class="st">"jmvReadWrite"</span><span class="op">)</span></span>
-<span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_omv.html">read_omv</a></span><span class="op">(</span><span class="va">fleOMV</span>, sveAtt <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu">jmvReadWrite</span><span class="fu">::</span><span class="fu"><a href="../reference/read_omv.html">read_omv</a></span><span class="op">(</span><span class="va">fleOMV</span>, sveAtt <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co"># shows the names of the attributes for the whole data set (e.g., number of</span></span>
 <span><span class="co"># rows and columns) and the names of the attributes of the first column</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/attributes.html" class="external-link">attributes</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span><span class="op">)</span></span>
@@ -281,7 +275,7 @@ recommended to leave the <code>sveAtt</code>-attribute set to
 <span><span class="co">#&gt; [17] "active"</span></span>
 <span><span class="co">#</span></span>
 <span><span class="co"># perhaps do some modifications to the file here and write it back afterwards</span></span>
-<span><span class="fu"><a href="../reference/write_omv.html">write_omv</a></span><span class="op">(</span><span class="va">data</span>, <span class="st">"Trial.omv"</span><span class="op">)</span></span>
+<span><span class="fu">jmvReadWrite</span><span class="fu">::</span><span class="fu"><a href="../reference/write_omv.html">write_omv</a></span><span class="op">(</span><span class="va">data</span>, <span class="st">"Trial.omv"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="st">"Trial.omv"</span><span class="op">)</span></span></code></pre></div>
 <p>If <code>Trial.omv</code> in the example above would have been kept,
 it should look like the original file (plus your possible

@@ -20,7 +20,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">jmvReadWrite</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.4.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.4.2</span>
       </span>
     </div>
 
@@ -124,15 +124,13 @@ file.</p></li>
     <div id="ref-examples">
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://sjentsch.github.io/jmvReadWrite/">jmvReadWrite</a></span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># use the data set "ToothGrowth" and, if it exists, write it as</span></span></span>
 <span class="r-in"><span><span class="co"># jamovi-file using write_omv()</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"ToothGrowth"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">jmvReadWrite</span><span class="fu">::</span><span class="va"><a href="ToothGrowth.html">ToothGrowth</a></span></span></span>
 <span class="r-in"><span><span class="va">nmeOut</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".omv"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># typically, one would use a "real" file name instead of tempfile(),</span></span></span>
 <span class="r-in"><span><span class="co"># e.g., "Data1.omv"</span></span></span>
-<span class="r-in"><span><span class="va">dtaDbg</span> <span class="op">=</span> <span class="fu">write_omv</span><span class="op">(</span>dtaFrm <span class="op">=</span> <span class="va">ToothGrowth</span>, fleOut <span class="op">=</span> <span class="va">nmeOut</span>, retDbg <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">dtaDbg</span> <span class="op">=</span> <span class="fu">jmvReadWrite</span><span class="fu">::</span><span class="fu">write_omv</span><span class="op">(</span>dtaFrm <span class="op">=</span> <span class="va">ToothGrowth</span>, fleOut <span class="op">=</span> <span class="va">nmeOut</span>, retDbg <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">dtaDbg</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># the print-function is only used to force devtools::run_examples()</span></span></span>
 <span class="r-in"><span><span class="co"># to show output</span></span></span>

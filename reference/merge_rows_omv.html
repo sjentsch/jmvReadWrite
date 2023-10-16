@@ -20,7 +20,7 @@ first file"><meta property="og:image" content="https://sjentsch.github.io/jmvRea
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">jmvReadWrite</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.4.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.4.2</span>
       </span>
     </div>
 
@@ -159,17 +159,16 @@ use <code>haven</code>, you may need to install it using <code>install.packages(
     <div id="ref-examples">
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://sjentsch.github.io/jmvReadWrite/">jmvReadWrite</a></span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">dtaInp</span> <span class="op">&lt;-</span> <span class="va">bfi_sample2</span></span></span>
+<span class="r-in"><span><span class="va">dtaInp</span> <span class="op">&lt;-</span> <span class="fu">jmvReadWrite</span><span class="fu">::</span><span class="va"><a href="bfi_sample2.html">bfi_sample2</a></span></span></span>
 <span class="r-in"><span><span class="va">nmeInp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"_"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">3</span>, <span class="st">".rds"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">nmeOut</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".omv"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">nmeInp</span><span class="op">)</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="va">dtaInp</span><span class="op">[</span><span class="op">-</span><span class="va">i</span> <span class="op">-</span> <span class="fl">1</span><span class="op">]</span>, <span class="va">nmeInp</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># save dtaInp three times (i.e., the length of nmeInp), removing one data columns in</span></span></span>
 <span class="r-in"><span><span class="co"># each data set (for demonstration purposes, A1 in the first, A2 in the second, ...)</span></span></span>
-<span class="r-in"><span><span class="fu">merge_rows_omv</span><span class="op">(</span>dtaInp <span class="op">=</span> <span class="va">nmeInp</span>, fleOut <span class="op">=</span> <span class="va">nmeOut</span>, colInd <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">jmvReadWrite</span><span class="fu">::</span><span class="fu">merge_rows_omv</span><span class="op">(</span>dtaInp <span class="op">=</span> <span class="va">nmeInp</span>, fleOut <span class="op">=</span> <span class="va">nmeOut</span>, colInd <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.info.html" class="external-link">file.info</a></span><span class="op">(</span><span class="va">nmeOut</span><span class="op">)</span><span class="op">$</span><span class="va">size</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># -&gt; 10767 (size may differ on different OSes)</span></span></span>
-<span class="r-in"><span><span class="va">dtaOut</span> <span class="op">&lt;-</span> <span class="fu"><a href="read_omv.html">read_omv</a></span><span class="op">(</span><span class="va">nmeOut</span>, sveAtt <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">dtaOut</span> <span class="op">&lt;-</span> <span class="fu">jmvReadWrite</span><span class="fu">::</span><span class="fu"><a href="read_omv.html">read_omv</a></span><span class="op">(</span><span class="va">nmeOut</span>, sveAtt <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="va">nmeOut</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># read the data set where the three original datasets were added as rows and show</span></span></span>
 <span class="r-in"><span><span class="co"># the variable names</span></span></span>
@@ -185,10 +184,10 @@ use <code>haven</code>, you may need to install it using <code>install.packages(
 <span class="r-in"><span><span class="co"># data set (250 -&gt; 750), the second dimension (columns / variables) is increased by 1</span></span></span>
 <span class="r-in"><span><span class="co"># (for "fleInd")</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="fu">merge_rows_omv</span><span class="op">(</span>dtaInp <span class="op">=</span> <span class="va">nmeInp</span>, fleOut <span class="op">=</span> <span class="va">nmeOut</span>, typMrg <span class="op">=</span> <span class="st">"common"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">jmvReadWrite</span><span class="fu">::</span><span class="fu">merge_rows_omv</span><span class="op">(</span>dtaInp <span class="op">=</span> <span class="va">nmeInp</span>, fleOut <span class="op">=</span> <span class="va">nmeOut</span>, typMrg <span class="op">=</span> <span class="st">"common"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># the argument typMrg = "common" removes the columns that are not present in all of</span></span></span>
 <span class="r-in"><span><span class="co"># the input data sets (i.e., A1, A2, A3)</span></span></span>
-<span class="r-in"><span><span class="va">dtaOut</span> <span class="op">&lt;-</span> <span class="fu"><a href="read_omv.html">read_omv</a></span><span class="op">(</span><span class="va">nmeOut</span>, sveAtt <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">dtaOut</span> <span class="op">&lt;-</span> <span class="fu">jmvReadWrite</span><span class="fu">::</span><span class="fu"><a href="read_omv.html">read_omv</a></span><span class="op">(</span><span class="va">nmeOut</span>, sveAtt <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="va">nmeOut</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># read the data set where the three original datasets were added as rows and show</span></span></span>
 <span class="r-in"><span><span class="co"># the variable names</span></span></span>

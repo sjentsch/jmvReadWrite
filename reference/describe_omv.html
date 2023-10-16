@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">jmvReadWrite</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.4.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.4.2</span>
       </span>
     </div>
 
@@ -142,7 +142,6 @@ SAS-data-files, and <code><a href="https://haven.tidyverse.org/reference/read_xp
     <div id="ref-examples">
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://sjentsch.github.io/jmvReadWrite/">jmvReadWrite</a></span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">dtaFrm</span> <span class="op">&lt;-</span> <span class="fu">jmvReadWrite</span><span class="fu">::</span><span class="va"><a href="ToothGrowth.html">ToothGrowth</a></span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"len"</span>, <span class="st">"supp"</span>, <span class="st">"dose"</span><span class="op">)</span><span class="op">]</span></span></span>
 <span class="r-in"><span><span class="va">nmeOut</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".omv"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
@@ -152,7 +151,7 @@ SAS-data-files, and <code><a href="https://haven.tidyverse.org/reference/read_xp
 <span class="r-in"><span>                                   <span class="st">"of three dose levels of vitamin C (0.5, 1, and 2 mg / day) by"</span>,</span></span>
 <span class="r-in"><span>                                   <span class="st">"one of two delivery methods, orange juice or ascorbic acid (a"</span>,</span></span>
 <span class="r-in"><span>                                   <span class="st">"form of vitamin C and coded as VC)."</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>               variables <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>len <span class="op">=</span> <span class="st">"Tooth length"</span>,</span></span>
+<span class="r-in"><span>               variables <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>len  <span class="op">=</span> <span class="st">"Tooth length"</span>,</span></span>
 <span class="r-in"><span>                                supp <span class="op">=</span> <span class="st">"Supplement type (VC or OJ)"</span>,</span></span>
 <span class="r-in"><span>                                dose <span class="op">=</span> <span class="st">"Dose (in milligrams / day"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>               references <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"Crampton, E. W. (1947). The growth of the odontoblast of the"</span>,</span></span>
@@ -160,7 +159,8 @@ SAS-data-files, and <code><a href="https://haven.tidyverse.org/reference/read_xp
 <span class="r-in"><span>                                  <span class="st">"pig. &lt;em&gt;The Journal of Nutrition, 33&lt;/em&gt;(5), 491-504."</span>,</span></span>
 <span class="r-in"><span>                                  <span class="st">"https://doi.org/10.1093/jn/33.5.491"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>               license <span class="op">=</span> <span class="st">""</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">describe_omv</span><span class="op">(</span>dtaInp <span class="op">=</span> <span class="va">dtaFrm</span>, fleOut <span class="op">=</span> <span class="va">nmeOut</span>, dtaTtl <span class="op">=</span> <span class="st">"ToothGrowth"</span>, dtaDsc <span class="op">=</span> <span class="va">lstDsc</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">jmvReadWrite</span><span class="fu">::</span><span class="fu">describe_omv</span><span class="op">(</span>dtaInp <span class="op">=</span> <span class="va">dtaFrm</span>, fleOut <span class="op">=</span> <span class="va">nmeOut</span>, dtaTtl <span class="op">=</span> <span class="st">"ToothGrowth"</span>,</span></span>
+<span class="r-in"><span>  dtaDsc <span class="op">=</span> <span class="va">lstDsc</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># don't include the unlink, if you copy the code and want to look at the resulting output file</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="va">nmeOut</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
@@ -181,7 +181,8 @@ SAS-data-files, and <code><a href="https://haven.tidyverse.org/reference/read_xp
 <span class="r-in"><span>                 <span class="st">"indented once&lt;/p&gt;&lt;p class=\"ql-indent-2\"&gt;indented twice&lt;/p&gt;&lt;p "</span>,</span></span>
 <span class="r-in"><span>                 <span class="st">"class=\"ql-indent-1\"&gt;indented once&lt;/p&gt;&lt;p&gt;Formula: &lt;span class=\"ql-formula\"&gt;"</span>,</span></span>
 <span class="r-in"><span>                 <span class="st">"e=mc^2&lt;/span&gt;&lt;/p&gt;&lt;pre&gt;Preformatted&lt;/pre&gt;&lt;p&gt;normal again&lt;/p&gt;&lt;h2&gt;Heading&lt;/h2&gt;"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">describe_omv</span><span class="op">(</span>dtaInp <span class="op">=</span> <span class="va">dtaFrm</span>, fleOut <span class="op">=</span> <span class="va">nmeOut</span>, dtaTtl <span class="op">=</span> <span class="st">"ToothGrowth"</span>, dtaDsc <span class="op">=</span> <span class="va">chrDsc</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">jmvReadWrite</span><span class="fu">::</span><span class="fu">describe_omv</span><span class="op">(</span>dtaInp <span class="op">=</span> <span class="va">dtaFrm</span>, fleOut <span class="op">=</span> <span class="va">nmeOut</span>, dtaTtl <span class="op">=</span> <span class="st">"ToothGrowth"</span>,</span></span>
+<span class="r-in"><span>  dtaDsc <span class="op">=</span> <span class="va">chrDsc</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="va">nmeOut</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-in"><span></span></span>

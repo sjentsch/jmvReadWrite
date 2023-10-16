@@ -110,14 +110,14 @@ data <- jmvReadWrite::read_omv(fleOMV, getSyn = TRUE)
 # if the syntax couldn't be extracted, an empty list (length = 0) is returned,
 # otherwise, the syntax of the analyses from the .omv-file is shown and
 # the commands of the first and the second analysis are run, with the
-# output of the second analysis assigned to the variable result2
+# output of the second analysis assigned to the variable result
 if (length(attr(data, "syntax")) >= 2) {
     attr(data, "syntax")
     # if the "jmv"-package is installed, we can run the analyses in "syntax"
     if ("jmv" %in% rownames(installed.packages())) {
         eval(parse(text = attr(data, "syntax")[[1]]))
-        eval(parse(text = paste0("result2 = ", attr(data, "syntax")[[2]])))
-        names(result2)
+        eval(parse(text = paste0("result = ", attr(data, "syntax")[[2]])))
+        names(result)
         # -> "main"      "assump"    "contrasts" "postHoc"   "emm"
         # (the names of the five output tables)
     }

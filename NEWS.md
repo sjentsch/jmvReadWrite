@@ -1,10 +1,11 @@
 # jmvReadWrite 0.4.2
 
-## Bug fixes:
-* correct replacement for numerical values in `replace_omv`
+## Bug fixes and enhancements:
+* corrected replacement of numerical values in `replace_omv`
 * replaced all occurrences of `library(jmvReadWrite)`
 * smaller corrections to the documentation (added parameter descriptions)
-* added unit tests for `replace` (replacement in character columns)
+* added unit tests for `replace_omv` (replacement in character columns)
+* adjusted `wide2long_omv` in order to accept `NULL` for `varID`
 
 ---
 

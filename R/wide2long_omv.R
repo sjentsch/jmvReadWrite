@@ -7,7 +7,7 @@
 #' @param varLst List / set of variables that are to be transformed into single (time-varying) variables in long format (default: c())
 #' @param varExc Name of the variable(s) should be excluded from the transformation, typically this will be between-subject-variable(s) (default: c())
 #' @param varID  Name(s) of one or more variables that (is created to) identify the same group / individual (if empty, "ID" is added with row numbers
-#'               identifying cases; default: "ID")
+#'               identifying cases; default: NULL)
 #' @param varTme Name of the variable that (is created to) differentiate multiple records from the same group / individual (default: "cond"; a counter is added
 #'               for each time-varying part)
 #' @param varSep Character that separates the variables in varLst into a time-varying part and a part that forms the variable name in long format ("_" in
@@ -27,8 +27,8 @@
 #'
 #' @details
 #' * If `varLst` is empty, it is tried to generate it using all variables in the data frame except those defined by `varExc` and `varID`. The variable(s) in
-#'   `varID` need to be unique identifiers (in the original dataset), those in `varExc` don't have this requirement. It is generally recommended that the
-#'   variable names in `varExc` and `varID` should not contain the variable separator (defined in `varSep`; default: "_").
+#'   `varID` need to be unique identifiers (in the original dataset), those in `varExc` don't have this requirement. It is recommended that the variable names
+#'   in `varExc` and `varID` should not contain the variable separator (defined in `varSep`; default: "_").
 #' * `varOrd` determines whether the variables are rearranged to match the order of split levels. Consider the `varLst` X_1, Y_1, X_2, Y_2. If `varOrd` were
 #'   set to FALSE, the original order would be preserved and the second part of the variable name (1, 2, ...) would become condition 1, and the first part
 #'   condition 2. In most cases, leaving `varOrd` set to TRUE is recommended.
@@ -111,11 +111,12 @@
 #'
 #' @export wide2long_omv
 #'
-wide2long_omv <- function(dtaInp = NULL, fleOut = "", varLst = c(), varExc = c(), varID = "ID", varTme = "cond", varSep = "_", varOrd = TRUE, varSrt = c(),
+wide2long_omv <- function(dtaInp = NULL, fleOut = "", varLst = c(), varExc = c(), varID = NULL, varTme = "cond", varSep = "_", varOrd = TRUE, varSrt = c(),
                           excLvl = NULL, usePkg = c("foreign", "haven"), selSet = "", ...) {
 
     # check and import input data set (either as data frame or from a file)
     if (!is.null(list(...)[["fleInp"]])) stop("Please use the argument dtaInp instead of fleInp.")
+    if (is.null(varID)) varID <- "ID"
     dtaFrm <- inp2DF(dtaInp, usePkg = usePkg, selSet = selSet, ...)
     dtaNmV <- names(dtaFrm)
     hasID  <- all(varID %in% dtaNmV)

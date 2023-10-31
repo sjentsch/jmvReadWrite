@@ -194,29 +194,35 @@ management tasks that are frequently required:
   Re-arranges the columns of your data file in a requested order.
 
 * [`convert_to_omv`](https://sjentsch.github.io/jmvReadWrite/reference/convert_to_omv.html):
-  Converts data sets from other file formats into jamovi-format (this function
-  may be helpful if you have to convert a larger amount of files).
+  Converts data sets from other file formats into jamovi-format. This function
+  may be helpful if you have to convert a larger amount of files.
+
+* [`describe_omv`](https://sjentsch.github.io/jmvReadWrite/reference/describe_omv.html):
+  Adds a title and a description to a data set. This function may be helpful
+  for documenting what is contained in a data set, e.g. for publishing them in
+  a repository such as OSF, or for generated data sets, e.g. those used in
+  teaching.
 
 * [`long2wide_omv`](https://sjentsch.github.io/jmvReadWrite/reference/long2wide_omv.html):
-  Convert a data set from long to wide format (time points for repeated
+  Convert a data set from long to wide format: Time points for repeated
   measurements are arranged as rows in the original and converted into
-  columns).
+  columns.
 
 * [`wide2long_omv`](https://sjentsch.github.io/jmvReadWrite/reference/wide2long_omv.html):
-  Convert a data set from wide to long format (time points for repeated
+  Convert a data set from wide to long format: Time points for repeated
   measurements are arranged as columns in the original and converted into
-  rows).
+  rows.
 
 * [`merge_cols_omv`](https://sjentsch.github.io/jmvReadWrite/reference/merge_cols_omv.html):
-  Add variables from several data sets (i.e., the variables / columns in the
-  second, etc. input data set are added as columns to the first data set).
+  Add variables from several data sets, i.e. the variables / columns in the
+  second, etc. input data set are added as columns to the first data set.
 
 * [`merge_rows_omv`](https://sjentsch.github.io/jmvReadWrite/reference/merge_rows_omv.html):
-  Add cases from several data sets (i.e., the cases / rows in the second, etc.
-  data set are added as rows to the first data set).
+  Add cases from several data sets, i.e. the cases / rows in the second, etc.
+  data set are added as rows to the first data set.
 
 * [`sort_omv`](https://sjentsch.github.io/jmvReadWrite/reference/sort_omv.html):
   Sort a data set according to one or more variable(s).
 
 * [`transpose_omv`](https://sjentsch.github.io/jmvReadWrite/reference/transpose_omv.html):
-  Transpose a data set (make rows into columns and vice versa).
+  Transpose a data set: Make rows into columns and vice versa.

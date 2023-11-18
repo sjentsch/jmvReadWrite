@@ -9,7 +9,7 @@ wide2long_omv(
   fleOut = "",
   varLst = c(),
   varExc = c(),
-  varID = "ID",
+  varID = NULL,
   varTme = "cond",
   varSep = "_",
   varOrd = TRUE,
@@ -32,7 +32,7 @@ returned instead}
 \item{varExc}{Name of the variable(s) should be excluded from the transformation, typically this will be between-subject-variable(s) (default: c())}
 
 \item{varID}{Name(s) of one or more variables that (is created to) identify the same group / individual (if empty, "ID" is added with row numbers
-identifying cases; default: "ID")}
+identifying cases; default: NULL)}
 
 \item{varTme}{Name of the variable that (is created to) differentiate multiple records from the same group / individual (default: "cond"; a counter is added
 for each time-varying part)}
@@ -63,8 +63,8 @@ Converts .omv-files for the statistical spreadsheet 'jamovi' (\url{https://www.j
 \details{
 \itemize{
 \item If \code{varLst} is empty, it is tried to generate it using all variables in the data frame except those defined by \code{varExc} and \code{varID}. The variable(s) in
-\code{varID} need to be unique identifiers (in the original dataset), those in \code{varExc} don't have this requirement. It is generally recommended that the
-variable names in \code{varExc} and \code{varID} should not contain the variable separator (defined in \code{varSep}; default: "_").
+\code{varID} need to be unique identifiers (in the original dataset), those in \code{varExc} don't have this requirement. It is recommended that the variable names
+in \code{varExc} and \code{varID} should not contain the variable separator (defined in \code{varSep}; default: "_").
 \item \code{varOrd} determines whether the variables are rearranged to match the order of split levels. Consider the \code{varLst} X_1, Y_1, X_2, Y_2. If \code{varOrd} were
 set to FALSE, the original order would be preserved and the second part of the variable name (1, 2, ...) would become condition 1, and the first part
 condition 2. In most cases, leaving \code{varOrd} set to TRUE is recommended.

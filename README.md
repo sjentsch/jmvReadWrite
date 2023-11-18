@@ -149,14 +149,14 @@ data <- jmvReadWrite::read_omv(fleOMV, getSyn = TRUE)
 # if the syntax couldn't be extracted, an empty list (length = 0) is returned,
 # otherwise, the syntax of the analyses from the .omv-file is shown and
 # the commands of the first and the second analysis are run, with the
-# output of the second analysis assigned to the variable result2
+# output of the second analysis assigned to the variable result
 if (length(attr(data, "syntax")) >= 2) {
     attr(data, "syntax")
     # if the "jmv"-package is installed, we can run the analyses in "syntax"
     if ("jmv" %in% rownames(installed.packages())) {
         eval(parse(text = attr(data, "syntax")[[1]]))
-        eval(parse(text = paste0("result2 = ", attr(data, "syntax")[[2]])))
-        names(result2)
+        eval(parse(text = paste0("result = ", attr(data, "syntax")[[2]])))
+        names(result)
         # -> "main"      "assump"    "contrasts" "postHoc"   "emm"
         # (the names of the five output tables)
     }
@@ -196,9 +196,9 @@ list.files(".", "Trial.omv")
 #> [1] "Trial.omv"
 file.info("Trial.omv")
 #>           size isdir mode               mtime               ctime
-#> Trial.omv 2609 FALSE  664 2023-10-16 12:53:28 2023-10-16 12:53:28
+#> Trial.omv 2609 FALSE  664 2023-11-18 17:43:07 2023-11-18 17:43:07
 #>                         atime  uid  gid    uname   grname
-#> Trial.omv 2023-10-16 12:53:28 1000 1000 sjentsch sjentsch
+#> Trial.omv 2023-11-18 17:43:07 1000 1000 sjentsch sjentsch
 unlink("Trial.omv")
 ```
 
@@ -248,34 +248,40 @@ with data management tasks that are frequently required:
     Re-arranges the columns of your data file in a requested order.
 
   - [`convert_to_omv`](https://sjentsch.github.io/jmvReadWrite/reference/convert_to_omv.html):
-    Converts data sets from other file formats into jamovi-format (this
+    Converts data sets from other file formats into jamovi-format. This
     function may be helpful if you have to convert a larger amount of
-    files).
+    files.
+
+  - [`describe_omv`](https://sjentsch.github.io/jmvReadWrite/reference/describe_omv.html):
+    Adds a title and a description to a data set. This function may be
+    helpful for documenting what is contained in a data set, e.g. for
+    publishing them in a repository such as OSF, or for generated data
+    sets, e.g. those used in teaching.
 
   - [`long2wide_omv`](https://sjentsch.github.io/jmvReadWrite/reference/long2wide_omv.html):
-    Convert a data set from long to wide format (time points for
+    Convert a data set from long to wide format: Time points for
     repeated measurements are arranged as rows in the original and
-    converted into columns).
+    converted into columns.
 
   - [`wide2long_omv`](https://sjentsch.github.io/jmvReadWrite/reference/wide2long_omv.html):
-    Convert a data set from wide to long format (time points for
+    Convert a data set from wide to long format: Time points for
     repeated measurements are arranged as columns in the original and
-    converted into rows).
+    converted into rows.
 
   - [`merge_cols_omv`](https://sjentsch.github.io/jmvReadWrite/reference/merge_cols_omv.html):
-    Add variables from several data sets (i.e., the variables / columns
+    Add variables from several data sets, i.e. the variables / columns
     in the second, etc. input data set are added as columns to the first
-    data set).
+    data set.
 
   - [`merge_rows_omv`](https://sjentsch.github.io/jmvReadWrite/reference/merge_rows_omv.html):
-    Add cases from several data sets (i.e., the cases / rows in the
-    second, etc. data set are added as rows to the first data set).
+    Add cases from several data sets, i.e. the cases / rows in the
+    second, etc. data set are added as rows to the first data set.
 
   - [`sort_omv`](https://sjentsch.github.io/jmvReadWrite/reference/sort_omv.html):
     Sort a data set according to one or more variable(s).
 
   - [`transpose_omv`](https://sjentsch.github.io/jmvReadWrite/reference/transpose_omv.html):
-    Transpose a data set (make rows into columns and vice versa).
+    Transpose a data set: Make rows into columns and vice versa.
 
 -----
 

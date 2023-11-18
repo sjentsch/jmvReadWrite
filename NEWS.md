@@ -1,6 +1,7 @@
 # jmvReadWrite 0.4.2
 
 ## Bug fixes and enhancements:
+* check for empty rows and missing values within `varID` in `merge_cols_omv`
 * corrected replacement of numerical values in `replace_omv`
 * replaced all occurrences of `library(jmvReadWrite)`
 * smaller corrections to the documentation (added parameter descriptions)

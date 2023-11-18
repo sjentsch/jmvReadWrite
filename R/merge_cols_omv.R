@@ -153,7 +153,7 @@ chkByV <- function(varBy = list(), dtaFrm = NULL) {
     # check whether all entries in the ID variables data sets contain a value
     for (i in seq_along(dtaFrm)) {
         if (any(sapply(varBy[[i]], function(c) any(is.na(dtaFrm[[i]][, c])) || any(is.null(dtaFrm[[i]][, c])) || !all(nzchar(dtaFrm[[i]][, c]))))) {
-            stop(sprintf("Values in the ID variable can't be empty (empty values found in %s)",
+            stop(sprintf("Values in the ID variable can't be empty (empty values found in %s).",
                            ifelse(i == 1, "the original data set", sprintf("data set %d to be merged", i - 1))))
         }
     }

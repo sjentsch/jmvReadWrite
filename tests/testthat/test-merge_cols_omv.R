@@ -43,7 +43,7 @@ test_that("merge_cols_omv works", {
     unlink(nmeOut)
     unlink(nmeInp)
 
-    dtaFrm <- list(data.frame(ID = runif(10), A = runif(10)), data.frame(ID = runif(10), B = runif(10)), data.frame(ID = runif(10), C = runif(10)), data.frame(ID = runif(10), D = runif(10)))
+    dtaFrm <- list(data.frame(ID = sample(10), A = runif(10)), data.frame(ID = sample(10), B = runif(10)), data.frame(ID = sample(10), C = runif(10)), data.frame(ID = sample(10), D = runif(10)))
     expect_equal(chkByV(list(), dtaFrm), rep(list("ID"), 4))
     expect_equal(chkByV(rep(list("ID"), 4), dtaFrm), rep(list("ID"), 4))
     expect_error(chkByV(rep(list("ID2"), 4), dtaFrm),
@@ -52,6 +52,11 @@ test_that("merge_cols_omv works", {
     expect_error(chkByV("ID2", dtaFrm), regexp = "^Not all data sets given in dtaInp contain the variable\\(s\\) / column\\(s\\) that shall be used for matching\\.")
     expect_error(chkByV(rep(list("ID"), 3), dtaFrm),
       regexp = "^varBy must be either a list \\(with the same length as dtaInp\\), a character vector, or a string\\.")
+    expect_error(chkByV(rep(list("ID"), 5), c(dtaFrm, list(data.frame(ID = c(sample(9), NA), E = runif(10))))),
+      regexp = "^Values in the ID variable can't be empty \\(empty values found in data set 4 to be merged\\)\\.")
+    expect_error(chkByV(rep(list("ID"), 5), c(list(data.frame(ID = c(sample(9), NA), Z = runif(10))), dtaFrm)),
+      regexp = "^Values in the ID variable can't be empty \\(empty values found in the original data set\\)\\.")
+
 
     nmeInp <- tempfile(fileext = ".rds")
     saveRDS(data.frame(ID = seq(60), A = rnorm(60), B = rnorm(60)), nmeInp)

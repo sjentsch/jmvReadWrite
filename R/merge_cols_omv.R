@@ -93,7 +93,7 @@ merge_cols_omv <- function(dtaInp = NULL, fleOut = "", typMrg = c("outer", "inne
     # store attributes and remove empty lines from the data sets
     attCol <- list()
     for (i in seq_along(dtaFrm)) {
-        attCol <- c(attCol, sapply(dtaFrm[[i]][, setdiff(names(dtaFrm[[i]]), names(attCol))], attributes))
+        attCol <- c(attCol, sapply(dtaFrm[[i]][, setdiff(names(dtaFrm[[i]]), names(attCol))], attributes, simplify = FALSE))
         dtaFrm[[i]] <- dtaFrm[[i]][!apply(is.na(dtaFrm[[i]]), 1, all), ]
     }
     attDF <- attributes(dtaFrm[[1]])
@@ -108,6 +108,23 @@ merge_cols_omv <- function(dtaInp = NULL, fleOut = "", typMrg = c("outer", "inne
     tmpMrg <- dtaFrm[[1]]
     for (i in setdiff(seq_along(dtaFrm), 1)) {
         tmpMrg <- do.call(merge, c(list(x = tmpMrg, y = dtaFrm[[i]], by.x = varBy[[1]], by.y = varBy[[i]]), crrArg[!grepl("^x$|^y$|^by.x$|^by.y$", names(crrArg))]))
+        # if there are duplicate columns (i.e., columns with the same name in two of the input data sets), unify them
+        for (unfClm in setdiff(names(attCol), names(tmpMrg))) {
+            dplClm <- grep(paste0(unfClm, "\\."), names(tmpMrg))
+            if (length(dplClm) == 0) next
+            names(tmpMrg)[dplClm[1]] <- unfClm
+            rmvClm <- NULL
+            for (i in seq(2, length(dplClm))) {
+                if (identical(tmpMrg[, dplClm[1]], tmpMrg[, dplClm[i]])) {
+                    rmvClm <- c(rmvClm, -dplClm[i])
+                } else {
+                    addClm <- sprintf("%s_%d", unfClm, sum(grepl(paste0(unfClm, "_"), names(tmpMrg))) + 2)
+                    names(tmpMrg)[dplClm[i]] <- addClm
+                    attCol[[addClm]] <- attCol[[unfClm]]
+                }
+            }
+            if (length(rmvClm) > 0) tmpMrg <- tmpMrg[, rmvClm]
+        }
     }
     dtaFrm <- tmpMrg
 

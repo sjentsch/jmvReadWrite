@@ -32,6 +32,37 @@ test_that("merge_cols_omv works", {
     dtaFrm <- merge_cols_omv(dtaInp = nmeInp[-2], typMrg = "inner", varBy = "ID", varSrt = c("gender_3", "age_3"))
     expect_s3_class(dtaFrm, "data.frame")
     expect_equal(dim(dtaFrm), c(245, 57))
+    unlink(nmeInp)
+    
+    nmeInp <- vector(mode = "character", length = 3)
+    dtaTmp <- jmvReadWrite::bfi_sample2
+    for (i in seq_along(nmeInp)) {
+        nmeInp[i] <- tempfile(fileext = ".rds")
+        saveRDS(dtaTmp, nmeInp[i])
+    }
+    dtaFrm <- merge_cols_omv(dtaInp = nmeInp, typMrg = "outer", varBy = "ID", varSrt = c("ID"))
+    expect_s3_class(dtaFrm, "data.frame")
+    expect_equal(dim(dtaFrm), c(250, 29))
+    expect_true(all(dtaFrm == dtaTmp[order(dtaTmp[, "ID"]), ]))
+    unlink(nmeInp)
+
+    nmeInp <- vector(mode = "character", length = 5)
+    dtaTmp <- jmvReadWrite::bfi_sample2
+    for (i in seq_along(nmeInp)) {
+        nmeInp[i] <- tempfile(fileext = ".rds")
+        strAtt <- attributes(dtaTmp[, "age"])
+        dtaTmp[, "age"] <- dtaTmp[sample(nrow(dtaTmp)), "age"]
+        attributes(dtaTmp[, "age"]) <- strAtt
+        saveRDS(dtaTmp, nmeInp[i])
+    }
+    dtaFrm <- merge_cols_omv(dtaInp = nmeInp, typMrg = "outer", varBy = "ID", varSrt = c("ID"))
+    dplClm <- gsub("age_1", "age", paste0("age_", seq(5)))
+    expect_s3_class(dtaFrm, "data.frame")
+    expect_equal(dim(dtaFrm), c(250, 33))
+    expect_true(all(dplClm %in% names(dtaFrm)))
+    expect_true(all(apply(sapply(dtaFrm[, dplClm], sort), 1, diff) == 0))
+    expect_true(all(diff(colMeans(dtaFrm[, dplClm])) == 0))
+    expect_true(all(sapply(dtaFrm[, dplClm], attributes) == "Age of the respondent (years)"))
 
     # test cases for code coverage ============================================================================================================================
     expect_error(merge_cols_omv(fleInp = nmeInp, typMrg = "outer", varBy = "ID"), regexp = "Please use the argument dtaInp instead of fleInp\\.")

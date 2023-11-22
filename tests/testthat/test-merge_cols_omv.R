@@ -33,7 +33,7 @@ test_that("merge_cols_omv works", {
     expect_s3_class(dtaFrm, "data.frame")
     expect_equal(dim(dtaFrm), c(245, 57))
     unlink(nmeInp)
-    
+
     nmeInp <- vector(mode = "character", length = 3)
     dtaTmp <- jmvReadWrite::bfi_sample2
     for (i in seq_along(nmeInp)) {

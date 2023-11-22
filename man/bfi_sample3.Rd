@@ -8,34 +8,34 @@
 \format{
 A data.frame with 250 rows and 28 variables
 \describe{
-\item{ID}{character}{Respondent ID}
-\item{A1}{ordered factor}{Am indifferent to the feelings of others. (reversed)}
-\item{A2}{ordered factor}{Inquire about others' well-being.}
-\item{A3}{ordered factor}{Know how to comfort others.}
-\item{A4}{ordered factor}{Love children.}
-\item{A5}{ordered factor}{Make people feel at ease.}
-\item{C1}{ordered factor}{Am exacting in my work.}
-\item{C2}{ordered factor}{Continue until everything is perfect.}
-\item{C3}{ordered factor}{Do things according to a plan.}
-\item{C4}{ordered factor}{Do things in a half-way manner. (reversed)}
-\item{C5}{ordered factor}{Waste my time. (reversed)}
-\item{E1}{ordered factor}{Don't talk a lot. (reversed)}
-\item{E2}{ordered factor}{Find it difficult to approach others. (reversed)}
-\item{E3}{ordered factor}{Know how to captivate people.}
-\item{E4}{ordered factor}{Make friends easily.}
-\item{E5}{ordered factor}{Take charge.}
-\item{N1}{ordered factor}{Get angry easily.}
-\item{N2}{ordered factor}{Get irritated easily.}
-\item{N3}{ordered factor}{Have frequent mood swings.}
-\item{N4}{ordered factor}{Often feel blue.}
-\item{N5}{ordered factor}{Panic easily.}
-\item{O1}{ordered factor}{Am full of ideas.}
-\item{O2}{ordered factor}{Avoid difficult reading material. (reversed)}
-\item{O3}{ordered factor}{Carry the conversation to a higher level.}
-\item{O4}{ordered factor}{Spend time reflecting on things.}
-\item{O5}{ordered factor}{Will not probe deeply into a subject. (reversed)}
-\item{gender}{factor}{Gender of the respondent (Females, Males)}
-\item{age}{integer}{Age of the respondent (years)}
+\item{\code{ID}}{Respondent ID}
+\item{\code{A1}}{Am indifferent to the feelings of others. (reversed)}
+\item{\code{A2}}{Inquire about others' well-being.}
+\item{\code{A3}}{Know how to comfort others.}
+\item{\code{A4}}{Love children.}
+\item{\code{A5}}{Make people feel at ease.}
+\item{\code{C1}}{Am exacting in my work.}
+\item{\code{C2}}{Continue until everything is perfect.}
+\item{\code{C3}}{Do things according to a plan.}
+\item{\code{C4}}{Do things in a half-way manner. (reversed)}
+\item{\code{C5}}{Waste my time. (reversed)}
+\item{\code{E1}}{Don't talk a lot. (reversed)}
+\item{\code{E2}}{Find it difficult to approach others. (reversed)}
+\item{\code{E3}}{Know how to captivate people.}
+\item{\code{E4}}{Make friends easily.}
+\item{\code{E5}}{Take charge.}
+\item{\code{N1}}{Get angry easily.}
+\item{\code{N2}}{Get irritated easily.}
+\item{\code{N3}}{Have frequent mood swings.}
+\item{\code{N4}}{Often feel blue.}
+\item{\code{N5}}{Panic easily.}
+\item{\code{O1}}{Am full of ideas.}
+\item{\code{O2}}{Avoid difficult reading material. (reversed)}
+\item{\code{O3}}{Carry the conversation to a higher level.}
+\item{\code{O4}}{Spend time reflecting on things.}
+\item{\code{O5}}{Will not probe deeply into a subject. (reversed)}
+\item{\code{gender}}{Gender of the respondent (Females, Males)}
+\item{\code{age}}{Age of the respondent (years)}
 }
 }
 \usage{

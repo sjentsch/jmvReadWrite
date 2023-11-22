@@ -10,6 +10,7 @@
 #'
 #'@format A data frame with 60 rows, each one representing a different album, and 5 variables:
 #'\describe{
+#'   \item{\code{selSbj}}{Select the data in this row (1) or not (0)}
 #'   \item{\code{Adverts}}{Amount (in thousands of pounds) spent promoting the album before release}
 #'   \item{\code{Airplay}}{How many times songs from the album were played on a prominent national radio station in the week before release}
 #'   \item{\code{Image}}{How attractive people found the band's image (out of 10)}

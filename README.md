@@ -10,6 +10,9 @@
 <!-- badges: start -->
 
 [![CRAN](http://www.r-pkg.org/badges/version/jmvReadWrite)](https://cran.r-project.org/package=jmvReadWrite)
+[![Project Status: Active – The project has reached a stable, usable
+state and is being actively
+developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 [![License](https://img.shields.io/badge/License-AGPL%20v3-green.svg)](https://www.gnu.org/licenses/agpl-3.0.html)
 [![Downloads](https://cranlogs.r-pkg.org/badges/jmvReadWrite?color=brightgreen)](https://cran.r-project.org/package=jmvReadWrite)
 [![Dependencies](https://tinyverse.netlify.com/badge/jmvReadWrite)](https://cran.r-project.org/package=jmvReadWrite)
@@ -196,9 +199,9 @@ list.files(".", "Trial.omv")
 #> [1] "Trial.omv"
 file.info("Trial.omv")
 #>           size isdir mode               mtime               ctime
-#> Trial.omv 2609 FALSE  664 2023-11-22 23:12:26 2023-11-22 23:12:26
+#> Trial.omv 2609 FALSE  664 2023-11-29 13:16:38 2023-11-29 13:16:38
 #>                         atime  uid  gid    uname   grname
-#> Trial.omv 2023-11-22 23:12:26 1000 1000 sjentsch sjentsch
+#> Trial.omv 2023-11-29 13:16:38 1000 1000 sjentsch sjentsch
 unlink("Trial.omv")
 ```
 

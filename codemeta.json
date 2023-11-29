@@ -1,0 +1,197 @@
+{
+  "@context": "https://doi.org/10.5063/schema/codemeta-2.0",
+  "@type": "SoftwareSourceCode",
+  "identifier": "jmvReadWrite",
+  "description": "The free and open a statistical spreadsheet 'jamovi' (<https://www.jamovi.org>) aims to make statistical analyses easy and intuitive. 'jamovi' produces syntax that can directly be used in R (in connection with the R-package 'jmv'). Having import / export routines for the data files 'jamovi' produces ('.omv') permits an easy transfer of data and analyses between 'jamovi' and R.",
+  "name": "jmvReadWrite: Read and Write 'jamovi' Files ('.omv')",
+  "codeRepository": "https://github.com/sjentsch/jmvReadWrite",
+  "issueTracker": "https://github.com/sjentsch/jmvReadWrite/issues",
+  "license": "https://spdx.org/licenses/AGPL-3.0",
+  "version": "0.4.2",
+  "programmingLanguage": {
+    "@type": "ComputerLanguage",
+    "name": "R",
+    "url": "https://r-project.org"
+  },
+  "runtimePlatform": "R version 4.3.2 (2023-10-31)",
+  "provider": {
+    "@id": "https://cran.r-project.org",
+    "@type": "Organization",
+    "name": "Comprehensive R Archive Network (CRAN)",
+    "url": "https://cran.r-project.org"
+  },
+  "author": [
+    {
+      "@type": "Person",
+      "givenName": "Sebastian",
+      "familyName": "Jentschke",
+      "email": "sebastian.jentschke@uib.no",
+      "@id": "https://orcid.org/0000-0003-2576-5432"
+    }
+  ],
+  "maintainer": [
+    {
+      "@type": "Person",
+      "givenName": "Sebastian",
+      "familyName": "Jentschke",
+      "email": "sebastian.jentschke@uib.no",
+      "@id": "https://orcid.org/0000-0003-2576-5432"
+    }
+  ],
+  "softwareSuggestions": [
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "jmv",
+      "name": "jmv",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=jmv"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "jmvcore",
+      "name": "jmvcore",
+      "version": ">= 2.4.7",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=jmvcore"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "foreign",
+      "name": "foreign",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=foreign"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "haven",
+      "name": "haven",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=haven"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "knitr",
+      "name": "knitr",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=knitr"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "rmarkdown",
+      "name": "rmarkdown",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=rmarkdown"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "RProtoBuf",
+      "name": "RProtoBuf",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=RProtoBuf"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "testthat",
+      "name": "testthat",
+      "version": ">= 3.0.0",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=testthat"
+    }
+  ],
+  "softwareRequirements": {
+    "1": {
+      "@type": "SoftwareApplication",
+      "identifier": "R",
+      "name": "R",
+      "version": ">= 3.5.0"
+    },
+    "2": {
+      "@type": "SoftwareApplication",
+      "identifier": "jsonlite",
+      "name": "jsonlite",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=jsonlite"
+    },
+    "3": {
+      "@type": "SoftwareApplication",
+      "identifier": "zip",
+      "name": "zip",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=zip"
+    },
+    "SystemRequirements": null
+  },
+  "fileSize": "2564.147KB",
+  "citation": [
+    {
+      "@type": "SoftwareSourceCode",
+      "datePublished": "2023",
+      "author": [
+        {
+          "@type": "Person",
+          "givenName": "Sebastian",
+          "familyName": "Jentschke",
+          "email": "sebastian.jentschke@uib.no"
+        }
+      ],
+      "name": "jmvReadWrite: Read and Write jamovi Files",
+      "url": "https://CRAN.R-project.org/package=jmvReadWrite",
+      "description": "R package version 0.4.2"
+    }
+  ],
+  "relatedLink": ["https://sjentsch.github.io/jmvReadWrite/", "https://CRAN.R-project.org/package=jmvReadWrite"],
+  "releaseNotes": "https://github.com/sjentsch/jmvReadWrite/blob/master/NEWS.md",
+  "readme": "https://github.com/sjentsch/jmvReadWrite/blob/main/README.md",
+  "contIntegration": ["https://github.com/sjentsch/jmvReadWrite/actions/workflows/ci.yml", "https://github.com/sjentsch/jmvReadWrite/actions/workflows/R-CMD-check.yaml", "https://github.com/sjentsch/jmvReadWrite/actions/workflows/codecov.yaml", "https://app.codecov.io/gh/sjentsch/jmvReadWrite?branch=main"],
+  "keywords": ["r", "jamovi", "cran"]
+}

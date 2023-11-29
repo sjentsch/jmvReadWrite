@@ -29,6 +29,9 @@ R), but "haven" is newer and more comprehensive}
 
 \item{...}{Additional arguments passed on to methods; see Details below}
 }
+\value{
+the function doesn't have a return value (it returns NULL)
+}
 \description{
 Convert data files (CSV, R, other statistics packages) into .omv-files for the statistical spreadsheet 'jamovi' (\url{https://www.jamovi.org})
 }

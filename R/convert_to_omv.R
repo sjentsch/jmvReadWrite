@@ -10,6 +10,8 @@
 #' @param selSet Name of the data set that is to be selected from the workspace (only applies when reading .RData-files)
 #' @param ...    Additional arguments passed on to methods; see Details below
 #'
+#' @return the function doesn't have a return value (it returns NULL)
+#'
 #' @details
 #' * In difference to the remaining helper functions, `convert_to_omv` doesn't accept a data frame as input and it neither does return a data frame if `fleOut`
 #'   is left empty: If you want to write a data frame, use `write_omv`. If you want to have a data frame returned use `read_omv` for jamovi-files or any of the
@@ -78,4 +80,6 @@ convert_to_omv <- function(fleInp = "", fleOut = "", varSrt = c(), usePkg = c("f
 
     # write file
     write_omv(dtaFrm = dtaFrm, fleOut = fleOut, ...)
+    
+    return(invisible(NULL))
 }

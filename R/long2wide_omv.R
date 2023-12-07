@@ -203,7 +203,7 @@ rstLbl <- function(dtaFrm = NULL, lstLbl = list(), varTgt = c(), varTme = c(), v
         if (crrNme %in% names(dtaFrm)) {
             attr(dtaFrm[[crrNme]], "jmv-desc") <- lstLbl$orgLbl[[crrNme]]
         } else if (crrNme %in% lstLbl$orgTgt) {
-            splTgt <- strsplit(varTgt, varSep)
+            splTgt <- strsplit(varTgt, gsub("\\.", "\\\\.", varSep))
             for (i in seq_along(splTgt)) {
                 if (crrNme %in% splTgt[[i]]) {
                     attr(dtaFrm[[varTgt[i]]], "jmv-desc") <-

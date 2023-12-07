@@ -140,7 +140,7 @@ wide2long_omv <- function(dtaInp = NULL, fleOut = "", varLst = c(), varExc = c()
     if (varOrd) varLst <- sort(varLst)
     # use varSep to split the variable names in varLst
     if (nzchar(varSep)) {
-        varSpl <- strsplit(varLst, varSep)
+        varSpl <- strsplit(varLst, gsub("\\.", "\\\\.", varSep))
         lngSpl <- unique(unlist(lapply(varSpl, length)))
         if (length(lngSpl) != 1) {
             stop(sprintf("The variable names in varLst need to have the same structure, i.e., the same number of separators within all variable names:\n%s\n\n",

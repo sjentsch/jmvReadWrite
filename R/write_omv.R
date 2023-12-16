@@ -31,15 +31,13 @@
 #'
 #' @examples
 #' \dontrun{
-#' library(jmvReadWrite)
-#'
 #' # use the data set "ToothGrowth" and, if it exists, write it as
 #' # jamovi-file using write_omv()
-#' data("ToothGrowth")
+#' jmvReadWrite::ToothGrowth
 #' nmeOut <- tempfile(fileext = ".omv")
 #' # typically, one would use a "real" file name instead of tempfile(),
 #' # e.g., "Data1.omv"
-#' dtaDbg = write_omv(dtaFrm = ToothGrowth, fleOut = nmeOut, retDbg = TRUE)
+#' dtaDbg = jmvReadWrite::write_omv(dtaFrm = ToothGrowth, fleOut = nmeOut, retDbg = TRUE)
 #' print(names(dtaDbg))
 #' # the print-function is only used to force devtools::run_examples()
 #' # to show output
@@ -135,7 +133,7 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", wrtPtB = FALSE, frcWrt = FALSE
              (i == 1 && !chkAtt(crrCol, "measureType") && !any(duplicated(crrCol) | is.na(crrCol)) &&
                (is.character(crrCol) || is.factor(crrCol) || (is.numeric(crrCol) && all(crrCol %% 1 == 0))))) {
             mtaDta$fields[[i]][["measureType"]] <- "ID"
-            mtaDta$fields[[i]][["dataType"]]    <- ifelse(is.numeric(crrCol), "Integer", "Text")
+            mtaDta$fields[[i]][["dataType"]]    <- ifelse(chkAtt(dtaFrm[[i]], "dataType"), attr(dtaFrm[[i]], "dataType"), ifelse(is.numeric(crrCol), "Integer", "Text"))
             mtaDta$fields[[i]][["type"]]        <- ifelse(is.numeric(crrCol), "integer", "string")
         # afterwards, the different variable types for each column of the original data frame are tested
         # an overview about how jamovi treats variable types internally and as which types they are written
@@ -143,7 +141,7 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", wrtPtB = FALSE, frcWrt = FALSE
         # [a] logical
         } else if (is.logical(crrCol)) {
             crrCol <- as.integer(crrCol)
-            mtaDta$fields[[i]][["dataType"]]    <- "Integer"
+            mtaDta$fields[[i]][["dataType"]]    <- ifelse(chkAtt(dtaFrm[[i]], "dataType"), attr(dtaFrm[[i]], "dataType"), "Integer")
             mtaDta$fields[[i]][["type"]]        <- "integer"
             # measureType not set as the correct type ("Nominal") is already the default
             xtdDta[[names(dtaFrm[i])]] <- list(labels = lapply(0:1, function(i) list(i, as.character(i), as.character(i), FALSE)))
@@ -152,22 +150,36 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", wrtPtB = FALSE, frcWrt = FALSE
         # [b] factors or characters / strings
         } else if (is.factor(crrCol) || is.character(crrCol)) {
             if (is.character(crrCol)) {
-                mtaDta$fields[[i]][["dataType"]] <- ifelse(!any(is.na(suppressWarnings(as.numeric(crrCol)))), "Integer", "Text")
+                # if "dataType" is already stored in the data frame, keep it, otherwise determine whether the factor levels are more likely to be "Integer" or "Text"
+                mtaDta$fields[[i]][["dataType"]] <- ifelse(chkAtt(dtaFrm[[i]], "dataType"), attr(dtaFrm[[i]], "dataType"),
+                                                      ifelse(!any(is.na(suppressWarnings(as.numeric(crrCol)))), "Integer", "Text"))
                 crrCol <- factor(trimws(crrCol), eval(parse(text = ifelse(mtaDta$fields[[i]][["dataType"]] == "Integer",
                                                                           "as.character(sort(as.numeric(unique(trimws(crrCol)))))",
                                                                           "sort(unique(trimws(crrCol)))"))))
+            }
+            if (chkAtt(dtaFrm[[i]], "values") && !identical(attr(dtaFrm[[i]], "values"), as.integer(attr(dtaFrm[[i]], "levels")))) {
+                clsRmv()
+                stop(sprintf(paste("\"values\"-attribute with unexpected values found for column \"%s\".",
+                                   "Please send the file to sebastian.jentschke@uib.no for debugging."), names(dtaFrm[i])))
             }
             # NB: If jamovi imports RData / RDS-files, character variables are given "ID" (measureType) / "Text" (dataType)
             #     however, converting them to factors and exporting those seems to make more sense
             facLvl <- attr(crrCol, "levels")
             # above must be kept at crrCol as the original column might be character and was converted above
             facOrd <- is.ordered(dtaFrm[[i]])
-            if (chkAtt(dtaFrm[[i]], "values") && !identical(attr(dtaFrm[[i]], "values"), as.integer(attr(dtaFrm[[i]], "levels")))) {
-                clsRmv()
-                stop(sprintf(paste("\"values\"-attribute with unexpected values found for column \"%s\".",
-                                   "Please send the file to sebastian.jentschke@uib.no for debugging."), names(dtaFrm[i])))
+            if (chkAtt(dtaFrm[[i]], "values")) {
+                crrCol <- attr(dtaFrm[[i]], "values")[as.vector.factor(crrCol, mode = "integer")]
+                if (length(facLvl) > 0) {
+                    xtdDta[[names(dtaFrm[i])]] <-
+                      list(labels = lapply(seq_along(facLvl), function(j) list(attr(dtaFrm[[i]], "values")[j], facLvl[[j]], facLvl[[j]], FALSE)))
+                }
+            } else {
+                crrCol <- as.vector.factor(crrCol, mode = "integer") - 1
+                if (length(facLvl) > 0) {
+                    xtdDta[[names(dtaFrm[i])]] <-
+                      list(labels = lapply(seq_along(facLvl), function(j) list(j - 1,                          facLvl[[j]], facLvl[[j]], FALSE)))
+                }
             }
-            crrCol <- as.vector.factor(crrCol, mode = "integer") - 1
             # if "dataType" is already stored in the data frame, keep it, otherwise determine whether the factor levels are more likely to be "Integer" or "Text"
             mtaDta$fields[[i]][["dataType"]] <- ifelse(chkAtt(dtaFrm[[i]], "dataType"), attr(dtaFrm[[i]], "dataType"),
                 ifelse(chkAtt(dtaFrm[[i]], "values"), "Integer",
@@ -181,16 +193,13 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", wrtPtB = FALSE, frcWrt = FALSE
 #                          stats::sd(diff(as.integer(facLvl))) < diff(range(crrCol)) / 10)) {
 #               mtaDta$fields[[i]][["measureType"]] <- ifelse(chkAtt(dtaFrm[[i]], "measureType"), attr(dtaFrm[[i]], "measureType"), "Ordinal")
 #           }
-            if (length(facLvl) > 0) {
-                xtdDta[[names(dtaFrm[i])]] <- list(labels = lapply(seq_along(facLvl), function(i) list(i - 1, facLvl[[i]], facLvl[[i]], FALSE)))
-            }
             rm(facLvl, facOrd)
         # [c] numerical (integer / decimals)
         } else if (is.numeric(crrCol)) {
             if (! all(is.na(crrCol)) && max(abs(crrCol), na.rm = TRUE) <= .Machine$integer.max && all(abs(crrCol - round(crrCol)) < sqrt(.Machine$double.eps), na.rm = TRUE)) {
                 crrCol <- as.integer(crrCol)
                 mtaDta$fields[[i]][["type"]]     <- "integer"
-                mtaDta$fields[[i]][["dataType"]] <- "Integer"
+                mtaDta$fields[[i]][["dataType"]] <- ifelse(chkAtt(dtaFrm[[i]], "dataType"), attr(dtaFrm[[i]], "dataType"), "Integer")
                 # if "measureType" is already stored in the data frame, keep it, otherwise assign "Continuous" if there are enough different values and a high value range and variability (sd)
                 if (length(unique(crrCol)) > length(crrCol) / 5 && length(unique(crrCol)) > diff(range(crrCol, na.rm = TRUE)) / 5 &&
                     stats::sd(crrCol, na.rm = TRUE) > diff(range(crrCol, na.rm = TRUE)) / 10) {
@@ -198,7 +207,7 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", wrtPtB = FALSE, frcWrt = FALSE
                 }
             } else {
                 mtaDta$fields[[i]][["type"]]     <- "number"
-                mtaDta$fields[[i]][["dataType"]] <- "Decimal"
+                mtaDta$fields[[i]][["dataType"]] <- ifelse(chkAtt(dtaFrm[[i]], "dataType"), attr(dtaFrm[[i]], "dataType"), "Decimal")
                 # if "measureType" is already stored in the data frame, keep it, otherwise assign "Continuous"
                 mtaDta$fields[[i]][["measureType"]] <- ifelse(chkAtt(dtaFrm[[i]], "measureType"), attr(dtaFrm[[i]], "measureType"), "Continuous")
             }
@@ -246,8 +255,7 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", wrtPtB = FALSE, frcWrt = FALSE
 
         # check that dataType, and measureType are set accordingly to type (attribute and column in the data frame)
         # dataType: Text, Integer, Decimal
-        #
-        # cat(sprintf("%02d: %s - %s - %s\n", i, mtaDta$fields[[i]][["type"]], mtaDta$fields[[i]][["dataType"]], mtaDta$fields[[i]][["measureType"]]))
+        # cat(sprintf("%02d: %s - %s - %s - %s\n", i, mtaDta$fields[[i]][["name"]], mtaDta$fields[[i]][["type"]], mtaDta$fields[[i]][["dataType"]], mtaDta$fields[[i]][["measureType"]]))
 
         # write to data.bin according to type
         if        (chkFld(mtaDta$fields[[i]], "type", "integer")) {

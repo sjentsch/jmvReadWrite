@@ -7,7 +7,7 @@
 #' @param varLst List / set of variables that are to be transformed into single (time-varying) variables in long format (default: c())
 #' @param varExc Name of the variable(s) should be excluded from the transformation, typically this will be between-subject-variable(s) (default: c())
 #' @param varID  Name(s) of one or more variables that (is created to) identify the same group / individual (if empty, "ID" is added with row numbers
-#'               identifying cases; default: "ID")
+#'               identifying cases; default: NULL)
 #' @param varTme Name of the variable that (is created to) differentiate multiple records from the same group / individual (default: "cond"; a counter is added
 #'               for each time-varying part)
 #' @param varSep Character that separates the variables in varLst into a time-varying part and a part that forms the variable name in long format ("_" in
@@ -27,8 +27,8 @@
 #'
 #' @details
 #' * If `varLst` is empty, it is tried to generate it using all variables in the data frame except those defined by `varExc` and `varID`. The variable(s) in
-#'   `varID` need to be unique identifiers (in the original dataset), those in `varExc` don't have this requirement. It is generally recommended that the
-#'   variable names in `varExc` and `varID` should not contain the variable separator (defined in `varSep`; default: "_").
+#'   `varID` need to be unique identifiers (in the original dataset), those in `varExc` don't have this requirement. It is recommended that the variable names
+#'   in `varExc` and `varID` should not contain the variable separator (defined in `varSep`; default: "_").
 #' * `varOrd` determines whether the variables are rearranged to match the order of split levels. Consider the `varLst` X_1, Y_1, X_2, Y_2. If `varOrd` were
 #'   set to FALSE, the original order would be preserved and the second part of the variable name (1, 2, ...) would become condition 1, and the first part
 #'   condition 2. In most cases, leaving `varOrd` set to TRUE is recommended.
@@ -56,7 +56,6 @@
 #'
 #' @examples
 #' \dontrun{
-#' library(jmvReadWrite)
 #' # generate a test dataframe with 100 (imaginary) participants / units of
 #' # observation (ID), and 8 repeated measurements of variable (X_1, X_2, ...)
 #' dtaInp <- cbind(data.frame(ID = as.character(seq(1:100))),
@@ -78,8 +77,9 @@
 #' nmeInp <- tempfile(fileext = ".rds")
 #' nmeOut <- tempfile(fileext = ".omv")
 #' saveRDS(dtaInp, nmeInp)
-#' wide2long_omv(dtaInp = nmeInp, fleOut = nmeOut, varID = "ID", varTme = "measure",
-#'     varLst = setdiff(names(dtaInp), "ID"), varSrt = c("ID", "measure"))
+#' jmvReadWrite::wide2long_omv(dtaInp = nmeInp, fleOut = nmeOut, varID = "ID",
+#'     varTme = "measure", varLst = setdiff(names(dtaInp), "ID"),
+#'     varSrt = c("ID", "measure"))
 #' # it is required to give at least the arguments dtaInp (if dtaInp is a data frame,
 #' # fleOut needs to be provided too) and varID
 #' # "reshape" then assigns all variables expect the variable defined by varID to
@@ -94,7 +94,7 @@
 #' cat(file.info(nmeOut)$size)
 #' # -> 6939 (approximate size; size may differ in every run [in dependence of how
 #' #          well the generated random data can be compressed])
-#' cat(str(read_omv(nmeOut, sveAtt = FALSE)))
+#' cat(str(jmvReadWrite::read_omv(nmeOut, sveAtt = FALSE)))
 #' # the data set is now transformed into long (and each the measurements is now
 #' # indicated by the "measure")
 #' # 'data.frame':	800 obs. of  3 variables:
@@ -111,11 +111,12 @@
 #'
 #' @export wide2long_omv
 #'
-wide2long_omv <- function(dtaInp = NULL, fleOut = "", varLst = c(), varExc = c(), varID = "ID", varTme = "cond", varSep = "_", varOrd = TRUE, varSrt = c(),
+wide2long_omv <- function(dtaInp = NULL, fleOut = "", varLst = c(), varExc = c(), varID = NULL, varTme = "cond", varSep = "_", varOrd = TRUE, varSrt = c(),
                           excLvl = NULL, usePkg = c("foreign", "haven"), selSet = "", ...) {
 
     # check and import input data set (either as data frame or from a file)
     if (!is.null(list(...)[["fleInp"]])) stop("Please use the argument dtaInp instead of fleInp.")
+    if (is.null(varID)) varID <- "ID"
     dtaFrm <- inp2DF(dtaInp, usePkg = usePkg, selSet = selSet, ...)
     dtaNmV <- names(dtaFrm)
     hasID  <- all(varID %in% dtaNmV)
@@ -139,7 +140,7 @@ wide2long_omv <- function(dtaInp = NULL, fleOut = "", varLst = c(), varExc = c()
     if (varOrd) varLst <- sort(varLst)
     # use varSep to split the variable names in varLst
     if (nzchar(varSep)) {
-        varSpl <- strsplit(varLst, varSep)
+        varSpl <- strsplit(varLst, gsub("\\.", "\\\\.", varSep))
         lngSpl <- unique(unlist(lapply(varSpl, length)))
         if (length(lngSpl) != 1) {
             stop(sprintf("The variable names in varLst need to have the same structure, i.e., the same number of separators within all variable names:\n%s\n\n",
@@ -190,10 +191,10 @@ wide2long_omv <- function(dtaInp = NULL, fleOut = "", varLst = c(), varExc = c()
             }
         }
         # assemble the arguments to call reshape (limiting the variable arguments - ... - to those permitted)
-        # rplAtt also corrects labels (if available) and variable names
+        # rmvTms also corrects labels (if available) and variable names
         crrArg <- list(data = dtaFrm, direction = "long", idvar = varID, sep = varSep, varying = crrVry, v.names = names(crrVry),
                        timevar = paste0(varTme, rep(sum(is.finite(dffSpl)), nmbTme)), times = crrTms)
-        dtaFrm <- rplAtt(do.call(stats::reshape, adjArg("stats::reshape", crrArg, ...,
+        dtaFrm <- rmvTms(do.call(stats::reshape, adjArg("stats::reshape", crrArg, ...,
                                                         c("data", "direction", "idvar", "sep", "varying", "times", "timevar", "v.names"))), crrTms)
         dtaFrm[[crrArg$timevar]] <- as.factor(dtaFrm[[crrArg$timevar]])
         varID  <- c(varID, crrArg$timevar)
@@ -218,7 +219,7 @@ wide2long_omv <- function(dtaInp = NULL, fleOut = "", varLst = c(), varExc = c()
     dtaFrm <- rmvID(dtaFrm, varID, hasID)
 
     # rtnDta in globals.R (unified function to either write the data frame, open it in a new jamovi session or return it)
-    rtnDta(dtaFrm = dtaFrm, fleOut = fleOut, dtaTtl = jmvTtl("_Long"), ...)
+    rtnDta(dtaFrm = dtaFrm, fleOut = fleOut, dtaTtl = jmvTtl("_long"), ...)
 }
 
 ordCol <- function(varNme = c(), dtaNmV = c(), varID = c(), varLst = c()) {
@@ -244,8 +245,8 @@ rmvID <- function(dtaFrm = NULL, varID = c(), hasID = TRUE) {
     dtaFrm
 }
 
-rplAtt <- function(dtaFrm = NULL, crrTms = c()) {
-    varNme <-      attr(dtaFrm, "reshapeLong")$v.names
+rmvTms <- function(dtaFrm = NULL, crrTms = c()) {
+    varNme <- attr(dtaFrm, "reshapeLong")$v.names
     for (crrNme in varNme) {
         attr(dtaFrm[[crrNme]], "name") <- crrNme
         crrDsc <- c(attr(dtaFrm[, crrNme], "jmv-desc"), attr(dtaFrm[, crrNme], "description"))[1]

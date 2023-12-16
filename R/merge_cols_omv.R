@@ -50,8 +50,7 @@
 #'
 #' @examples
 #' \dontrun{
-#' library(jmvReadWrite)
-#' dtaInp <- bfi_sample2
+#' dtaInp <- jmvReadWrite::bfi_sample2
 #' nmeInp <- paste0(tempfile(), "_", 1:3, ".rds")
 #' nmeOut <- tempfile(fileext = ".omv")
 #' for (i in seq_along(nmeInp)) {
@@ -59,10 +58,10 @@
 #' }
 #' # save dtaInp three times (i.e., the length of nmeInp), adding "_" + 1 ... 3 as index
 #' # to the data variables (A1 ... O5, gender, age → A1_1, ...)
-#' merge_cols_omv(dtaInp = nmeInp, fleOut = nmeOut, varBy = "ID")
+#' jmvReadWrite::merge_cols_omv(dtaInp = nmeInp, fleOut = nmeOut, varBy = "ID")
 #' cat(file.info(nmeOut)$size)
 #' # -> 17731 (size may differ on different OSes)
-#' dtaOut <- read_omv(nmeOut, sveAtt = FALSE)
+#' dtaOut <- jmvReadWrite::read_omv(nmeOut, sveAtt = FALSE)
 #' # read the data set where the three original datasets were added as columns and show
 #' # the variable names
 #' cat(names(dtaOut))
@@ -91,9 +90,12 @@ merge_cols_omv <- function(dtaInp = NULL, fleOut = "", typMrg = c("outer", "inne
     if (!is.null(list(...)[["fleInp"]])) stop("Please use the argument dtaInp instead of fleInp.")
     dtaFrm <- inp2DF(dtaInp = dtaInp, minDF = 2, maxDF = Inf, usePkg = usePkg, selSet = selSet, ...)
 
-    # store attributes
+    # store attributes and remove empty lines from the data sets
     attCol <- list()
-    for (i in seq_along(dtaFrm)) attCol <- c(attCol, sapply(dtaFrm[[i]][, setdiff(names(dtaFrm[[i]]), names(attCol))], attributes))
+    for (i in seq_along(dtaFrm)) {
+        attCol <- c(attCol, sapply(dtaFrm[[i]][, setdiff(names(dtaFrm[[i]]), names(attCol))], attributes, simplify = FALSE))
+        dtaFrm[[i]] <- dtaFrm[[i]][!apply(is.na(dtaFrm[[i]]), 1, all), ]
+    }
     attDF <- attributes(dtaFrm[[1]])
 
     # check the matching variable(s)
@@ -106,6 +108,23 @@ merge_cols_omv <- function(dtaInp = NULL, fleOut = "", typMrg = c("outer", "inne
     tmpMrg <- dtaFrm[[1]]
     for (i in setdiff(seq_along(dtaFrm), 1)) {
         tmpMrg <- do.call(merge, c(list(x = tmpMrg, y = dtaFrm[[i]], by.x = varBy[[1]], by.y = varBy[[i]]), crrArg[!grepl("^x$|^y$|^by.x$|^by.y$", names(crrArg))]))
+        # if there are duplicate columns (i.e., columns with the same name in two of the input data sets), unify them
+        for (unfClm in setdiff(names(attCol), names(tmpMrg))) {
+            dplClm <- grep(paste0(unfClm, "\\."), names(tmpMrg))
+            if (length(dplClm) == 0) next
+            names(tmpMrg)[dplClm[1]] <- unfClm
+            rmvClm <- NULL
+            for (i in seq(2, length(dplClm))) {
+                if (identical(tmpMrg[, dplClm[1]], tmpMrg[, dplClm[i]])) {
+                    rmvClm <- c(rmvClm, -dplClm[i])
+                } else {
+                    addClm <- sprintf("%s_%d", unfClm, sum(grepl(paste0(unfClm, "_"), names(tmpMrg))) + 2)
+                    names(tmpMrg)[dplClm[i]] <- addClm
+                    attCol[[addClm]] <- attCol[[unfClm]]
+                }
+            }
+            if (length(rmvClm) > 0) tmpMrg <- tmpMrg[, rmvClm]
+        }
     }
     dtaFrm <- tmpMrg
 
@@ -130,24 +149,33 @@ chkByV <- function(varBy = list(), dtaFrm = NULL) {
         (is.vector(varBy)    && length(varBy) == 0) ||
         (is.character(varBy) && !nzchar(varBy)) ||
         is.null(varBy)) {
-        return(rep(list(mtcVar(dtaFrm)), length(dtaFrm)))
-    # varBy is a list with the same length as dtaFrm
-    } else if (is.list(varBy) && length(varBy) == length(dtaFrm)) {
-        if (all(sapply(seq_along(dtaFrm), function(i) all(varBy[[i]] %in% names(dtaFrm[[i]]))))) {
-            return(varBy)
-        } else {
-            stop("Not all data sets given in dtaInp contain the variable(s) / column(s) that shall be used for matching.")
-        }
+        varBy <- rep(list(mtcVar(dtaFrm)), length(dtaFrm))
     # varBy is a character vector (without empty elements) or a string
     } else if ((is.vector(varBy) && !is.list(varBy) && length(varBy) >= 1 && all(nzchar(varBy))) || is.character(varBy)) {
         if (all(sapply(dtaFrm, function(x) all(varBy %in% names(x))))) {
-            return(rep(list(varBy), length(dtaFrm)))
+            varBy <- rep(list(varBy), length(dtaFrm))
         } else {
             stop("Not all data sets given in dtaInp contain the variable(s) / column(s) that shall be used for matching.")
         }
+    # varBy is a list with the same length as dtaFrm
+    } else if (is.list(varBy) && length(varBy) == length(dtaFrm)) {
+        if (!all(sapply(seq_along(dtaFrm), function(i) all(varBy[[i]] %in% names(dtaFrm[[i]]))))) {
+            stop("Not all data sets given in dtaInp contain the variable(s) / column(s) that shall be used for matching.")
+        }
+        # else: leave varBy unchanged
     } else {
         stop("varBy must be either a list (with the same length as dtaInp), a character vector, or a string.")
     }
+
+    # check whether all entries in the ID variables data sets contain a value
+    for (i in seq_along(dtaFrm)) {
+        if (any(sapply(varBy[[i]], function(c) any(is.na(dtaFrm[[i]][, c])) || any(is.null(dtaFrm[[i]][, c])) || !all(nzchar(dtaFrm[[i]][, c]))))) {
+            stop(sprintf("Values in the ID variable can't be empty (empty values found in %s).",
+                           ifelse(i == 1, "the original data set", sprintf("data set %d to be merged", i - 1))))
+        }
+    }
+
+    varBy
 }
 
 mtcVar <- function(dtaFrm = NULL) {

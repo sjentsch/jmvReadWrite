@@ -59,6 +59,17 @@ test_that("long2wide_omv works", {
                                                  48.56846, 48.96117, 47.64545, 46.51572, 50.94652, 47.33624, 47.53437, 55.55701, 51.50431, 50.19580, 52.81145, 43.68338), tolerance = 1e-4)
     expect_equal(unname(unlist(sapply(df4Chk, attr, "jmv-desc"))), sprintf("%s (Month: %s)", rep(c("Variable X", "Variable Y"), each = 12), month.abb[rep(1:12, times = 2)]))
 
+    expect_null(long2wide_omv(dtaInp = nmeInp, fleOut = nmeOut, varID = "Year", varTme = "Month", varSep = "."))
+    df4Chk <- read_omv(nmeOut)
+    expect_s3_class(df4Chk, "data.frame")
+    expect_equal(dim(df4Chk), c(121, 25))
+    expect_equal(as.vector(sapply(df4Chk, typeof)), c("integer", rep("double", 24)))
+    expect_equal(names(df4Chk), c("Year", paste0(rep(c("X.", "Y."), each = 12), month.abb[rep(1:12, times = 2)])))
+    expect_equal(unname(colMeans(df4Chk[-1])), c(51.05398, 51.52200, 50.90146, 47.98040, 46.28997, 53.70601, 49.47946, 49.24704, 49.92602, 44.93970, 49.37357, 47.55488,
+                                                 48.56846, 48.96117, 47.64545, 46.51572, 50.94652, 47.33624, 47.53437, 55.55701, 51.50431, 50.19580, 52.81145, 43.68338), tolerance = 1e-4)
+    expect_equal(unname(unlist(sapply(df4Chk, attr, "jmv-desc"))), sprintf("%s (Month: %s)", rep(c("Variable X", "Variable Y"), each = 12), month.abb[rep(1:12, times = 2)]))
+    unlink(nmeOut)
+
     # more complex data set ===================================================================================================================================
     set.seed(1)
     dtaTmp <- data.frame(ID = rep(sprintf("sbj_%03d", seq(1, 100)), each = 24), sex = rep(sample(rep(c("male", "female"), each = 50)), each = 24),

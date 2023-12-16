@@ -1,3 +1,35 @@
+# jmvReadWrite 0.4.3
+
+## Bug fixes and enhancements:
+* fixed bugs and created test cases for `rplAtt` (replace non-UTF with UTF characters, part of `read_omv`)
+* added `invisible(NULL)`where NULL or nothing was returned 
+* adjust strsplit in `long2wide_omv` and `wide2long_omv` in order to permit having “.” as varSep
+* added codemeta.json, badge about package status, and how to contribute to the package (for pkgcheck)
+* added documentation of return value to convert_to_omv
+
+
+---
+
+# jmvReadWrite 0.4.2
+
+## Bug fixes and enhancements:
+* check for empty rows and missing values within `varID` in `merge_cols_omv`
+* corrected replacement of numerical values in `replace_omv`
+* replaced all occurrences of `library(jmvReadWrite)`
+* smaller corrections to the documentation (added parameter descriptions)
+* added unit tests for `replace_omv` (replacement in character columns)
+* adjusted `wide2long_omv` in order to accept `NULL` for `varID`
+
+---
+
+# jmvReadWrite 0.4.1
+
+## Bug fix:
+* ensure that the examples, tests and creating the vignette also works when
+  `jmv` is not present
+
+---
+
 # jmvReadWrite 0.4.0
 
 ## Enhancements and bug fixes:

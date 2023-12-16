@@ -32,6 +32,37 @@ test_that("merge_cols_omv works", {
     dtaFrm <- merge_cols_omv(dtaInp = nmeInp[-2], typMrg = "inner", varBy = "ID", varSrt = c("gender_3", "age_3"))
     expect_s3_class(dtaFrm, "data.frame")
     expect_equal(dim(dtaFrm), c(245, 57))
+    unlink(nmeInp)
+
+    nmeInp <- vector(mode = "character", length = 3)
+    dtaTmp <- jmvReadWrite::bfi_sample2
+    for (i in seq_along(nmeInp)) {
+        nmeInp[i] <- tempfile(fileext = ".rds")
+        saveRDS(dtaTmp, nmeInp[i])
+    }
+    dtaFrm <- merge_cols_omv(dtaInp = nmeInp, typMrg = "outer", varBy = "ID", varSrt = c("ID"))
+    expect_s3_class(dtaFrm, "data.frame")
+    expect_equal(dim(dtaFrm), c(250, 29))
+    expect_true(all(dtaFrm == dtaTmp[order(dtaTmp[, "ID"]), ]))
+    unlink(nmeInp)
+
+    nmeInp <- vector(mode = "character", length = 5)
+    dtaTmp <- jmvReadWrite::bfi_sample2
+    for (i in seq_along(nmeInp)) {
+        nmeInp[i] <- tempfile(fileext = ".rds")
+        strAtt <- attributes(dtaTmp[, "age"])
+        dtaTmp[, "age"] <- dtaTmp[sample(nrow(dtaTmp)), "age"]
+        attributes(dtaTmp[, "age"]) <- strAtt
+        saveRDS(dtaTmp, nmeInp[i])
+    }
+    dtaFrm <- merge_cols_omv(dtaInp = nmeInp, typMrg = "outer", varBy = "ID", varSrt = c("ID"))
+    dplClm <- gsub("age_1", "age", paste0("age_", seq(5)))
+    expect_s3_class(dtaFrm, "data.frame")
+    expect_equal(dim(dtaFrm), c(250, 33))
+    expect_true(all(dplClm %in% names(dtaFrm)))
+    expect_true(all(apply(sapply(dtaFrm[, dplClm], sort), 1, diff) == 0))
+    expect_true(all(diff(colMeans(dtaFrm[, dplClm])) == 0))
+    expect_true(all(sapply(dtaFrm[, dplClm], attributes) == "Age of the respondent (years)"))
 
     # test cases for code coverage ============================================================================================================================
     expect_error(merge_cols_omv(fleInp = nmeInp, typMrg = "outer", varBy = "ID"), regexp = "Please use the argument dtaInp instead of fleInp\\.")
@@ -43,7 +74,7 @@ test_that("merge_cols_omv works", {
     unlink(nmeOut)
     unlink(nmeInp)
 
-    dtaFrm <- list(data.frame(ID = runif(10), A = runif(10)), data.frame(ID = runif(10), B = runif(10)), data.frame(ID = runif(10), C = runif(10)), data.frame(ID = runif(10), D = runif(10)))
+    dtaFrm <- list(data.frame(ID = sample(10), A = runif(10)), data.frame(ID = sample(10), B = runif(10)), data.frame(ID = sample(10), C = runif(10)), data.frame(ID = sample(10), D = runif(10)))
     expect_equal(chkByV(list(), dtaFrm), rep(list("ID"), 4))
     expect_equal(chkByV(rep(list("ID"), 4), dtaFrm), rep(list("ID"), 4))
     expect_error(chkByV(rep(list("ID2"), 4), dtaFrm),
@@ -52,6 +83,11 @@ test_that("merge_cols_omv works", {
     expect_error(chkByV("ID2", dtaFrm), regexp = "^Not all data sets given in dtaInp contain the variable\\(s\\) / column\\(s\\) that shall be used for matching\\.")
     expect_error(chkByV(rep(list("ID"), 3), dtaFrm),
       regexp = "^varBy must be either a list \\(with the same length as dtaInp\\), a character vector, or a string\\.")
+    expect_error(chkByV(rep(list("ID"), 5), c(dtaFrm, list(data.frame(ID = c(sample(9), NA), E = runif(10))))),
+      regexp = "^Values in the ID variable can't be empty \\(empty values found in data set 4 to be merged\\)\\.")
+    expect_error(chkByV(rep(list("ID"), 5), c(list(data.frame(ID = c(sample(9), NA), Z = runif(10))), dtaFrm)),
+      regexp = "^Values in the ID variable can't be empty \\(empty values found in the original data set\\)\\.")
+
 
     nmeInp <- tempfile(fileext = ".rds")
     saveRDS(data.frame(ID = seq(60), A = rnorm(60), B = rnorm(60)), nmeInp)
@@ -64,13 +100,14 @@ test_that("merge_cols_omv works", {
     expect_true(chkFle(nmeOut, fleCnt = "data.bin"))
     df4Chk <- read_omv(nmeOut, sveAtt = FALSE, getSyn = TRUE)
     expect_s3_class(df4Chk, "data.frame")
-    expect_equal(dim(df4Chk), c(60, 16))
+    expect_equal(dim(df4Chk), c(60, 19))
     expect_equal(names(df4Chk),
-      c("ID", "Filter 1", "logLen", "supp - Transform 1", "len", "supp", "dose", "dose2", "Trial", "Residuals", "J", "K", "L", "weights", "A", "B"))
+      c("ID", "Filter 1", "logLen", "supp - Transform 1", "len", "supp", "dose", "dose2", "dose3", "Trial", "Residuals", "J", "K", "L", "M", "O", "weights", "A", "B"))
     expect_equal(as.vector(sapply(df4Chk, typeof)),
-      c("integer", "logical", "double", "integer", "double", "integer", "double", "integer", "integer", "double", "double", "double", "integer", "integer", "double", "double"))
+      c("integer", "logical", "double", "integer", "double", "integer", "double", "integer", "integer", "integer",
+        "double", "double", "double", "integer", "logical", "logical", "integer", "double", "double"))
     expect_equal(sort(zip::zip_list(nmeOut)$filename),
-      c("01 empty/analysis", "02 anova/analysis", "02 anova/resources/61c33c657d5e31f1.png", "02 anova/resources/dd0ce025a00dad1b.png", "03 empty/analysis",
+      c("01 empty/analysis", "02 anova/analysis", "02 anova/resources/65167cb3bdaf8761.png", "02 anova/resources/99f9b5d34a92049b.png", "03 empty/analysis",
         "04 ancova/analysis", "05 empty/analysis", "data.bin", "index.html", "meta", "metadata.json", "xdata.json"))
     expect_equal(attr(df4Chk, "syntax"),
       c(paste("jmv::ANOVA(formula = len ~ supp + dose2 + supp:dose2, data = data, effectSize = \"partEta\", modelTest = TRUE, qq = TRUE,",

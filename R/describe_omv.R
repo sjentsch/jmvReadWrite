@@ -43,7 +43,6 @@
 #'
 #' @examples
 #' \dontrun{
-#' library(jmvReadWrite)
 #' dtaFrm <- jmvReadWrite::ToothGrowth[, c("len", "supp", "dose")]
 #' nmeOut <- tempfile(fileext = ".omv")
 #'
@@ -53,7 +52,7 @@
 #'                                    "of three dose levels of vitamin C (0.5, 1, and 2 mg / day) by",
 #'                                    "one of two delivery methods, orange juice or ascorbic acid (a",
 #'                                    "form of vitamin C and coded as VC)."),
-#'                variables = list(len = "Tooth length",
+#'                variables = list(len  = "Tooth length",
 #'                                 supp = "Supplement type (VC or OJ)",
 #'                                 dose = "Dose (in milligrams / day"),
 #'                references = paste("Crampton, E. W. (1947). The growth of the odontoblast of the",
@@ -61,7 +60,8 @@
 #'                                   "pig. <em>The Journal of Nutrition, 33</em>(5), 491-504.",
 #'                                   "https://doi.org/10.1093/jn/33.5.491"),
 #'                license = "")
-#' describe_omv(dtaInp = dtaFrm, fleOut = nmeOut, dtaTtl = "ToothGrowth", dtaDsc = lstDsc)
+#' jmvReadWrite::describe_omv(dtaInp = dtaFrm, fleOut = nmeOut, dtaTtl = "ToothGrowth",
+#'   dtaDsc = lstDsc)
 #' # don't include the unlink, if you copy the code and want to look at the resulting output file
 #' unlink(nmeOut)
 #'
@@ -82,7 +82,8 @@
 #'                  "indented once</p><p class=\"ql-indent-2\">indented twice</p><p ",
 #'                  "class=\"ql-indent-1\">indented once</p><p>Formula: <span class=\"ql-formula\">",
 #'                  "e=mc^2</span></p><pre>Preformatted</pre><p>normal again</p><h2>Heading</h2>")
-#' describe_omv(dtaInp = dtaFrm, fleOut = nmeOut, dtaTtl = "ToothGrowth", dtaDsc = chrDsc)
+#' jmvReadWrite::describe_omv(dtaInp = dtaFrm, fleOut = nmeOut, dtaTtl = "ToothGrowth",
+#'   dtaDsc = chrDsc)
 #' unlink(nmeOut)
 #' }
 #'
@@ -103,7 +104,7 @@ describe_omv <- function(dtaInp = NULL, fleOut = "", dtaTtl = c(), dtaDsc = c(),
 
     if (utils::packageVersion("jmvcore") < "2.4.3") {
         warning("jmvcore version 2.4.3 (or higher) is required for using describe_omv.\n\n")
-        return()
+        return(invisible(NULL))
     }
     if (!jmvPtB()) stop("The R-packages RProtoBuf and jmvcore must be installed for using describe_omv (see warnings() for further details).")
 
@@ -318,7 +319,7 @@ prpAtt <- function(lstAtt = NULL) {
     crrAtt <- lstAtt
     if (utils::hasName(lstAtt, "list") && identical(attr(lstAtt[["list"]], "lstEnt"), TRUE)) crrAtt[["list"]] <- NULL
     if (utils::hasName(lstAtt, "formula")) crrAtt[["formula"]] <- NULL
-    if (length(crrAtt) > 0) return(list(attributes = crrAtt)) else return(NULL)
+    if (length(crrAtt) > 0) return(list(attributes = crrAtt)) else return(invisible(NULL))
 }
 
 # add / replace HTML for title and description within index.html

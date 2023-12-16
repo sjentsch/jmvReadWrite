@@ -16,22 +16,29 @@
 #'         within that variable / column (row names are used for being tolerant to filtered-out cases in jamovi, if a filter is used, row numbers would be
 #'         incorrect)
 #'
+#' @details
+#' * The ellipsis-parameter (`...`) can be used to submit arguments / parameters to the function that is used for reading and writing the data. Clicking on the
+#'   respective function under “See also”, you can get a more detailed overview over which parameters each of those functions take. The functions are:
+#'   `read_omv` and `write_omv` (for jamovi-files).
+#'
+#' @seealso `replace_omv` uses [jmvReadWrite::read_omv()] and [jmvReadWrite::write_omv()] for reading and writing jamovi-files.
+#'
 #' @examples
 #' \dontrun{
-#' library(jmvReadWrite)
 #' # the exact value 24 appears 13 times in age
-#' search_omv(bfi_sample, 24, whlTrm = TRUE)
+#' bfi_sample <- jmvReadWrite::bfi_sample
+#' jmvReadWrite::search_omv(bfi_sample, 24, whlTrm = TRUE)
 #' # taking the fifth entry from the search results
 #' bfi_sample["61", "age"]
 #' # with the following search, both Males and Females are found
 #' # (the M of Males, wouldn't be matched if ignCse were FALSE and males is
 #' #  only a partial match within Females, thus whlTrm must be set to FALSE)
-#' search_omv(bfi_sample, "males", whlTrm = FALSE, ignCse = TRUE)
+#' jmvReadWrite::search_omv(bfi_sample, "males", whlTrm = FALSE, ignCse = TRUE)
 #' # the first entry is a female, the first entry is a male
 #' bfi_sample["1", "gender"] # Females
 #' bfi_sample["6", "gender"] # Males
 #' # using the search results assigned to a variable
-#' srcRes <- search_omv(bfi_sample, "males", whlTrm = FALSE, ignCse = TRUE)
+#' srcRes <- jmvReadWrite::search_omv(bfi_sample, "males", whlTrm = FALSE, ignCse = TRUE)
 #' bfi_sample[srcRes[[1]][1], names(srcRes[1])] # Females
 #' bfi_sample[srcRes[[1]][6], names(srcRes[1])] # Males
 #' }

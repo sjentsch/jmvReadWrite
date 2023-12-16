@@ -9,10 +9,10 @@ test_that("globals work", {
     expect_true(chkDir(nmeOMV))
     if (.Platform$OS.type == "unix") {
         # permissions on *nix-systems
-        dir.create(file.path(tempdir(), "chkPrm"), mode = "0111")
-        expect_error(chkDir(file.path(tempdir(), "chkPrm", "Trial.omv")),
+        dir.create("chkPrm", mode = "0111")
+        expect_error(chkDir(file.path("chkPrm", "Trial.omv")),
           regexp = "The directory \\(.*\\) exists, but you don't have writing permissions in that directory\\.")
-        unlink(file.path(tempdir(), "chkPrm"), recursive = TRUE)
+        unlink("chkPrm", recursive = TRUE)
     }
     expect_true(chkDtF(jmvReadWrite::ToothGrowth, minSze = c(60, 7)))
     expect_true(chkExt(nmeOMV, vldExt))

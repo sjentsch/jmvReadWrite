@@ -7,12 +7,12 @@ test_that("globals work", {
                  list(fleInp = "Trial_dflArg.omv", getSyn = TRUE, sveAtt = FALSE, getHTM = FALSE))
     expect_equal(fcnArg(c("merge", "data.frame")), c("x", "y", "by", "by.x", "by.y", "all", "all.x", "all.y", "sort", "suffixes", "no.dups", "incomparables", "..."))
     expect_true(chkDir(nmeOMV))
-    if (.Platform$OS.type == "unix") {
+    if (.Platform$OS.type == "unix" && Sys.getenv("NO_CHKDIR") != "true") {
         # permissions on *nix-systems
-        dir.create("chkPrm", mode = "0111")
-        expect_error(chkDir(file.path("chkPrm", "Trial.omv")),
+        dir.create(file.path(tempdir(), "chkPrm"), mode = "0111")
+        expect_error(chkDir(file.path(tempdir(), "chkPrm", "Trial.omv")),
           regexp = "The directory \\(.*\\) exists, but you don't have writing permissions in that directory\\.")
-        unlink("chkPrm", recursive = TRUE)
+        unlink(file.path(tempdir(), "chkPrm"), recursive = TRUE)
     }
     expect_true(chkDtF(jmvReadWrite::ToothGrowth, minSze = c(60, 7)))
     expect_true(chkExt(nmeOMV, vldExt))

@@ -191,10 +191,10 @@ wide2long_omv <- function(dtaInp = NULL, fleOut = "", varLst = c(), varExc = c()
             }
         }
         # assemble the arguments to call reshape (limiting the variable arguments - ... - to those permitted)
-        # rplAtt also corrects labels (if available) and variable names
+        # rmvTms also corrects labels (if available) and variable names
         crrArg <- list(data = dtaFrm, direction = "long", idvar = varID, sep = varSep, varying = crrVry, v.names = names(crrVry),
                        timevar = paste0(varTme, rep(sum(is.finite(dffSpl)), nmbTme)), times = crrTms)
-        dtaFrm <- rplAtt(do.call(stats::reshape, adjArg("stats::reshape", crrArg, ...,
+        dtaFrm <- rmvTms(do.call(stats::reshape, adjArg("stats::reshape", crrArg, ...,
                                                         c("data", "direction", "idvar", "sep", "varying", "times", "timevar", "v.names"))), crrTms)
         dtaFrm[[crrArg$timevar]] <- as.factor(dtaFrm[[crrArg$timevar]])
         varID  <- c(varID, crrArg$timevar)
@@ -245,8 +245,8 @@ rmvID <- function(dtaFrm = NULL, varID = c(), hasID = TRUE) {
     dtaFrm
 }
 
-rplAtt <- function(dtaFrm = NULL, crrTms = c()) {
-    varNme <-      attr(dtaFrm, "reshapeLong")$v.names
+rmvTms <- function(dtaFrm = NULL, crrTms = c()) {
+    varNme <- attr(dtaFrm, "reshapeLong")$v.names
     for (crrNme in varNme) {
         attr(dtaFrm[[crrNme]], "name") <- crrNme
         crrDsc <- c(attr(dtaFrm[, crrNme], "jmv-desc"), attr(dtaFrm[, crrNme], "description"))[1]

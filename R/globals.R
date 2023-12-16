@@ -369,11 +369,11 @@ rtnDta <- function(dtaFrm = NULL, fleOut = "", dtaTtl = "", wrtPtB = FALSE, psvA
                 warning("psvAnl is only possible if dtaInp is a file name (analyses are not stored in data frames, only in the jamovi files).")
             }
         }
-        return()
+        return(invisible(NULL))
     } else if (isJmv() && is.character(fleOut)) {
         if (psvAnl) warning("psvAnl is only possible if fleOut is a file name (analyses are not stored in data frames, only in the jamovi files).")
         jmvOpn(dtaFrm, dtaTtl = dtaTtl)
-        return()
+        return(invisible(NULL))
     } else {
         if (psvAnl) warning("psvAnl is only possible if fleOut is a file name (analyses are not stored in data frames, only in the jamovi files).")
         return(dtaFrm)

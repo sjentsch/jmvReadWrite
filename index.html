@@ -200,9 +200,9 @@
 <span><span class="co">#&gt; [1] "Trial.omv"</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/file.info.html" class="external-link">file.info</a></span><span class="op">(</span><span class="st">"Trial.omv"</span><span class="op">)</span></span>
 <span><span class="co">#&gt;           size isdir mode               mtime               ctime</span></span>
-<span><span class="co">#&gt; Trial.omv 2610 FALSE  664 2023-12-16 21:14:32 2023-12-16 21:14:32</span></span>
+<span><span class="co">#&gt; Trial.omv 2610 FALSE  664 2023-12-16 21:55:21 2023-12-16 21:55:21</span></span>
 <span><span class="co">#&gt;                         atime  uid  gid    uname   grname</span></span>
-<span><span class="co">#&gt; Trial.omv 2023-12-16 21:14:32 1000 1000 sjentsch sjentsch</span></span>
+<span><span class="co">#&gt; Trial.omv 2023-12-16 21:55:21 1000 1000 sjentsch sjentsch</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="st">"Trial.omv"</span><span class="op">)</span></span></code></pre></div>
 <p>Although jamovi reads R-data files (.RData, .rda, .rds) <a href="https://sjentsch.github.io/jmvReadWrite/reference/write_omv.html"><code>write_omv</code></a> permits to store <code>jamovi</code>-specific attributes (such as variable labels) in addition. Please note that if you are reading from an <code>.omv</code>-file in order to write back to an <code>.omv</code>-file (perhaps after some modifications), it is recommended to leave the <code>sveAtt</code>-attribute set to <code>TRUE</code> (which is the default).</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
@@ -306,6 +306,7 @@
 <li><a href="https://github.com/sjentsch/jmvReadWrite/issues" class="external-link"><img src="https://img.shields.io/github/issues/sjentsch/jmvReadWrite?color=%23fa251e&amp;logo=GitHub" alt="Register an issue"></a></li>
 <li><a href="https://github.com/sjentsch/jmvReadWrite/actions/workflows/ci.yml" class="external-link"><img src="https://github.com/sjentsch/jmvReadWrite/actions/workflows/ci.yml/badge.svg" alt="CI"></a></li>
 <li><a href="https://github.com/sjentsch/jmvReadWrite/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/sjentsch/jmvReadWrite/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a></li>
+<li><a href="https://github.com/sjentsch/jmvReadWrite/actions?query=workflow%3Apkgcheck" class="external-link"><img src="https://github.com/sjentsch/jmvReadWrite/workflows/pkgcheck/badge.svg" alt="pkgcheck"></a></li>
 <li><a href="https://github.com/sjentsch/jmvReadWrite/actions/workflows/codecov.yaml" class="external-link"><img src="https://github.com/sjentsch/jmvReadWrite/actions/workflows/codecov.yaml/badge.svg" alt="code-coverage"></a></li>
 <li><a href="https://app.codecov.io/gh/sjentsch/jmvReadWrite?branch=main" class="external-link"><img src="https://codecov.io/gh/sjentsch/jmvReadWrite/branch/main/graph/badge.svg" alt="Codecov coverage"></a></li>
 <li><a href="https://sjentsch.github.io/jmvReadWrite/"><img src="https://img.shields.io/badge/documentation-is_here-blue" alt="Documentation"></a></li>

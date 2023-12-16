@@ -22,6 +22,7 @@ commit](https://img.shields.io/github/last-commit/sjentsch/jmvReadWrite?logo=Git
 issue](https://img.shields.io/github/issues/sjentsch/jmvReadWrite?color=%23fa251e&logo=GitHub)](https://github.com/sjentsch/jmvReadWrite/issues)
 [![CI](https://github.com/sjentsch/jmvReadWrite/actions/workflows/ci.yml/badge.svg)](https://github.com/sjentsch/jmvReadWrite/actions/workflows/ci.yml)
 [![R-CMD-check](https://github.com/sjentsch/jmvReadWrite/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/sjentsch/jmvReadWrite/actions/workflows/R-CMD-check.yaml)
+[![pkgcheck](https://github.com/sjentsch/jmvReadWrite/workflows/pkgcheck/badge.svg)](https://github.com/sjentsch/jmvReadWrite/actions?query=workflow%3Apkgcheck)
 [![code-coverage](https://github.com/sjentsch/jmvReadWrite/actions/workflows/codecov.yaml/badge.svg)](https://github.com/sjentsch/jmvReadWrite/actions/workflows/codecov.yaml)
 [![Codecov
 coverage](https://codecov.io/gh/sjentsch/jmvReadWrite/branch/main/graph/badge.svg)](https://app.codecov.io/gh/sjentsch/jmvReadWrite?branch=main)
@@ -199,9 +200,9 @@ list.files(".", "Trial.omv")
 #> [1] "Trial.omv"
 file.info("Trial.omv")
 #>           size isdir mode               mtime               ctime
-#> Trial.omv 2610 FALSE  664 2023-12-16 21:14:32 2023-12-16 21:14:32
+#> Trial.omv 2610 FALSE  664 2023-12-16 21:55:21 2023-12-16 21:55:21
 #>                         atime  uid  gid    uname   grname
-#> Trial.omv 2023-12-16 21:14:32 1000 1000 sjentsch sjentsch
+#> Trial.omv 2023-12-16 21:55:21 1000 1000 sjentsch sjentsch
 unlink("Trial.omv")
 ```
 

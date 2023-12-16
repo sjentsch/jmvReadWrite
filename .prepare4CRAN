@@ -5,10 +5,10 @@ devtools::load_all()
 
 for (blnAtt in c(TRUE, FALSE)) {
     for (crrOMV in list.files('inst/extdata/')) {
+        cat(sprintf('\n%s\n\n%s\n\n', strrep("=", 100), crrOMV))
         data <- read_omv(file.path('inst/extdata/', crrOMV), sveAtt = blnAtt)
         write_omv(data, "~/Trial.omv")
         data2 <- read_omv("~/Trial.omv", sveAtt = blnAtt)
-        cat(sprintf('\n%s\n\n%s\n\n', strrep("=", 100), crrOMV))
         suppressWarnings(print(diffdf::diffdf(data, data2)))
         unlink("~/Trial.omv")
         rm("data", "data2")
@@ -19,8 +19,7 @@ rm('blnAtt', 'crrOMV')
 
 # checks the requirements (all dependencies up-to-date, etc.)
 # use devtools::update_packages("devtools") and devtools::install_dev_deps() if required
-# NB: there might be an error when updating the tidyverse-packages: remove the APA-style
-#     formatting in .Rprofile, restart R and put it back afterwards
+# NB: there might be an error when updating the tidyverse-packages: start R with --no-init-file
 devtools::dev_sitrep()
 
 # do some initial checks

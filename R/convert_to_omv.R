@@ -80,6 +80,6 @@ convert_to_omv <- function(fleInp = "", fleOut = "", varSrt = c(), usePkg = c("f
 
     # write file
     write_omv(dtaFrm = dtaFrm, fleOut = fleOut, ...)
-    
+
     return(invisible(NULL))
 }

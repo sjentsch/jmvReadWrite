@@ -1,3 +1,15 @@
+# jmvReadWrite 0.4.3
+
+## Bug fixes and enhancements:
+* fixed bugs and created test cases for `rplAtt` (replace non-UTF with UTF characters, part of `read_omv`)
+* added `invisible(NULL)`where NULL or nothing was returned 
+* adjust strsplit in `long2wide_omv` and `wide2long_omv` in order to permit having “.” as varSep
+* added codemeta.json, badge about package status, and how to contribute to the package (for pkgcheck)
+* added documentation of return value to convert_to_omv
+
+
+---
+
 # jmvReadWrite 0.4.2
 
 ## Bug fixes and enhancements:

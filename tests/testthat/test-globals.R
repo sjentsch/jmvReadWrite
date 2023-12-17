@@ -7,7 +7,7 @@ test_that("globals work", {
                  list(fleInp = "Trial_dflArg.omv", getSyn = TRUE, sveAtt = FALSE, getHTM = FALSE))
     expect_equal(fcnArg(c("merge", "data.frame")), c("x", "y", "by", "by.x", "by.y", "all", "all.x", "all.y", "sort", "suffixes", "no.dups", "incomparables", "..."))
     expect_true(chkDir(nmeOMV))
-    if (.Platform$OS.type == "unix") {
+    if (.Platform$OS.type == "unix" && Sys.getenv("NO_CHKDIR") != "true") {
         # permissions on *nix-systems
         dir.create(file.path(tempdir(), "chkPrm"), mode = "0111")
         expect_error(chkDir(file.path(tempdir(), "chkPrm", "Trial.omv")),
@@ -96,7 +96,7 @@ test_that("globals work", {
     attr(tmpDF[["ON"]], "values")   <- seq(7)
     attr(tmpDF[["NN"]], "values")   <- seq(7)
     attr(tmpDF[["CR"]], "jmv-desc") <- "Trial (is description kept?)"
-    expect_equal(sapply(sapply(jmvAtt(tmpDF), attributes), names), list(ID = c("jmv-id", "measureType", "dataType"),
+    expect_equal(lapply(lapply(jmvAtt(tmpDF), attributes), names), list(ID = c("jmv-id", "measureType", "dataType"),
         I = c("measureType", "dataType"), D = c("measureType", "dataType"),
         OT = c("levels", "class", "measureType", "dataType"), ON = c("levels", "class", "values", "measureType", "dataType"),
         NT = c("levels", "class", "measureType", "dataType"), NN = c("levels", "class", "values", "measureType", "dataType"),

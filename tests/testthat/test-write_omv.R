@@ -15,16 +15,16 @@ test_that("write_omv works", {
     # check the debugging information: name and type of the three parts that are returned, content of the metadata, whether all entries in xtdDta are labels, and
     # whether dtaFrm as a data frame with the correct sizes and attributes
     expect_equal(names(dtaDbg),                       c("mtaDta", "xtdDta", "dtaFrm"))
-    expect_equal(as.character(sapply(dtaDbg, class)), c("list",   "list",   "data.frame"))
+    expect_equal(vapply(dtaDbg, class, character(1), USE.NAMES = FALSE), c("list",   "list",   "data.frame"))
     expect_equal(names(dtaDbg$mtaDta), c("rowCount", "columnCount", "removedRows", "addedRows", "fields", "transforms", "weights"))
-    expect_true(all(grepl("labels", sapply(dtaDbg$xtdDta, attributes))))
+    expect_true(all(grepl("labels", unlist(lapply(dtaDbg$xtdDta, attributes)))))
     expect_s3_class(dtaDbg$dtaFrm, "data.frame")
     expect_equal(dim(dtaDbg$dtaFrm), c(60, 7))
     expect_equal(names(attributes(dtaDbg$dtaFrm)), c("names", "row.names", "class"))
     expect_equal(names(attributes(dtaDbg$dtaFrm[[3]])), c("levels", "class", "description"))
     expect_equal(names(attributes(dtaDbg$dtaFrm[[7]])), c("jmv-desc"))
     expect_equal(attributes(dtaDbg$dtaFrm[[4]]), NULL)
-    expect_equal(sapply(jmvReadWrite::ToothGrowth, class), sapply(dtaDbg$dtaFrm, class))
+    expect_equal(lapply(jmvReadWrite::ToothGrowth, class), lapply(dtaDbg$dtaFrm, class))
 
     # test cases for code coverage ============================================================================================================================
     expect_error(write_omv(NULL, nmeOut), regexp = "^The data frame to be written needs to be given as parameter \\(dtaFrm = \\.\\.\\.\\)\\.")
@@ -43,10 +43,10 @@ test_that("write_omv works", {
 
     attr(dtaDbg$dtaFrm, "variable.labels") <- stats::setNames(c("Label for ID", "Label for supp", "Label for supp2"), c("ID", "supp", "supp2"))
     dtaDbg$dtaFrm$supp <- as.character(dtaDbg$dtaFrm$supp)
-    expect_equal(sapply(c(1, 3), function(n) write_omv(dtaDbg$dtaFrm, nmeOut, frcWrt = TRUE, retDbg = TRUE)[["mtaDta"]][["fields"]][[n]][["description"]]),
+    expect_equal(vapply(c(1, 3), function(n) write_omv(dtaDbg$dtaFrm, nmeOut, frcWrt = TRUE, retDbg = TRUE)[["mtaDta"]][["fields"]][[n]][["description"]], character(1)),
       c("Label for ID", "Label for supp2"))
     unlink(nmeOut)
-    expect_identical(sapply(c("dataType", "type"), function(f) write_omv(dtaDbg$dtaFrm, nmeOut, frcWrt = TRUE, retDbg = TRUE)[["mtaDta"]][["fields"]][[2]][[f]], USE.NAMES = FALSE),
+    expect_identical(vapply(c("dataType", "type"), function(f) write_omv(dtaDbg$dtaFrm, nmeOut, frcWrt = TRUE, retDbg = TRUE)[["mtaDta"]][["fields"]][[2]][[f]], character(1), USE.NAMES = FALSE),
       c("Text", "integer"))
     unlink(nmeOut)
 
@@ -103,9 +103,9 @@ test_that("write_omv works", {
     Sys.setenv(JAMOVI_R_VERSION = paste0(R.version$major, ".", R.version$minor))
     df4Chk <- write_omv(dtaFrm = jmvReadWrite::ToothGrowth, fleOut = nmeOut, retDbg = TRUE)$dtaFrm
     Sys.unsetenv("JAMOVI_R_VERSION")
-    expect_true(all(sapply(df4Chk, function(x) identical(c("measureType", "dataType") %in% names(attributes(x)), c(TRUE, TRUE)))))
-    expect_equal(unname(sapply(df4Chk, function(x) attr(x, "dataType"))), c("Text", "Text", "Text", "Decimal", "Text", "Decimal", "Decimal"))
-    expect_equal(unname(sapply(df4Chk, function(x) attr(x, "measureType"))), c("ID", "Nominal", "Nominal", "Continuous", "Ordinal", "Continuous", "Continuous"))
+    expect_true(all(vapply(df4Chk, function(x) identical(c("measureType", "dataType") %in% names(attributes(x)), c(TRUE, TRUE)), logical(1))))
+    expect_equal(vapply(df4Chk, function(x) attr(x, "dataType"),    character(1), USE.NAMES = FALSE), c("Text", "Text", "Text", "Decimal", "Text", "Decimal", "Decimal"))
+    expect_equal(vapply(df4Chk, function(x) attr(x, "measureType"), character(1), USE.NAMES = FALSE), c("ID", "Nominal", "Nominal", "Continuous", "Ordinal", "Continuous", "Continuous"))
     # do not unlink to provoke the error underneath
     expect_error(write_omv(dtaFrm = jmvReadWrite::ToothGrowth, fleOut = nmeOut),
       regexp = "The output file already exists\\. Either remove the file or set the parameter frcWrt to TRUE\\.")

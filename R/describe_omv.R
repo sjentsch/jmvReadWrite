@@ -203,10 +203,8 @@ splHTM <- function(vecChr = "") {
 # then split the input (into HTML tags and content) and replace characters that have a HTML-function (e.g., "/")
 # in the content
 clnHTM <- function(inpLne = c(), toHTM = FALSE) {
-    inpLne <- sapply(inpLne, function(x) {
-                                           paste0(ifelse(grepl("^\\s*<p.*?>|^\\s*<li.*?>", x), "", "<p>"), x,
-                                                  ifelse(grepl("</p.*?>\\s*$|</li.*?>\\s*$", x), "", "</p>"))
-                                         }, USE.NAMES = FALSE)
+    inpLne <- vapply(inpLne, function(x) paste0(ifelse(grepl("^\\s*<p.*?>|^\\s*<li.*?>", x), "", "<p>"), x, ifelse(grepl("</p.*?>\\s*$|</li.*?>\\s*$", x), "", "</p>")),
+                character(1), USE.NAMES = FALSE)
     splLne <- splHTM(paste0(inpLne, collapse = ""))
     selCnt <- !grepl("<.*?>", splLne)
     splLne[selCnt] <- rplHTM(splLne[selCnt], toHTM)

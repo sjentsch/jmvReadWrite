@@ -107,8 +107,8 @@ merge_rows_omv <- function(dtaInp = NULL, fleOut = "", typMrg = c("all", "common
         # duplicates(order ensures that the data set that contains most variables
         # is prioritized, but yet, it is still impossible to preserve the whole
         # order - i.e., variables missing in one data set may end up at the end)
-        varNme <- unlist(sapply(dtaFrm[order(-sapply(sapply(dtaFrm, dim, simplify = FALSE), "[[", 2))], names,                                                  simplify = FALSE))
-        varTyp <- unlist(sapply(dtaFrm[order(-sapply(sapply(dtaFrm, dim, simplify = FALSE), "[[", 2))], function(D) unlist(sapply(D, function(C) class(C)[1])), simplify = FALSE))
+        varNme <- unlist(lapply(dtaFrm[order(-vapply(dtaFrm, function(x) dim(x)[2], integer(1)))], names))
+        varTyp <- unlist(lapply(dtaFrm[order(-vapply(dtaFrm, function(x) dim(x)[2], integer(1)))], function(D) vapply(D, function(C) class(C)[1], character(1))))
         varNme <- varNme[!duplicated(varNme)]
         for (crrNme in varNme) {
             if (sum(names(varTyp) == crrNme) <= 1) next
@@ -128,7 +128,7 @@ merge_rows_omv <- function(dtaInp = NULL, fleOut = "", typMrg = c("all", "common
         dtaFrm <- tmpMrg
     # keeping only variables that are common to all input data sets
     } else if (typMrg == "common") {
-        varNme <- Reduce(intersect, sapply(dtaFrm, names, simplify = FALSE))
+        varNme <- Reduce(intersect, lapply(dtaFrm, names))
         if (identical(varNme, character(0))) {
             stop(paste("The data sets in the files that were given as dtaInp-argument do not contain variables that are overlapping (i.e., contained in all data sets).",
                        "You can either reduce the number of data sets given to dtaInp or use \"outer\" as argument for \"typMrg\" (see Details in the help for this function)."))

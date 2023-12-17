@@ -14,7 +14,7 @@ test_that("arrange_cols_omv works", {
     expect_s3_class(df4Chk, "data.frame")
     expect_equal(dim(df4Chk), c(200, 5))
     expect_equal(names(df4Chk), c("selSbj", "Sales", "Adverts", "Airplay", "Image"))
-    expect_equal(as.vector(sapply(df4Chk, typeof)), c("integer", "integer", "double", "integer", "integer"))
+    expect_equal(vapply(df4Chk, typeof, character(1), USE.NAMES = FALSE), c("integer", "integer", "double", "integer", "integer"))
     unlink(nmeOut)
 
     expect_null(arrange_cols_omv(dtaInp = nmeInp, fleOut = nmeOut, varMve = list(Sales = -3, Adverts = 2)))
@@ -28,14 +28,14 @@ test_that("arrange_cols_omv works", {
     expect_s3_class(df4Chk, "data.frame")
     expect_equal(dim(df4Chk), c(200, 5))
     expect_equal(names(df4Chk), c("selSbj", "Sales", "Airplay", "Image", "Adverts"))
-    expect_equal(as.vector(sapply(df4Chk, typeof)), c("integer", "integer", "integer", "integer", "double"))
+    expect_equal(vapply(df4Chk, typeof, character(1), USE.NAMES = FALSE), c("integer", "integer", "integer", "integer", "double"))
     unlink(nmeOut)
 
     df4Chk <- arrange_cols_omv(dtaInp = nmeInp, varMve = list(Sales = -3, Adverts = 2))
     expect_s3_class(df4Chk, "data.frame")
     expect_equal(dim(df4Chk), c(200, 5))
     expect_equal(names(df4Chk), c("selSbj", "Sales", "Airplay", "Image", "Adverts"))
-    expect_equal(as.vector(sapply(df4Chk, typeof)), c("integer", "integer", "integer", "integer", "double"))
+    expect_equal(vapply(df4Chk, typeof, character(1), USE.NAMES = FALSE), c("integer", "integer", "integer", "integer", "double"))
 
     # test cases for code coverage ============================================================================================================================
     expect_error(arrange_cols_omv(fleInp = nmeInp, varMve = list(len = -2, supp = -1)), regexp = "Please use the argument dtaInp instead of fleInp\\.")
@@ -108,7 +108,7 @@ test_that("arrange_cols_omv works", {
     expect_s3_class(df4Chk, "data.frame")
     expect_equal(dim(df4Chk), c(60, 17))
     expect_equal(names(df4Chk), c("Filter 1", "ID", "len", "logLen", "supp", "supp - Transform 1", "dose", "dose2", "dose3", "Trial", "Residuals", "J", "K", "L", "M", "O", "weights"))
-    expect_equal(as.vector(sapply(df4Chk, typeof)),
+    expect_equal(as.vector(vapply(df4Chk, typeof, character(1))),
       c("logical", "integer", "double", "double", "integer", "integer", "double", "integer", "integer", "integer", "double", "double", "double", "integer", "logical", "logical", "integer"))
     expect_equal(sort(zip::zip_list(nmeOut)$filename),
       c("01 empty/analysis", "02 anova/analysis", "02 anova/resources/65167cb3bdaf8761.png", "02 anova/resources/99f9b5d34a92049b.png", "03 empty/analysis",

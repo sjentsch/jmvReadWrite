@@ -141,7 +141,7 @@ wide2long_omv <- function(dtaInp = NULL, fleOut = "", varLst = c(), varExc = c()
     # use varSep to split the variable names in varLst
     if (nzchar(varSep)) {
         varSpl <- strsplit(varLst, gsub("\\.", "\\\\.", varSep))
-        lngSpl <- unique(unlist(lapply(varSpl, length)))
+        lngSpl <- unique(vapply(varSpl, length, integer(1)))
         if (length(lngSpl) != 1) {
             stop(sprintf("The variable names in varLst need to have the same structure, i.e., the same number of separators within all variable names:\n%s\n\n",
               paste0(varLst, collapse = ", ")))
@@ -165,7 +165,7 @@ wide2long_omv <- function(dtaInp = NULL, fleOut = "", varLst = c(), varExc = c()
     # (Inf is larger than any finite number and the while loop stops if there aren't any finite
     # numbers, i.e., values other than Inf or NA) left
     dffSpl <- rep(NA, lngSpl)
-    for (i in seq(lngSpl)) dffSpl[i] <- which(sapply(varSpl, "[[", i)[1] != sapply(varSpl, "[[", i)[-1])[1]
+    for (i in seq(lngSpl)) dffSpl[i] <- which(c(FALSE, !duplicated(vapply(varSpl, "[[", character(1), i))[-1]))[1]
     dffSpl[is.na(dffSpl)] <- Inf
     dffSpl[excLvl] <- Inf
     nmbTme <- sum(is.finite(dffSpl)) > 1
@@ -176,7 +176,7 @@ wide2long_omv <- function(dtaInp = NULL, fleOut = "", varLst = c(), varExc = c()
         # crrPos: the smallest level that is valid (i.e., that is not unique or excluded because of excLvl)
         crrPos <- which(dffSpl == min(dffSpl, na.rm = TRUE))
         # crrTms is used as parameter in crrArg and the if-condition below
-        crrTms <- unique(sapply(varSpl, "[[", crrPos))
+        crrTms <- unique(vapply(varSpl, "[[", character(1), crrPos))
         # assemble the list for varying, if crrTms are the only elements of left in varLst, an output
         # variable “measure” is used as target, otherwise crrVry is assembled as named list with the
         # target as name and all former variables for that step of the hierarchy as entries

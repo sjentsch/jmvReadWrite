@@ -73,15 +73,16 @@ read_omv <- function(fleInp = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = TRUE,
 
     # iterate through fields
     for (i in seq_len(colNum)) {
-        # check meta-data
-        if (!all(grepl(grpMta, names(mtaDta$fields[[i]])))) stop("Unimplemeted field in the meta data (column).")
+        # assign metadate for the current column, and check whether there are any unimplemented entries
+        mtaCol <- mtaDta$fields[[i]]
+        if (!all(grepl(grpMta, names(mtaCol)))) stop("Unimplemeted field in the meta data (column).")
 
         # type: determines the format in the binary file
-        if        (chkFld(mtaDta$fields[[i]], "type", "integer")) {
+        if        (chkFld(mtaCol, "type", "integer")) {
             crrCol <- readBin(binHdl, integer(), n = rowNum)
-        } else if (chkFld(mtaDta$fields[[i]], "type", "number"))  {
+        } else if (chkFld(mtaCol, "type", "number"))  {
             crrCol <- readBin(binHdl,  double(), n = rowNum)
-        } else if (chkFld(mtaDta$fields[[i]], "type", "string"))  {
+        } else if (chkFld(mtaCol, "type", "string"))  {
             crrCol <- vector("character", length = rowNum)
             crrIdx <- readBin(binHdl, integer(), n = rowNum)
             for (j in seq(rowNum)) {
@@ -95,42 +96,20 @@ read_omv <- function(fleInp = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = TRUE,
             }
             rm(crrIdx)
         } else {
-            stop(sprintf("Variable type \"%s\" not implemented.", mtaDta$fields[[i]]$type))
+            stop(sprintf("Variable type \"%s\" not implemented.", mtaCol$type))
         }
 
-        # name
-        crrNme <- mtaDta$fields[[i]]$name
-
-        # value labels
-        if (any(crrNme == names(xtdDta))) {
-            if        (chkFld(mtaDta$fields[[i]], "columnType", "Filter") || chkFld(mtaDta$fields[[i]], "name", "^Filter [0-9]+$")) {
-                crrCol <- as.logical(crrCol)
-                fltLst <- c(fltLst, i)
-            } else if (chkFld(mtaDta$fields[[i]], "columnType", "Data|Recoded")) {
-                crrCol <- factor(crrCol, levels = unlist(sapply(xtdDta[[crrNme]]$labels, function(m) m[1])),
-                                         labels = unlist(sapply(xtdDta[[crrNme]]$labels, function(m) m[2])),
-                                         ordered = chkFld(mtaDta$fields[[i]], "measureType", "Ordinal"))
-                if (identical(sort(levels(crrCol)), c("0", "1")))        crrCol <- as.logical(gsub("^1$", "TRUE", gsub("^0$", "FALSE", crrCol)))
-                if (identical(sort(levels(crrCol)), c("FALSE", "TRUE"))) crrCol <- as.logical(crrCol)
-                if (!is.logical(crrCol) && chkFld(mtaDta$fields[[i]], "dataType", "Integer") &&
-                  all(sapply(xtdDta[[crrNme]]$labels, function(m) m[1] == as.integer(m[2])))) {
-                    attr(crrCol, "values") <- unlist(sapply(xtdDta[[crrNme]]$labels, function(m) m[1]))
-                }
-            } else {
-                stop(sprintf("Error when reading value label - likely the column type is not implemented (yet): %s - %s - %s",
-                             crrNme, mtaDta$fields[[i]]$dataType, mtaDta$fields[[i]]$columnType))
-            }
-        }
-
-        dtaFrm[[crrNme]] <- crrCol
-
-        if (chkFld(mtaDta$fields[[i]], "measureType", "ID")) attr(dtaFrm[[crrNme]], "jmv-id")   <- TRUE
-        if (chkFld(mtaDta$fields[[i]], "description", ".+")) attr(dtaFrm[[crrNme]], "jmv-desc") <- mtaDta$fields[[i]][["description"]]
+        # assign name of the current column, add value labels, assign crrCol to dtaFrm, and add attributes (if present)
+        crrNme <- mtaCol$name
+        dtaFrm[[crrNme]] <- valLbl(crrCol, mtaCol, xtdDta)
+        if (chkFld(mtaCol, "measureType", "ID")) attr(dtaFrm[[crrNme]], "jmv-id")   <- TRUE
+        if (chkFld(mtaCol, "description", ".+")) attr(dtaFrm[[crrNme]], "jmv-desc") <- mtaCol[["description"]]
+        if (chkFld(mtaCol, "columnType", "Filter") || chkFld(mtaCol, "name", "^Filter [0-9]+$")) fltLst <- c(fltLst, i)
 
         if (sveAtt) {
-            dtaFrm[crrNme] <- setAtt(names(mtaFld),   mtaDta$fields[[i]], dtaFrm[crrNme])
+            dtaFrm[crrNme] <- setAtt(names(mtaFld),   mtaCol, dtaFrm[crrNme])
         } else {
-            dtaFrm[crrNme] <- setAtt("missingValues", mtaDta$fields[[i]], dtaFrm[crrNme])
+            dtaFrm[crrNme] <- setAtt("missingValues", mtaCol, dtaFrm[crrNme])
         }
 
         if (rmMsVl) {
@@ -218,6 +197,29 @@ read_omv <- function(fleInp = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = TRUE,
     dtaFrm
 }
 
+valLbl <- function(crrCol = NULL, mtaCol = NULL, xtdDta = NULL) {
+    crrNme <- mtaCol$name
+    if (any(crrNme == names(xtdDta))) {
+        if        (chkFld(mtaCol, "columnType", "Filter") || chkFld(mtaCol, "name", "^Filter [0-9]+$")) {
+            crrCol <- as.logical(crrCol)
+        } else if (chkFld(mtaCol, "columnType", "Data|Recoded")) {
+            crrCol <- factor(crrCol, levels = unlist(sapply(xtdDta[[crrNme]]$labels, function(m) m[1])),
+                                     labels = unlist(sapply(xtdDta[[crrNme]]$labels, function(m) m[2])),
+                                     ordered = chkFld(mtaCol, "measureType", "Ordinal"))
+            if (identical(sort(levels(crrCol)), c("0", "1")))        crrCol <- as.logical(gsub("^1$", "TRUE", gsub("^0$", "FALSE", crrCol)))
+            if (identical(sort(levels(crrCol)), c("FALSE", "TRUE"))) crrCol <- as.logical(crrCol)
+            if (!is.logical(crrCol) && chkFld(mtaCol, "dataType", "Integer") &&
+              all(sapply(xtdDta[[crrNme]]$labels, function(m) m[1] == as.integer(m[2])))) {
+                attr(crrCol, "values") <- unlist(sapply(xtdDta[[crrNme]]$labels, function(m) m[1]))
+            }
+        } else {
+            stop(sprintf("Error when reading value label - likely the column type is not implemented (yet): %s - %s - %s",
+                         crrNme, mtaCol$dataType, mtaCol$columnType))
+        }
+    }
+
+    crrCol
+}
 
 # =================================================================================================
 # read_all: for reading data files from various formats (incl. functions that are called)

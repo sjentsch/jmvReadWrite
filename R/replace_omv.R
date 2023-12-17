@@ -73,20 +73,8 @@ replace_omv <- function(dtaInp = NULL, fleOut = "", rplLst = list(), whlTrm = TR
 
     incClT <- c("Data", rep("Computed", incCmp), rep("Recoded", incRcd))
     incMsT <- c(rep("ID", incID), rep("Nominal", incNom), rep("Ordinal", incOrd), rep("Continuous", incNum))
-    if (!is.null(varInc) && length(varInc) > 0 && !is.null(varExc) && length(varExc) > 0) warning("Both varInc and varExc are given, varInc takes precedence.")
-    if        (!is.null(varInc) && length(varInc) > 0 && all(nzchar(varInc))) {
-        if (!all(varInc %in% names(dtaFrm))) {
-            stop(sprintf("All variables in varInc must be contained in the original data set (%s are not).", paste(varInc[!(varInc %in% names(dtaFrm))], collapse = ", ")))
-        }
-        srcNme <- varInc
-    } else if (!is.null(varExc) && length(varExc) > 0 && all(nzchar(varExc))) {
-        if (!all(varExc %in% names(dtaFrm))) {
-            stop(sprintf("All variables in varExc must be contained in the original data set (%s are not).", paste(varExc[!(varExc %in% names(dtaFrm))], collapse = ", ")))
-        }
-        srcNme <- setdiff(names(dtaFrm), varExc)
-    } else {
-        srcNme <- names(dtaFrm)
-    }
+
+    srcNme <- chkInE(varInc, varExc, dtaFrm)
     srcNme <- srcNme[sapply(dtaFrm[srcNme], function(x) is.null(attr(x,  "columnType")) || any(attr(x,  "columnType") == incClT))]
     srcNme <- srcNme[sapply(dtaFrm[srcNme], function(x) is.null(attr(x, "measureType")) || any(attr(x, "measureType") == incMsT))]
     for (i in seq_along(srcNme)) {
@@ -106,4 +94,23 @@ replace_omv <- function(dtaInp = NULL, fleOut = "", rplLst = list(), whlTrm = TR
 
     # rtnDta in globals.R (unified function to either write the data frame, open it in a new jamovi session or return it)
     rtnDta(dtaFrm = dtaFrm, fleOut = fleOut, dtaTtl = jmvTtl("_rplc"), psvAnl = psvAnl, dtaInp = dtaInp, ...)
+}
+
+chkInE <- function(varInc = c(), varExc = c(), dtaFrm = NULL) {
+    if (!is.null(varInc) && length(varInc) > 0 && !is.null(varExc) && length(varExc) > 0) warning("Both varInc and varExc are given, varInc takes precedence.")
+    if        (!is.null(varInc) && length(varInc) > 0 && all(nzchar(varInc))) {
+        if (!all(varInc %in% names(dtaFrm))) {
+            stop(sprintf("All variables in varInc must be contained in the original data set (%s are not).", paste(varInc[!(varInc %in% names(dtaFrm))], collapse = ", ")))
+        }
+        srcNme <- varInc
+    } else if (!is.null(varExc) && length(varExc) > 0 && all(nzchar(varExc))) {
+        if (!all(varExc %in% names(dtaFrm))) {
+            stop(sprintf("All variables in varExc must be contained in the original data set (%s are not).", paste(varExc[!(varExc %in% names(dtaFrm))], collapse = ", ")))
+        }
+        srcNme <- setdiff(names(dtaFrm), varExc)
+    } else {
+        srcNme <- names(dtaFrm)
+    }
+
+    srcNme
 }

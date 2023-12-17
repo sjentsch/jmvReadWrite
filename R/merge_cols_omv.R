@@ -145,10 +145,7 @@ merge_cols_omv <- function(dtaInp = NULL, fleOut = "", typMrg = c("outer", "inne
 
 chkByV <- function(varBy = list(), dtaFrm = NULL) {
     # varBy is empty
-    if ((is.list(varBy)      && length(varBy) == 0) ||
-        (is.vector(varBy)    && length(varBy) == 0) ||
-        (is.character(varBy) && !nzchar(varBy)) ||
-        is.null(varBy)) {
+    if (empByV(varBy)) {
         varBy <- rep(list(mtcVar(dtaFrm)), length(dtaFrm))
     # varBy is a character vector (without empty elements) or a string
     } else if ((is.vector(varBy) && !is.list(varBy) && length(varBy) >= 1 && all(nzchar(varBy))) || is.character(varBy)) {
@@ -176,6 +173,13 @@ chkByV <- function(varBy = list(), dtaFrm = NULL) {
     }
 
     varBy
+}
+
+empByV <- function(varBy = NULL) {
+    (is.list(varBy)      && length(varBy) == 0) ||
+    (is.vector(varBy)    && length(varBy) == 0) ||
+    (is.character(varBy) && !nzchar(varBy)) ||
+    is.null(varBy)
 }
 
 mtcVar <- function(dtaFrm = NULL) {

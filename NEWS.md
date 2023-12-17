@@ -1,3 +1,11 @@
+# jmvReadWrite 0.5.0
+
+## Enhancements and bug fixes:
+* `compute_omv`
+* `recode_omv`
+
+---
+
 # jmvReadWrite 0.4.3
 
 ## Bug fixes and enhancements:

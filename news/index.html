@@ -54,7 +54,9 @@
 <h2 class="page-header" data-toc-text="0.4.3" id="jmvreadwrite-043">jmvReadWrite 0.4.3<a class="anchor" aria-label="anchor" href="#jmvreadwrite-043"></a></h2>
 <div class="section level3">
 <h3 id="bug-fixes-and-enhancements-0-4-3">Bug fixes and enhancements:<a class="anchor" aria-label="anchor" href="#bug-fixes-and-enhancements-0-4-3"></a></h3>
-<ul><li>fixed bugs and created test cases for <code>rplAtt</code> (replace non-UTF with UTF characters, part of <code>read_omv</code>)</li>
+<ul><li>replace sapply with vapply or lapply (in accordance with goodpractice)</li>
+<li>reducing cyclomatic complexity to 30</li>
+<li>fixed bugs and created test cases for <code>rplAtt</code> (replace non-UTF with UTF characters, part of <code>read_omv</code>)</li>
 <li>added <code>invisible(NULL)</code>where NULL or nothing was returned</li>
 <li>adjust strsplit in <code>long2wide_omv</code> and <code>wide2long_omv</code> in order to permit having “.” as varSep</li>
 <li>added codemeta.json, badge about package status, and how to contribute to the package (for pkgcheck)</li>

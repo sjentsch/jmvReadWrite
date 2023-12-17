@@ -62,14 +62,14 @@ search_omv <- function(dtaInp = NULL, srcTrm = c(), whlTrm = FALSE, ignCse = FAL
     incClT <- c("Data", rep("Computed", incCmp), rep("Recoded", incRcd))
     incMsT <- c(rep("ID", incID), rep("Nominal", incNom), rep("Ordinal", incOrd), rep("Continuous", incNum))
     srcNme <- names(dtaFrm)
-    srcNme <- srcNme[sapply(dtaFrm[srcNme], function(x) is.null(attr(x,  "columnType")) || any(attr(x,  "columnType") == incClT))]
-    srcNme <- srcNme[sapply(dtaFrm[srcNme], function(x) is.null(attr(x, "measureType")) || any(attr(x, "measureType") == incMsT))]
+    srcNme <- srcNme[vapply(dtaFrm[srcNme], function(x) is.null(attr(x,  "columnType")) || any(attr(x,  "columnType") == incClT), logical(1))]
+    srcNme <- srcNme[vapply(dtaFrm[srcNme], function(x) is.null(attr(x, "measureType")) || any(attr(x, "measureType") == incMsT), logical(1))]
     srcRes <- stats::setNames(rep(list(NULL), length(srcNme)), srcNme)
     nmeRow <- row.names(dtaFrm)
     for (i in seq_along(srcRes)) {
         srcRes[[i]] <- nmeRow[srcClm(dtaFrm[[srcNme[i]]], srcTrm, whlTrm, ignCse)]
     }
-    return(srcRes[sapply(srcRes, length) > 0])
+    return(srcRes[vapply(srcRes, length, integer(1)) > 0])
 }
 
 srcClm <- function(inpClm = NULL, srcTrm = "", whlTrm = FALSE, ignCse = FALSE) {

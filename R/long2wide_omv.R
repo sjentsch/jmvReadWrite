@@ -125,7 +125,7 @@ long2wide_omv <- function(dtaInp = NULL, fleOut = "", varTgt = c(), varExc = c()
     }
     # [b] store the original variable labels, the original time-varying / target variable,
     # and an empty vector for storing labels
-    lstLbl <- list(orgLbl = sapply(dtaFrm, attr, "jmv-desc"), orgTgt = varTgt)
+    lstLbl <- list(orgLbl = lapply(dtaFrm, attr, "jmv-desc"), orgTgt = varTgt)
 
     # [c] there might be several occurrences for each combination of varID and varTme; aggregate them
     dtaFrm <- aggDta(dtaFrm = dtaFrm, varAgg = varAgg, varID = varID, varTme = varTme, varExc = varExc, varTgt = varTgt)
@@ -176,7 +176,7 @@ aggDta <- function(dtaFrm = NULL, varAgg = "", varID = c(), varTme = c(), varExc
     } else if (varAgg == "mean")  {
         # [2] if "mean" is chosen as aggregation function, it becomes (a little) more complicated
         # [a] the target variables (for which the mean is calculated) should be numeric
-        if (!all(sapply(dtaFrm[, varTgt], is.numeric))) {
+        if (!all(vapply(dtaFrm[, varTgt], is.numeric, logical(1)))) {
             stop(paste("In order to calculate the mean when aggregating the data, all target variables (varTgt) need to be numeric. Use varAgg = \"first\" instead",
                        "(to use the first occuring value) or convert the target variables to numeric."))
         }

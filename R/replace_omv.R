@@ -62,7 +62,7 @@ replace_omv <- function(dtaInp = NULL, fleOut = "", rplLst = list(), whlTrm = TR
                         incID = TRUE, incCmp = TRUE, incRcd = TRUE, psvAnl = FALSE, ...) {
 
     # check the input parameter:
-    if (length(rplLst) < 1 || !is.list(rplLst) || !all(sapply(rplLst, length) == 2)) {
+    if (length(rplLst) < 1 || !is.list(rplLst) || !all(vapply(rplLst, length, integer(1)) == 2)) {
         stop("Calling replace_omv requires the parameter rplLst (a list where each entry is a vector with length 2; see Details in help).")
     }
 
@@ -75,8 +75,8 @@ replace_omv <- function(dtaInp = NULL, fleOut = "", rplLst = list(), whlTrm = TR
     incMsT <- c(rep("ID", incID), rep("Nominal", incNom), rep("Ordinal", incOrd), rep("Continuous", incNum))
 
     srcNme <- chkInE(varInc, varExc, dtaFrm)
-    srcNme <- srcNme[sapply(dtaFrm[srcNme], function(x) is.null(attr(x,  "columnType")) || any(attr(x,  "columnType") == incClT))]
-    srcNme <- srcNme[sapply(dtaFrm[srcNme], function(x) is.null(attr(x, "measureType")) || any(attr(x, "measureType") == incMsT))]
+    srcNme <- srcNme[vapply(dtaFrm[srcNme], function(x) is.null(attr(x,  "columnType")) || any(attr(x,  "columnType") == incClT), logical(1))]
+    srcNme <- srcNme[vapply(dtaFrm[srcNme], function(x) is.null(attr(x, "measureType")) || any(attr(x, "measureType") == incMsT), logical(1))]
     for (i in seq_along(srcNme)) {
         for (j in seq_along(rplLst)) {
             if (is.factor(dtaFrm[[srcNme[i]]])) {

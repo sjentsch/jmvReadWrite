@@ -103,7 +103,7 @@ hasExt <- function(fleNme = "", extNme = c("")) {
 }
 
 hasPkg <- function(usePkg = c()) {
-    all(sapply(usePkg, function(X) nzchar(system.file(package = X))))
+    all(vapply(usePkg, function(X) nzchar(system.file(package = X)), logical(1)))
 }
 
 nrmFle <- function(fleNme = "") {
@@ -117,9 +117,9 @@ fmtFlI <- function(fleInp = c(), minLng = 1, maxLng = Inf, excExt = "") {
         stop(sprintf("The fleInp-argument is supposed to be a character vector with a minimal length of %.0f and a maximal length of %.0f (current length is %.0f).%s",
                      minLng, maxLng, length(fleInp), ifelse(length(fleInp) > maxLng, "\n  If you would like to process several files, call the function individually for each.", "")))
     }
-    fleInp <- unname(sapply(fleInp, nrmFle))
-    all(sapply(fleInp, chkFle))
-    all(sapply(fleInp, chkExt, setdiff(vldExt, excExt)))
+    fleInp <- unname(vapply(fleInp, nrmFle, character(1)))
+    all(vapply(fleInp, chkFle, logical(1)))
+    all(vapply(fleInp, chkExt, logical(1), setdiff(vldExt, excExt)))
     fleInp
 }
 
@@ -155,7 +155,7 @@ jmvPtB <- function() {
     synPkg <- c("RProtoBuf", "jmvcore")
     if (!hasPkg(synPkg)) {
         warning(sprintf("For using protocol buffers, the package(s) \"%s\" need(s) to be installed.\n\n",
-          paste0(synPkg[!sapply(synPkg, hasPkg)], collapse = "\", \"")))
+          paste0(synPkg[!vapply(synPkg, hasPkg, logical(1))], collapse = "\", \"")))
         return(FALSE)
     }
     # check the two possible places for the jamovi.proto file

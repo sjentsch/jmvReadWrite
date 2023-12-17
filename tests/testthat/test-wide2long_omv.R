@@ -11,7 +11,7 @@ test_that("wide2long_omv works", {
     df4Chk <- read_omv(nmeOut)
     expect_s3_class(df4Chk, "data.frame")
     expect_equal(dim(df4Chk), c(1452, 3))
-    expect_equal(as.vector(sapply(df4Chk, typeof)), c("integer", "integer", "double"))
+    expect_equal(vapply(df4Chk, typeof, character(1), USE.NAMES = FALSE), c("integer", "integer", "double"))
     expect_equal(names(df4Chk), c("Year", "Month", "X"))
     expect_equal(names(attributes(df4Chk)), c("names", "row.names", "class", "removedRows", "addedRows", "transforms"))
     expect_equal(names(attributes(df4Chk[[3]])), c("jmv-desc", "name", "id", "columnType", "dataType", "measureType", "formula", "formulaMessage",
@@ -32,7 +32,7 @@ test_that("wide2long_omv works", {
     df4Chk <- read_omv(nmeOut)
     expect_s3_class(df4Chk, "data.frame")
     expect_equal(dim(df4Chk), c(1452, 3))
-    expect_equal(as.vector(sapply(df4Chk, typeof)), c("integer", "integer", "double"))
+    expect_equal(vapply(df4Chk, typeof, character(1), USE.NAMES = FALSE), c("integer", "integer", "double"))
     expect_equal(names(df4Chk), c("Year", "Month", "X"))
     expect_equal(names(attributes(df4Chk)), c("names", "row.names", "class", "removedRows", "addedRows", "transforms"))
     expect_equal(names(attributes(df4Chk[[3]])), c("jmv-desc", "name", "id", "columnType", "dataType", "measureType", "formula", "formulaMessage",
@@ -45,7 +45,7 @@ test_that("wide2long_omv works", {
     df4Chk <- read_omv(nmeOut)
     expect_s3_class(df4Chk, "data.frame")
     expect_equal(dim(df4Chk), c(1452, 3))
-    expect_equal(as.vector(sapply(df4Chk, typeof)), c("integer", "integer", "double"))
+    expect_equal(vapply(df4Chk, typeof, character(1), USE.NAMES = FALSE), c("integer", "integer", "double"))
     expect_equal(names(attributes(df4Chk)), c("names", "row.names", "class", "removedRows", "addedRows", "transforms"))
     expect_equal(names(attributes(df4Chk[[3]])), c("jmv-desc", "name", "id", "columnType", "dataType", "measureType", "formula", "formulaMessage",
                                                    "parentId", "width", "type", "importName", "description", "transform", "edits", "missingValues"))
@@ -101,7 +101,7 @@ test_that("wide2long_omv works", {
     expect_s3_class(df4Chk, "data.frame")
     expect_equal(dim(df4Chk), c(363, 3))
     expect_equal(names(df4Chk), c("ID", "cond", "measure"))
-    expect_equal(as.vector(sapply(df4Chk, class)), c("factor", "factor", "numeric"))
+    expect_equal(vapply(df4Chk, class, character(1), USE.NAMES = FALSE), c("factor", "factor", "numeric"))
     expect_equal(table(df4Chk$cond), table(c(rep("A", 121), rep("B", 121), rep("C", 121))))
 
 
@@ -118,7 +118,7 @@ test_that("wide2long_omv works", {
     df4Chk <- wide2long_omv(dtaInp = dtaTmp, fleOut = "", varLst = names(dtaTmp)[c(-1, -2)], varExc = "sex", varID = "ID", varTme = "cond", excLvl = 1)
     expect_s3_class(df4Chk, "data.frame")
     expect_equal(dim(df4Chk), c(2400, 7))
-    expect_equal(as.vector(sapply(df4Chk, typeof)), c(rep("integer", 6), "double"))
+    expect_equal(vapply(df4Chk, typeof, character(1), USE.NAMES = FALSE), c(rep("integer", 6), "double"))
     expect_equal(names(df4Chk), c("ID", "sex", sprintf("cond%d", 1:3), "rspCrr", "rspTme"))
     expect_equal(df4Chk[, "cond1"], as.factor(rep(rep(c("cong", "incong", "neutral"), each = 8), times = 100)))
     expect_equal(df4Chk[, "cond2"], as.factor(rep(rep(c("BLUE", "GREEN", "RED", "YELLOW"), each = 2), times = 300)))
@@ -128,7 +128,7 @@ test_that("wide2long_omv works", {
     df4Chk <- wide2long_omv(dtaInp = dtaTmp, fleOut = "", varLst = names(dtaTmp)[c(-1, -2)], varExc = "sex", varID = "ID", varTme = "cond")
     expect_s3_class(df4Chk, "data.frame")
     expect_equal(dim(df4Chk), c(4800, 7))
-    expect_equal(as.vector(sapply(df4Chk, typeof)), c(rep("integer", 6), "double"))
+    expect_equal(vapply(df4Chk, typeof, character(1), USE.NAMES = FALSE), c(rep("integer", 6), "double"))
     expect_equal(names(df4Chk), c("ID", "sex", sprintf("cond%d", 1:4), "measure"))
     expect_equal(df4Chk[, "cond1"], as.factor(rep(rep(c("rspCrr", "rspTme"), each = 24), times = 100)))
     expect_equal(df4Chk[, "cond2"], as.factor(rep(rep(c("cong", "incong", "neutral"), each = 8), times = 200)))

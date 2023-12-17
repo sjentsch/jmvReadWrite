@@ -30,7 +30,7 @@ test_that("merge_rows_omv works", {
     dtaFrm <- merge_rows_omv(dtaInp = nmeInp, colInd = TRUE)
     expect_s3_class(dtaFrm, "data.frame")
     expect_equal(dim(dtaFrm), c(758, 34))
-    expect_true(all(unname(table(dtaFrm$fleInd)) == sapply(tmpInp, dim)[1, ]))
+    expect_true(all(unname(table(dtaFrm$fleInd)) == vapply(tmpInp, dim, integer(2))[1, ]))
 
     dtaFrm <- merge_rows_omv(dtaInp = nmeInp, rstRwN = TRUE)
     expect_s3_class(dtaFrm, "data.frame")

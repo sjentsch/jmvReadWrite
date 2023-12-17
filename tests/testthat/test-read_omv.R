@@ -6,7 +6,7 @@ test_that("read_omv works", {
     df4Chk <- read_omv(fleInp = nmeInp, useFlt = FALSE, rmMsVl = FALSE, sveAtt = FALSE, getSyn = FALSE, getHTM = FALSE)
     expect_s3_class(df4Chk, "data.frame")
     expect_equal(dim(df4Chk), c(60, 17))
-    expect_equal(as.vector(sapply(df4Chk, typeof)),
+    expect_equal(vapply(df4Chk, typeof, character(1), USE.NAMES = FALSE),
       c("logical", "integer", "double", "integer", "double", "integer", "double", "integer", "integer", "integer", "double", "double", "double", "integer", "logical", "logical", "integer"))
     expect_equal(names(attributes(df4Chk)), c("names", "row.names", "class", "fltLst"))
     expect_equal(names(attributes(df4Chk[[2]])),  c("jmv-id", "missingValues"))
@@ -27,21 +27,21 @@ test_that("read_omv works", {
     df4Chk <- read_omv(fleInp = nmeInp, useFlt = TRUE, rmMsVl = FALSE, sveAtt = FALSE, getSyn = FALSE, getHTM = FALSE)
     expect_s3_class(df4Chk, "data.frame")
     expect_equal(dim(df4Chk), c(58, 16))
-    expect_equal(as.vector(sapply(df4Chk, typeof)),
+    expect_equal(vapply(df4Chk, typeof, character(1), USE.NAMES = FALSE),
       c("integer", "double", "integer", "double", "integer", "double", "integer", "integer", "integer", "double", "double", "double", "integer", "logical", "logical", "integer"))
 
     # read the data set (with the rmMsVl-argument set TRUE) and test its properties: data frame, size, correct column type
     df4Chk <- read_omv(fleInp = nmeInp, useFlt = FALSE, rmMsVl = TRUE, sveAtt = FALSE, getSyn = FALSE, getHTM = FALSE)
     expect_s3_class(df4Chk, "data.frame")
     expect_equal(dim(df4Chk), c(60, 17))
-    expect_equal(as.vector(sapply(df4Chk, typeof)),
+    expect_equal(vapply(df4Chk, typeof, character(1), USE.NAMES = FALSE),
       c("logical", "integer", "double", "integer", "double", "integer", "double", "integer", "integer", "integer", "double", "double", "double", "integer", "logical", "logical", "integer"))
 
     # read the data set (with the sveAtt-argument set TRUE) and test its properties: data frame, size, correct column type, and several attributes of the whole data frame and columns within it
     df4Chk <- read_omv(fleInp = nmeInp, useFlt = FALSE, rmMsVl = FALSE, sveAtt = TRUE, getSyn = FALSE, getHTM = FALSE)
     expect_s3_class(df4Chk, "data.frame")
     expect_equal(dim(df4Chk), c(60, 17))
-    expect_equal(as.vector(sapply(df4Chk, typeof)),
+    expect_equal(vapply(df4Chk, typeof, character(1), USE.NAMES = FALSE),
       c("logical", "integer", "double", "integer", "double", "integer", "double", "integer", "integer", "integer", "double", "double", "double", "integer", "logical", "logical", "integer"))
     expect_equal(names(attributes(df4Chk)), c("names", "row.names", "class", "fltLst", "removedRows", "addedRows", "transforms"))
     expect_equal(names(attributes(df4Chk[[4]])),  c("levels", "class", "values", "name", "id", "columnType", "dataType", "measureType", "formula", "formulaMessage",
@@ -107,7 +107,7 @@ test_that("read_all works", {
     df4Chk <- read_all(nmeInp)
     expect_s3_class(df4Chk, "data.frame")
     expect_equal(dim(df4Chk), c(60, 17))
-    expect_equal(as.vector(sapply(df4Chk, typeof)),
+    expect_equal(vapply(df4Chk, typeof, character(1), USE.NAMES = FALSE),
       c("logical", "integer", "double", "integer", "double", "integer", "double", "integer", "integer", "integer", "double", "double", "double", "integer", "logical", "logical", "integer"))
     expect_equal(names(attributes(df4Chk)), c("names", "row.names", "class", "fltLst", "removedRows", "addedRows", "transforms"))
     expect_equal(names(attributes(df4Chk[[4]])),  c("levels", "class", "values", "name", "id", "columnType", "dataType", "measureType", "formula", "formulaMessage",
@@ -120,8 +120,8 @@ test_that("read_all works", {
     saveRDS(jmvReadWrite::ToothGrowth, nmeTmp)
     df4Chk <- read_all(nmeTmp)
     expect_equal(dim(df4Chk), c(60, 7))
-    expect_equal(unname(sapply(df4Chk, typeof)),                c("character", "integer", "integer", "double", "integer", "double", "double"))
-    expect_equal(unname(sapply(sapply(df4Chk, class), "[", 1)), c("character", "factor", "factor", "numeric", "ordered", "numeric", "numeric"))
+    expect_equal(vapply(df4Chk, typeof,                  character(1), USE.NAMES = FALSE), c("character", "integer", "integer", "double", "integer", "double", "double"))
+    expect_equal(vapply(df4Chk, function(x) class(x)[1], character(1), USE.NAMES = FALSE), c("character", "factor", "factor", "numeric", "ordered", "numeric", "numeric"))
     expect_equal(names(attributes(df4Chk)), c("names", "row.names", "class"))
     expect_equal(names(attributes(df4Chk[[3]])),  c("levels", "class", "description"))
     expect_equal(names(attributes(df4Chk[[5]])),  c("levels", "class"))
@@ -234,5 +234,5 @@ test_that("read_all works", {
                                          Airplay = "No. of plays on radio",
                                          Image = "Band image rating (0-10)",
                                          Sales = "Album sales (thousands)")
-    expect_identical(sapply(fgnLbl(dtaTmp), attr, "jmv-desc"), attr(dtaTmp, "variable.labels"))
+    expect_identical(vapply(fgnLbl(dtaTmp), attr, character(1), "jmv-desc"), attr(dtaTmp, "variable.labels"))
 })

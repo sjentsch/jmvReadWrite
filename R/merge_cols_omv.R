@@ -93,7 +93,7 @@ merge_cols_omv <- function(dtaInp = NULL, fleOut = "", typMrg = c("outer", "inne
     # store attributes and remove empty lines from the data sets
     attCol <- list()
     for (i in seq_along(dtaFrm)) {
-        attCol <- c(attCol, sapply(dtaFrm[[i]][, setdiff(names(dtaFrm[[i]]), names(attCol))], attributes, simplify = FALSE))
+        attCol <- c(attCol, lapply(dtaFrm[[i]][, setdiff(names(dtaFrm[[i]]), names(attCol))], attributes))
         dtaFrm[[i]] <- dtaFrm[[i]][!apply(is.na(dtaFrm[[i]]), 1, all), ]
     }
     attDF <- attributes(dtaFrm[[1]])
@@ -149,14 +149,14 @@ chkByV <- function(varBy = list(), dtaFrm = NULL) {
         varBy <- rep(list(mtcVar(dtaFrm)), length(dtaFrm))
     # varBy is a character vector (without empty elements) or a string
     } else if ((is.vector(varBy) && !is.list(varBy) && length(varBy) >= 1 && all(nzchar(varBy))) || is.character(varBy)) {
-        if (all(sapply(dtaFrm, function(x) all(varBy %in% names(x))))) {
+        if (all(vapply(dtaFrm, function(x) all(varBy %in% names(x)), logical(length(varBy))))) {
             varBy <- rep(list(varBy), length(dtaFrm))
         } else {
             stop("Not all data sets given in dtaInp contain the variable(s) / column(s) that shall be used for matching.")
         }
     # varBy is a list with the same length as dtaFrm
     } else if (is.list(varBy) && length(varBy) == length(dtaFrm)) {
-        if (!all(sapply(seq_along(dtaFrm), function(i) all(varBy[[i]] %in% names(dtaFrm[[i]]))))) {
+        if (!all(vapply(seq_along(dtaFrm), function(i) all(varBy[[i]] %in% names(dtaFrm[[i]])), logical(1)))) {
             stop("Not all data sets given in dtaInp contain the variable(s) / column(s) that shall be used for matching.")
         }
         # else: leave varBy unchanged
@@ -166,7 +166,8 @@ chkByV <- function(varBy = list(), dtaFrm = NULL) {
 
     # check whether all entries in the ID variables data sets contain a value
     for (i in seq_along(dtaFrm)) {
-        if (any(sapply(varBy[[i]], function(c) any(is.na(dtaFrm[[i]][, c])) || any(is.null(dtaFrm[[i]][, c])) || !all(nzchar(dtaFrm[[i]][, c]))))) {
+        if (any(vapply(varBy[[i]], function(c) any(is.na(dtaFrm[[i]][, c])) || any(is.null(dtaFrm[[i]][, c])) || !all(nzchar(dtaFrm[[i]][, c])),
+                  logical(length(varBy[[i]]))))) {
             stop(sprintf("Values in the ID variable can't be empty (empty values found in %s).",
                            ifelse(i == 1, "the original data set", sprintf("data set %d to be merged", i - 1))))
         }

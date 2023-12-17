@@ -21,7 +21,7 @@ test_that("merge_cols_omv works", {
     dtaFrm <- merge_cols_omv(dtaInp = nmeInp, typMrg = "outer", varBy = "ID", varSrt = c("gender_3", "age_3"))
     expect_s3_class(dtaFrm, "data.frame")
     expect_equal(dim(dtaFrm), c(250, 85))
-    expect_equal(as.vector(sapply(dtaFrm, typeof)), c("character", rep(c(rep("integer", 27), "character"), 3)))
+    expect_equal(vapply(dtaFrm, typeof, character(1), USE.NAMES = FALSE), c("character", rep(c(rep("integer", 27), "character"), 3)))
     expect_equal(names(dtaFrm), c("ID", paste0(paste0(varTmp, "_"), sort(rep(1:3, length(varTmp))))))
     expect_equal(unname(colSums(is.na(dtaFrm[, paste0("age_", 1:3)]))), c(5, 2, 0))
     expect_equal(as.integer(table(dtaFrm[["gender_3"]])), c(172, 78))
@@ -60,9 +60,9 @@ test_that("merge_cols_omv works", {
     expect_s3_class(dtaFrm, "data.frame")
     expect_equal(dim(dtaFrm), c(250, 33))
     expect_true(all(dplClm %in% names(dtaFrm)))
-    expect_true(all(apply(sapply(dtaFrm[, dplClm], sort), 1, diff) == 0))
+    expect_true(all(apply(vapply(dtaFrm[, dplClm], sort, numeric(dim(dtaFrm)[1])), 1, diff) == 0))
     expect_true(all(diff(colMeans(dtaFrm[, dplClm])) == 0))
-    expect_true(all(sapply(dtaFrm[, dplClm], attributes) == "Age of the respondent (years)"))
+    expect_true(all(unlist(lapply(dtaFrm[, dplClm], attributes)) == "Age of the respondent (years)"))
 
     # test cases for code coverage ============================================================================================================================
     expect_error(merge_cols_omv(fleInp = nmeInp, typMrg = "outer", varBy = "ID"), regexp = "Please use the argument dtaInp instead of fleInp\\.")
@@ -103,7 +103,7 @@ test_that("merge_cols_omv works", {
     expect_equal(dim(df4Chk), c(60, 19))
     expect_equal(names(df4Chk),
       c("ID", "Filter 1", "logLen", "supp - Transform 1", "len", "supp", "dose", "dose2", "dose3", "Trial", "Residuals", "J", "K", "L", "M", "O", "weights", "A", "B"))
-    expect_equal(as.vector(sapply(df4Chk, typeof)),
+    expect_equal(vapply(df4Chk, typeof, character(1), USE.NAMES = FALSE),
       c("integer", "logical", "double", "integer", "double", "integer", "double", "integer", "integer", "integer",
         "double", "double", "double", "integer", "logical", "logical", "integer", "double", "double"))
     expect_equal(sort(zip::zip_list(nmeOut)$filename),

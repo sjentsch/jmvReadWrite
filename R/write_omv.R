@@ -442,7 +442,7 @@ htmTxt <- function() {
 
 # creates the text output for the manifest file
 mnfTxt <- function() {
-    crrTxt <- paste0(sapply(lstMnf, "[[", 1), ":")
+    crrTxt <- paste0(vapply(lstMnf, "[[", character(1), 1), ":")
     for (i in seq_along(lstMnf)) {
         if (crrTxt[i] == "Created-By:") {
             crrTxt[i] <- paste(crrTxt[i], "jmvReadWrite", utils::packageVersion("jmvReadWrite"))

@@ -96,7 +96,7 @@ test_that("globals work", {
     attr(tmpDF[["ON"]], "values")   <- seq(7)
     attr(tmpDF[["NN"]], "values")   <- seq(7)
     attr(tmpDF[["CR"]], "jmv-desc") <- "Trial (is description kept?)"
-    expect_equal(sapply(sapply(jmvAtt(tmpDF), attributes), names), list(ID = c("jmv-id", "measureType", "dataType"),
+    expect_equal(lapply(lapply(jmvAtt(tmpDF), attributes), names), list(ID = c("jmv-id", "measureType", "dataType"),
         I = c("measureType", "dataType"), D = c("measureType", "dataType"),
         OT = c("levels", "class", "measureType", "dataType"), ON = c("levels", "class", "values", "measureType", "dataType"),
         NT = c("levels", "class", "measureType", "dataType"), NN = c("levels", "class", "values", "measureType", "dataType"),

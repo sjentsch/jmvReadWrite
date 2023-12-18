@@ -99,6 +99,10 @@ test_that("read_omv works", {
       regexp = "^The file that you are trying to read \\(.*\\) was written with a version of jamovi that currently is not implemented"))
     suppressMessages(expect_null(getHdl(fleOMV = nmeTmp, crrFle = "MANIFEST.MF")))
     unlink(nmeTmp)
+
+    # unimplemented columnType when assigning value labels
+    expect_error(valLbl(mtaCol = list(name = "Trial", columnType = "Trial", dataType = "Trial"), xtdDta = list(Trial = NULL)),
+      regexp = "Error when reading value label - likely the column type is not implemented \\(yet\\): Trial - Trial - Trial")
 })
 
 test_that("read_all works", {

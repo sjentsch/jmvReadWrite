@@ -59,7 +59,7 @@ transpose_omv <- function(dtaInp = NULL, fleOut = "", varNme = "", usePkg = c("f
 
     # check and import input data set (either as data frame or from a file)
     if (!is.null(list(...)[["fleInp"]])) stop("Please use the argument dtaInp instead of fleInp.")
-    dtaFrm <- inp2DF(dtaInp = dtaInp, usePkg = usePkg, selSet = selSet, ...)
+    dtaFrm <- inp2DF(dtaInp = dtaInp, rmvEmp = TRUE, usePkg = usePkg, selSet = selSet, ...)
 
     # create variable names for the output data frame: if varNme is empty (default), then the row names of the
     # original data frame are used (preceded by "V_" if they contain only numbers); if varNme has the length 1

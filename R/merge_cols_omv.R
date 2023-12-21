@@ -88,7 +88,7 @@ merge_cols_omv <- function(dtaInp = NULL, fleOut = "", typMrg = c("outer", "inne
 
     # check and import input data set (either as data frame or from a file)
     if (!is.null(list(...)[["fleInp"]])) stop("Please use the argument dtaInp instead of fleInp.")
-    dtaFrm <- inp2DF(dtaInp = dtaInp, minDF = 2, maxDF = Inf, usePkg = usePkg, selSet = selSet, ...)
+    dtaFrm <- inp2DF(dtaInp = dtaInp, minDF = 2, maxDF = Inf, rmvEmp = TRUE, usePkg = usePkg, selSet = selSet, ...)
 
     # store attributes and remove empty lines from the data sets
     attCol <- list()

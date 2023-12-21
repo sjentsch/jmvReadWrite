@@ -325,7 +325,7 @@ chkFld <- function(fldObj = NULL, fldNme = "", fldVal = NULL) {
 
 # =================================================================================================
 # function handling to have either a data frame or a character (pointing to a file) as input
-inp2DF <- function(dtaInp = NULL, minDF = 1, maxDF = 1, usePkg = c("foreign", "haven"), selSet = "", ...) {
+inp2DF <- function(dtaInp = NULL, minDF = 1, maxDF = 1, rmvEmp = FALSE, usePkg = c("foreign", "haven"), selSet = "", ...) {
     usePkg <- match.arg(usePkg)
     # check and format input and output files, handle / check further input arguments:
     # if the input is a data frame, it is “embedded” in a list (in order to permit to read
@@ -343,6 +343,23 @@ inp2DF <- function(dtaInp = NULL, minDF = 1, maxDF = 1, usePkg = c("foreign", "h
     } else {
         clsRmv()
         stop("dtaInp must either be a data frame or a character (pointing to a location where the input file can be found).")
+    }
+    # if rmvEmp is set, check for rows that are completely empty and remove them
+    if (rmvEmp) {
+        for (i in seq_along(lstDF)) {
+            blnEmp <- apply(lstDF[[i]], 1, function(x) all(is.na(x)))
+            if (blnEmp[1] && sum(diff(blnEmp) == -1) == 1) {
+                lstDF[[i]] <- lstDF[[i]][-seq(1, which(diff(blnEmp) == -1)), ]
+                blnEmp <- apply(lstDF[[i]], 1, function(x) all(is.na(x)))
+            }
+            if (blnEmp[length(blnEmp)] && sum(diff(blnEmp) == 1) == 1) {
+                lstDF[[i]] <- lstDF[[i]][, -seq(which(diff(blnEmp) == 1) + 1, length(blnEmp))]
+                blnEmp <- apply(lstDF[[i]], 1, function(x) all(is.na(x)))
+            }
+            if (any(blnEmp)) {
+                stop("Empty rows are not permitted execpt from the begin or the end of an input data frame (in such case, they are automatically removed).")
+            }
+        }
     }
     # most functions expect only one data frame to be returned, thus, the list
     # used for reading processing those data frames is unpacked if there is

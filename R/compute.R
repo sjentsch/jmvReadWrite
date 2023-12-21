@@ -1,4 +1,4 @@
-compute <- function(crrCmd = c(), data = data.frame()) {
+compute <- function(crrCmd = c(), dtaFrm = NULL) {
     # jamovi Computed variables
     # https://raw.githubusercontent.com/jamovi/jamovi/current-dev/client/main/vareditor/formulatoolbar.js
     # on Linux: curl -s https://raw.githubusercontent.com/jamovi/jamovi/current-dev/client/main/vareditor/formulatoolbar.js | grep "^\s*descriptions" | cut -d\' -f2 | sed 's/ <i>//' | sed 's/<\/i> //' | sed 's/<\/i>,/,/' | sort
@@ -9,7 +9,7 @@ compute <- function(crrCmd = c(), data = data.frame()) {
     # https://www.ibm.com/docs/en/spss-statistics/SaaS?topic=expressions-not-logical-operator
 
     # determine the number of rows in the data frame
-    nRow <- dim(data)[1]
+    nRow <- dim(dtaFrm)[1]
     # get rid of the COMPUTE-command in case SPSS-syntax is submitted
     isSPSS <- grepl("^COMPUTE", crrCmd)
     crrCmd <- trimws(gsub("\\.$", "", gsub("^COMPUTE", "", crrCmd)))
@@ -27,7 +27,7 @@ compute <- function(crrCmd = c(), data = data.frame()) {
     cmpVrF <- gsub(",\\s*group_by\\s*=\\s*\\w*", "", cmpVrF[is.na(suppressWarnings(as.numeric(cmpVrF)))])
     cmpJMV <- gsub(paste0("\\(", cmpVrF), "([VARNAMES]", cmpJMV)
     # check whether all variables are contained in the data
-    cmpVrF <- fixVar(strSpl(cmpVrF, "\\s*,\\s*|\\s* \\s*"), crrCmd, names(data))
+    cmpVrF <- fixVar(strSpl(cmpVrF, "\\s*,\\s*|\\s* \\s*"), crrCmd, names(dtaFrm))
     if (any(any(grepl("^#", cmpVrF)))) stop(sprintf("Variable \"%s\" is not contained in the data, formula can't be calculated:\n \"%s\"\n\n", cmpVrF[grepl("^#", cmpVrF)], crrCmd))
 
     # jamovi-functions ========================================================
@@ -65,13 +65,14 @@ compute <- function(crrCmd = c(), data = data.frame()) {
     #                                                     Note that most of these arguments are optional -- it is possible
     #                                                     to simply use CONTAINS(needle, haystack).
     # -> SPSS: CHAR.INDEX(haystack, needle[, divisor]) / INDEX - find needle in haystack
+    # NB: currently only works for two input parameters
     if (grepl("CONTAINS\\(|CHAR\\.INDEX\\(|INDEX\\(", cmpJMV, ignore.case = TRUE)) {
         # if SPSS: haystack and needle are switched
         if (isSPSS) {
             cmpJMV <- gsub("\\(\\s*", "(", gsub("CONTAINS\\((.*)?, (.*)?\\)", "CONTAINS\\(\\2, \\1)", cmpJMV, ignore.case = TRUE))
         }
         cmpJMV <- gsub("CONTAINS\\(|CHAR\\.INDEX\\(|INDEX\\(", "CONTAINS(", cmpJMV, ignore.case = TRUE)
-# to implement
+# to check
         cmpRpR <- c(cmpRpR, "CONTAINS\\(", "contains(")
     }
     # EXP(number): Returns the exponent for basis \u212F of a number.
@@ -82,7 +83,7 @@ compute <- function(crrCmd = c(), data = data.frame()) {
     # FILTER(variable, filter_expression): Filters a variable using the filter expression.
     if (grepl("FILTER\\(", cmpJMV, ignore.case = TRUE)) {
         cmpJMV <- gsub("FILTER\\(", "FILTER(", cmpJMV, ignore.case = TRUE)
-# to implement
+# to check
         cmpRpR <- c(cmpRpR, "FILTER\\(", "filter(")
     }
     # FLOOR(variable): Rounds each value to the integer below
@@ -98,7 +99,7 @@ compute <- function(crrCmd = c(), data = data.frame()) {
     # HLOOKUP(index, value 1, value 2, …): The value in the provided values at index.
     if (grepl("HLOOKUP\\(", cmpJMV, ignore.case = TRUE)) {
         cmpJMV <- gsub("HLOOKUP\\(", "HLOOKUP(", cmpJMV, ignore.case = TRUE)
-# to implement
+# to check
         cmpRpR <- c(cmpRpR, "HLOOKUP\\(", "hlookup(")
     }
     # IF(expression, value, else): If the expression resolves true, use the value, otherwise the else.
@@ -122,11 +123,10 @@ compute <- function(crrCmd = c(), data = data.frame()) {
         cmpJMV <- gsub("IQR\\(", "IQR(", cmpJMV, ignore.case = TRUE)
         cmpRpR <- c(cmpRpR, "IQR\\(", "iqr(")
     }
-# to-do: handle NAs
     # LN(number): Returns the natural logarithm of a number.
     if (grepl("LN\\(", cmpJMV, ignore.case = TRUE)) {
         cmpJMV <- gsub("LN\\(", "LN(", cmpJMV, ignore.case = TRUE)
-        cmpRpR <- c(cmpRpR, "LN\\(", "log(")
+        cmpRpR <- c(cmpRpR, "LN\\(", "ln(")
     }
     # LOG10(number): Returns the base-10 logarithm of a number. [SPSS: LG10]
     if (grepl("LG10\\(|LOG10\\(", cmpJMV, ignore.case = TRUE)) {
@@ -136,7 +136,7 @@ compute <- function(crrCmd = c(), data = data.frame()) {
     # MATCH(value, value 1, value 2, …): The index of value in the provided values.
     if (grepl("MATCH\\(", cmpJMV, ignore.case = TRUE)) {
         cmpJMV <- gsub("MATCH\\(", "MATCH(", cmpJMV, ignore.case = TRUE)
-# to implement
+# to check
         cmpRpR <- c(cmpRpR, "MATCH\\(", "match(")
     }
     # MAX(number 1, number 2, …): Returns the largest value of a set of numbers.
@@ -192,7 +192,6 @@ compute <- function(crrCmd = c(), data = data.frame()) {
     # OFFSET(variable, integer): Offsets the values up or down [SPSS: LAG(variable[, n])]
     if (grepl("OFFSET\\(|LAG\\(", cmpJMV, ignore.case = TRUE)) {
         cmpJMV <- gsub("OFFSET\\(|LAG\\(", "OFFSET(", cmpJMV, ignore.case = TRUE)
-# to implement
         cmpRpR <- c(cmpRpR, "OFFSET\\(", "offset(")
     }
     # RANK(variable): Ranks each value
@@ -214,14 +213,14 @@ compute <- function(crrCmd = c(), data = data.frame()) {
     # SAMPLE(variable, n, otherwise=NA): Draws a sample of n from the variable. i.e. SAMPLE(var, 20), i.e. SAMPLE(1, 20), i.e. SAMPLE(\"training\", 20, \"test\")
     if (grepl("SAMPLE\\(", cmpJMV, ignore.case = TRUE)) {
         cmpJMV <- gsub("SAMPLE\\(", "SAMPLE(", cmpJMV, ignore.case = TRUE)
-# to implement
-        cmpRpR <- c(cmpRpR, "SAMPLE\\(", "jmvSmp(")
+# to check
+        cmpRpR <- c(cmpRpR, "SAMPLE\\(", paste0("jmvSmp(", dim(data)[1], ", "))
     }
     # SCALE -> Z
     # SPLIT(variable, sep=",", piece): Splits text into pieces based on a separator. piece specifies the desired piece by index.
     if (grepl("SPLIT\\(", cmpJMV, ignore.case = TRUE)) {
         cmpJMV <- gsub("SPLIT\\(", "SPLIT(", cmpJMV, ignore.case = TRUE)
-# to implement
+# to check
         cmpRpR <- c(cmpRpR, "SPLIT\\(", "split(")
     }
     # SQRT(number): Returns the square root of a number.
@@ -366,24 +365,26 @@ compute <- function(crrCmd = c(), data = data.frame()) {
     }
     # CHAR.LPAD(strexpr1,length[,strexpr2])
     if (grepl("CHAR\\.LPAD(", cmpJMV)) {
-        stop("SIG.CHISQ is not implemented.")
+        stop("CHAR.LPAD is not implemented.")
     }
     # CHAR.MBLEN(strexpr,pos)
     if (grepl("CHAR\\.MBLEN\\(", cmpJMV)) {
-        stop("SIG.CHISQ is not implemented.")
+        stop("CHAR.MBLEN is not implemented.")
     }
     # CHAR.RINDEX(haystack,needle[,divisor])
     if (grepl("CHAR\\.RINDEX\\(", cmpJMV)) {
-        stop("SIG.CHISQ is not implemented.")
+        stop("CHAR.RINDEX is not implemented.")
     }
     # CHAR.RPAD(strexpr1,length[,strexpr2])
     if (grepl("CHAR\\.RPAD\\(", cmpJMV)) {
-        stop("SIG.CHISQ is not implemented.")
+        stop("CHAR.RPAD is not implemented.")
     }
+# implement SUBSTR
     # CHAR.SUBSTR(strexpr,pos[,length])
     if (grepl("CHAR\\.SUBSTR\\(", cmpJMV)) {
-        stop("SIG.CHISQ is not implemented.")
+        stop("CHAR.SUBSTR is not implemented.")
     }
+# implement CONCAT
     # CONCAT(strexpr,strexpr[,..])
     if (grepl("CONCAT\\(", cmpJMV, ignore.case = TRUE)) {
         cmpRpR <- c(cmpRpR, "CONCAT\\(", "paste0(")
@@ -431,7 +432,7 @@ compute <- function(crrCmd = c(), data = data.frame()) {
     }
     # RTRIM(strexpr[,char])
     if (grepl("RTRIM\\(", cmpJMV)) {
-        cmpRpR <- c(cmpRpR, "LTRIM\\(", "trimws(", "[VARNAMES]", "[VARNAMES], which = \"right\"")
+        cmpRpR <- c(cmpRpR, "RTRIM\\(", "trimws(", "[VARNAMES]", "[VARNAMES], which = \"right\"")
         cmpVld <- FALSE
     }
     # SIN(radians)
@@ -447,14 +448,14 @@ compute <- function(crrCmd = c(), data = data.frame()) {
     if (grepl("TRUNC\\(", cmpJMV)) {
         stop("TRUNC is not implemented.")
     }
-    # UPCASE(strexpr)
+    # UPCASE(strexpr) -> UPPER
     if (grepl("UPCASE\\(", cmpJMV, ignore.case = TRUE)) {
         cmpRpR <- c(cmpRpR, "UPCASE\\(", "toupper(")
         cmpVld <- FALSE
     }
     # VALUELABEL(varname)
     if (grepl("VALUELABEL\\(", cmpJMV, ignore.case = TRUE)) {
-        cmpRpR <- c(cmpRpR, "VALUELABEL\\(", "attr(data[[", "\\)$", "]], 'jmv-desc')")
+        cmpRpR <- c(cmpRpR, "VALUELABEL\\(", "attr(dtaFrm[[", "\\)$", "]], 'jmv-desc')")
         cmpVld <- FALSE
     }
     # Distribution functions --------------------------------------------------
@@ -560,11 +561,11 @@ compute <- function(crrCmd = c(), data = data.frame()) {
 
     # calculate values in R ===================================================
     # add a data column (with the name of cmpVrT) and assign NA to it
-    if (!any(grepl(cmpVrT, names(data)))) data[[cmpVrT]] <- NA
+    if (!any(grepl(cmpVrT, names(dtaFrm)))) dtaFrm[[cmpVrT]] <- NA
     # deal with min_valid: either select all row numbers (if cmpMnV is NA; default) or select row numbers
     # where the count of non-NA values is equal or exceeds the threshold set by cmpMnV
     if (grepl("min_valid\\s*=\\s*", cmpJMV)) {
-        selRow <- which(rowSums(!is.na(data[, cmpVrF])) >= as.integer(sub(".*?min_valid\\s=\\s(\\d+).*?[,|)].*", "\\1", cmpJMV, perl = TRUE)))
+        selRow <- which(rowSums(!is.na(dtaFrm[, cmpVrF])) >= as.integer(sub(".*?min_valid\\s=\\s(\\d+).*?[,|)].*", "\\1", cmpJMV, perl = TRUE)))
     } else {
         selRow <- seq(nRow)
     }
@@ -580,28 +581,28 @@ compute <- function(crrCmd = c(), data = data.frame()) {
     # unqGrp and afterwards, the for-loop underneath sequentially selects those unique groups
     if (grepl("group_by\\s*=\\s*", cmpJMV)) {
         cmpGrp <- sub(".*?group_by\\s=\\s(\\w+).*?[,|)].*", "\\1", cmpJMV, perl = TRUE)
-        unqGrp <- unique(data[selRow, cmpGrp])
+        unqGrp <- unique(dtaFrm[selRow, cmpGrp])
     } else {
         cmpGrp <- c()
         unqGrp <- ""
     }
     for (crrGrp in unqGrp) {
-        selGrp <- ifelse(is.null(cmpGrp), rep(TRUE, length(selRow)), data[selRow, cmpGrp] == crrGrp)
+        selGrp <- ifelse(is.null(cmpGrp), rep(TRUE, length(selRow)), dtaFrm[selRow, cmpGrp] == crrGrp)
         if (grepl("MAXABSIQR\\(|MAXABSZ\\(", cmpJMV)) {
-            data[selRow[selGrp], cmpVrT] <- max(unname(apply(data[selRow[selGrp], cmpVrF], cmpDim, eval(parse(text = cmdClR(cmpJMV, cmpRpR))))))
+            dtaFrm[selRow[selGrp], cmpVrT] <- max(unname(apply(dtaFrm[selRow[selGrp], cmpVrF], cmpDim, eval(parse(text = cmdClR(cmpJMV, cmpRpR))))))
         } else {
-          # unname(apply(data[, cmpVrF], 1, eval(parse(text = "function(X) abs(-mean(X))"))))
-            data[selRow[selGrp], cmpVrT] <-     unname(apply(data[selRow[selGrp], cmpVrF], cmpDim, eval(parse(text = cmdClR(cmpJMV, cmpRpR)))))
+          # unname(apply(dtaFrm[, cmpVrF], 1, eval(parse(text = "function(X) abs(-mean(X))"))))
+            dtaFrm[selRow[selGrp], cmpVrT] <-     unname(apply(dtaFrm[selRow[selGrp], cmpVrF], cmpDim, eval(parse(text = cmdClR(cmpJMV, cmpRpR)))))
         }
     }
     # if the command contains only commands that are available in jamovi, assign the required attributes to mark the variable as "Computed variable"
     if (cmpVld) {
-        attr(data[[cmpVrT]], "columnType")     <- "Computed"
-        attr(data[[cmpVrT]], "formula")        <- cmpJMV
-        attr(data[[cmpVrT]], "formulaMessage") <- ""
+        attr(dtaFrm[[cmpVrT]], "columnType")     <- "Computed"
+        attr(dtaFrm[[cmpVrT]], "formula")        <- cmpJMV
+        attr(dtaFrm[[cmpVrT]], "formulaMessage") <- ""
     }
 
-    data
+    dtaFrm
 }
 
 fixVar <- function(vecVar = c(), crrSPS = c(), allVar = "") {
@@ -668,8 +669,16 @@ cmdClR <- function(strCmd = "", rplCmd = c()) {
     if (grepl("boxcox\\(", strCmd)) {
         strCmd <- paste0("boxcox <- function(X, lambda = 0) ifelse(lambda == 0, log(X), (X ** lambda - 1) / lambda); ", strCmd)
     }
+    # NB: contains currently only works for two input parameters
+    if (grepl("contains\\(", strCmd)) {
+        strCmd <- paste0("contains <- function(...) { inpLst <- list(...); if (length(inpLst) == 2) as.integer(apply(as.data.frame(inpLst), ",
+                                                     "1, function(x) any(duplicated(x)))) else NA }; ", strCmd)
+    }
     if (grepl("filter\\(", strCmd)) {
         strCmd <- paste0("filter <- function(X, fltExp = \"\") ifelse(eval(parse(text = fltExp)), X, ifelse(is.numeric(NA), \"\")); ", strCmd)
+    }
+    if (grepl("hlookup\\(", strCmd)) {
+        strCmd <- paste0("hlookup <- function(...) { inpLst <- list(...); as.factor(diag(as.matrix(as.data.frame(inpLst[-1])[, as.integer(inpLst[[1]])]))) }; ", strCmd)
     }
     if (grepl("iqr\\(", strCmd)) {
         strCmd <- paste0("iqr <- function(X) { Q <- quantile(X, c(0.25, 0.75)); ",
@@ -678,9 +687,32 @@ cmdClR <- function(strCmd = "", rplCmd = c()) {
                                               "Y[X >= Q[2]] <- (X[X >= Q[2]] - Q[2]) / diff(Q); ",
                                               "Y }; ", strCmd)
     }
-    if (grepl("se\\(", strCmd)) {
-        strCmd <- paste0("se <- function(X) sd(X, na.rm = TRUE) / sqrt(sum(!is.na(X))); ", strCmd)
+    if (grepl("jmvSmp\\(", strCmd)) {
+        strCmd <- paste0("jmvSmp <- function(m, x, n, y) { isNum <- all(is.numeric(c(x, y))); s <- factor(sample(c(rep(x, n), rep(y, m - n))), ordered = isNum); ",
+                                                          "if (isNum) attr(s, \"values\") <- sort(c(x, y)); s }; ", strCmd)
     }
+    if (grepl("ln\\(", strCmd)) {
+        strCmd <- paste0("ln <- function(x) { x[x == 0] <- NaN; log(x) }; ", strCmd)
+    }
+    if (grepl("match\\(", strCmd)) {
+        strCmd <- paste0("match <- function(...) { inpLst <- list(...); as.ordered(apply(matrix(unlist(inpLst[-1]), ncol = length(inpLst) - 1), 1, ",
+                                                                          "function(x) grep(inpLst[[1]], x)[1])) }; ", strCmd)
+    }
+    if (grepl("offset\\(", strCmd)) {
+        strCmd <- paste0("offset <- function(x, n) c(rep(NaN, ifelse(n > 0, n, 0)), x, rep(NA, ifelse(n < 0, -n, 0)))[seq_along(x) + ifelse(n > 0, 0, -n)]; ", strCmd)
+    }
+    if (grepl("se\\(", strCmd)) {
+        strCmd <- paste0("se <- function(x) sd(x, na.rm = TRUE) / sqrt(sum(!is.na(x))); ", strCmd)
+    }
+    if (grepl("split\\(", strCmd)) {
+        strCmd <- paste0("split <- function(x, sep = ",", piece = NA) { x <- as.character(x); ",
+                                                                       "if (is.na(piece)) {",
+                                                                       " as.factor(unname(vapply(x, function(c) paste(strsplit(c, sep)[[1]], collapse = " "), character(1)))) ", 
+                                                                       "} else if (piece > 0) {",
+                                                                       " as.factor(unname(vapply(x, function(c) strsplit(c, sep)[[1]][piece], character(1)))) ",
+                                                                       "} else {",
+                                                                       "  as.factor(rep(NA, length(x))) ",
+                                                                       "} }; ", strCmd)
     # replace [VARNAMES] with X (used for apply-function), put function(X) in front of the command
     paste0("function(X) ", gsub("\\[VARNAMES\\]", "X", strCmd))
 }

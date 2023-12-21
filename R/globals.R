@@ -353,7 +353,7 @@ inp2DF <- function(dtaInp = NULL, minDF = 1, maxDF = 1, rmvEmp = FALSE, usePkg =
                 blnEmp <- apply(lstDF[[i]], 1, function(x) all(is.na(x)))
             }
             if (blnEmp[length(blnEmp)] && sum(diff(blnEmp) == 1) == 1) {
-                lstDF[[i]] <- lstDF[[i]][, -seq(which(diff(blnEmp) == 1) + 1, length(blnEmp))]
+                lstDF[[i]] <- lstDF[[i]][seq(which(diff(blnEmp) == 1)), ]
                 blnEmp <- apply(lstDF[[i]], 1, function(x) all(is.na(x)))
             }
             if (any(blnEmp)) {

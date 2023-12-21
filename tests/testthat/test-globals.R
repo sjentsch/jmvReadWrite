@@ -101,7 +101,6 @@ test_that("globals work", {
     expect_error(df4Chk <- inp2DF(dtaInp = inpDF, rmvEmp = TRUE),
       regexp = "Empty rows are not permitted execpt from the begin or the end of an input data frame \\(in such case, they are automatically removed\\)\\.")
 
-
     tmpDF <- data.frame(ID = sprintf("P_%04d", sample(9999, 100)), I = as.integer(sample(1e6, 100)), D = rnorm(100),
                         OT = factor(sample(c("low", "middle", "high"), 100, replace = TRUE), levels = c("low", "middle", "high"), ordered = TRUE),
                         ON = factor(sample(seq(7), 100, replace = TRUE), levels = seq(7), ordered = TRUE),

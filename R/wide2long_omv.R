@@ -117,7 +117,7 @@ wide2long_omv <- function(dtaInp = NULL, fleOut = "", varLst = c(), varExc = c()
     # check and import input data set (either as data frame or from a file)
     if (!is.null(list(...)[["fleInp"]])) stop("Please use the argument dtaInp instead of fleInp.")
     if (is.null(varID)) varID <- "ID"
-    dtaFrm <- inp2DF(dtaInp, usePkg = usePkg, selSet = selSet, ...)
+    dtaFrm <- inp2DF(dtaInp, rmvEmp = TRUE, usePkg = usePkg, selSet = selSet, ...)
     dtaNmV <- names(dtaFrm)
     hasID  <- all(varID %in% dtaNmV)
 

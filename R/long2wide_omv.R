@@ -113,7 +113,7 @@ long2wide_omv <- function(dtaInp = NULL, fleOut = "", varTgt = c(), varExc = c()
 
     # check and import input data set (either as data frame or from a file)
     if (!is.null(list(...)[["fleInp"]])) stop("Please use the argument dtaInp instead of fleInp.")
-    dtaFrm <- inp2DF(dtaInp = dtaInp, usePkg = usePkg, selSet = selSet, ...)
+    dtaFrm <- inp2DF(dtaInp = dtaInp, rmvEmp = TRUE, usePkg = usePkg, selSet = selSet, ...)
 
     # transform data set
     # [a] check whether varID, varTme and varTgt are not empty and exist in the data set

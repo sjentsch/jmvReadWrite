@@ -55,3 +55,16 @@ knitr::opts_chunk$set(
 ## License
 
 [AGPL 3](https://github.com/sjentsch/jmvReadWrite/blob/main/LICENSE)
+
+
+## Giving back
+
+If you find this package helpful, please consider donating to the jamovi project (via
+the Patreon-link on the left side).
+If you can't give money, but would like to support us in another way, you may contribute
+to translating [jamovi](https://hosted.weblate.org/engage/jamovi/), the
+[jamovi documentation](https://hosted.weblate.org/engage/jamovidocs/), or the textbook
+[”learning statistics with jamovi“](https://hosted.weblate.org/engage/jamovi/) into your
+language.
+
+Thank you for your support!

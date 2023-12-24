@@ -2,9 +2,9 @@
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
-    branches: [main]
+    branches: ['**']
   pull_request:
-    branches: [main]
+    branches: [main, master]
 
 name: R-CMD-check
 
@@ -45,8 +45,12 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::rcmdcheck
+          extra-packages: any::rcmdcheck, any::XML, any::roxygen2, github::jamovi/jmvcore
           needs: check
+
+      - name: Document
+        run: roxygen2::roxygenise(roclets = "rd")
+        shell: Rscript {0}
 
       - uses: r-lib/actions/check-r-package@v2
         with:

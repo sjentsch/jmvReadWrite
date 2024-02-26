@@ -19,7 +19,7 @@ rm('blnAtt', 'crrOMV')
 
 # checks the requirements (all dependencies up-to-date, etc.)
 # use devtools::update_packages("devtools") and devtools::install_dev_deps() if required
-# NB: there might be an error when updating the tidyverse-packages: start R with --no-init-file
+# NB: there might be an error when updating the tidyverse-packages: start R with R --no-init-file
 devtools::dev_sitrep()
 
 # do some initial checks
@@ -36,14 +36,15 @@ devtools::lint()
 devtools::test()
 devtools::test_coverage()
 # once happy with the coverage, it can be uploaded using
-covr::codecov(token = "2f521d97-d1e2-4baf-b05b-0b569a7c6f0f")
+covr::codecov(token = "2f521d97-d1e2-4baf-b05b-0b569a7c6f0f")  # jmvReadWrite
+covr::codecov(token = "821f2b2f-e305-49b2-ab96-7f328530f6ed")  # jTransform
 
 # ================================================================================================================================================
 # REMEMBER: error messages from R are not always pointing to the place where the error occurs - especially when using commands like build_readme()
 # ================================================================================================================================================
 
 # update version number in DESCRIPTION and NEWS.md (and changes in NEWS.md)
-system("gedit DESCRIPTION NEWS.md inst/CITATION")
+system("gedit DESCRIPTION NEWS.md inst/CITATION")  # jmvReadWrite
 
 # building / updating README, PDF manual, and the HTML documentation
 # add new functions to _pkgdown.yaml and to vignettes/jmvReadWrite.Rmd if required

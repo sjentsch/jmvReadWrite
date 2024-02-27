@@ -42,8 +42,8 @@ Label columns / variables in .omv-files for the statistical spreadsheet 'jamovi'
 }
 \details{
 \itemize{
-\item \code{varLbl} can be either \link{1} a character with a file name to read (the file must contain to columns, one with the variable names, the other with the
-variable labels); \link{2} a data frame with two columns (one with the variable names, the other with the variable labels), or \link{3} a character vector
+\item \code{varLbl} can be either (1) a character with a file name to read (the file must contain to columns, one with the variable names, the other with the
+variable labels); (2) a data frame with two columns (one with the variable names, the other with the variable labels), or (3) a character vector
 containing the variable labels (with a length equal to the number of variables in the input data set).
 \item The ellipsis-parameter (\code{...}) can be used to submit arguments / parameters to the functions that are used for reading and writing the data. By clicking
 on the respective function under “See also”, you can get a more detailed overview over which parameters each of those functions take. The functions are:
@@ -56,9 +56,10 @@ and \code{read_xpt} (\code{haven}) / \code{read.xport} (\code{foreign}) for SAS-
 }
 \examples{
 \dontrun{
-# use one of the RData files included in the package, but only the first 28 columns
+# use one of the data files included in the package, but only the first 28 columns
 # (the latter columns contain data for testing calculations, etc.)
-dtaInp <- jmvReadWrite::read_omv(system.file("extdata", "bfi_sample.omv", package = "jmvReadWrite"))[1:28]
+nmeInp <- system.file("extdata", "bfi_sample.omv", package = "jmvReadWrite")
+dtaInp <- jmvReadWrite::read_omv(nmeInp)[1:28]
 nmeOut <- tempfile(fileext = ".omv")
 # in the original file, the variable labels – attr(*, "jmv-desc") - are empty
 lapply(dtaInp, attr, "jmv-desc")
@@ -66,22 +67,22 @@ lapply(dtaInp, attr, "jmv-desc")
 # the first containing the variable name, the second the variable labels
 # you can easily create such a file in Excel and save it as CSV
 # if your CSV contains column names (e.g., varNme and varLbl) in the first row are they ignored
-lblDtF <- read.csv(system.file("data", "label_example.csv", package = "jmvReadWrite"), header = FALSE)
+lblFle <- system.file("extdata", "label_example.csv", package = "jmvReadWrite")
+lblDtF <- utils::read.csv(lblFle, header = FALSE)
 str(lblDtF)
 
 # there are three options to give the varLbl parameter:
-# [1] as file name, ...
-lblFle <- system.file("data", "label_example.csv", package = "jmvReadWrite")
+# (1) as file name, ...
 jmvReadWrite::label_vars_omv(dtaInp = dtaInp, fleOut = nmeOut, varLbl = lblFle)
 lapply(jmvReadWrite::read_omv(nmeOut), attr, "jmv-desc")
 unlink(nmeOut)
 
-# [2] as data frame (using lblDtF from above), or ...
+# (2) as data frame (using lblDtF from above), or ...
 jmvReadWrite::label_vars_omv(dtaInp = dtaInp, fleOut = nmeOut, varLbl = lblDtF)
 lapply(jmvReadWrite::read_omv(nmeOut), attr, "jmv-desc")
 unlink(nmeOut)
 
-# [3] as character vector (with the same length as there are columns in the input data set)
+# (3) as character vector (with the same length as there are columns in the input data set)
 lblChr <- lblDtF[[2]]
 head(lblChr)
 jmvReadWrite::label_vars_omv(dtaInp = dtaInp, fleOut = nmeOut, varLbl = lblChr)

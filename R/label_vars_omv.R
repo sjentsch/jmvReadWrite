@@ -16,8 +16,8 @@
 #' @return a data frame (only returned if `fleOut` is empty) where the order of variables / columns of the input data set is re-arranged
 #'
 #' @details
-#' * `varLbl` can be either [1] a character with a file name to read (the file must contain to columns, one with the variable names, the other with the
-#'   variable labels); [2] a data frame with two columns (one with the variable names, the other with the variable labels), or [3] a character vector
+#' * `varLbl` can be either (1) a character with a file name to read (the file must contain to columns, one with the variable names, the other with the
+#'   variable labels); (2) a data frame with two columns (one with the variable names, the other with the variable labels), or (3) a character vector
 #'   containing the variable labels (with a length equal to the number of variables in the input data set).
 #' * The ellipsis-parameter (`...`) can be used to submit arguments / parameters to the functions that are used for reading and writing the data. By clicking
 #'   on the respective function under “See also”, you can get a more detailed overview over which parameters each of those functions take. The functions are:
@@ -36,7 +36,8 @@
 #' \dontrun{
 #' # use one of the data files included in the package, but only the first 28 columns
 #' # (the latter columns contain data for testing calculations, etc.)
-#' dtaInp <- jmvReadWrite::read_omv(system.file("extdata", "bfi_sample.omv", package = "jmvReadWrite"))[1:28]
+#' nmeInp <- system.file("extdata", "bfi_sample.omv", package = "jmvReadWrite")
+#' dtaInp <- jmvReadWrite::read_omv(nmeInp)[1:28]
 #' nmeOut <- tempfile(fileext = ".omv")
 #' # in the original file, the variable labels – attr(*, "jmv-desc") - are empty
 #' lapply(dtaInp, attr, "jmv-desc")
@@ -44,22 +45,22 @@
 #' # the first containing the variable name, the second the variable labels
 #' # you can easily create such a file in Excel and save it as CSV
 #' # if your CSV contains column names (e.g., varNme and varLbl) in the first row are they ignored
-#' lblDtF <- read.csv(system.file("data", "label_example.csv", package = "jmvReadWrite"), header = FALSE)
+#' lblFle <- system.file("extdata", "label_example.csv", package = "jmvReadWrite")
+#' lblDtF <- utils::read.csv(lblFle, header = FALSE)
 #' str(lblDtF)
 #'
 #' # there are three options to give the varLbl parameter:
-#' # [1] as file name, ...
-#' lblFle <- system.file("data", "label_example.csv", package = "jmvReadWrite")
+#' # (1) as file name, ...
 #' jmvReadWrite::label_vars_omv(dtaInp = dtaInp, fleOut = nmeOut, varLbl = lblFle)
 #' lapply(jmvReadWrite::read_omv(nmeOut), attr, "jmv-desc")
 #' unlink(nmeOut)
-#' 
-#' # [2] as data frame (using lblDtF from above), or ...
+#'
+#' # (2) as data frame (using lblDtF from above), or ...
 #' jmvReadWrite::label_vars_omv(dtaInp = dtaInp, fleOut = nmeOut, varLbl = lblDtF)
 #' lapply(jmvReadWrite::read_omv(nmeOut), attr, "jmv-desc")
 #' unlink(nmeOut)
-#' 
-#' # [3] as character vector (with the same length as there are columns in the input data set)
+#'
+#' # (3) as character vector (with the same length as there are columns in the input data set)
 #' lblChr <- lblDtF[[2]]
 #' head(lblChr)
 #' jmvReadWrite::label_vars_omv(dtaInp = dtaInp, fleOut = nmeOut, varLbl = lblChr)
@@ -79,10 +80,10 @@ label_vars_omv <- function(dtaInp = NULL, fleOut = "", varLbl = NULL, psvAnl = F
     if (!is.null(list(...)[["fleInp"]])) stop("Please use the argument dtaInp instead of fleInp.")
     dtaFrm <- inp2DF(dtaInp = dtaInp, usePkg = usePkg, selSet = selSet, ...)
 
-    # if varLbl is a character (a file name) or a character vector (with labels), transform it into a data frame with two columns (variable names and labels) 
+    # if varLbl is a character (a file name) or a character vector (with labels), transform it into a data frame with two columns (variable names and labels)
     if (is.character(varLbl)) {
         if (length(varLbl) == 1 && file.exists(varLbl)) {
-            varLbl <- read.csv(varLbl, header = FALSE)
+            varLbl <- utils::read.csv(varLbl, header = FALSE)
         } else if (length(varLbl) == length(dtaFrm)) {
             varLbl <- data.frame(varNme = names(dtaFrm), varLbl = varLbl)
         } else {
@@ -90,7 +91,7 @@ label_vars_omv <- function(dtaInp = NULL, fleOut = "", varLbl = NULL, psvAnl = F
                                 "has the same length as the number of variables in the input data set (%d)."), length(dtaFrm)))
         }
     }
-    
+
     # assign the labels to the data frame
     if (is.data.frame(varLbl) && length(varLbl) == 2) {
         # determine which column of the data frame contains the variable names
@@ -110,7 +111,7 @@ label_vars_omv <- function(dtaInp = NULL, fleOut = "", varLbl = NULL, psvAnl = F
                                 length(nmeClm), paste0(varLbl[[1]], collapse = ", "), paste0(names(dtaFrm), collapse = ", ")))
         }
     } else {
-        stop(sprintf("varLbl was either not a data frame or could not be converted into one.\n%s", capture.output(str(varLbl))))
+        stop(sprintf("varLbl was either not a data frame or could not be converted into one.\n%s", utils::capture.output(utils::str(varLbl))))
     }
 
     # rtnDta in globals.R (unified function to either write the data frame, open it in a new jamovi session or return it)

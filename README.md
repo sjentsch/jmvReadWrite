@@ -200,9 +200,9 @@ list.files(".", "Trial.omv")
 #> [1] "Trial.omv"
 file.info("Trial.omv")
 #>           size isdir mode               mtime               ctime
-#> Trial.omv 2610 FALSE  664 2023-12-16 21:55:21 2023-12-16 21:55:21
-#>                         atime  uid  gid    uname   grname
-#> Trial.omv 2023-12-16 21:55:21 1000 1000 sjentsch sjentsch
+#> Trial.omv 2610 FALSE  644 2024-02-26 23:38:42 2024-02-26 23:38:42
+#>                         atime   uid  gid  uname grname
+#> Trial.omv 2024-02-26 23:38:42 87448 4601 sje025 ansatt
 unlink("Trial.omv")
 ```
 
@@ -298,3 +298,16 @@ with data management tasks that are frequently required:
 ## License
 
 [AGPL 3](https://github.com/sjentsch/jmvReadWrite/blob/main/LICENSE)
+
+## Giving back
+
+If you find this package helpful, please consider donating to the jamovi
+project (via the Patreon-link on the left side). If you can’t give
+money, but would like to support us in another way, you may contribute
+to translating [jamovi](https://hosted.weblate.org/engage/jamovi/), the
+[jamovi documentation](https://hosted.weblate.org/engage/jamovidocs/),
+or the textbook [”learning statistics with
+jamovi“](https://hosted.weblate.org/engage/jamovi/) into your
+language.
+
+Thank you for your support\!

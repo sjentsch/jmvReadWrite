@@ -1,6 +1,6 @@
 Package: jmvReadWrite
 Title: Read and Write 'jamovi' Files ('.omv')
-Version: 0.4.3
+Version: 0.4.4
 Author: Sebastian Jentschke [aut, cre]
     (<https://orcid.org/0000-0003-2576-5432>)
 Authors@R:
@@ -12,7 +12,7 @@ Description: The free and open a statistical spreadsheet 'jamovi'
     connection with the R-package 'jmv'). Having import / export routines for
     the data files 'jamovi' produces ('.omv') permits an easy transfer of
     data and analyses between 'jamovi' and R.
-License: AGPL-3 + file LICENSE
+License: AGPL-3
 Language: en-GB
 Encoding: UTF-8
 LazyData: true

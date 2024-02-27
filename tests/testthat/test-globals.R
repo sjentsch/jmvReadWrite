@@ -65,8 +65,6 @@ test_that("globals work", {
     expect_equal(setdiff(names(attributes(jmvReadWrite::AlbumSales)), names(attributes(rmvAtt(jmvReadWrite::AlbumSales)))), c("datalabel", "var.labels"))
     unlink(nmeOMV)
 
-    
-
     expect_error(inp2DF(dtaInp = 1), regexp = "^dtaInp must either be a data frame or a character \\(pointing to a location where the input file can be found\\)\\.")
     inpDF <- jmvReadWrite::AlbumSales
     inpNme <- file.path("..", "ToothGrowth.omv")

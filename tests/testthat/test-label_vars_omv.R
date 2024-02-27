@@ -9,7 +9,7 @@ test_that("label_vars_omv works", {
     # check that the labels in the original file are not set (NULL)
     expect_true(all(vapply(dtaInp[, lblDtF[, 1]], function(c) is.null(attr(c, "jmv-desc")), logical(1))))
 
-    # varLbl: [1] use file name as parameter
+    # varLbl: (1) use file name as parameter
     expect_null(label_vars_omv(dtaInp = nmeInp, fleOut = nmeOut, varLbl = lblFle))
     expect_true(chkFle(nmeOut))
     expect_gt(file.info(nmeOut)$size, 1)
@@ -23,7 +23,7 @@ test_that("label_vars_omv works", {
     expect_equal(as.character(lapply(df4Chk[, lblDtF[, 1]], attr, "jmv-desc")), lblDtF[, 2])
     unlink(nmeOut)
 
-    # varLbl: [2] use data frame as parameter
+    # varLbl: (2) use data frame as parameter
     expect_null(label_vars_omv(dtaInp = nmeInp, fleOut = nmeOut, varLbl = lblDtF))
     expect_true(chkFle(nmeOut))
     expect_gt(file.info(nmeOut)$size, 1)
@@ -37,8 +37,8 @@ test_that("label_vars_omv works", {
     expect_equal(as.character(lapply(df4Chk[, lblDtF[, 1]], attr, "jmv-desc")), lblDtF[, 2])
     unlink(nmeOut)
 
-    # varLbl: [3] use character vector (with labels) as parameter, here we need to
-    # give a data frame with the same number of columns as input  
+    # varLbl: (3) use character vector (with labels) as parameter, here we need to
+    # give a data frame with the same number of columns as input
     expect_null(label_vars_omv(dtaInp = dtaInp[, lblDtF[, 1]], fleOut = nmeOut, varLbl = lblDtF))
     expect_true(chkFle(nmeOut))
     expect_gt(file.info(nmeOut)$size, 1)
@@ -54,7 +54,7 @@ test_that("label_vars_omv works", {
 
     # test cases for code coverage ============================================================================================================================
     expect_error(label_vars_omv(fleInp = nmeInp, varLbl = lblDtF), regexp = "Please use the argument dtaInp instead of fleInp\\.")
-    expect_error(label_vars_omv(dtaInp = nmeInp, fleOut = nmeOut), 
+    expect_error(label_vars_omv(dtaInp = nmeInp, fleOut = nmeOut),
       regexp = "^Calling label_vars_omv requires the parameter varLbl, using the correct format \\(see Details in help\\)\\.")
     expect_false(file.exists(nmeOut))
     expect_error(label_vars_omv(dtaInp = nmeInp, fleOut = nmeOut, varLbl = list()),

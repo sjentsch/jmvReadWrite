@@ -1,14 +1,21 @@
+# jmvReadWrite 0.4.4
+
+## Enhancements:
+* added `var_labels_omv` (assign labels to variables in a data set; including unit tests, and files for
+  the tests and the examples)
+
+---
+
 # jmvReadWrite 0.4.3
 
 ## Bug fixes and enhancements:
-* replace sapply with vapply or lapply (in accordance with goodpractice)
+* replaced `sapply` with `vapply` or `lapply` (in accordance with `goodpractice`)
 * reducing cyclomatic complexity to 30
 * fixed bugs and created test cases for `rplAtt` (replace non-UTF with UTF characters, part of `read_omv`)
 * added `invisible(NULL)`where NULL or nothing was returned 
-* adjust strsplit in `long2wide_omv` and `wide2long_omv` in order to permit having “.” as varSep
-* added codemeta.json, badge about package status, and how to contribute to the package (for pkgcheck)
-* added documentation of return value to convert_to_omv
-
+* adjust `strsplit` in `long2wide_omv` and `wide2long_omv` in order to permit having “.” as varSep
+* added `codemeta.json`, badge about package status, and how to contribute to the package (for `pkgcheck`)
+* added documentation of return value to `convert_to_omv`
 
 ---
 
@@ -91,6 +98,7 @@
   `jmvReadWrite:::jmvAtt()` to call it
 * smaller bug fixes (typos, to ensure consistency in naming, etc.)
 
+---
 
 # jmvReadWrite 0.3.7
 
@@ -105,6 +113,7 @@
 * bug fixes: added a check in `fmtFlO` to ensure that the output files are in
   jamovi-format (.omv); removed typos, etc.
 
+---
 
 # jmvReadWrite 0.3.6
 
@@ -117,6 +126,7 @@
 * bug fixes: corrected an error in `chkFle`, removed duplicate functions from
   `globals.R`
 
+---
 
 # jmvReadWrite 0.3.5
 
@@ -125,6 +135,7 @@
   data frames have the same set of variables) in `merge_cols_omv`
 * added logo and citation
 
+---
 
 # jmvReadWrite 0.3.4
 
@@ -134,6 +145,7 @@
 * general bug fixes and improvements (removing ;s as suggested by lintr,
   etc.)
 
+---
 
 # jmvReadWrite 0.3.3
 
@@ -155,6 +167,7 @@
   and angle brackets; for help, documentation, etc.)
 * general bug fixes and improvements (simplifying the code)
 
+---
 
 # jmvReadWrite 0.3.2
 
@@ -162,6 +175,7 @@
 * added a warning about packages that are required when the extraction of
   syntax can't be carried out due to these missing dependencies
 
+---
 
 # jmvReadWrite 0.3.1
 
@@ -169,6 +183,7 @@
 * fixed a "bug" in a testthat-condition that resulted in an error on several
   systems
 
+---
 
 # jmvReadWrite 0.3.0
 
@@ -202,6 +217,7 @@
   the file name with `normalizePath` to `read_omv`
 * fixed missing retDbg-parameter in one of the examples
 
+---
 
 # jmvReadWrite 0.2.3
 
@@ -217,6 +233,7 @@
 * added parameter `retDbg` (default: `FALSE`) to write_omv so that output for
   debugging is only produced upon setting it 
 
+---
 
 # jmvReadWrite 0.2.2
 
@@ -226,6 +243,7 @@
 * added documentation (pkgdown) in docs/
 * set up examples and lintr
 
+---
 
 # jmvReadWrite 0.2.1
 
@@ -237,6 +255,7 @@
 * improved the README (switched it to be generated from Rmd so that the
   vignette could be included
 
+---
 
 # jmvReadWrite 0.2.0
 

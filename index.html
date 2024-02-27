@@ -45,7 +45,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">jmvReadWrite</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.4.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.4.4</span>
       </span>
     </div>
 
@@ -200,9 +200,9 @@
 <span><span class="co">#&gt; [1] "Trial.omv"</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/file.info.html" class="external-link">file.info</a></span><span class="op">(</span><span class="st">"Trial.omv"</span><span class="op">)</span></span>
 <span><span class="co">#&gt;           size isdir mode               mtime               ctime</span></span>
-<span><span class="co">#&gt; Trial.omv 2610 FALSE  664 2023-12-16 21:55:21 2023-12-16 21:55:21</span></span>
-<span><span class="co">#&gt;                         atime  uid  gid    uname   grname</span></span>
-<span><span class="co">#&gt; Trial.omv 2023-12-16 21:55:21 1000 1000 sjentsch sjentsch</span></span>
+<span><span class="co">#&gt; Trial.omv 2610 FALSE  644 2024-02-26 23:38:42 2024-02-26 23:38:42</span></span>
+<span><span class="co">#&gt;                         atime   uid  gid  uname grname</span></span>
+<span><span class="co">#&gt; Trial.omv 2024-02-26 23:38:42 87448 4601 sje025 ansatt</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="st">"Trial.omv"</span><span class="op">)</span></span></code></pre></div>
 <p>Although jamovi reads R-data files (.RData, .rda, .rds) <a href="https://sjentsch.github.io/jmvReadWrite/reference/write_omv.html"><code>write_omv</code></a> permits to store <code>jamovi</code>-specific attributes (such as variable labels) in addition. Please note that if you are reading from an <code>.omv</code>-file in order to write back to an <code>.omv</code>-file (perhaps after some modifications), it is recommended to leave the <code>sveAtt</code>-attribute set to <code>TRUE</code> (which is the default).</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
@@ -253,6 +253,12 @@
 </h2>
 <p><a href="https://github.com/sjentsch/jmvReadWrite/blob/main/LICENSE" class="external-link">AGPL 3</a></p>
 </div>
+<div class="section level2">
+<h2 id="giving-back">Giving back<a class="anchor" aria-label="anchor" href="#giving-back"></a>
+</h2>
+<p>If you find this package helpful, please consider donating to the jamovi project (via the Patreon-link on the left side). If you can’t give money, but would like to support us in another way, you may contribute to translating <a href="https://hosted.weblate.org/engage/jamovi/" class="external-link">jamovi</a>, the <a href="https://hosted.weblate.org/engage/jamovidocs/" class="external-link">jamovi documentation</a>, or the textbook <a href="https://hosted.weblate.org/engage/jamovi/" class="external-link">”learning statistics with jamovi“</a> into your language.</p>
+<p>Thank you for your support!</p>
+</div>
 </div>
   </div>
 
@@ -269,9 +275,7 @@
 <div class="license">
 <h2 data-toc-skip>License</h2>
 <ul class="list-unstyled">
-<li>
-<a href="https://www.r-project.org/Licenses/AGPL-3" class="external-link">AGPL-3</a> + file <a href="LICENSE-text.html">LICENSE</a>
-</li>
+<li><a href="https://www.r-project.org/Licenses/AGPL-3" class="external-link">AGPL-3</a></li>
 </ul>
 </div>
 

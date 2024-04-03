@@ -4,7 +4,7 @@ OR
 devtools::load_all()
 
 for (blnAtt in c(TRUE, FALSE)) {
-    for (crrOMV in list.files('inst/extdata/')) {
+    for (crrOMV in list.files('inst/extdata/', '*.omv')) {
         cat(sprintf('\n%s\n\n%s\n\n', strrep("=", 100), crrOMV))
         data <- read_omv(file.path('inst/extdata/', crrOMV), sveAtt = blnAtt)
         write_omv(data, "~/Trial.omv")

@@ -135,6 +135,38 @@ test_that("long2wide_omv works", {
     expect_equal(vapply(df4Chk, attr, character(1), "jmv-desc", USE.NAMES = FALSE), c(unname(unlist(lblTmp[1:2])), sprintf("%s (cond: %s)",
       rep(unname(unlist(lblTmp[6:7])), each = 3), rep(c("cong", "incong", "neutral"), times = 2))))
 
+    df4Chk <- long2wide_omv(dtaInp = dtaTmp, varID = "ID", varTme = "cond", varTgt = c("rspCrr", "rspTme"), varExc = "sex", varAgg = "mean")
+    expect_s3_class(df4Chk, "data.frame")
+    expect_equal(dim(df4Chk), c(100, 8))
+    expect_equal(names(df4Chk), c("ID", "sex", sprintf("%s_%s", rep(c("rspCrr", "rspTme"), each = 3), rep(rep(c("cong", "incong", "neutral"), times = 2)))))
+    avgTmp <- aggregate(x = dtaTmp[, c("rspCrr", "rspTme")], by = dtaTmp[, c("ID", "cond")], FUN = mean)
+    expect_equal(unname(as.matrix(df4Chk[3:8])), cbind(matrix(avgTmp[, "rspCrr"], ncol = 3), matrix(avgTmp[, "rspTme"], ncol = 3)))
+    expect_equal(vapply(df4Chk, attr, character(1), "jmv-desc", USE.NAMES = FALSE), c(unname(unlist(lblTmp[1:2])), sprintf("%s (cond: %s)",
+      rep(unname(unlist(lblTmp[6:7])), each = 3), rep(c("cong", "incong", "neutral"), times = 2))))
+
+    # ---------------------------------------------------------------------------------------------------------------------------------------------------------
+    dtaTmp[seq(1, 2400, 25), c("rspCrr", "rspTme")] <- NA
+
+    df4Chk <- long2wide_omv(dtaInp = dtaTmp, varID = "ID", varTme = "cond", varTgt = c("rspCrr", "rspTme"), varExc = "sex", varAgg = "first")
+    expect_s3_class(df4Chk, "data.frame")
+    expect_equal(dim(df4Chk), c(100, 8))
+    expect_equal(names(df4Chk), c("ID", "sex", sprintf("%s_%s", rep(c("rspCrr", "rspTme"), each = 3), rep(rep(c("cong", "incong", "neutral"), times = 2)))))
+    avgTmp <- aggregate(x = dtaTmp[, c("rspCrr", "rspTme")], by = dtaTmp[, c("ID", "cond")], FUN = function(x) x[!is.na(x)][1])
+    expect_equal(unname(as.matrix(df4Chk[3:8])), cbind(matrix(avgTmp[, "rspCrr"], ncol = 3), matrix(avgTmp[, "rspTme"], ncol = 3)))
+    expect_equal(vapply(df4Chk, attr, character(1), "jmv-desc", USE.NAMES = FALSE), c(unname(unlist(lblTmp[1:2])), sprintf("%s (cond: %s)",
+      rep(unname(unlist(lblTmp[6:7])), each = 3), rep(c("cong", "incong", "neutral"), times = 2))))
+
+    df4Chk <- long2wide_omv(dtaInp = dtaTmp, varID = "ID", varTme = "cond", varTgt = c("rspCrr", "rspTme"), varExc = "sex", varAgg = "mean")
+    expect_s3_class(df4Chk, "data.frame")
+    expect_equal(dim(df4Chk), c(100, 8))
+    expect_equal(names(df4Chk), c("ID", "sex", sprintf("%s_%s", rep(c("rspCrr", "rspTme"), each = 3), rep(rep(c("cong", "incong", "neutral"), times = 2)))))
+    avgTmp <- aggregate(x = dtaTmp[, c("rspCrr", "rspTme")], by = dtaTmp[, c("ID", "cond")], FUN = mean, na.rm = TRUE)
+    expect_equal(unname(as.matrix(df4Chk[3:8])), cbind(matrix(avgTmp[, "rspCrr"], ncol = 3), matrix(avgTmp[, "rspTme"], ncol = 3)))
+    expect_equal(vapply(df4Chk, attr, character(1), "jmv-desc", USE.NAMES = FALSE), c(unname(unlist(lblTmp[1:2])), sprintf("%s (cond: %s)",
+      rep(unname(unlist(lblTmp[6:7])), each = 3), rep(c("cong", "incong", "neutral"), times = 2))))
+
+    # ---------------------------------------------------------------------------------------------------------------------------------------------------------
+
     dtaTmp$rspCrr <- as.factor(dtaTmp$rspCrr)
     expect_error(long2wide_omv(dtaInp = dtaTmp, varID = "ID", varTme = "cond", varTgt = c("rspCrr", "rspTme"), varExc = "sex"),
       regexp = "^In order to calculate the mean when aggregating the data, all target variables \\(varTgt\\) need to be numeric\\.")

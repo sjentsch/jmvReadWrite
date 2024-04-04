@@ -1,9 +1,8 @@
 # CRAN Notes - jmvReadWrite
 
 ## Current version
-0.4.4
-bug fixes and enhancements that increase code safety (in accordance with `goodpractice`, e.g., remove `sapply`; 0.4.3); 0.4.3 was prepared but never submitted
-added new function `label_vars_omv` (0.4.4)
+0.4.5
+* change long2wide_omv so that it to handle (omit) NAs when aggregating values (including unit tests)
 
 ## Test environments
 * `devtools::check()`

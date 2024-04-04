@@ -1,3 +1,10 @@
+# jmvReadWrite 0.4.5
+
+## Bug fix:
+* change `long2wide_omv` so that it to handle (omit) NAs when aggregating values (including unit tests)
+
+---
+
 # jmvReadWrite 0.4.4
 
 ## Enhancements:

@@ -1,3 +1,11 @@
+# jmvReadWrite 0.4.6
+
+## Bug fix:
+* ensure that the `dataType` attribute is preserved / honoured by `write_omv` (earlier on, the data type
+  of a variable / column was determined by a logic and my have changed the class of ths column)
+
+---
+
 # jmvReadWrite 0.4.5
 
 ## Bug fix:

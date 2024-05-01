@@ -73,7 +73,7 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", wrtPtB = FALSE, frcWrt = FALSE
     chkDtF(dtaFrm)
     if (isJmv()) dtaFrm <- jmvAtt(dtaFrm)
 
-    # handle the attributes "variable.labels" and "value.labels" in the format provided by the R-package "foreign"
+    # handle the attributes "variable.labels" and "value.labels" in the format provided bymtaDta <- mtaGlb the R-package "foreign"
     # the attribute "variable.labels" (attached to the data frame) is converted them to the format used by jamovi ("jmv-desc" attached to the data column)
     if (chkAtt(dtaFrm, "variable.labels")) dtaFrm <- fgnLbl(dtaFrm)
     if (chkAtt(dtaFrm, "label.table")) stop("R-foreign-style value labels need to be implemented. Please send the data file that caused this problem to sebastian.jentschke@uib.no")
@@ -289,7 +289,17 @@ prcFnC <- function(crrCol = NULL, crrFld = NULL, dtaCol = NULL, crrNme = c()) {
 }
 
 prcNum <- function(crrCol = NULL, crrFld = NULL, dtaCol = NULL) {
-    if (! all(is.na(crrCol)) && max(abs(crrCol), na.rm = TRUE) <= .Machine$integer.max && all(abs(crrCol - round(crrCol)) < sqrt(.Machine$double.eps), na.rm = TRUE)) {
+    if        (chkAtt(dtaCol, "dataType") && attr(dtaCol, "dataType") == "Integer") {
+        crrCol <- as.integer(crrCol)
+        crrFld[["type"]]     <- "integer"
+        crrFld[["dataType"]] <- "Integer"
+        crrFld[["measureType"]] <- ifelse(chkAtt(dtaCol, "measureType"), attr(dtaCol, "measureType"), "Continuous")
+    } else if (chkAtt(dtaCol, "dataType") && attr(dtaCol, "dataType") == "Decimal") {
+        crrCol <- as.numeric(crrCol)
+        crrFld[["type"]]     <- "number"
+        crrFld[["dataType"]] <- "Decimal"
+        crrFld[["measureType"]] <- ifelse(chkAtt(dtaCol, "measureType"), attr(dtaCol, "measureType"), "Continuous")
+    } else if (!all(is.na(crrCol)) && max(abs(crrCol), na.rm = TRUE) <= .Machine$integer.max && all(abs(crrCol - round(crrCol)) < sqrt(.Machine$double.eps), na.rm = TRUE)) {
         crrCol <- as.integer(crrCol)
         crrFld[["type"]]     <- "integer"
         crrFld[["dataType"]] <- ifelse(chkAtt(dtaCol, "dataType"), attr(dtaCol, "dataType"), "Integer")

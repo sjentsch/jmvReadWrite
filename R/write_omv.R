@@ -147,7 +147,7 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", wrtPtB = FALSE, frcWrt = FALSE
             xtdDta[[crrNme]]   <- attr(crrCol, "crrLbl")
         # [c] numerical (integer / decimals)
         } else if (is.numeric(crrCol)) {
-            crrCol <- prcNum(crrCol, mtaDta$fields[[i]], dtaFrm[[i]])
+            crrCol <- prcNum(crrCol, mtaDta$fields[[i]])
             mtaDta$fields[[i]] <- attr(crrCol, "crrFld")
         # [d] dates / times - jamovi actually doesn't support it but i perhaps makes most sense to implement it as numeric
         # can be transformed back in R using - as.Date(..., origin = "1970-01-01") and hms::as_hms(...)
@@ -288,35 +288,39 @@ prcFnC <- function(crrCol = NULL, crrFld = NULL, dtaCol = NULL, crrNme = c()) {
      crrCol
 }
 
-prcNum <- function(crrCol = NULL, crrFld = NULL, dtaCol = NULL) {
-    if        (chkAtt(dtaCol, "dataType") && attr(dtaCol, "dataType") == "Integer") {
-        crrCol <- as.integer(crrCol)
+prcNum <- function(crrCol = NULL, crrFld = NULL) {
+    # determine type (how values are stored) and dataType (used by jamovi ~ R: Decimal ~ numeric, Integer ~ integer)
+    if        (chkAtt(crrCol, "dataType")) {
+        crrFld[["type"]]     <- gsub("decimal", "number", tolower(attr(crrCol, "dataType")))
+        crrFld[["dataType"]] <- attr(crrCol, "dataType")
+    } else if (detInt(crrCol)) {
         crrFld[["type"]]     <- "integer"
         crrFld[["dataType"]] <- "Integer"
-        crrFld[["measureType"]] <- ifelse(chkAtt(dtaCol, "measureType"), attr(dtaCol, "measureType"), "Continuous")
-    } else if (chkAtt(dtaCol, "dataType") && attr(dtaCol, "dataType") == "Decimal") {
-        crrCol <- as.numeric(crrCol)
-        crrFld[["type"]]     <- "number"
-        crrFld[["dataType"]] <- "Decimal"
-        crrFld[["measureType"]] <- ifelse(chkAtt(dtaCol, "measureType"), attr(dtaCol, "measureType"), "Continuous")
-    } else if (!all(is.na(crrCol)) && max(abs(crrCol), na.rm = TRUE) <= .Machine$integer.max && all(abs(crrCol - round(crrCol)) < sqrt(.Machine$double.eps), na.rm = TRUE)) {
-        crrCol <- as.integer(crrCol)
-        crrFld[["type"]]     <- "integer"
-        crrFld[["dataType"]] <- ifelse(chkAtt(dtaCol, "dataType"), attr(dtaCol, "dataType"), "Integer")
-        # if "measureType" is already stored in the data frame, keep it, otherwise assign "Continuous" if there are enough different values and a high value range and variability (sd)
-        if (length(unique(crrCol)) > length(crrCol) / 5 && length(unique(crrCol)) > diff(range(crrCol, na.rm = TRUE)) / 5 &&
-            stats::sd(crrCol, na.rm = TRUE) > diff(range(crrCol, na.rm = TRUE)) / 10) {
-            crrFld[["measureType"]] <- ifelse(chkAtt(dtaCol, "measureType"), attr(dtaCol, "measureType"), "Continuous")
-        }
     } else {
         crrFld[["type"]]     <- "number"
-        crrFld[["dataType"]] <- ifelse(chkAtt(dtaCol, "dataType"), attr(dtaCol, "dataType"), "Decimal")
-        # if "measureType" is already stored in the data frame, keep it, otherwise assign "Continuous"
-        crrFld[["measureType"]] <- ifelse(chkAtt(dtaCol, "measureType"), attr(dtaCol, "measureType"), "Continuous")
+        crrFld[["dataType"]] <- "Decimal"
     }
+    # if "measureType" is already stored in the data frame, keep it; otherwise assign "Continuous" if the dataType is Decimal" or
+    crrFld[["measureType"]] <- ifelse(chkAtt(crrCol, "measureType"), attr(crrCol, "measureType"), 
+                                        ifelse(crrFld[["dataType"]] == "Decimal" || detCnt(crrCol), "Continuous", crrFld[["measureType"]]))
 
-     attr(crrCol, "crrFld") <- crrFld
-     crrCol
+    attr(crrCol, "crrFld") <- crrFld
+    crrCol
+}
+
+# determine whether a column is (i.e., can become) integer without loosing data
+detInt <- function(crrCol = NULL) {
+    !all(is.na(crrCol)) &&
+    max(abs(crrCol), na.rm = TRUE) <= .Machine$integer.max &&
+    all(abs(crrCol - round(crrCol)) < sqrt(.Machine$double.eps), na.rm = TRUE)
+}
+
+# determine whether a column likely should get the measureType "Continuous", requiring
+# that there are enough different values and a high value range and variability (sd)
+detCnt <- function(crrCol = NULL) {
+    length(unique(crrCol)) > length(crrCol) / 5 &&
+    length(unique(crrCol)) > diff(range(crrCol, na.rm = TRUE)) / 5 &&
+    stats::sd(crrCol, na.rm = TRUE) > diff(range(crrCol, na.rm = TRUE)) / 10
 }
 
 rmvMta <- function(crrFld = NULL, dtaCol = NULL) {

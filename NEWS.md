@@ -2,7 +2,7 @@
 
 ## Bug fix:
 * ensure that the `dataType` attribute is preserved / honoured by `write_omv` (earlier on, the data type
-  of a variable / column was determined by a logic and my have changed the class of ths column)
+  of a variable / column was determined by a logic and my have changed the class of this column)
 
 ---
 

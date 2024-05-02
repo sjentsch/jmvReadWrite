@@ -108,7 +108,7 @@ test_that("write_omv works", {
     expect_equal(vapply(df4Chk, function(x) attr(x, "measureType"), character(1), USE.NAMES = FALSE), c("ID", "Nominal", "Nominal", "Continuous", "Ordinal", "Continuous", "Continuous"))
     # do not unlink to provoke the error underneath
     expect_error(write_omv(dtaFrm = jmvReadWrite::ToothGrowth, fleOut = nmeOut),
-      regexp = "The output file already exists\\. Either remove the file or set the parameter frcWrt to TRUE\\.")
+      regexp = "The output file .* already exists\\. Either remove the file or set the parameter frcWrt to TRUE\\.")
     unlink(nmeOut)
 
     dtaOut <- jmvReadWrite::ToothGrowth

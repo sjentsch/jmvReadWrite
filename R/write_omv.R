@@ -301,7 +301,7 @@ prcNum <- function(crrCol = NULL, crrFld = NULL) {
         crrFld[["dataType"]] <- "Decimal"
     }
     # if "measureType" is already stored in the data frame, keep it; otherwise assign "Continuous" if the dataType is Decimal" or
-    crrFld[["measureType"]] <- ifelse(chkAtt(crrCol, "measureType"), attr(crrCol, "measureType"), 
+    crrFld[["measureType"]] <- ifelse(chkAtt(crrCol, "measureType"), attr(crrCol, "measureType"),
                                         ifelse(crrFld[["dataType"]] == "Decimal" || detCnt(crrCol), "Continuous", crrFld[["measureType"]]))
 
     attr(crrCol, "crrFld") <- crrFld
@@ -372,7 +372,7 @@ fleExs <- function(fleOut = c(), frcWrt = FALSE) {
         if (frcWrt) {
             unlink(fleOut)
         } else {
-            stop("The output file already exists. Either remove the file or set the parameter frcWrt to TRUE.")
+            stop(sprintf("The output file %s already exists. Either remove the file or set the parameter frcWrt to TRUE.", basename(fleOut)))
         }
     }
 }

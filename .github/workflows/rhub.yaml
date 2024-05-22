@@ -19,10 +19,11 @@ on:
       name:
         description: 'Run name.'
         type: string
-        default: 'rhub (manually)'
+        default: 'manually started run'
       id:
         description: 'Unique ID. You can leave this empty now.'
         type: string
+        default: 'rhub'
 
 jobs:
 

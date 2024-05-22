@@ -451,7 +451,7 @@ jmvAtt <- function(dtaFrm = NULL) {
 
     for (crrNme in names(dtaFrm)) {
          # if the attributes already exist, go to the next column
-         if (chkAtt(dtaFrm[[crrNme]], "measureType") && chkAtt(dtaFrm[[crrNme]], "measureType")) next
+         if (chkAtt(dtaFrm[[crrNme]], "measureType") && chkAtt(dtaFrm[[crrNme]], "dataType")) next
          # jmv-id
          if (!is.null(attr(dtaFrm[[crrNme]], "jmv-id")) && attr(dtaFrm[[crrNme]], "jmv-id")) {
              attr(dtaFrm[[crrNme]], "measureType")  <- "ID"
@@ -468,13 +468,13 @@ jmvAtt <- function(dtaFrm = NULL) {
          } else if (is.ordered(dtaFrm[[crrNme]]) && !is.null(attr(dtaFrm[[crrNme]], "values"))) {
              attr(dtaFrm[[crrNme]], "measureType")  <- "Ordinal"
              attr(dtaFrm[[crrNme]], "dataType")     <- "Integer"
-         } else if (is.factor(dtaFrm[[crrNme]]) &&  is.null(attr(dtaFrm[[crrNme]], "values"))) {
+         } else if (is.factor(dtaFrm[[crrNme]])  &&  is.null(attr(dtaFrm[[crrNme]], "values"))) {
              attr(dtaFrm[[crrNme]], "measureType")  <- "Nominal"
              attr(dtaFrm[[crrNme]], "dataType")     <- "Text"
-         } else if (is.factor(dtaFrm[[crrNme]]) && !is.null(attr(dtaFrm[[crrNme]], "values"))) {
+         } else if (is.factor(dtaFrm[[crrNme]])  && !is.null(attr(dtaFrm[[crrNme]], "values"))) {
              attr(dtaFrm[[crrNme]], "measureType")  <- "Nominal"
              attr(dtaFrm[[crrNme]], "dataType")     <- "Integer"
-         } else if (is.character(dtaFrm[[crrNme]])) {
+         } else if (is.logical(dtaFrm[[crrNme]]) || is.character(dtaFrm[[crrNme]])) {
              crrAtt <- attributes(dtaFrm[[crrNme]])
              dtaFrm[[crrNme]] <- as.factor(dtaFrm[[crrNme]])
              dffAtt <- setdiff(names(crrAtt), c("levels", "class"))

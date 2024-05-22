@@ -462,18 +462,9 @@ jmvAtt <- function(dtaFrm = NULL) {
          } else if (is.numeric(dtaFrm[[crrNme]])) {
              attr(dtaFrm[[crrNme]], "measureType")  <- "Continuous"
              attr(dtaFrm[[crrNme]], "dataType")     <- "Decimal"
-         } else if (is.ordered(dtaFrm[[crrNme]]) &&  is.null(attr(dtaFrm[[crrNme]], "values"))) {
-             attr(dtaFrm[[crrNme]], "measureType")  <- "Ordinal"
-             attr(dtaFrm[[crrNme]], "dataType")     <- "Text"
-         } else if (is.ordered(dtaFrm[[crrNme]]) && !is.null(attr(dtaFrm[[crrNme]], "values"))) {
-             attr(dtaFrm[[crrNme]], "measureType")  <- "Ordinal"
-             attr(dtaFrm[[crrNme]], "dataType")     <- "Integer"
-         } else if (is.factor(dtaFrm[[crrNme]])  &&  is.null(attr(dtaFrm[[crrNme]], "values"))) {
-             attr(dtaFrm[[crrNme]], "measureType")  <- "Nominal"
-             attr(dtaFrm[[crrNme]], "dataType")     <- "Text"
-         } else if (is.factor(dtaFrm[[crrNme]])  && !is.null(attr(dtaFrm[[crrNme]], "values"))) {
-             attr(dtaFrm[[crrNme]], "measureType")  <- "Nominal"
-             attr(dtaFrm[[crrNme]], "dataType")     <- "Integer"
+         } else if (is.factor(dtaFrm[[crrNme]])) {
+             attr(dtaFrm[[crrNme]], "measureType")  <- ifelse(is.ordered(dtaFrm[[crrNme]]), "Ordinal", "Nominal")
+             attr(dtaFrm[[crrNme]], "dataType")     <- ifelse(is.null(attr(dtaFrm[[crrNme]], "values")), "Text", "Integer")
          } else if (is.logical(dtaFrm[[crrNme]]) || is.character(dtaFrm[[crrNme]])) {
              crrAtt <- attributes(dtaFrm[[crrNme]])
              dtaFrm[[crrNme]] <- as.factor(dtaFrm[[crrNme]])

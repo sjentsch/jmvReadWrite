@@ -1,15 +1,18 @@
 # jmvReadWrite 0.4.6
 
-## Bug fix:
+## Bug fixes:
 * ensure that the `dataType` attribute is preserved / honoured by `write_omv` (earlier on, the data type
   of a variable / column was determined by a logic and my have changed the class of this column)
+* fixed a bug leading to an error in `write_omv` when columns where completely empty (i.e., if they contained
+  only NAs; incl. the respective unit tests)
+* reduced cyclomatic complexity for `replace_omv`, `wide2long_omv`, and  `jmvAtt`
 
 ---
 
 # jmvReadWrite 0.4.5
 
 ## Bug fix:
-* change `long2wide_omv` so that it to handle (omit) NAs when aggregating values (including unit tests)
+* change `long2wide_omv` so that it to handle (omit) NAs when aggregating values (incl. unit tests)
 
 ---
 

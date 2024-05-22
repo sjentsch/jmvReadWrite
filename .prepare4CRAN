@@ -64,14 +64,8 @@ devtools::check(force_suggests = TRUE, incoming = TRUE, remote = TRUE, env_vars 
 devtools::check_win_devel()
 
 # the next stage of ping-pong, either build on the standard platforms
-devtools::check_rhub()
-devtools::check_rhub(env_vars = c("_R_CHECK_FORCE_SUGGESTS_" = "false"))
-# or builds it the package on rhub using all major platforms R is supported on
-devtools::check_rhub(pkg = ".", platforms = rhub::platforms()$name, env_vars = c("_R_CHECK_FORCE_SUGGESTS_" = "false"))
-# or, if there are known errors (e.g., on rhub), exclude certain platforms explicitly
-crrPlt = rhub::platforms()
-crrPlt = crrPlt[-c(x, ...), ]
-devtools::check_rhub(pkg = ".", platforms = crrPlt$name, env_vars = c("_R_CHECK_FORCE_SUGGESTS_" = "false"))
+rhub::rc_submit(platforms=c("linux", "windows", "macos", "macos-arm64"))
+rhub::rhub_check(platforms=c("linux", "windows", "macos", "macos-arm64"))
 
 # update version number and comments in cran-comments.md (and perhaps NEWS.md)
 system("gedit cran-comments.md NEWS.md")

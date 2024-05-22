@@ -182,8 +182,9 @@
 <span><span class="co"># "retDbg" has to be set in order to return debug information to wrtDta</span></span>
 <span><span class="va">wrtDta</span> <span class="op">&lt;-</span> <span class="fu">jmvReadWrite</span><span class="fu">::</span><span class="fu"><a href="reference/write_omv.html">write_omv</a></span><span class="op">(</span><span class="va">ToothGrowth</span>, <span class="st">"Trial.omv"</span>, retDbg <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">wrtDta</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "mtaDta" "xtdDta" "dtaFrm"</span></span>
-<span><span class="co"># -&gt; "mtaDta" "xtdDta" "dtaFrm"</span></span>
+<span><span class="co">#&gt; [1] "mtaDta" "xtdDta" "dtaFrm"</span></span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># -&gt; "mtaDta" "xtdDta" "dtaFrm"</span></span>
 <span><span class="co"># this debug information contains a list with the metadata ("mtaDta", e.g.,</span></span>
 <span><span class="co"># column and data type), the extended data ("xtdDta", e.g., variable lables),</span></span>
 <span><span class="co"># and the data frame (dtaFrm) for checking (understanding the file format) and</span></span>
@@ -192,15 +193,17 @@
 <span><span class="co"># check whether the file was written to the disk, get the file information (size, etc.)</span></span>
 <span><span class="co"># and delete the file afterwards</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="st">"."</span>, <span class="st">"Trial.omv"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "Trial.omv"</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/file.info.html" class="external-link">file.info</a></span><span class="op">(</span><span class="st">"Trial.omv"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "Trial.omv"</span></span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/file.info.html" class="external-link">file.info</a></span><span class="op">(</span><span class="st">"Trial.omv"</span><span class="op">)</span></span>
 <span><span class="co">#&gt;           size isdir mode               mtime               ctime</span></span>
-<span><span class="co">#&gt; Trial.omv 2610 FALSE  644 2024-05-02 18:26:39 2024-05-02 18:26:39</span></span>
+<span><span class="co">#&gt; Trial.omv 2610 FALSE  644 2024-05-22 18:03:47 2024-05-22 18:03:47</span></span>
 <span><span class="co">#&gt;                         atime   uid  gid  uname grname</span></span>
-<span><span class="co">#&gt; Trial.omv 2024-05-02 18:26:39 87448 4601 sje025 ansatt</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="st">"Trial.omv"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="co">#&gt; Trial.omv 2024-05-22 18:03:47 87448 4601 sje025 ansatt</span></span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="st">"Trial.omv"</span><span class="op">)</span></span></code></pre></div>
 <p>Although jamovi reads R-data files (.RData, .rda, .rds) <a href="https://sjentsch.github.io/jmvReadWrite/reference/write_omv.html"><code>write_omv</code></a> permits to store <code>jamovi</code>-specific attributes (such as variable labels) in addition. Please note that if you are reading from an <code>.omv</code>-file in order to write back to an <code>.omv</code>-file (perhaps after some modifications), it is recommended to leave the <code>sveAtt</code>-attribute set to <code>TRUE</code> (which is the default).</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># reading and writing a file with the "sveAtt"-parameter permits you to keep</span></span>
 <span><span class="co"># essential meta-data to ensure that the written file looks and works like the</span></span>
 <span><span class="co"># original file (plus you modifications)</span></span>
@@ -210,14 +213,16 @@
 <span><span class="co"># rows and columns) and the names of the attributes of the first column</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/attributes.html" class="external-link">attributes</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "names"       "row.names"   "class"       "fltLst"      "removedRows"</span></span>
-<span><span class="co">#&gt; [6] "addedRows"   "transforms"</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/attributes.html" class="external-link">attributes</a></span><span class="op">(</span><span class="va">data</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [6] "addedRows"   "transforms"</span></span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/attributes.html" class="external-link">attributes</a></span><span class="op">(</span><span class="va">data</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;  [1] "name"           "id"             "columnType"     "dataType"      </span></span>
 <span><span class="co">#&gt;  [5] "measureType"    "formula"        "formulaMessage" "parentId"      </span></span>
 <span><span class="co">#&gt;  [9] "width"          "type"           "importName"     "description"   </span></span>
 <span><span class="co">#&gt; [13] "transform"      "edits"          "missingValues"  "filterNo"      </span></span>
-<span><span class="co">#&gt; [17] "active"</span></span>
-<span><span class="co">#</span></span>
+<span><span class="co">#&gt; [17] "active"</span></span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">#</span></span>
 <span><span class="co"># perhaps do some modifications to the file here and write it back afterwards</span></span>
 <span><span class="fu">jmvReadWrite</span><span class="fu">::</span><span class="fu"><a href="reference/write_omv.html">write_omv</a></span><span class="op">(</span><span class="va">data</span>, <span class="st">"Trial.omv"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="st">"Trial.omv"</span><span class="op">)</span></span></code></pre></div>

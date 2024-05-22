@@ -53,15 +53,18 @@
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.4.6" id="jmvreadwrite-046">jmvReadWrite 0.4.6<a class="anchor" aria-label="anchor" href="#jmvreadwrite-046"></a></h2>
 <div class="section level3">
-<h3 id="bug-fix-0-4-6">Bug fix:<a class="anchor" aria-label="anchor" href="#bug-fix-0-4-6"></a></h3>
+<h3 id="bug-fixes-0-4-6">Bug fixes:<a class="anchor" aria-label="anchor" href="#bug-fixes-0-4-6"></a></h3>
 <ul><li>ensure that the <code>dataType</code> attribute is preserved / honoured by <code>write_omv</code> (earlier on, the data type of a variable / column was determined by a logic and my have changed the class of this column)</li>
+<li>fixed a bug leading to an error in <code>write_omv</code> when columns where completely empty (i.e., if they contained only NAs; incl. the respective unit tests)</li>
+<li>reduced cyclomatic complexity for <code>replace_omv</code>, <code>wide2long_omv</code>, and <code>jmvAtt</code>
+</li>
 </ul><hr></div>
 </div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.4.5" id="jmvreadwrite-045">jmvReadWrite 0.4.5<small>2024-04-04</small><a class="anchor" aria-label="anchor" href="#jmvreadwrite-045"></a></h2>
 <div class="section level3">
 <h3 id="bug-fix-0-4-5">Bug fix:<a class="anchor" aria-label="anchor" href="#bug-fix-0-4-5"></a></h3>
-<ul><li>change <code>long2wide_omv</code> so that it to handle (omit) NAs when aggregating values (including unit tests)</li>
+<ul><li>change <code>long2wide_omv</code> so that it to handle (omit) NAs when aggregating values (incl. unit tests)</li>
 </ul><hr></div>
 </div>
     <div class="section level2">

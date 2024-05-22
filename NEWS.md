@@ -6,6 +6,7 @@
 * fixed a bug leading to an error in `write_omv` when columns where completely empty (i.e., if they contained
   only NAs; incl. the respective unit tests)
 * reduced cyclomatic complexity for `replace_omv`, `wide2long_omv`, and  `jmvAtt`
+* added workflow for `rhub`
 
 ---
 

@@ -43,7 +43,7 @@ covr::codecov(token = "821f2b2f-e305-49b2-ab96-7f328530f6ed")  # jTransform
 # REMEMBER: error messages from R are not always pointing to the place where the error occurs - especially when using commands like build_readme()
 # ================================================================================================================================================
 
-# update version number in DESCRIPTION and NEWS.md (and changes in NEWS.md)
+# update version number in DESCRIPTION and NEWS.md (and changes in NEWS.md)$(git log --date=format:'%Y-%m-%d' | grep -m1 "^Date" | sed 's/Date:\s*//')"
 system("gedit DESCRIPTION NEWS.md inst/CITATION")  # jmvReadWrite
 
 # building / updating README, PDF manual, and the HTML documentation

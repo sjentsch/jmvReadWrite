@@ -17,8 +17,9 @@ on:
         type: string
         default: 'linux,windows,macos,macos-arm64'
       name:
-        description: 'rhub'
+        description: 'Run name.'
         type: string
+        default: 'rhub (manually)'
       id:
         description: 'Unique ID. You can leave this empty now.'
         type: string

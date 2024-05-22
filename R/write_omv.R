@@ -258,6 +258,7 @@ prcFnC <- function(crrCol = NULL, crrFld = NULL, dtaCol = NULL, crrNme = c()) {
     facLvl <- attr(crrCol, "levels")
     # above must be kept at crrCol as the original column might be character and was converted above
     facOrd <- is.ordered(dtaCol)
+    crrLbl <- NULL
     if (chkAtt(dtaCol, "values")) {
         crrCol <- attr(dtaCol, "values")[as.vector.factor(crrCol, mode = "integer")]
         if (length(facLvl) > 0) {
@@ -285,6 +286,7 @@ prcFnC <- function(crrCol = NULL, crrFld = NULL, dtaCol = NULL, crrNme = c()) {
 
      attr(crrCol, "crrFld") <- crrFld
      attr(crrCol, "crrLbl") <- crrLbl
+
      crrCol
 }
 

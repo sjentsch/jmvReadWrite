@@ -70,6 +70,9 @@ rhub::rhub_check(platforms=c("linux", "windows", "macos", "macos-arm64"))
 # update version number and comments in cran-comments.md (and perhaps NEWS.md)
 system("gedit cran-comments.md NEWS.md")
 
+# update codemeta.json (devtools::release() asks for it)
+codemetar::write_codemeta()
+
 # now, we are ready to release the package onto CRAN
 devtools::release()
 

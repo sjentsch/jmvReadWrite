@@ -15,7 +15,6 @@ state and is being actively
 developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 [![License](https://img.shields.io/badge/License-AGPL%20v3-green.svg)](https://www.gnu.org/licenses/agpl-3.0.html)
 [![Downloads](https://cranlogs.r-pkg.org/badges/jmvReadWrite?color=brightgreen)](https://cran.r-project.org/package=jmvReadWrite)
-[![Dependencies](https://tinyverse.netlify.com/badge/jmvReadWrite)](https://cran.r-project.org/package=jmvReadWrite)
 [![Last
 commit](https://img.shields.io/github/last-commit/sjentsch/jmvReadWrite?logo=GitHub)](https://github.com/sjentsch/jmvReadWrite)
 [![Register an
@@ -206,9 +205,9 @@ list.files(".", "Trial.omv")
 ``` r
 file.info("Trial.omv")
 #>           size isdir mode               mtime               ctime
-#> Trial.omv 2610 FALSE  644 2024-05-22 18:03:47 2024-05-22 18:03:47
+#> Trial.omv 2610 FALSE  644 2024-05-22 21:54:08 2024-05-22 21:54:08
 #>                         atime   uid  gid  uname grname
-#> Trial.omv 2024-05-22 18:03:47 87448 4601 sje025 ansatt
+#> Trial.omv 2024-05-22 21:54:08 87448 4601 sje025 ansatt
 ```
 
 ``` r

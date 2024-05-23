@@ -40,19 +40,18 @@
 #'
 #' @examples
 #' \dontrun{
-#' library(jmvReadWrite)
 #' nmeInp <- system.file("extdata", "AlbumSales.omv", package = "jmvReadWrite")
 #' nmeOut <- tempfile(fileext = ".omv")
 #' # the original file has the variables in the order: "Adverts", "Airplay", "Image", "Sales"
 #' names(read_omv(nmeInp))
 #' # first, we move the variable "Sales" to the first place using the varOrd-parameter
-#' arrange_cols_omv(dtaInp = nmeInp, fleOut = nmeOut,
+#' jmvReadWrite::arrange_cols_omv(dtaInp = nmeInp, fleOut = nmeOut,
 #'   varOrd = c("Sales", "Adverts", "Airplay", "Image"))
-#' names(read_omv(nmeOut))
+#' names(jmvReadWrite::read_omv(nmeOut))
 #' unlink(nmeOut)
 #' # now, we move the variable "Sales" to the first place using the varMve-parameter
-#' arrange_cols_omv(dtaInp = nmeInp, fleOut = nmeOut, varMve = list(Sales = -3))
-#' names(read_omv(nmeOut))
+#' jmvReadWrite::arrange_cols_omv(dtaInp = nmeInp, fleOut = nmeOut, varMve = list(Sales = -3))
+#' names(jmvReadWrite::read_omv(nmeOut))
 #' unlink(nmeOut)
 #' }
 #'

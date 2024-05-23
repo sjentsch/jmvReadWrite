@@ -44,17 +44,16 @@
 #'
 #' @examples
 #' \dontrun{
-#' library(jmvReadWrite)
-#' dtaInp <- bfi_sample2
+#' dtaInp <- jmvReadWrite::bfi_sample2
 #' nmeInp <- paste0(tempfile(), "_", 1:3, ".rds")
 #' nmeOut <- tempfile(fileext = ".omv")
 #' for (i in seq_along(nmeInp)) saveRDS(dtaInp[-i - 1], nmeInp[i])
 #' # save dtaInp three times (i.e., the length of nmeInp), removing one data columns in
 #' # each data set (for demonstration purposes, A1 in the first, A2 in the second, ...)
-#' merge_rows_omv(dtaInp = nmeInp, fleOut = nmeOut, colInd = TRUE)
+#' jmvReadWrite::merge_rows_omv(dtaInp = nmeInp, fleOut = nmeOut, colInd = TRUE)
 #' cat(file.info(nmeOut)$size)
 #' # -> 10767 (size may differ on different OSes)
-#' dtaOut <- read_omv(nmeOut, sveAtt = FALSE)
+#' dtaOut <- jmvReadWrite::read_omv(nmeOut, sveAtt = FALSE)
 #' unlink(nmeOut)
 #' # read the data set where the three original datasets were added as rows and show
 #' # the variable names
@@ -70,10 +69,10 @@
 #' # data set (250 -> 750), the second dimension (columns / variables) is increased by 1
 #' # (for "fleInd")
 #'
-#' merge_rows_omv(dtaInp = nmeInp, fleOut = nmeOut, typMrg = "common")
+#' jmvReadWrite::merge_rows_omv(dtaInp = nmeInp, fleOut = nmeOut, typMrg = "common")
 #' # the argument typMrg = "common" removes the columns that are not present in all of
 #' # the input data sets (i.e., A1, A2, A3)
-#' dtaOut <- read_omv(nmeOut, sveAtt = FALSE)
+#' dtaOut <- jmvReadWrite::read_omv(nmeOut, sveAtt = FALSE)
 #' unlink(nmeOut)
 #' # read the data set where the three original datasets were added as rows and show
 #' # the variable names
@@ -108,8 +107,8 @@ merge_rows_omv <- function(dtaInp = NULL, fleOut = "", typMrg = c("all", "common
         # duplicates(order ensures that the data set that contains most variables
         # is prioritized, but yet, it is still impossible to preserve the whole
         # order - i.e., variables missing in one data set may end up at the end)
-        varNme <- unlist(sapply(dtaFrm[order(-sapply(sapply(dtaFrm, dim, simplify = FALSE), "[[", 2))], names,                                                  simplify = FALSE))
-        varTyp <- unlist(sapply(dtaFrm[order(-sapply(sapply(dtaFrm, dim, simplify = FALSE), "[[", 2))], function(D) unlist(sapply(D, function(C) class(C)[1])), simplify = FALSE))
+        varNme <- unlist(lapply(dtaFrm[order(-vapply(dtaFrm, function(x) dim(x)[2], integer(1)))], names))
+        varTyp <- unlist(lapply(dtaFrm[order(-vapply(dtaFrm, function(x) dim(x)[2], integer(1)))], function(D) vapply(D, function(C) class(C)[1], character(1))))
         varNme <- varNme[!duplicated(varNme)]
         for (crrNme in varNme) {
             if (sum(names(varTyp) == crrNme) <= 1) next
@@ -129,7 +128,7 @@ merge_rows_omv <- function(dtaInp = NULL, fleOut = "", typMrg = c("all", "common
         dtaFrm <- tmpMrg
     # keeping only variables that are common to all input data sets
     } else if (typMrg == "common") {
-        varNme <- Reduce(intersect, sapply(dtaFrm, names, simplify = FALSE))
+        varNme <- Reduce(intersect, lapply(dtaFrm, names))
         if (identical(varNme, character(0))) {
             stop(paste("The data sets in the files that were given as dtaInp-argument do not contain variables that are overlapping (i.e., contained in all data sets).",
                        "You can either reduce the number of data sets given to dtaInp or use \"outer\" as argument for \"typMrg\" (see Details in the help for this function)."))

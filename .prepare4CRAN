@@ -4,11 +4,11 @@ OR
 devtools::load_all()
 
 for (blnAtt in c(TRUE, FALSE)) {
-    for (crrOMV in list.files('inst/extdata/')) {
+    for (crrOMV in list.files('inst/extdata/', '*.omv')) {
+        cat(sprintf('\n%s\n\n%s\n\n', strrep("=", 100), crrOMV))
         data <- read_omv(file.path('inst/extdata/', crrOMV), sveAtt = blnAtt)
         write_omv(data, "~/Trial.omv")
         data2 <- read_omv("~/Trial.omv", sveAtt = blnAtt)
-        cat(sprintf('\n%s\n\n%s\n\n', strrep("=", 100), crrOMV))
         suppressWarnings(print(diffdf::diffdf(data, data2)))
         unlink("~/Trial.omv")
         rm("data", "data2")
@@ -19,8 +19,7 @@ rm('blnAtt', 'crrOMV')
 
 # checks the requirements (all dependencies up-to-date, etc.)
 # use devtools::update_packages("devtools") and devtools::install_dev_deps() if required
-# NB: there might be an error when updating the tidyverse-packages: remove the APA-style
-#     formatting in .Rprofile, restart R and put it back afterwards
+# NB: there might be an error when updating the tidyverse-packages: start R with R --no-init-file
 devtools::dev_sitrep()
 
 # do some initial checks
@@ -37,14 +36,15 @@ devtools::lint()
 devtools::test()
 devtools::test_coverage()
 # once happy with the coverage, it can be uploaded using
-covr::codecov(token = "2f521d97-d1e2-4baf-b05b-0b569a7c6f0f")
+covr::codecov(token = "2f521d97-d1e2-4baf-b05b-0b569a7c6f0f")  # jmvReadWrite
+covr::codecov(token = "821f2b2f-e305-49b2-ab96-7f328530f6ed")  # jTransform
 
 # ================================================================================================================================================
 # REMEMBER: error messages from R are not always pointing to the place where the error occurs - especially when using commands like build_readme()
 # ================================================================================================================================================
 
-# update version number in DESCRIPTION and NEWS.md (and changes in NEWS.md)
-system("gedit DESCRIPTION NEWS.md inst/CITATION")
+# update version number in DESCRIPTION and NEWS.md (and changes in NEWS.md)$(git log --date=format:'%Y-%m-%d' | grep -m1 "^Date" | sed 's/Date:\s*//')"
+system("gedit DESCRIPTION NEWS.md inst/CITATION")  # jmvReadWrite
 
 # building / updating README, PDF manual, and the HTML documentation
 # add new functions to _pkgdown.yaml and to vignettes/jmvReadWrite.Rmd if required
@@ -64,16 +64,19 @@ devtools::check(force_suggests = TRUE, incoming = TRUE, remote = TRUE, env_vars 
 devtools::check_win_devel()
 
 # the next stage of ping-pong, either build on the standard platforms
-devtools::check_rhub()
-# or builds it the package on rhub using all major platforms R is supported on
-devtools::check_rhub(pkg = ".", platforms = rhub::platforms()$name, env_vars = c("_R_CHECK_FORCE_SUGGESTS_" = "false"))
-# or, if there are known errors (e.g., on rhub), exclude certain platforms explicitly
-crrPlt = rhub::platforms()
-crrPlt = crrPlt[-c(x, ...), ]
-devtools::check_rhub(pkg = ".", platforms = crrPlt$name, env_vars = c("_R_CHECK_FORCE_SUGGESTS_" = "false"))
+#rhub::rc_submit(platforms=c("linux", "windows", "macos", "macos-arm64"))
+rhub::rhub_check(platforms=c("linux", "windows", "macos", "macos-arm64"))
+# running github actions requires a personal access token: https://github.com/settings/profile
+# → Developer options → Personal access token → Tokens (classic) → tick “repo”
+# the token is valid for a limited time period and can be regenerated; to update the
+# token, the following function can be used (choose 2 and copy the token when requested)
+gitcreds::gitcreds_set()
 
 # update version number and comments in cran-comments.md (and perhaps NEWS.md)
 system("gedit cran-comments.md NEWS.md")
+
+# update codemeta.json (devtools::release() asks for it)
+codemetar::write_codemeta()
 
 # now, we are ready to release the package onto CRAN
 devtools::release()

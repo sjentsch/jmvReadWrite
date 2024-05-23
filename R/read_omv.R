@@ -12,22 +12,23 @@
 #'
 #' @examples
 #' \dontrun{
-#' library(jmvReadWrite)
 #' nmeInp <- system.file("extdata", "ToothGrowth.omv", package = "jmvReadWrite")
-#' data <- read_omv(fleInp = nmeInp, getSyn = TRUE)
+#' data <- jmvReadWrite::read_omv(fleInp = nmeInp, getSyn = TRUE)
 #' # if the syntax couldn't be extracted, an empty list - length = 0 - is returned,
 #' # otherwise, the commands are shown and the first analysis is run, with the output
 #' # from the second analysis being assigned to the variable result
 #' if (length(attr(data, "syntax")) >= 1) {
 #'     print(attr(data, "syntax"))
-#'     # the print-function is only used to force devtools::run_examples() to show output
-#'     eval(parse(text=paste0("result = ", attr(data, "syntax")[1])))
-#'     # without assigning the output to a variable, the command would be:
-#'     # eval(parse(text=attr(data, "syntax")[1]))
-#'     print(names(result))
-#'     print(result$main)
-#'     # -> "main"      "assump"    "contrasts" "postHoc"   "emm"       "residsOV"
-#'     # (the names of the six output tables)
+#'     if (nzchar(system.file(package = "jmv"))) {
+#'         # the print-function is only used to force devtools::run_examples() to show output
+#'         eval(parse(text = paste0("result = ", attr(data, "syntax")[1])))
+#'         # without assigning the output to a variable, the command would be:
+#'         # eval(parse(text = attr(data, "syntax")[1]))
+#'         print(names(result))
+#'         print(result$main)
+#'         # -> "main"      "assump"    "contrasts" "postHoc"   "emm"       "residsOV"
+#'         # (the names of the six output tables)
+#'     }
 #' }
 #' }
 #'
@@ -52,7 +53,7 @@ read_omv <- function(fleInp = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = TRUE,
 
     # load the meta-data (global and data column attributes of the data set) and the extended
     # data (value labels)
-    mtaDta <- getTxt(fleInp, "metadata.json")$dataSet
+    mtaDta <- getTxt(fleInp, "metadata.json")[["dataSet"]]
     xtdDta <- getTxt(fleInp, "xdata.json")
     binHdl <- getHdl(fleInp, "data.bin", "rb")
     if (strBin) {
@@ -67,20 +68,21 @@ read_omv <- function(fleInp = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = TRUE,
     rowNum <- mtaDta$rowCount
     colNum <- mtaDta$columnCount
     if (length(mtaDta$fields) != colNum) stop("Number of fields in the metadata is not matching up the number of columns.")
-    dtaFrm <- stats::setNames(data.frame(matrix(NA, nrow = rowNum, ncol = colNum)), sapply(mtaDta$fields, "[[", "name"))
+    dtaFrm <- stats::setNames(data.frame(matrix(NA, nrow = rowNum, ncol = colNum)), vapply(mtaDta$fields, "[[", character(1), "name"))
     fltLst <- c()
 
     # iterate through fields
     for (i in seq_len(colNum)) {
-        # check meta-data
-        if (!all(grepl(grpMta, names(mtaDta$fields[[i]])))) stop("Unimplemeted field in the meta data (column).")
+        # assign metadate for the current column, and check whether there are any unimplemented entries
+        mtaCol <- mtaDta$fields[[i]]
+        if (!all(grepl(grpMta, names(mtaCol)))) stop("Unimplemeted field in the meta data (column).")
 
         # type: determines the format in the binary file
-        if        (chkFld(mtaDta$fields[[i]], "type", "integer")) {
+        if        (chkFld(mtaCol, "type", "integer")) {
             crrCol <- readBin(binHdl, integer(), n = rowNum)
-        } else if (chkFld(mtaDta$fields[[i]], "type", "number"))  {
+        } else if (chkFld(mtaCol, "type", "number"))  {
             crrCol <- readBin(binHdl,  double(), n = rowNum)
-        } else if (chkFld(mtaDta$fields[[i]], "type", "string"))  {
+        } else if (chkFld(mtaCol, "type", "string"))  {
             crrCol <- vector("character", length = rowNum)
             crrIdx <- readBin(binHdl, integer(), n = rowNum)
             for (j in seq(rowNum)) {
@@ -94,40 +96,20 @@ read_omv <- function(fleInp = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = TRUE,
             }
             rm(crrIdx)
         } else {
-            stop(sprintf("Variable type \"%s\" not implemented.", mtaDta$fields[[i]]$type))
+            stop(sprintf("Variable type \"%s\" not implemented.", mtaCol$type))
         }
 
-        # name
-        crrNme <- mtaDta$fields[[i]]$name
-
-        # value labels
-        if (any(crrNme == names(xtdDta))) {
-            if        (chkFld(mtaDta$fields[[i]], "columnType", "Filter") || chkFld(mtaDta$fields[[i]], "name", "^Filter [0-9]+$")) {
-                crrCol <- as.logical(crrCol)
-                fltLst <- c(fltLst, i)
-            } else if (chkFld(mtaDta$fields[[i]], "columnType", "Data|Recoded")) {
-                crrCol <- factor(crrCol, levels = unlist(sapply(xtdDta[[crrNme]]$labels, function(m) m[1])),
-                                         labels = unlist(sapply(xtdDta[[crrNme]]$labels, function(m) m[2])),
-                                         ordered = chkFld(mtaDta$fields[[i]], "measureType", "Ordinal"))
-                if (chkFld(mtaDta$fields[[i]], "dataType", "Integer")) {
-                    if (identical(sort(levels(crrCol)), c("0", "1")))        crrCol <- as.logical(gsub("^1$", "TRUE", gsub("^0$", "FALSE", crrCol)))
-                    if (identical(sort(levels(crrCol)), c("FALSE", "TRUE"))) crrCol <- as.logical(crrCol)
-                }
-            } else {
-                stop(sprintf("Error when reading value label - likely the column type is not implemented (yet): %s - %s - %s",
-                             crrNme, mtaDta$fields[[i]]$dataType, mtaDta$fields[[i]]$columnType))
-            }
-        }
-
-        dtaFrm[[crrNme]] <- crrCol
-
-        if (chkFld(mtaDta$fields[[i]], "measureType", "ID")) attr(dtaFrm[[crrNme]], "jmv-id")   <- TRUE
-        if (chkFld(mtaDta$fields[[i]], "description", ".+")) attr(dtaFrm[[crrNme]], "jmv-desc") <- mtaDta$fields[[i]][["description"]]
+        # assign name of the current column, add value labels, assign crrCol to dtaFrm, and add attributes (if present)
+        crrNme <- mtaCol$name
+        dtaFrm[[crrNme]] <- valLbl(crrCol, mtaCol, xtdDta)
+        if (chkFld(mtaCol, "measureType", "ID")) attr(dtaFrm[[crrNme]], "jmv-id")   <- TRUE
+        if (chkFld(mtaCol, "description", ".+")) attr(dtaFrm[[crrNme]], "jmv-desc") <- mtaCol[["description"]]
+        if (chkFld(mtaCol, "columnType", "Filter") || chkFld(mtaCol, "name", "^Filter [0-9]+$")) fltLst <- c(fltLst, i)
 
         if (sveAtt) {
-            dtaFrm[crrNme] <- setAtt(names(mtaFld),   mtaDta$fields[[i]], dtaFrm[crrNme])
+            dtaFrm[crrNme] <- setAtt(names(mtaFld),   mtaCol, dtaFrm[crrNme])
         } else {
-            dtaFrm[crrNme] <- setAtt("missingValues", mtaDta$fields[[i]], dtaFrm[crrNme])
+            dtaFrm[crrNme] <- setAtt("missingValues", mtaCol, dtaFrm[crrNme])
         }
 
         if (rmMsVl) {
@@ -215,6 +197,29 @@ read_omv <- function(fleInp = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = TRUE,
     dtaFrm
 }
 
+valLbl <- function(crrCol = NULL, mtaCol = NULL, xtdDta = NULL) {
+    crrNme <- mtaCol$name
+    if (any(crrNme == names(xtdDta))) {
+        if        (chkFld(mtaCol, "columnType", "Filter") || chkFld(mtaCol, "name", "^Filter [0-9]+$")) {
+            crrCol <- as.logical(crrCol)
+        } else if (chkFld(mtaCol, "columnType", "Data|Recoded")) {
+            crrCol <- factor(crrCol, levels = unlist(lapply(xtdDta[[crrNme]]$labels, function(m) m[1])),
+                                     labels = unlist(lapply(xtdDta[[crrNme]]$labels, function(m) m[2])),
+                                     ordered = chkFld(mtaCol, "measureType", "Ordinal"))
+            if (identical(sort(levels(crrCol)), c("0", "1")))        crrCol <- as.logical(gsub("^1$", "TRUE", gsub("^0$", "FALSE", crrCol)))
+            if (identical(sort(levels(crrCol)), c("FALSE", "TRUE"))) crrCol <- as.logical(crrCol)
+            if (!is.logical(crrCol) && chkFld(mtaCol, "dataType", "Integer") &&
+              all(vapply(xtdDta[[crrNme]]$labels, function(m) m[1] == as.integer(m[2]), logical(1)))) {
+                attr(crrCol, "values") <- unlist(lapply(xtdDta[[crrNme]]$labels, function(m) m[1]))
+            }
+        } else {
+            stop(sprintf("Error when reading value label - likely the column type is not implemented (yet): %s - %s - %s",
+                         crrNme, mtaCol$dataType, mtaCol$columnType))
+        }
+    }
+
+    crrCol
+}
 
 # =================================================================================================
 # read_all: for reading data files from various formats (incl. functions that are called)
@@ -326,7 +331,7 @@ chkMnf <- function(fleOMV = "", fleMnf = c("")) {
     # check the version information in the manifest and whether they are currently supported
     # [[1]] points to the first manifest file, in case both (MANIFEST.MF and meta) exist
     crrTxt <- getTxt(fleOMV, fleMnf[[1]])
-    if (length(crrTxt) != length(lstMnf) || !all(grepl(paste(sapply(lstMnf, "[[", 1), collapse = "|"), crrTxt))) {
+    if (length(crrTxt) != length(lstMnf) || !all(grepl(paste(vapply(lstMnf, "[[", character(1), 1), collapse = "|"), crrTxt))) {
         stop(sprintf(paste("The file you are trying to read (%s) has an improper manifest file (meta) and is likely corrupted.",
                            "If the error persists, send the file to sebastian.jentschke@uib.no!"), basename(fleOMV)))
     }
@@ -427,7 +432,7 @@ hvnAdj <- function(dtaFrm = NULL, rmvAtt = c(), jmvLbl = FALSE) {
 }
 
 rmvQtn <- function(dtaFrm = NULL) {
-    for (crrCol in names(which(sapply(dtaFrm, is.character)))) {
+    for (crrCol in names(which(vapply(dtaFrm, is.character, logical(1))))) {
         dtaFrm[[crrCol]] <- trimws(gsub("\"", "", dtaFrm[[crrCol]]))
     }
 
@@ -437,25 +442,29 @@ rmvQtn <- function(dtaFrm = NULL) {
 rplAtt <- function(dtaFrm = NULL) {
     # extract the attributes from the dataset and its columns and determine which attributes are
     # character
-    dfAtt  <- setdiff(names(attributes(dtaFrm))[sapply(attributes(dtaFrm), is.character)], c("names", "row.names", "class"))
-    colAtt <- setdiff(unique(unlist(sapply(sapply(dtaFrm, attributes), names), use.names = FALSE)), c("class"))
+    dfAtt  <- setdiff(names(attributes(dtaFrm))[vapply(attributes(dtaFrm), is.character, logical(1))], c("names", "row.names", "class"))
+    colAtt <- setdiff(unique(unlist(lapply(lapply(dtaFrm, attributes), names), use.names = FALSE)), c("class"))
 
     # go through the data frame attributes (except the attributes from R) and check their validity
     for (crrAtt in dfAtt) {
         attr(dtaFrm, crrAtt) <- rplStr(attr(dtaFrm, crrAtt), crrAtt)
     }
+    # changing column attributes puts class in the last place within the attributes, this is reversed underneath
+    dfOrd <- names(attributes(dtaFrm))
 
     # go through the column attributes (except the attributes from R) and the detect columns
     # where those attributes are not validly encoded
     for (crrAtt in colAtt) {
-        lstAtt <- sapply(dtaFrm[names(dtaFrm)], attr, crrAtt)
-        lstAtt <- lstAtt[!sapply(lstAtt, is.null)]
-        if (!any(sapply(lstAtt, is.character))) break
-        if (!all(sapply(lstAtt, is.character))) stop(sprintf("Some attribute values of \"%s\" are not of the type character.", crrAtt))
-        for (crrCol in names(lstAtt)[sapply(lstAtt, function(x) !all(validEnc(x)))]) {
+        lstAtt <- lapply(dtaFrm, attr, crrAtt)
+        lstAtt <- lstAtt[!vapply(lstAtt, is.null, logical(1))]
+        if (!any(vapply(lstAtt, is.character, logical(1)))) next
+#       for (crrCol in names(lstAtt)[vapply(lstAtt, function(x) !all(validEnc(x)), logical(1))]) {
+        for (crrCol in names(lstAtt)) {
             attr(dtaFrm[[crrCol]], crrAtt) <- rplStr(attr(dtaFrm[[crrCol]], crrAtt), paste0(c(crrCol, crrAtt), collapse = " - "))
         }
     }
+    # re-establish the correct order of the data frame attributes
+    attributes(dtaFrm) <- attributes(dtaFrm)[dfOrd]
 
     dtaFrm
 }

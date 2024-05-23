@@ -80,7 +80,6 @@ use \code{haven}, you may need to install it using \code{install.packages("haven
 }
 \examples{
 \dontrun{
-library(jmvReadWrite)
 # generate a test dataframe with 100 (imaginary) participants / units of
 #  observation (ID), 8 measurement (measure) of one variable (X)
 dtaInp <- data.frame(ID = rep(as.character(seq(1, 100)), each = 8),
@@ -96,7 +95,8 @@ cat(str(dtaInp))
 nmeInp <- tempfile(fileext = ".rds")
 nmeOut <- tempfile(fileext = ".omv")
 saveRDS(dtaInp, nmeInp)
-long2wide_omv(dtaInp = nmeInp, fleOut = nmeOut, varTgt = "X", varID = "ID", varTme = "measure")
+jmvReadWrite::long2wide_omv(dtaInp = nmeInp, fleOut = nmeOut, varTgt = "X", varID = "ID",
+  varTme = "measure")
 # it is required to give at least the arguments dtaInp, varID and varTme
 # check whether the file was created and its size
 cat(list.files(dirname(nmeOut), basename(nmeOut)))
@@ -104,7 +104,7 @@ cat(list.files(dirname(nmeOut), basename(nmeOut)))
 cat(file.info(nmeOut)$size)
 # -> 6851 (approximate size; size may differ in every run [in dependence of
 #          how well the generated random data can be compressed])
-cat(str(read_omv(nmeOut, sveAtt = FALSE)))
+cat(str(jmvReadWrite::read_omv(nmeOut, sveAtt = FALSE)))
 # the data set is now transformed into wide (and each the measurements is now
 # indicated as a suffix to X; X_1, X_2, ...)
 # 'data.frame':	100 obs. of  9 variables:

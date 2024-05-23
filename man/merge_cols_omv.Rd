@@ -77,8 +77,7 @@ use \code{haven}, you may need to install it using \code{install.packages("haven
 }
 \examples{
 \dontrun{
-library(jmvReadWrite)
-dtaInp <- bfi_sample2
+dtaInp <- jmvReadWrite::bfi_sample2
 nmeInp <- paste0(tempfile(), "_", 1:3, ".rds")
 nmeOut <- tempfile(fileext = ".omv")
 for (i in seq_along(nmeInp)) {
@@ -86,10 +85,10 @@ for (i in seq_along(nmeInp)) {
 }
 # save dtaInp three times (i.e., the length of nmeInp), adding "_" + 1 ... 3 as index
 # to the data variables (A1 ... O5, gender, age → A1_1, ...)
-merge_cols_omv(dtaInp = nmeInp, fleOut = nmeOut, varBy = "ID")
+jmvReadWrite::merge_cols_omv(dtaInp = nmeInp, fleOut = nmeOut, varBy = "ID")
 cat(file.info(nmeOut)$size)
 # -> 17731 (size may differ on different OSes)
-dtaOut <- read_omv(nmeOut, sveAtt = FALSE)
+dtaOut <- jmvReadWrite::read_omv(nmeOut, sveAtt = FALSE)
 # read the data set where the three original datasets were added as columns and show
 # the variable names
 cat(names(dtaOut))

@@ -9,6 +9,7 @@ cond
 com
 CR
 csv
+cyclomatic
 dataType
 dtaDsc
 dtaInp
@@ -48,6 +49,8 @@ omv
 org
 ori
 OSF
+Patreon
+pkgcheck
 pkgdown
 pos
 rda

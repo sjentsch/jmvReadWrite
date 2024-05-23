@@ -6,12 +6,13 @@
 \title{Imagine that you worked for a record company and that your boss was interested in predicting album sales from
 advertising.}
 \format{
-A data.frame with 60 rows, each one representing a different album, and 5 variables
+A data frame with 60 rows, each one representing a different album, and 5 variables:
 \describe{
-\item{Adverts}{numeric}{Amount (in thousands of pounds) spent promoting the album before release}
-\item{Airplay}{integer}{How many times songs from the album were played on a prominent national radio station in the week before release}
-\item{Image}{integer}{How attractive people found the band's image (out of 10)}
-\item{Sales}{integer}{Sales (in thousands) of each album in the week after release}
+\item{\code{selSbj}}{Select the data in this row (1) or not (0)}
+\item{\code{Adverts}}{Amount (in thousands of pounds) spent promoting the album before release}
+\item{\code{Airplay}}{How many times songs from the album were played on a prominent national radio station in the week before release}
+\item{\code{Image}}{How attractive people found the band's image (out of 10)}
+\item{\code{Sales}}{Sales (in thousands) of each album in the week after release}
 }
 }
 \usage{

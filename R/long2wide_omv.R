@@ -46,7 +46,6 @@
 #'
 #' @examples
 #' \dontrun{
-#' library(jmvReadWrite)
 #' # generate a test dataframe with 100 (imaginary) participants / units of
 #' #  observation (ID), 8 measurement (measure) of one variable (X)
 #' dtaInp <- data.frame(ID = rep(as.character(seq(1, 100)), each = 8),
@@ -62,7 +61,8 @@
 #' nmeInp <- tempfile(fileext = ".rds")
 #' nmeOut <- tempfile(fileext = ".omv")
 #' saveRDS(dtaInp, nmeInp)
-#' long2wide_omv(dtaInp = nmeInp, fleOut = nmeOut, varTgt = "X", varID = "ID", varTme = "measure")
+#' jmvReadWrite::long2wide_omv(dtaInp = nmeInp, fleOut = nmeOut, varTgt = "X", varID = "ID",
+#'   varTme = "measure")
 #' # it is required to give at least the arguments dtaInp, varID and varTme
 #' # check whether the file was created and its size
 #' cat(list.files(dirname(nmeOut), basename(nmeOut)))
@@ -70,7 +70,7 @@
 #' cat(file.info(nmeOut)$size)
 #' # -> 6851 (approximate size; size may differ in every run [in dependence of
 #' #          how well the generated random data can be compressed])
-#' cat(str(read_omv(nmeOut, sveAtt = FALSE)))
+#' cat(str(jmvReadWrite::read_omv(nmeOut, sveAtt = FALSE)))
 #' # the data set is now transformed into wide (and each the measurements is now
 #' # indicated as a suffix to X; X_1, X_2, ...)
 #' # 'data.frame':	100 obs. of  9 variables:
@@ -113,7 +113,7 @@ long2wide_omv <- function(dtaInp = NULL, fleOut = "", varTgt = c(), varExc = c()
 
     # check and import input data set (either as data frame or from a file)
     if (!is.null(list(...)[["fleInp"]])) stop("Please use the argument dtaInp instead of fleInp.")
-    dtaFrm <- inp2DF(dtaInp = dtaInp, usePkg = usePkg, selSet = selSet, ...)
+    dtaFrm <- inp2DF(dtaInp = dtaInp, rmvEmp = TRUE, usePkg = usePkg, selSet = selSet, ...)
 
     # transform data set
     # [a] check whether varID, varTme and varTgt are not empty and exist in the data set
@@ -125,7 +125,7 @@ long2wide_omv <- function(dtaInp = NULL, fleOut = "", varTgt = c(), varExc = c()
     }
     # [b] store the original variable labels, the original time-varying / target variable,
     # and an empty vector for storing labels
-    lstLbl <- list(orgLbl = sapply(dtaFrm, attr, "jmv-desc"), orgTgt = varTgt)
+    lstLbl <- list(orgLbl = lapply(dtaFrm, attr, "jmv-desc"), orgTgt = varTgt)
 
     # [c] there might be several occurrences for each combination of varID and varTme; aggregate them
     dtaFrm <- aggDta(dtaFrm = dtaFrm, varAgg = varAgg, varID = varID, varTme = varTme, varExc = varExc, varTgt = varTgt)
@@ -159,7 +159,7 @@ long2wide_omv <- function(dtaInp = NULL, fleOut = "", varTgt = c(), varExc = c()
     if (!any(duplicated(dtaFrm[[varID]]))) attr(dtaFrm[[varID]], "jmv-id") <- TRUE
 
     # rtnDta in globals.R (unified function to either write the data frame, open it in a new jamovi session or return it)
-    rtnDta(dtaFrm = dtaFrm, fleOut = fleOut, sfxTtl = "_wide", ...)
+    rtnDta(dtaFrm = dtaFrm, fleOut = fleOut, dtaTtl = jmvTtl("_wide"), ...)
 }
 
 aggDta <- function(dtaFrm = NULL, varAgg = "", varID = c(), varTme = c(), varExc = c(), varTgt = c()) {
@@ -172,11 +172,11 @@ aggDta <- function(dtaFrm = NULL, varAgg = "", varID = c(), varTme = c(), varExc
     # variables in varID and varTme
     } else if (varAgg == "first") {
         # [1] if "first" is chosen as aggregation function, the first occurence at each step is returned
-        stats::aggregate(x = dtaFrm[, c(varTgt, varExc), drop = FALSE], by = dtaFrm[, c(varID, varTme), drop = FALSE], FUN = "[[", 1)
+        stats::aggregate(x = dtaFrm[, c(varTgt, varExc), drop = FALSE], by = dtaFrm[, c(varID, varTme), drop = FALSE], FUN = function(x) x[!is.na(x)][1])
     } else if (varAgg == "mean")  {
         # [2] if "mean" is chosen as aggregation function, it becomes (a little) more complicated
         # [a] the target variables (for which the mean is calculated) should be numeric
-        if (!all(sapply(dtaFrm[, varTgt], is.numeric))) {
+        if (!all(vapply(dtaFrm[, varTgt], is.numeric, logical(1)))) {
             stop(paste("In order to calculate the mean when aggregating the data, all target variables (varTgt) need to be numeric. Use varAgg = \"first\" instead",
                        "(to use the first occuring value) or convert the target variables to numeric."))
         }
@@ -188,12 +188,12 @@ aggDta <- function(dtaFrm = NULL, varAgg = "", varID = c(), varTme = c(), varExc
         # participant [ID]); finally the results from the two aggregate-functions are merged again
         # to return the complete data set
         if (length(varExc) > 0) {
-            merge(stats::aggregate(x = dtaFrm[, c(varTgt), drop = FALSE], by = dtaFrm[, c(varID, varTme), drop = FALSE], FUN = mean),
-                  stats::aggregate(x = dtaFrm[, c(varExc), drop = FALSE], by = dtaFrm[, c(varID, varTme), drop = FALSE], FUN = "[[", 1))
+            merge(stats::aggregate(x = dtaFrm[, c(varTgt), drop = FALSE], by = dtaFrm[, c(varID, varTme), drop = FALSE], FUN = mean, na.rm = TRUE),
+                  stats::aggregate(x = dtaFrm[, c(varExc), drop = FALSE], by = dtaFrm[, c(varID, varTme), drop = FALSE], FUN = function(x) x[!is.na(x)][1]))
         # [c] if there is no “excluded” variable, the mean is calculated for the target variables
         # at each possible combination of the variables varID and varTme
         } else {
-            stats::aggregate(x = dtaFrm[, c(varTgt), drop = FALSE], by = dtaFrm[, c(varID, varTme), drop = FALSE], FUN = mean)
+            stats::aggregate(x = dtaFrm[, c(varTgt), drop = FALSE], by = dtaFrm[, c(varID, varTme), drop = FALSE], FUN = mean, na.rm = TRUE)
         }
     }
 }
@@ -203,7 +203,7 @@ rstLbl <- function(dtaFrm = NULL, lstLbl = list(), varTgt = c(), varTme = c(), v
         if (crrNme %in% names(dtaFrm)) {
             attr(dtaFrm[[crrNme]], "jmv-desc") <- lstLbl$orgLbl[[crrNme]]
         } else if (crrNme %in% lstLbl$orgTgt) {
-            splTgt <- strsplit(varTgt, varSep)
+            splTgt <- strsplit(varTgt, gsub("\\.", "\\\\.", varSep))
             for (i in seq_along(splTgt)) {
                 if (crrNme %in% splTgt[[i]]) {
                     attr(dtaFrm[[varTgt[i]]], "jmv-desc") <-

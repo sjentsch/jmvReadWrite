@@ -54,19 +54,18 @@ and \code{read_xpt} (\code{haven}) / \code{read.xport} (\code{foreign}) for SAS-
 }
 \examples{
 \dontrun{
-library(jmvReadWrite)
 nmeInp <- system.file("extdata", "AlbumSales.omv", package = "jmvReadWrite")
 nmeOut <- tempfile(fileext = ".omv")
-sort_omv(dtaInp = nmeInp, fleOut = nmeOut, varSrt = "Image")
-dtaFrm <- read_omv(nmeOut)
+jmvReadWrite::sort_omv(dtaInp = nmeInp, fleOut = nmeOut, varSrt = "Image")
+dtaFrm <- jmvReadWrite::read_omv(nmeOut)
 unlink(nmeOut)
 cat(dtaFrm$Image)
 # shows that the variable "Image" is sorted in ascending order
 cat(is.unsorted(dtaFrm$Image))
 # is.unsorted (which checks for whether the variable is NOT sorted) returns FALSE
-sort_omv(dtaInp = nmeInp, fleOut = nmeOut, varSrt = "-Image")
+jmvReadWrite::sort_omv(dtaInp = nmeInp, fleOut = nmeOut, varSrt = "-Image")
 # variables can also be sorted in descending order by preceding them with "-"
-dtaFrm <- read_omv(nmeOut)
+dtaFrm <- jmvReadWrite::read_omv(nmeOut)
 unlink(nmeOut)
 cat(dtaFrm$Image)
 # shows that the variable "Image" is now sorted in descending order

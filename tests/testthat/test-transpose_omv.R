@@ -16,7 +16,7 @@ test_that("arrange_cols_omv works", {
     expect_s3_class(df4Chk, "data.frame")
     expect_equal(dim(df4Chk), c(75, 17))
     expect_equal(names(df4Chk), c("ID", sprintf("V_%d", seq(16))))
-    expect_equal(as.vector(sapply(df4Chk, typeof)), c("character", rep("integer", 16)))
+    expect_equal(vapply(df4Chk, typeof, character(1), USE.NAMES = FALSE), c("character", rep("integer", 16)))
     unlink(nmeOut)
 
     expect_null(transpose_omv(dtaInp = cbind(list(qstItm = sprintf("Qst_%02d", seq(16))), tmpDF), fleOut = nmeOut, varNme = "qstItm"))
@@ -30,7 +30,7 @@ test_that("arrange_cols_omv works", {
     expect_s3_class(df4Chk, "data.frame")
     expect_equal(dim(df4Chk), c(75, 17))
     expect_equal(names(df4Chk), c("ID", sprintf("Qst_%02d", seq(16))))
-    expect_equal(as.vector(sapply(df4Chk, typeof)), c("character", rep("integer", 16)))
+    expect_equal(vapply(df4Chk, typeof, character(1), USE.NAMES = FALSE), c("character", rep("integer", 16)))
     unlink(nmeOut)
 
     expect_null(transpose_omv(dtaInp = tmpDF, fleOut = nmeOut, varNme = sprintf("Trl_%02d", seq(16))))
@@ -44,7 +44,7 @@ test_that("arrange_cols_omv works", {
     expect_s3_class(df4Chk, "data.frame")
     expect_equal(dim(df4Chk), c(75, 17))
     expect_equal(names(df4Chk), c("ID", sprintf("Trl_%02d", seq(16))))
-    expect_equal(as.vector(sapply(df4Chk, typeof)), c("character", rep("integer", 16)))
+    expect_equal(vapply(df4Chk, typeof, character(1), USE.NAMES = FALSE), c("character", rep("integer", 16)))
     unlink(nmeOut)
 
     expect_null(transpose_omv(dtaInp = nmeInp, fleOut = nmeOut))
@@ -58,14 +58,14 @@ test_that("arrange_cols_omv works", {
     expect_s3_class(df4Chk, "data.frame")
     expect_equal(dim(df4Chk), c(75, 17))
     expect_equal(names(df4Chk), c("ID", sprintf("V_%d", seq(16))))
-    expect_equal(as.vector(sapply(df4Chk, typeof)), c("character", rep("integer", 16)))
+    expect_equal(vapply(df4Chk, typeof, character(1), USE.NAMES = FALSE), c("character", rep("integer", 16)))
     unlink(nmeOut)
 
     df4Chk <- transpose_omv(dtaInp = tmpDF)
     expect_s3_class(df4Chk, "data.frame")
     expect_equal(dim(df4Chk), c(75, 17))
     expect_equal(names(df4Chk), c("ID", sprintf("V_%d", seq(16))))
-    expect_equal(as.vector(sapply(df4Chk, typeof)), c("character", rep("integer", 16)))
+    expect_equal(vapply(df4Chk, typeof, character(1), USE.NAMES = FALSE), c("character", rep("integer", 16)))
 
     expect_error(transpose_omv(fleInp = tmpDF, fleOut = nmeOut), regexp = "Please use the argument dtaInp instead of fleInp\\.")
     unlink(nmeInp)

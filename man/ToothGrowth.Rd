@@ -5,15 +5,15 @@
 \alias{ToothGrowth}
 \title{The Effect of Vitamin C on Tooth Growth in Guinea Pigs}
 \format{
-A data.frame with 60 rows and 6 variables
+A data frame with 60 rows and 6 variables:
 \describe{
-\item{ID}{character}{ID of the guinea pig}
-\item{supp}{factor}{Supplement type (VC: Vitamin C or OJ: Orange juice)}
-\item{supp2}{factor}{Transformation of the supplement type (factor to numerical: VC = 1; OJ = 2)}
-\item{dose}{numeric}{Dose in grams / day}
-\item{dose2}{ordered factor}{Dose in grams / day}
-\item{len}{numeric}{Tooth length}
-\item{logLen}{numeric}{Natural logarithm of the tooth length (len)}
+\item{\code{ID}}{ID of the guinea pig}
+\item{\code{supp}}{Supplement type (VC: Vitamin C or OJ: Orange juice)}
+\item{\code{supp2}}{Transformation of the supplement type (factor to numerical: VC = 1; OJ = 2)}
+\item{\code{dose}}{Dose in grams / day}
+\item{\code{dose2}}{Dose in grams / day}
+\item{\code{len}}{Tooth length}
+\item{\code{logLen}}{Natural logarithm of the tooth length (len)}
 }
 }
 \usage{

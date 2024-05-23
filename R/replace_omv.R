@@ -35,22 +35,24 @@
 #'
 #' @examples
 #' \dontrun{
-#' library(jmvReadWrite)
+#' bfi_sample <- jmvReadWrite::bfi_sample
 #' # the gender in the original data file is plural...
 #' table(bfi_sample$gender)
 #' # and shall be converted to singular
-#' rplDF <- replace_omv(bfi_sample, rplLst = list(c("Females", "Female"), c("Males", "Male")))
+#' rplDF <- jmvReadWrite::replace_omv(dtaInp = bfi_sample,
+#'            rplLst = list(c("Females", "Female"), c("Males", "Male")))
 #' table(rplDF$gender)
 #' # with giving an output file name, the data set is written
 #' nmeOut <- tempfile(fileext = ".omv")
-#' replace_omv(bfi_sample, fleOut = nmeOut, rplLst = list(c("Females", "Female"), c("Males", "Male")))
+#' jmvReadWrite::replace_omv(bfi_sample, fleOut = nmeOut,
+#'   rplLst = list(c("Females", "Female"), c("Males", "Male")))
 #' file.exists(nmeOut)
-#' rplDF <- read_omv(nmeOut)
+#' rplDF <- jmvReadWrite::read_omv(nmeOut)
 #' table(rplDF$gender)
 #' unlink(nmeOut)
 #' # it is sensible to check / search for the original values before running replace_omv
-#' search_omv(bfi_sample, 24, whlTrm = TRUE)
-#' rplDF <- replace_omv(bfi_sample, rplLst = list(c(24, NA)))
+#' jmvReadWrite::search_omv(bfi_sample, 24, whlTrm = TRUE)
+#' rplDF <- jmvReadWrite::replace_omv(bfi_sample, rplLst = list(c(24, NA)))
 #' table(rplDF$age)
 #' }
 #'
@@ -60,7 +62,7 @@ replace_omv <- function(dtaInp = NULL, fleOut = "", rplLst = list(), whlTrm = TR
                         incID = TRUE, incCmp = TRUE, incRcd = TRUE, psvAnl = FALSE, ...) {
 
     # check the input parameter:
-    if (length(rplLst) < 1 || !is.list(rplLst) || !all(sapply(rplLst, length) == 2)) {
+    if (length(rplLst) < 1 || !is.list(rplLst) || !all(vapply(rplLst, length, integer(1)) == 2)) {
         stop("Calling replace_omv requires the parameter rplLst (a list where each entry is a vector with length 2; see Details in help).")
     }
 
@@ -69,8 +71,18 @@ replace_omv <- function(dtaInp = NULL, fleOut = "", rplLst = list(), whlTrm = TR
     dtaFrm <- inp2DF(dtaInp = dtaInp, ...)
     dtaFrm <- jmvAtt(dtaFrm)
 
-    incClT <- c("Data", rep("Computed", incCmp), rep("Recoded", incRcd))
-    incMsT <- c(rep("ID", incID), rep("Nominal", incNom), rep("Ordinal", incOrd), rep("Continuous", incNum))
+    srcNme <- chkInE(dtaFrm, varInc, varExc, incNum, incOrd, incNom, incID, incCmp, incRcd)
+    for (i in seq_along(srcNme)) {
+        for (j in seq_along(rplLst)) {
+            dtaFrm <- rplVal(dtaFrm, srcNme[i], rplLst[[j]], whlTrm)
+        }
+    }
+
+    # rtnDta in globals.R (unified function to either write the data frame, open it in a new jamovi session or return it)
+    rtnDta(dtaFrm = dtaFrm, fleOut = fleOut, dtaTtl = jmvTtl("_rplc"), psvAnl = psvAnl, dtaInp = dtaInp, ...)
+}
+
+chkInE <- function(dtaFrm = NULL, varInc = c(), varExc = c(), incNum = TRUE, incOrd = TRUE, incNom = TRUE, incID = TRUE, incCmp = TRUE, incRcd = TRUE) {
     if (!is.null(varInc) && length(varInc) > 0 && !is.null(varExc) && length(varExc) > 0) warning("Both varInc and varExc are given, varInc takes precedence.")
     if        (!is.null(varInc) && length(varInc) > 0 && all(nzchar(varInc))) {
         if (!all(varInc %in% names(dtaFrm))) {
@@ -85,25 +97,26 @@ replace_omv <- function(dtaInp = NULL, fleOut = "", rplLst = list(), whlTrm = TR
     } else {
         srcNme <- names(dtaFrm)
     }
-    srcNme <- srcNme[sapply(dtaFrm[srcNme], function(x) is.null(attr(x,  "columnType")) || any(attr(x,  "columnType") == incClT))]
-    srcNme <- srcNme[sapply(dtaFrm[srcNme], function(x) is.null(attr(x, "measureType")) || any(attr(x, "measureType") == incMsT))]
-    for (i in seq_along(srcNme)) {
-        typClm <- class(dtaFrm[[srcNme[i]]])
-        for (j in seq_along(rplLst)) {
-            if (is.factor(dtaFrm[[srcNme[i]]])) {
-                if (rplLst[[j]][1] %in% levels(dtaFrm[[srcNme[i]]])) levels(dtaFrm[[srcNme[i]]]) <- gsub(rplLst[[j]][1], rplLst[[j]][2], levels(dtaFrm[[srcNme[i]]]))
-            } else if (is.numeric(dtaFrm[[srcNme[i]]]) || is.character(dtaFrm[[srcNme[i]]])) {
-                srcSel <- srcClm(dtaFrm[[srcNme[i]]], as.character(rplLst[[j]][1]), whlTrm)
-                if (any(srcSel)) {
-                    dtaFrm[srcSel, srcNme[i]] <- ifelse(identical(class(rplLst[[j]][2]), typClm),
-                                                          rplLst[[j]][2],
-                                                          eval(parse(text = paste0("as.", typClm, "(rplLst[[j]][2])"))))
-                }
-            }
-            # other variable types are already caught by jmvAtt() above
-        }
-    }
 
-    # rtnDta in globals.R (unified function to either write the data frame, open it in a new jamovi session or return it)
-    rtnDta(dtaFrm = dtaFrm, fleOut = fleOut, sfxTtl = "_rplc", psvAnl = psvAnl, dtaInp = dtaInp, ...)
+    incClT <- c("Data", rep("Computed", incCmp), rep("Recoded", incRcd))
+    incMsT <- c(rep("ID", incID), rep("Nominal", incNom), rep("Ordinal", incOrd), rep("Continuous", incNum))
+    srcNme <- srcNme[vapply(dtaFrm[srcNme], function(x) is.null(attr(x,  "columnType")) || any(attr(x,  "columnType") == incClT), logical(1))]
+    srcNme <- srcNme[vapply(dtaFrm[srcNme], function(x) is.null(attr(x, "measureType")) || any(attr(x, "measureType") == incMsT), logical(1))]
+
+    srcNme
+}
+
+rplVal <- function(dtaFrm = NULL, crrCll = "", crrRpl = NULL, whlTrm = TRUE) {
+    if (is.factor(dtaFrm[[crrCll]])) {
+        if (crrRpl[1] %in% levels(dtaFrm[[crrCll]])) levels(dtaFrm[[crrCll]]) <- gsub(crrRpl[1], crrRpl[2], levels(dtaFrm[[crrCll]]))
+    } else if (is.numeric(dtaFrm[[crrCll]])) {
+        srcSel <- srcClm(dtaFrm[[crrCll]], gsub("\\.", "\\\\.", as.character(crrRpl[1])), whlTrm)
+        if (any(srcSel)) dtaFrm[srcSel, crrCll] <- dtaFrm[srcSel, crrCll] + diff(as.numeric(crrRpl))
+    } else if (is.character(dtaFrm[[crrCll]])) {
+        srcSel <- srcClm(dtaFrm[[crrCll]], gsub("\\.", "\\\\.", as.character(crrRpl[1])), whlTrm)
+        if (any(srcSel)) dtaFrm[srcSel, crrCll] <- crrRpl[2]
+    }
+    # other variable types are already caught by jmvAtt() above
+
+    dtaFrm
 }

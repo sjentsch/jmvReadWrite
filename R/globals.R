@@ -103,7 +103,7 @@ hasExt <- function(fleNme = "", extNme = c("")) {
 }
 
 hasPkg <- function(usePkg = c()) {
-    all(sapply(usePkg, function(X) nzchar(system.file(package = X))))
+    all(vapply(usePkg, function(X) nzchar(system.file(package = X)), logical(1)))
 }
 
 nrmFle <- function(fleNme = "") {
@@ -117,9 +117,9 @@ fmtFlI <- function(fleInp = c(), minLng = 1, maxLng = Inf, excExt = "") {
         stop(sprintf("The fleInp-argument is supposed to be a character vector with a minimal length of %.0f and a maximal length of %.0f (current length is %.0f).%s",
                      minLng, maxLng, length(fleInp), ifelse(length(fleInp) > maxLng, "\n  If you would like to process several files, call the function individually for each.", "")))
     }
-    fleInp <- unname(sapply(fleInp, nrmFle))
-    all(sapply(fleInp, chkFle))
-    all(sapply(fleInp, chkExt, setdiff(vldExt, excExt)))
+    fleInp <- unname(vapply(fleInp, nrmFle, character(1)))
+    all(vapply(fleInp, chkFle, logical(1)))
+    all(vapply(fleInp, chkExt, logical(1), setdiff(vldExt, excExt)))
     fleInp
 }
 
@@ -155,7 +155,7 @@ jmvPtB <- function() {
     synPkg <- c("RProtoBuf", "jmvcore")
     if (!hasPkg(synPkg)) {
         warning(sprintf("For using protocol buffers, the package(s) \"%s\" need(s) to be installed.\n\n",
-          paste0(synPkg[!sapply(synPkg, hasPkg)], collapse = "\", \"")))
+          paste0(synPkg[!vapply(synPkg, hasPkg, logical(1))], collapse = "\", \"")))
         return(FALSE)
     }
     # check the two possible places for the jamovi.proto file
@@ -386,7 +386,7 @@ for (cmdCnt in seq_along(cmdSPS)) {
 
 # =================================================================================================
 # function handling to have either a data frame or a character (pointing to a file) as input
-inp2DF <- function(dtaInp = NULL, minDF = 1, maxDF = 1, usePkg = c("foreign", "haven"), selSet = "", ...) {
+inp2DF <- function(dtaInp = NULL, minDF = 1, maxDF = 1, rmvEmp = FALSE, usePkg = c("foreign", "haven"), selSet = "", ...) {
     usePkg <- match.arg(usePkg)
     # check and format input and output files, handle / check further input arguments:
     # if the input is a data frame, it is “embedded” in a list (in order to permit to read
@@ -405,6 +405,23 @@ inp2DF <- function(dtaInp = NULL, minDF = 1, maxDF = 1, usePkg = c("foreign", "h
         clsRmv()
         stop("dtaInp must either be a data frame or a character (pointing to a location where the input file can be found).")
     }
+    # if rmvEmp is set, check for rows that are completely empty and remove them
+    if (rmvEmp) {
+        for (i in seq_along(lstDF)) {
+            blnEmp <- apply(lstDF[[i]], 1, function(x) all(is.na(x)))
+            if (blnEmp[1] && sum(diff(blnEmp) == -1) == 1) {
+                lstDF[[i]] <- lstDF[[i]][-seq(1, which(diff(blnEmp) == -1)), ]
+                blnEmp <- apply(lstDF[[i]], 1, function(x) all(is.na(x)))
+            }
+            if (blnEmp[length(blnEmp)] && sum(diff(blnEmp) == 1) == 1) {
+                lstDF[[i]] <- lstDF[[i]][seq(which(diff(blnEmp) == 1)), ]
+                blnEmp <- apply(lstDF[[i]], 1, function(x) all(is.na(x)))
+            }
+            if (any(blnEmp)) {
+                stop("Empty rows are not permitted execpt from the begin or the end of an input data frame (in such case, they are automatically removed).")
+            }
+        }
+    }
     # most functions expect only one data frame to be returned, thus, the list
     # used for reading processing those data frames is unpacked if there is
     # only one data frame to return
@@ -418,7 +435,7 @@ inp2DF <- function(dtaInp = NULL, minDF = 1, maxDF = 1, usePkg = c("foreign", "h
 #   - open the data frame in a new session (only in jamovi, and if fleOut is an empty character vector)
 #   - return the data frame (in R in any case, or in jamovi if fleOut is NULL)
 #   NB: this makes opening the data frame in a new session the default, if in jamovi
-rtnDta <- function(dtaFrm = NULL, fleOut = "", sfxTtl = "", wrtPtB = FALSE, psvAnl = FALSE, dtaInp = NULL, ...) {
+rtnDta <- function(dtaFrm = NULL, fleOut = "", dtaTtl = "", wrtPtB = FALSE, psvAnl = FALSE, dtaInp = NULL, ...) {
     if (!is.null(fleOut) && nzchar(fleOut[1])) {
         fleOut <- fmtFlO(fleOut[1])
         write_omv(dtaFrm = dtaFrm, fleOut = fleOut, wrtPtB = wrtPtB, ...)
@@ -430,11 +447,11 @@ rtnDta <- function(dtaFrm = NULL, fleOut = "", sfxTtl = "", wrtPtB = FALSE, psvA
                 warning("psvAnl is only possible if dtaInp is a file name (analyses are not stored in data frames, only in the jamovi files).")
             }
         }
-        return()
+        return(invisible(NULL))
     } else if (isJmv() && is.character(fleOut)) {
         if (psvAnl) warning("psvAnl is only possible if fleOut is a file name (analyses are not stored in data frames, only in the jamovi files).")
-        jmvOpn(dtaFrm, sfxTtl = sfxTtl)
-        return()
+        jmvOpn(dtaFrm, dtaTtl = dtaTtl)
+        return(invisible(NULL))
     } else {
         if (psvAnl) warning("psvAnl is only possible if fleOut is a file name (analyses are not stored in data frames, only in the jamovi files).")
         return(dtaFrm)
@@ -495,7 +512,7 @@ jmvAtt <- function(dtaFrm = NULL) {
 
     for (crrNme in names(dtaFrm)) {
          # if the attributes already exist, go to the next column
-         if (chkAtt(dtaFrm[[crrNme]], "measureType") && chkAtt(dtaFrm[[crrNme]], "measureType")) next
+         if (chkAtt(dtaFrm[[crrNme]], "measureType") && chkAtt(dtaFrm[[crrNme]], "dataType")) next
          # jmv-id
          if (!is.null(attr(dtaFrm[[crrNme]], "jmv-id")) && attr(dtaFrm[[crrNme]], "jmv-id")) {
              attr(dtaFrm[[crrNme]], "measureType")  <- "ID"
@@ -506,19 +523,10 @@ jmvAtt <- function(dtaFrm = NULL) {
          } else if (is.numeric(dtaFrm[[crrNme]])) {
              attr(dtaFrm[[crrNme]], "measureType")  <- "Continuous"
              attr(dtaFrm[[crrNme]], "dataType")     <- "Decimal"
-         } else if (is.ordered(dtaFrm[[crrNme]]) &&  is.null(attr(dtaFrm[[crrNme]], "values"))) {
-             attr(dtaFrm[[crrNme]], "measureType")  <- "Ordinal"
-             attr(dtaFrm[[crrNme]], "dataType")     <- "Text"
-         } else if (is.ordered(dtaFrm[[crrNme]]) && !is.null(attr(dtaFrm[[crrNme]], "values"))) {
-             attr(dtaFrm[[crrNme]], "measureType")  <- "Ordinal"
-             attr(dtaFrm[[crrNme]], "dataType")     <- "Integer"
-         } else if (is.factor(dtaFrm[[crrNme]]) &&  is.null(attr(dtaFrm[[crrNme]], "values"))) {
-             attr(dtaFrm[[crrNme]], "measureType")  <- "Nominal"
-             attr(dtaFrm[[crrNme]], "dataType")     <- "Text"
-         } else if (is.factor(dtaFrm[[crrNme]]) && !is.null(attr(dtaFrm[[crrNme]], "values"))) {
-             attr(dtaFrm[[crrNme]], "measureType")  <- "Nominal"
-             attr(dtaFrm[[crrNme]], "dataType")     <- "Integer"
-         } else if (is.character(dtaFrm[[crrNme]])) {
+         } else if (is.factor(dtaFrm[[crrNme]])) {
+             attr(dtaFrm[[crrNme]], "measureType")  <- ifelse(is.ordered(dtaFrm[[crrNme]]), "Ordinal", "Nominal")
+             attr(dtaFrm[[crrNme]], "dataType")     <- ifelse(is.null(attr(dtaFrm[[crrNme]], "values")), "Text", "Integer")
+         } else if (is.logical(dtaFrm[[crrNme]]) || is.character(dtaFrm[[crrNme]])) {
              crrAtt <- attributes(dtaFrm[[crrNme]])
              dtaFrm[[crrNme]] <- as.factor(dtaFrm[[crrNme]])
              dffAtt <- setdiff(names(crrAtt), c("levels", "class"))
@@ -533,7 +541,7 @@ jmvAtt <- function(dtaFrm = NULL) {
     dtaFrm
 }
 
-jmvOpn <- function(dtaFrm = NULL, sfxTtl = "") {
+jmvOpn <- function(dtaFrm = NULL, dtaTtl = "") {
     # on both Windows and Linux, jamovi is in the path, and, hence,
     # Sys.which should give the full location
     jmvEXE <- Sys.which("jamovi")
@@ -557,8 +565,7 @@ jmvOpn <- function(dtaFrm = NULL, sfxTtl = "") {
     if (nzchar(jmvEXE) && file.exists(jmvEXE)) {
         tmpOut <- tempfile(fileext = ".omv")
         jmvReadWrite::write_omv(dtaFrm, fleOut = tmpOut)
-# TO-DO: replace Dataset with the name of the current data set
-        system2(jmvEXE, args = paste0(" --temp --title=\"", "Dataset", sfxTtl, "\" ", tmpOut), stderr = TRUE, stdout = TRUE)
+        system2(jmvEXE, args = paste0(" --temp --title=\"", dtaTtl, "\" ", tmpOut), stderr = TRUE, stdout = TRUE)
     } else {
         stop(sprintf("The position of the jamovi executable could not be determined or it was not found at the determined position. Determined position: %s", jmvEXE))
     }
@@ -571,4 +578,11 @@ jmvPth <- function(inpPth = "", strTgt = "", bfrTgt = TRUE) {
     } else {
         return()
     }
+}
+
+jmvTtl <- function(sfxTtl = "") {
+    # return empty string when not inside jamove (then the title is irrelevant)
+    if (!isJmv()) return("")
+# TO-DO: replace Dataset with the name of the current data set (once this is implemented)
+    return(paste0("Dataset", sfxTtl))
 }

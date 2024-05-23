@@ -32,19 +32,18 @@
 #'
 #' @examples
 #' \dontrun{
-#' library(jmvReadWrite)
 #' nmeInp <- system.file("extdata", "AlbumSales.omv", package = "jmvReadWrite")
 #' nmeOut <- tempfile(fileext = ".omv")
-#' sort_omv(dtaInp = nmeInp, fleOut = nmeOut, varSrt = "Image")
-#' dtaFrm <- read_omv(nmeOut)
+#' jmvReadWrite::sort_omv(dtaInp = nmeInp, fleOut = nmeOut, varSrt = "Image")
+#' dtaFrm <- jmvReadWrite::read_omv(nmeOut)
 #' unlink(nmeOut)
 #' cat(dtaFrm$Image)
 #' # shows that the variable "Image" is sorted in ascending order
 #' cat(is.unsorted(dtaFrm$Image))
 #' # is.unsorted (which checks for whether the variable is NOT sorted) returns FALSE
-#' sort_omv(dtaInp = nmeInp, fleOut = nmeOut, varSrt = "-Image")
+#' jmvReadWrite::sort_omv(dtaInp = nmeInp, fleOut = nmeOut, varSrt = "-Image")
 #' # variables can also be sorted in descending order by preceding them with "-"
-#' dtaFrm <- read_omv(nmeOut)
+#' dtaFrm <- jmvReadWrite::read_omv(nmeOut)
 #' unlink(nmeOut)
 #' cat(dtaFrm$Image)
 #' # shows that the variable "Image" is now sorted in descending order
@@ -70,24 +69,24 @@ sort_omv <- function(dtaInp = NULL, fleOut = "", varSrt = c(), psvAnl = FALSE, u
     dtaFrm <- srtFrm(dtaFrm, varSrt)
 
     # rtnDta in globals.R (unified function to either write the data frame, open it in a new jamovi session or return it)
-    rtnDta(dtaFrm = dtaFrm, fleOut = fleOut, sfxTtl = "_sort", psvAnl = psvAnl, dtaInp = dtaInp, ...)
+    rtnDta(dtaFrm = dtaFrm, fleOut = fleOut, dtaTtl = jmvTtl("_sort"), psvAnl = psvAnl, dtaInp = dtaInp, ...)
 }
 
 srtFrm <- function(dtaFrm = NULL, varSrt = c()) {
     # if the sorting variable(s) are found, generate an order according to them and afterwards remove / reset the rownames
     if (chkVar(dtaFrm, gsub("^-", "", varSrt))) {
 #       srtOrd <- eval(parse(text = paste0("order(", paste0(gsub("dtaFrm[[\"-", "-dtaFrm[[\"", paste0("dtaFrm[[\"", varSrt, "\"]]"), fixed = TRUE), collapse = ", "), ")")))
-        srtOrd <- eval(parse(text = paste0("order(", paste0(sapply(varSrt, function(x) {
+        srtOrd <- eval(parse(text = paste0("order(", paste0(vapply(varSrt, function(x) {
             s <- ifelse(grepl("^-", x), "-", "")
             ifelse(!any(is.na(suppressWarnings(as.numeric(dtaFrm[[x]])))),
                 paste0(s, "as.numeric(dtaFrm[[\"", sub("^-", "", x), "\"]])"),
                 paste0(s, "dtaFrm[[\"", sub("^-", "", x), "\"]]"))
-            }), collapse = ", "), ")")))
+            }, character(1)), collapse = ", "), ")")))
         # sorting makes the data.frame lose it's attributes which are therefore stored and later restored
-        attMem <- sapply(dtaFrm, attributes)
+        attMem <- lapply(dtaFrm, attributes)
         dtaFrm <- dtaFrm[srtOrd, , drop = FALSE]
         rownames(dtaFrm) <- NULL
-        for (n in names(attMem)[!sapply(attMem, is.null)]) attributes(dtaFrm[[n]]) <- attMem[[n]]
+        for (n in names(attMem)[!vapply(attMem, is.null, logical(1))]) attributes(dtaFrm[[n]]) <- attMem[[n]]
     }
 
     dtaFrm

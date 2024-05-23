@@ -64,8 +64,13 @@ devtools::check(force_suggests = TRUE, incoming = TRUE, remote = TRUE, env_vars 
 devtools::check_win_devel()
 
 # the next stage of ping-pong, either build on the standard platforms
-rhub::rc_submit(platforms=c("linux", "windows", "macos", "macos-arm64"))
+#rhub::rc_submit(platforms=c("linux", "windows", "macos", "macos-arm64"))
 rhub::rhub_check(platforms=c("linux", "windows", "macos", "macos-arm64"))
+# running github actions requires a personal access token: https://github.com/settings/profile
+# → Developer options → Personal access token → Tokens (classic) → tick “repo”
+# the token is valid for a limited time period and can be regenerated; to update the
+# token, the following function can be used (choose 2 and copy the token when requested)
+gitcreds::gitcreds_set()
 
 # update version number and comments in cran-comments.md (and perhaps NEWS.md)
 system("gedit cran-comments.md NEWS.md")

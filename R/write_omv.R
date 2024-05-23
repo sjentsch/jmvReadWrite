@@ -73,7 +73,7 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", wrtPtB = FALSE, frcWrt = FALSE
     chkDtF(dtaFrm)
     if (isJmv()) dtaFrm <- jmvAtt(dtaFrm)
 
-    # handle the attributes "variable.labels" and "value.labels" in the format provided by the R-package "foreign"
+    # handle the attributes "variable.labels" and "value.labels" in the format provided bymtaDta <- mtaGlb the R-package "foreign"
     # the attribute "variable.labels" (attached to the data frame) is converted them to the format used by jamovi ("jmv-desc" attached to the data column)
     if (chkAtt(dtaFrm, "variable.labels")) dtaFrm <- fgnLbl(dtaFrm)
     if (chkAtt(dtaFrm, "label.table")) stop("R-foreign-style value labels need to be implemented. Please send the data file that caused this problem to sebastian.jentschke@uib.no")
@@ -147,7 +147,7 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", wrtPtB = FALSE, frcWrt = FALSE
             xtdDta[[crrNme]]   <- attr(crrCol, "crrLbl")
         # [c] numerical (integer / decimals)
         } else if (is.numeric(crrCol)) {
-            crrCol <- prcNum(crrCol, mtaDta$fields[[i]], dtaFrm[[i]])
+            crrCol <- prcNum(crrCol, mtaDta$fields[[i]])
             mtaDta$fields[[i]] <- attr(crrCol, "crrFld")
         # [d] dates / times - jamovi actually doesn't support it but i perhaps makes most sense to implement it as numeric
         # can be transformed back in R using - as.Date(..., origin = "1970-01-01") and hms::as_hms(...)
@@ -258,6 +258,7 @@ prcFnC <- function(crrCol = NULL, crrFld = NULL, dtaCol = NULL, crrNme = c()) {
     facLvl <- attr(crrCol, "levels")
     # above must be kept at crrCol as the original column might be character and was converted above
     facOrd <- is.ordered(dtaCol)
+    crrLbl <- NULL
     if (chkAtt(dtaCol, "values")) {
         crrCol <- attr(dtaCol, "values")[as.vector.factor(crrCol, mode = "integer")]
         if (length(facLvl) > 0) {
@@ -285,28 +286,43 @@ prcFnC <- function(crrCol = NULL, crrFld = NULL, dtaCol = NULL, crrNme = c()) {
 
      attr(crrCol, "crrFld") <- crrFld
      attr(crrCol, "crrLbl") <- crrLbl
+
      crrCol
 }
 
-prcNum <- function(crrCol = NULL, crrFld = NULL, dtaCol = NULL) {
-    if (! all(is.na(crrCol)) && max(abs(crrCol), na.rm = TRUE) <= .Machine$integer.max && all(abs(crrCol - round(crrCol)) < sqrt(.Machine$double.eps), na.rm = TRUE)) {
-        crrCol <- as.integer(crrCol)
+prcNum <- function(crrCol = NULL, crrFld = NULL) {
+    # determine type (how values are stored) and dataType (used by jamovi ~ R: Decimal ~ numeric, Integer ~ integer)
+    if        (chkAtt(crrCol, "dataType")) {
+        crrFld[["type"]]     <- gsub("decimal", "number", tolower(attr(crrCol, "dataType")))
+        crrFld[["dataType"]] <- attr(crrCol, "dataType")
+    } else if (detInt(crrCol)) {
         crrFld[["type"]]     <- "integer"
-        crrFld[["dataType"]] <- ifelse(chkAtt(dtaCol, "dataType"), attr(dtaCol, "dataType"), "Integer")
-        # if "measureType" is already stored in the data frame, keep it, otherwise assign "Continuous" if there are enough different values and a high value range and variability (sd)
-        if (length(unique(crrCol)) > length(crrCol) / 5 && length(unique(crrCol)) > diff(range(crrCol, na.rm = TRUE)) / 5 &&
-            stats::sd(crrCol, na.rm = TRUE) > diff(range(crrCol, na.rm = TRUE)) / 10) {
-            crrFld[["measureType"]] <- ifelse(chkAtt(dtaCol, "measureType"), attr(dtaCol, "measureType"), "Continuous")
-        }
+        crrFld[["dataType"]] <- "Integer"
     } else {
         crrFld[["type"]]     <- "number"
-        crrFld[["dataType"]] <- ifelse(chkAtt(dtaCol, "dataType"), attr(dtaCol, "dataType"), "Decimal")
-        # if "measureType" is already stored in the data frame, keep it, otherwise assign "Continuous"
-        crrFld[["measureType"]] <- ifelse(chkAtt(dtaCol, "measureType"), attr(dtaCol, "measureType"), "Continuous")
+        crrFld[["dataType"]] <- "Decimal"
     }
+    # if "measureType" is already stored in the data frame, keep it; otherwise assign "Continuous" if the dataType is Decimal" or
+    crrFld[["measureType"]] <- ifelse(chkAtt(crrCol, "measureType"), attr(crrCol, "measureType"),
+                                        ifelse(crrFld[["dataType"]] == "Decimal" || detCnt(crrCol), "Continuous", crrFld[["measureType"]]))
 
-     attr(crrCol, "crrFld") <- crrFld
-     crrCol
+    attr(crrCol, "crrFld") <- crrFld
+    crrCol
+}
+
+# determine whether a column is (i.e., can become) integer without loosing data
+detInt <- function(crrCol = NULL) {
+    !all(is.na(crrCol)) &&
+    max(abs(crrCol), na.rm = TRUE) <= .Machine$integer.max &&
+    all(abs(crrCol - round(crrCol)) < sqrt(.Machine$double.eps), na.rm = TRUE)
+}
+
+# determine whether a column likely should get the measureType "Continuous", requiring
+# that there are enough different values and a high value range and variability (sd)
+detCnt <- function(crrCol = NULL) {
+    length(unique(crrCol)) > length(crrCol) / 5 &&
+    length(unique(crrCol)) > diff(range(crrCol, na.rm = TRUE)) / 5 &&
+    stats::sd(crrCol, na.rm = TRUE) > diff(range(crrCol, na.rm = TRUE)) / 10
 }
 
 rmvMta <- function(crrFld = NULL, dtaCol = NULL) {
@@ -358,7 +374,7 @@ fleExs <- function(fleOut = c(), frcWrt = FALSE) {
         if (frcWrt) {
             unlink(fleOut)
         } else {
-            stop("The output file already exists. Either remove the file or set the parameter frcWrt to TRUE.")
+            stop(sprintf("The output file %s already exists. Either remove the file or set the parameter frcWrt to TRUE.", basename(fleOut)))
         }
     }
 }

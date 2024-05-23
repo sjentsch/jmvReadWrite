@@ -205,11 +205,7 @@ wide2long_omv <- function(dtaInp = NULL, fleOut = "", varLst = c(), varExc = c()
     attr(dtaFrm, "reshapeLong") <- NULL
 
     # sort data set (if varSrt is not empty, otherwise sort after the first variable in varID (defining the participant)
-    if (length(varSrt) > 0) {
-        dtaFrm <- srtFrm(dtaFrm, varSrt)
-    } else {
-        dtaFrm <- srtFrm(dtaFrm, varID[1])
-    }
+    dtaFrm <- srtFrm(dtaFrm, c(rep(varSrt, length(varSrt) > 0), rep(varID[1], length(varSrt) >= 0)))
     # correct the column order (ID should come first, otherwise the order is kept with the transformed variables inserted into
     # were the respective original (i.e., before the transformation) variables were
     dtaFrm <- dtaFrm[, ordCol(names(dtaFrm), dtaNmV, varID, varLst)]

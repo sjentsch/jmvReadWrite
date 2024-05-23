@@ -26,6 +26,40 @@ test_that("write_omv works", {
     expect_equal(attributes(dtaDbg$dtaFrm[[4]]), NULL)
     expect_equal(lapply(jmvReadWrite::ToothGrowth, class), lapply(dtaDbg$dtaFrm, class))
 
+    # add columns with only NAs to the dataset and attach jamovi-attributes to them, write the resulting data frame
+    dtaDbg <- write_omv(dtaFrm = cbind(dtaOut, jmvAtt(data.frame(T1 = rep(as.integer(NA), nrow(dtaOut)), T2 = as.numeric(NA), T3 = factor(NA),
+                                                                 T4 = factor(NA, ordered = TRUE), T5 = as.character(NA), T6 = NA))), fleOut = nmeOut, retDbg = TRUE)
+    expect_true(file.exists(nmeOut))
+    expect_gt(file.info(nmeOut)$size, 1)
+    expect_true(chkFle(nmeOut, isZIP = TRUE))
+    expect_true(chkFle(nmeOut, fleCnt = "meta"))
+    expect_true(chkFle(nmeOut, fleCnt = "metadata.json"))
+    expect_true(chkFle(nmeOut, fleCnt = "data.bin"))
+    unlink(nmeOut)
+
+    expect_equal(names(dtaDbg),                       c("mtaDta", "xtdDta", "dtaFrm"))
+    expect_equal(vapply(dtaDbg, class, character(1), USE.NAMES = FALSE), c("list",   "list",   "data.frame"))
+    expect_equal(names(dtaDbg$mtaDta), c("rowCount", "columnCount", "removedRows", "addedRows", "fields", "transforms", "weights"))
+    expect_true(all(grepl("labels", unlist(lapply(dtaDbg$xtdDta, attributes)))))
+    expect_s3_class(dtaDbg$dtaFrm, "data.frame")
+    expect_equal(dim(dtaDbg$dtaFrm), c(60, 13))
+    expect_equal(names(attributes(dtaDbg$dtaFrm)), c("names", "class", "row.names"))
+    expect_equal(names(attributes(dtaDbg$dtaFrm[[3]])),  c("levels", "class", "description"))
+    expect_equal(names(attributes(dtaDbg$dtaFrm[[7]])),  c("jmv-desc"))
+    expect_equal(names(attributes(dtaDbg$dtaFrm[[10]])), c("class", "levels", "measureType", "dataType"))
+    expect_equal(names(attributes(dtaDbg$dtaFrm[[11]])), c("class", "levels", "measureType", "dataType"))
+    expect_equal(names(attributes(dtaDbg$dtaFrm[[12]])), c("levels", "class", "measureType", "dataType"))
+    expect_equal(names(attributes(dtaDbg$dtaFrm[[13]])), c("levels", "class", "measureType", "dataType"))
+    expect_equal(attributes(dtaDbg$dtaFrm[[4]]),  NULL)
+    expect_equal(attributes(dtaDbg$dtaFrm[[8]]),  list(measureType = "Continuous", dataType = "Integer"))
+    expect_equal(attributes(dtaDbg$dtaFrm[[9]]),  list(measureType = "Continuous", dataType = "Decimal"))
+    expect_equal(attributes(dtaDbg$dtaFrm[[10]]), list(class =              "factor",  levels = character(0), measureType = "Nominal",    dataType = "Text"))
+    expect_equal(attributes(dtaDbg$dtaFrm[[11]]), list(class = c("ordered", "factor"), levels = character(0), measureType = "Ordinal",    dataType = "Text"))
+    expect_equal(attributes(dtaDbg$dtaFrm[[12]]), list(levels = character(0), class = "factor",               measureType = "Nominal",    dataType = "Text"))
+    expect_equal(attributes(dtaDbg$dtaFrm[[13]]), list(levels = character(0), class = "factor",               measureType = "Nominal",    dataType = "Text"))
+    expect_equal(c(lapply(jmvReadWrite::ToothGrowth, class), list(T1 = "integer", T2 = "numeric", T3 = "factor", T4 = c("ordered", "factor"), T5 = "factor", T6 = "factor")),
+                 lapply(dtaDbg$dtaFrm, class))
+
     # test cases for code coverage ============================================================================================================================
     expect_error(write_omv(NULL, nmeOut), regexp = "^The data frame to be written needs to be given as parameter \\(dtaFrm = \\.\\.\\.\\)\\.")
     expect_error(write_omv(data.frame(T1 = sample(9999, 100), T2 = as.complex(rnorm(100))), nmeOut),
@@ -108,7 +142,7 @@ test_that("write_omv works", {
     expect_equal(vapply(df4Chk, function(x) attr(x, "measureType"), character(1), USE.NAMES = FALSE), c("ID", "Nominal", "Nominal", "Continuous", "Ordinal", "Continuous", "Continuous"))
     # do not unlink to provoke the error underneath
     expect_error(write_omv(dtaFrm = jmvReadWrite::ToothGrowth, fleOut = nmeOut),
-      regexp = "The output file already exists\\. Either remove the file or set the parameter frcWrt to TRUE\\.")
+      regexp = "The output file .* already exists\\. Either remove the file or set the parameter frcWrt to TRUE\\.")
     unlink(nmeOut)
 
     dtaOut <- jmvReadWrite::ToothGrowth

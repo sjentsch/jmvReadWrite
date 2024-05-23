@@ -15,15 +15,14 @@ state and is being actively
 developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 [![License](https://img.shields.io/badge/License-AGPL%20v3-green.svg)](https://www.gnu.org/licenses/agpl-3.0.html)
 [![Downloads](https://cranlogs.r-pkg.org/badges/jmvReadWrite?color=brightgreen)](https://cran.r-project.org/package=jmvReadWrite)
-[![Dependencies](https://tinyverse.netlify.com/badge/jmvReadWrite)](https://cran.r-project.org/package=jmvReadWrite)
 [![Last
 commit](https://img.shields.io/github/last-commit/sjentsch/jmvReadWrite?logo=GitHub)](https://github.com/sjentsch/jmvReadWrite)
 [![Register an
 issue](https://img.shields.io/github/issues/sjentsch/jmvReadWrite?color=%23fa251e&logo=GitHub)](https://github.com/sjentsch/jmvReadWrite/issues)
-[![CI](https://github.com/sjentsch/jmvReadWrite/actions/workflows/ci.yml/badge.svg)](https://github.com/sjentsch/jmvReadWrite/actions/workflows/ci.yml)
+[![R-hub](https://github.com/sjentsch/jmvReadWrite/actions/workflows/rhub.yaml/badge.svg)](https://github.com/sjentsch/jmvReadWrite/actions/workflows/rhub.yaml)
 [![R-CMD-check](https://github.com/sjentsch/jmvReadWrite/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/sjentsch/jmvReadWrite/actions/workflows/R-CMD-check.yaml)
+[![CI](https://github.com/sjentsch/jmvReadWrite/actions/workflows/CI.yml/badge.svg)](https://github.com/sjentsch/jmvReadWrite/actions/workflows/CI.yml)
 [![pkgcheck](https://github.com/sjentsch/jmvReadWrite/workflows/pkgcheck/badge.svg)](https://github.com/sjentsch/jmvReadWrite/actions?query=workflow%3Apkgcheck)
-[![code-coverage](https://github.com/sjentsch/jmvReadWrite/actions/workflows/codecov.yaml/badge.svg)](https://github.com/sjentsch/jmvReadWrite/actions/workflows/codecov.yaml)
 [![Codecov
 coverage](https://codecov.io/gh/sjentsch/jmvReadWrite/branch/main/graph/badge.svg)](https://app.codecov.io/gh/sjentsch/jmvReadWrite?branch=main)
 [![Documentation](https://img.shields.io/badge/documentation-is_here-blue)](https://sjentsch.github.io/jmvReadWrite/)
@@ -188,6 +187,9 @@ data("ToothGrowth", package = "jmvReadWrite")
 wrtDta <- jmvReadWrite::write_omv(ToothGrowth, "Trial.omv", retDbg = TRUE)
 names(wrtDta)
 #> [1] "mtaDta" "xtdDta" "dtaFrm"
+```
+
+``` r
 # -> "mtaDta" "xtdDta" "dtaFrm"
 # this debug information contains a list with the metadata ("mtaDta", e.g.,
 # column and data type), the extended data ("xtdDta", e.g., variable lables),
@@ -198,11 +200,17 @@ names(wrtDta)
 # and delete the file afterwards
 list.files(".", "Trial.omv")
 #> [1] "Trial.omv"
+```
+
+``` r
 file.info("Trial.omv")
 #>           size isdir mode               mtime               ctime
-#> Trial.omv 2610 FALSE  664 2023-12-16 21:55:21 2023-12-16 21:55:21
-#>                         atime  uid  gid    uname   grname
-#> Trial.omv 2023-12-16 21:55:21 1000 1000 sjentsch sjentsch
+#> Trial.omv 2610 FALSE  644 2024-05-23 12:52:07 2024-05-23 12:52:07
+#>                         atime   uid  gid  uname grname
+#> Trial.omv 2024-05-23 12:52:07 87448 4601 sje025 ansatt
+```
+
+``` r
 unlink("Trial.omv")
 ```
 
@@ -225,12 +233,18 @@ data <- jmvReadWrite::read_omv(fleOMV, sveAtt = TRUE)
 names(attributes(data))
 #> [1] "names"       "row.names"   "class"       "fltLst"      "removedRows"
 #> [6] "addedRows"   "transforms"
+```
+
+``` r
 names(attributes(data[[1]]))
 #>  [1] "name"           "id"             "columnType"     "dataType"      
 #>  [5] "measureType"    "formula"        "formulaMessage" "parentId"      
 #>  [9] "width"          "type"           "importName"     "description"   
 #> [13] "transform"      "edits"          "missingValues"  "filterNo"      
 #> [17] "active"
+```
+
+``` r
 #
 # perhaps do some modifications to the file here and write it back afterwards
 jmvReadWrite::write_omv(data, "Trial.omv")
@@ -298,3 +312,16 @@ with data management tasks that are frequently required:
 ## License
 
 [AGPL 3](https://github.com/sjentsch/jmvReadWrite/blob/main/LICENSE)
+
+## Giving back
+
+If you find this package helpful, please consider donating to the jamovi
+project (via the Patreon-link on the left side). If you can’t give
+money, but would like to support us in another way, you may contribute
+to translating [jamovi](https://hosted.weblate.org/engage/jamovi/), the
+[jamovi documentation](https://hosted.weblate.org/engage/jamovidocs/),
+or the textbook [”learning statistics with
+jamovi“](https://hosted.weblate.org/engage/jamovi/) into your
+language.
+
+Thank you for your support\!

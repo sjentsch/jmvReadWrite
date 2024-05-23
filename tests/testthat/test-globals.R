@@ -86,6 +86,19 @@ test_that("globals work", {
     expect_equal(names(attributes(df4Chk[[1]])), c("datalabel", "names", "var.labels", "class", "row.names", "fleInp"))
     expect_equal(attr(df4Chk[[1]], "fleInp"), file.path("..", "ToothGrowth.omv"))
 
+    inpDF <- rbind(jmvReadWrite::AlbumSales[seq(sample(10)), ] * NA, jmvReadWrite::AlbumSales, jmvReadWrite::AlbumSales[seq(sample(10)), ] * NA)
+    df4Chk <- inp2DF(dtaInp = inpDF, rmvEmp = TRUE)
+    expect_s3_class(df4Chk, "data.frame")
+    expect_equal(dim(df4Chk), c(200, 5))
+    expect_equal(names(df4Chk), c("selSbj", "Adverts", "Airplay", "Image", "Sales"))
+    expect_equal(names(attributes(df4Chk)), c("names", "row.names", "class"))
+    expect_true(all(df4Chk == jmvReadWrite::AlbumSales))
+
+    inpDF <- rbind(jmvReadWrite::AlbumSales[seq(sample(10)), ] * NA, jmvReadWrite::AlbumSales[seq(1, 100), ], jmvReadWrite::AlbumSales[1, ] * NA,
+                   jmvReadWrite::AlbumSales[seq(101, 200), ], jmvReadWrite::AlbumSales[seq(sample(10)), ] * NA)
+    expect_error(df4Chk <- inp2DF(dtaInp = inpDF, rmvEmp = TRUE),
+      regexp = "Empty rows are not permitted execpt from the begin or the end of an input data frame \\(in such case, they are automatically removed\\)\\.")
+
     tmpDF <- data.frame(ID = sprintf("P_%04d", sample(9999, 100)), I = as.integer(sample(1e6, 100)), D = rnorm(100),
                         OT = factor(sample(c("low", "middle", "high"), 100, replace = TRUE), levels = c("low", "middle", "high"), ordered = TRUE),
                         ON = factor(sample(seq(7), 100, replace = TRUE), levels = seq(7), ordered = TRUE),

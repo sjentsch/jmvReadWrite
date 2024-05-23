@@ -172,7 +172,7 @@ aggDta <- function(dtaFrm = NULL, varAgg = "", varID = c(), varTme = c(), varExc
     # variables in varID and varTme
     } else if (varAgg == "first") {
         # [1] if "first" is chosen as aggregation function, the first occurence at each step is returned
-        stats::aggregate(x = dtaFrm[, c(varTgt, varExc), drop = FALSE], by = dtaFrm[, c(varID, varTme), drop = FALSE], FUN = "[[", 1)
+        stats::aggregate(x = dtaFrm[, c(varTgt, varExc), drop = FALSE], by = dtaFrm[, c(varID, varTme), drop = FALSE], FUN = function(x) x[!is.na(x)][1])
     } else if (varAgg == "mean")  {
         # [2] if "mean" is chosen as aggregation function, it becomes (a little) more complicated
         # [a] the target variables (for which the mean is calculated) should be numeric
@@ -188,12 +188,12 @@ aggDta <- function(dtaFrm = NULL, varAgg = "", varID = c(), varTme = c(), varExc
         # participant [ID]); finally the results from the two aggregate-functions are merged again
         # to return the complete data set
         if (length(varExc) > 0) {
-            merge(stats::aggregate(x = dtaFrm[, c(varTgt), drop = FALSE], by = dtaFrm[, c(varID, varTme), drop = FALSE], FUN = mean),
-                  stats::aggregate(x = dtaFrm[, c(varExc), drop = FALSE], by = dtaFrm[, c(varID, varTme), drop = FALSE], FUN = "[[", 1))
+            merge(stats::aggregate(x = dtaFrm[, c(varTgt), drop = FALSE], by = dtaFrm[, c(varID, varTme), drop = FALSE], FUN = mean, na.rm = TRUE),
+                  stats::aggregate(x = dtaFrm[, c(varExc), drop = FALSE], by = dtaFrm[, c(varID, varTme), drop = FALSE], FUN = function(x) x[!is.na(x)][1]))
         # [c] if there is no “excluded” variable, the mean is calculated for the target variables
         # at each possible combination of the variables varID and varTme
         } else {
-            stats::aggregate(x = dtaFrm[, c(varTgt), drop = FALSE], by = dtaFrm[, c(varID, varTme), drop = FALSE], FUN = mean)
+            stats::aggregate(x = dtaFrm[, c(varTgt), drop = FALSE], by = dtaFrm[, c(varID, varTme), drop = FALSE], FUN = mean, na.rm = TRUE)
         }
     }
 }

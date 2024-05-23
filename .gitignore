@@ -42,7 +42,6 @@ pkgdown/
 
 # R Environment Variables
 .Renviron
-.Rbuildignore
 
 # pkgdown site
 docs/

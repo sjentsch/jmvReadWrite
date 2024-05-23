@@ -71,24 +71,10 @@ replace_omv <- function(dtaInp = NULL, fleOut = "", rplLst = list(), whlTrm = TR
     dtaFrm <- inp2DF(dtaInp = dtaInp, ...)
     dtaFrm <- jmvAtt(dtaFrm)
 
-    incClT <- c("Data", rep("Computed", incCmp), rep("Recoded", incRcd))
-    incMsT <- c(rep("ID", incID), rep("Nominal", incNom), rep("Ordinal", incOrd), rep("Continuous", incNum))
-
-    srcNme <- chkInE(varInc, varExc, dtaFrm)
-    srcNme <- srcNme[vapply(dtaFrm[srcNme], function(x) is.null(attr(x,  "columnType")) || any(attr(x,  "columnType") == incClT), logical(1))]
-    srcNme <- srcNme[vapply(dtaFrm[srcNme], function(x) is.null(attr(x, "measureType")) || any(attr(x, "measureType") == incMsT), logical(1))]
+    srcNme <- chkInE(dtaFrm, varInc, varExc, incNum, incOrd, incNom, incID, incCmp, incRcd)
     for (i in seq_along(srcNme)) {
         for (j in seq_along(rplLst)) {
-            if (is.factor(dtaFrm[[srcNme[i]]])) {
-                if (rplLst[[j]][1] %in% levels(dtaFrm[[srcNme[i]]])) levels(dtaFrm[[srcNme[i]]]) <- gsub(rplLst[[j]][1], rplLst[[j]][2], levels(dtaFrm[[srcNme[i]]]))
-            } else if (is.numeric(dtaFrm[[srcNme[i]]])) {
-                srcSel <- srcClm(dtaFrm[[srcNme[i]]], gsub("\\.", "\\\\.", as.character(rplLst[[j]][1])), whlTrm)
-                if (any(srcSel)) dtaFrm[srcSel, srcNme[i]] <- dtaFrm[srcSel, srcNme[i]] + diff(as.numeric(rplLst[[j]]))
-            } else if (is.character(dtaFrm[[srcNme[i]]])) {
-                srcSel <- srcClm(dtaFrm[[srcNme[i]]], gsub("\\.", "\\\\.", as.character(rplLst[[j]][1])), whlTrm)
-                if (any(srcSel)) dtaFrm[srcSel, srcNme[i]] <- rplLst[[j]][2]
-            }
-            # other variable types are already caught by jmvAtt() above
+            dtaFrm <- rplVal(dtaFrm, srcNme[i], rplLst[[j]], whlTrm)
         }
     }
 
@@ -96,7 +82,7 @@ replace_omv <- function(dtaInp = NULL, fleOut = "", rplLst = list(), whlTrm = TR
     rtnDta(dtaFrm = dtaFrm, fleOut = fleOut, dtaTtl = jmvTtl("_rplc"), psvAnl = psvAnl, dtaInp = dtaInp, ...)
 }
 
-chkInE <- function(varInc = c(), varExc = c(), dtaFrm = NULL) {
+chkInE <- function(dtaFrm = NULL, varInc = c(), varExc = c(), incNum = TRUE, incOrd = TRUE, incNom = TRUE, incID = TRUE, incCmp = TRUE, incRcd = TRUE) {
     if (!is.null(varInc) && length(varInc) > 0 && !is.null(varExc) && length(varExc) > 0) warning("Both varInc and varExc are given, varInc takes precedence.")
     if        (!is.null(varInc) && length(varInc) > 0 && all(nzchar(varInc))) {
         if (!all(varInc %in% names(dtaFrm))) {
@@ -112,5 +98,25 @@ chkInE <- function(varInc = c(), varExc = c(), dtaFrm = NULL) {
         srcNme <- names(dtaFrm)
     }
 
+    incClT <- c("Data", rep("Computed", incCmp), rep("Recoded", incRcd))
+    incMsT <- c(rep("ID", incID), rep("Nominal", incNom), rep("Ordinal", incOrd), rep("Continuous", incNum))
+    srcNme <- srcNme[vapply(dtaFrm[srcNme], function(x) is.null(attr(x,  "columnType")) || any(attr(x,  "columnType") == incClT), logical(1))]
+    srcNme <- srcNme[vapply(dtaFrm[srcNme], function(x) is.null(attr(x, "measureType")) || any(attr(x, "measureType") == incMsT), logical(1))]
+
     srcNme
+}
+
+rplVal <- function(dtaFrm = NULL, crrCll = "", crrRpl = NULL, whlTrm = TRUE) {
+    if (is.factor(dtaFrm[[crrCll]])) {
+        if (crrRpl[1] %in% levels(dtaFrm[[crrCll]])) levels(dtaFrm[[crrCll]]) <- gsub(crrRpl[1], crrRpl[2], levels(dtaFrm[[crrCll]]))
+    } else if (is.numeric(dtaFrm[[crrCll]])) {
+        srcSel <- srcClm(dtaFrm[[crrCll]], gsub("\\.", "\\\\.", as.character(crrRpl[1])), whlTrm)
+        if (any(srcSel)) dtaFrm[srcSel, crrCll] <- dtaFrm[srcSel, crrCll] + diff(as.numeric(crrRpl))
+    } else if (is.character(dtaFrm[[crrCll]])) {
+        srcSel <- srcClm(dtaFrm[[crrCll]], gsub("\\.", "\\\\.", as.character(crrRpl[1])), whlTrm)
+        if (any(srcSel)) dtaFrm[srcSel, crrCll] <- crrRpl[2]
+    }
+    # other variable types are already caught by jmvAtt() above
+
+    dtaFrm
 }

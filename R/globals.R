@@ -353,7 +353,7 @@ inp2DF <- function(dtaInp = NULL, minDF = 1, maxDF = 1, rmvEmp = FALSE, usePkg =
                 blnEmp <- apply(lstDF[[i]], 1, function(x) all(is.na(x)))
             }
             if (blnEmp[length(blnEmp)] && sum(diff(blnEmp) == 1) == 1) {
-                lstDF[[i]] <- lstDF[[i]][, -seq(which(diff(blnEmp) == 1) + 1, length(blnEmp))]
+                lstDF[[i]] <- lstDF[[i]][seq(which(diff(blnEmp) == 1)), ]
                 blnEmp <- apply(lstDF[[i]], 1, function(x) all(is.na(x)))
             }
             if (any(blnEmp)) {
@@ -451,7 +451,7 @@ jmvAtt <- function(dtaFrm = NULL) {
 
     for (crrNme in names(dtaFrm)) {
          # if the attributes already exist, go to the next column
-         if (chkAtt(dtaFrm[[crrNme]], "measureType") && chkAtt(dtaFrm[[crrNme]], "measureType")) next
+         if (chkAtt(dtaFrm[[crrNme]], "measureType") && chkAtt(dtaFrm[[crrNme]], "dataType")) next
          # jmv-id
          if (!is.null(attr(dtaFrm[[crrNme]], "jmv-id")) && attr(dtaFrm[[crrNme]], "jmv-id")) {
              attr(dtaFrm[[crrNme]], "measureType")  <- "ID"
@@ -462,19 +462,10 @@ jmvAtt <- function(dtaFrm = NULL) {
          } else if (is.numeric(dtaFrm[[crrNme]])) {
              attr(dtaFrm[[crrNme]], "measureType")  <- "Continuous"
              attr(dtaFrm[[crrNme]], "dataType")     <- "Decimal"
-         } else if (is.ordered(dtaFrm[[crrNme]]) &&  is.null(attr(dtaFrm[[crrNme]], "values"))) {
-             attr(dtaFrm[[crrNme]], "measureType")  <- "Ordinal"
-             attr(dtaFrm[[crrNme]], "dataType")     <- "Text"
-         } else if (is.ordered(dtaFrm[[crrNme]]) && !is.null(attr(dtaFrm[[crrNme]], "values"))) {
-             attr(dtaFrm[[crrNme]], "measureType")  <- "Ordinal"
-             attr(dtaFrm[[crrNme]], "dataType")     <- "Integer"
-         } else if (is.factor(dtaFrm[[crrNme]]) &&  is.null(attr(dtaFrm[[crrNme]], "values"))) {
-             attr(dtaFrm[[crrNme]], "measureType")  <- "Nominal"
-             attr(dtaFrm[[crrNme]], "dataType")     <- "Text"
-         } else if (is.factor(dtaFrm[[crrNme]]) && !is.null(attr(dtaFrm[[crrNme]], "values"))) {
-             attr(dtaFrm[[crrNme]], "measureType")  <- "Nominal"
-             attr(dtaFrm[[crrNme]], "dataType")     <- "Integer"
-         } else if (is.character(dtaFrm[[crrNme]])) {
+         } else if (is.factor(dtaFrm[[crrNme]])) {
+             attr(dtaFrm[[crrNme]], "measureType")  <- ifelse(is.ordered(dtaFrm[[crrNme]]), "Ordinal", "Nominal")
+             attr(dtaFrm[[crrNme]], "dataType")     <- ifelse(is.null(attr(dtaFrm[[crrNme]], "values")), "Text", "Integer")
+         } else if (is.logical(dtaFrm[[crrNme]]) || is.character(dtaFrm[[crrNme]])) {
              crrAtt <- attributes(dtaFrm[[crrNme]])
              dtaFrm[[crrNme]] <- as.factor(dtaFrm[[crrNme]])
              dffAtt <- setdiff(names(crrAtt), c("levels", "class"))

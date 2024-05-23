@@ -20,10 +20,9 @@ commit](https://img.shields.io/github/last-commit/sjentsch/jmvReadWrite?logo=Git
 [![Register an
 issue](https://img.shields.io/github/issues/sjentsch/jmvReadWrite?color=%23fa251e&logo=GitHub)](https://github.com/sjentsch/jmvReadWrite/issues)
 [![R-hub](https://github.com/sjentsch/jmvReadWrite/actions/workflows/rhub.yaml/badge.svg)](https://github.com/sjentsch/jmvReadWrite/actions/workflows/rhub.yaml)
-[![CI](https://github.com/sjentsch/jmvReadWrite/actions/workflows/ci.yml/badge.svg)](https://github.com/sjentsch/jmvReadWrite/actions/workflows/ci.yml)
 [![R-CMD-check](https://github.com/sjentsch/jmvReadWrite/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/sjentsch/jmvReadWrite/actions/workflows/R-CMD-check.yaml)
+[![CI](https://github.com/sjentsch/jmvReadWrite/actions/workflows/CI.yml/badge.svg)](https://github.com/sjentsch/jmvReadWrite/actions/workflows/CI.yml)
 [![pkgcheck](https://github.com/sjentsch/jmvReadWrite/workflows/pkgcheck/badge.svg)](https://github.com/sjentsch/jmvReadWrite/actions?query=workflow%3Apkgcheck)
-[![code-coverage](https://github.com/sjentsch/jmvReadWrite/actions/workflows/codecov.yaml/badge.svg)](https://github.com/sjentsch/jmvReadWrite/actions/workflows/codecov.yaml)
 [![Codecov
 coverage](https://codecov.io/gh/sjentsch/jmvReadWrite/branch/main/graph/badge.svg)](https://app.codecov.io/gh/sjentsch/jmvReadWrite?branch=main)
 [![Documentation](https://img.shields.io/badge/documentation-is_here-blue)](https://sjentsch.github.io/jmvReadWrite/)
@@ -206,9 +205,9 @@ list.files(".", "Trial.omv")
 ``` r
 file.info("Trial.omv")
 #>           size isdir mode               mtime               ctime
-#> Trial.omv 2610 FALSE  644 2024-05-23 12:21:53 2024-05-23 12:21:53
+#> Trial.omv 2610 FALSE  644 2024-05-23 12:52:07 2024-05-23 12:52:07
 #>                         atime   uid  gid  uname grname
-#> Trial.omv 2024-05-23 12:21:53 87448 4601 sje025 ansatt
+#> Trial.omv 2024-05-23 12:52:07 87448 4601 sje025 ansatt
 ```
 
 ``` r

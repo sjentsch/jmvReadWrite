@@ -19,6 +19,7 @@ developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.re
 commit](https://img.shields.io/github/last-commit/sjentsch/jmvReadWrite?logo=GitHub)](https://github.com/sjentsch/jmvReadWrite)
 [![Register an
 issue](https://img.shields.io/github/issues/sjentsch/jmvReadWrite?color=%23fa251e&logo=GitHub)](https://github.com/sjentsch/jmvReadWrite/issues)
+[![R-hub](https://github.com/sjentsch/jmvReadWrite/actions/workflows/rhub.yaml/badge.svg)](https://github.com/sjentsch/jmvReadWrite/actions/workflows/rhub.yaml)
 [![CI](https://github.com/sjentsch/jmvReadWrite/actions/workflows/ci.yml/badge.svg)](https://github.com/sjentsch/jmvReadWrite/actions/workflows/ci.yml)
 [![R-CMD-check](https://github.com/sjentsch/jmvReadWrite/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/sjentsch/jmvReadWrite/actions/workflows/R-CMD-check.yaml)
 [![pkgcheck](https://github.com/sjentsch/jmvReadWrite/workflows/pkgcheck/badge.svg)](https://github.com/sjentsch/jmvReadWrite/actions?query=workflow%3Apkgcheck)
@@ -205,9 +206,9 @@ list.files(".", "Trial.omv")
 ``` r
 file.info("Trial.omv")
 #>           size isdir mode               mtime               ctime
-#> Trial.omv 2610 FALSE  644 2024-05-22 21:54:08 2024-05-22 21:54:08
+#> Trial.omv 2610 FALSE  644 2024-05-23 12:21:53 2024-05-23 12:21:53
 #>                         atime   uid  gid  uname grname
-#> Trial.omv 2024-05-22 21:54:08 87448 4601 sje025 ansatt
+#> Trial.omv 2024-05-23 12:21:53 87448 4601 sje025 ansatt
 ```
 
 ``` r

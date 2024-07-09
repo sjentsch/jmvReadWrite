@@ -7,13 +7,13 @@
   "codeRepository": "https://github.com/sjentsch/jmvReadWrite",
   "issueTracker": "https://github.com/sjentsch/jmvReadWrite/issues",
   "license": "https://spdx.org/licenses/AGPL-3.0",
-  "version": "0.4.6",
+  "version": "0.4.7",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "R",
     "url": "https://r-project.org"
   },
-  "runtimePlatform": "R version 4.4.0 (2024-04-24)",
+  "runtimePlatform": "R version 4.4.1 (2024-06-14)",
   "provider": {
     "@id": "https://cran.r-project.org",
     "@type": "Organization",
@@ -21,6 +21,15 @@
     "url": "https://cran.r-project.org"
   },
   "author": [
+    {
+      "@type": "Person",
+      "givenName": "Sebastian",
+      "familyName": "Jentschke",
+      "email": "sebastian.jentschke@uib.no",
+      "@id": "https://orcid.org/0000-0003-2576-5432"
+    }
+  ],
+  "copyrightHolder": [
     {
       "@type": "Person",
       "givenName": "Sebastian",
@@ -171,7 +180,7 @@
     },
     "SystemRequirements": null
   },
-  "fileSize": "772.542KB",
+  "fileSize": "801.311KB",
   "citation": [
     {
       "@type": "SoftwareSourceCode",
@@ -186,13 +195,13 @@
       ],
       "name": "jmvReadWrite: Read and Write jamovi Files",
       "url": "https://CRAN.R-project.org/package=jmvReadWrite",
-      "description": "R package version 0.4.6"
+      "description": "R package version 0.4.7"
     }
   ],
   "relatedLink": ["https://sjentsch.github.io/jmvReadWrite/", "https://CRAN.R-project.org/package=jmvReadWrite"],
   "releaseNotes": "https://github.com/sjentsch/jmvReadWrite/blob/master/NEWS.md",
   "readme": "https://github.com/sjentsch/jmvReadWrite/blob/main/README.md",
-  "contIntegration": ["https://github.com/sjentsch/jmvReadWrite/actions/workflows/ci.yml", "https://github.com/sjentsch/jmvReadWrite/actions/workflows/R-CMD-check.yaml", "https://github.com/sjentsch/jmvReadWrite/actions?query=workflow%3Apkgcheck", "https://github.com/sjentsch/jmvReadWrite/actions/workflows/codecov.yaml", "https://app.codecov.io/gh/sjentsch/jmvReadWrite?branch=main"],
+  "contIntegration": ["https://github.com/sjentsch/jmvReadWrite/actions/workflows/rhub.yaml", "https://github.com/sjentsch/jmvReadWrite/actions/workflows/R-CMD-check.yaml", "https://github.com/sjentsch/jmvReadWrite/actions/workflows/CI.yml", "https://github.com/sjentsch/jmvReadWrite/actions?query=workflow%3Apkgcheck", "https://app.codecov.io/gh/sjentsch/jmvReadWrite?branch=main"],
   "developmentStatus": "https://www.repostatus.org/#active",
   "keywords": ["r", "jamovi", "cran"]
 }

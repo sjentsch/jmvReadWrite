@@ -2,7 +2,7 @@
 
 ## Enhancements:
 * added `transform_vars_omv`: apply transformations - calculating the square root, the logarithm to the base 10 or
-  an inversion - to make variables (better) conform to a normal contribution
+  an inversion - to make variables (better) conform to a normal contribution (incl. unit tests)
 
 ## Bug fixes:
 * fixed small bugs in `read_omv` and `write_omv` to better handle variable labels

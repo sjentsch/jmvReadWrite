@@ -6,7 +6,7 @@ test_that("transform_vars_omv works", {
                          SP = rnorm(1000) * 1e-2 + rexp(1000, 2) * (1 - 1e-2), SN = rnorm(1000) * 1e-2 - rexp(1000, 2) * (1 - 1e-2),
                          EP = rnorm(1000) * 1e-4 + rexp(1000, 2) * (1 - 1e-4), EN = rnorm(1000) * 1e-4 - rexp(1000, 2) * (1 - 1e-4))
     nmeOut <- tempfile(fileext = ".omv")
-    
+
     # varXfm: (1) use transformations as list names, write data frame
     varXfm <- list(posSqr = c("MP"), negSqr = c("MN"), posLog = c("SP"), negLog = c("SN"), posInv = c("EP"), negInv = c("EN"))
     expect_null(transform_vars_omv(dtaInp = dtaInp, fleOut = nmeOut, varXfm = varXfm))
@@ -145,6 +145,9 @@ test_that("transform_vars_omv works", {
     expect_false(file.exists(nmeOut))
     expect_error(transform_vars_omv(dtaInp = dtaInp, fleOut = nmeOut, varXfm = list(wrgNme = "MP")),
       regexp = "^The parameter varXfm has an invalid entry \\(wrong name\\), please use the correct format \\(see Details in help\\)\\.")
+    expect_false(file.exists(nmeOut))
+    expect_error(transform_vars_omv(dtaInp = dtaInp, fleOut = nmeOut, varXfm = list(posSqr = c("MP", "V1", "V2"))),
+      regexp = "^All columns / variables given in the parameter varXfm need to be contained in the input data frame \\(dtaInp\\), but variable\\(s\\)")
     expect_false(file.exists(nmeOut))
 
 })

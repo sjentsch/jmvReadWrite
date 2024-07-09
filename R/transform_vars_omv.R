@@ -4,8 +4,8 @@
 #'               any supported file type, see Details below
 #' @param fleOut Name of the data file to be written (including the path, if required; "FILE_OUT.omv"; default: ""); if empty, the resulting data frame is
 #'               returned instead
-#' @param varXfm 
-#'   See Details for more information.
+#' @param varXfm Named list variable where the name indicates which transformation is to be carried out and where each list entry points to one or more
+#'               variables to be transformed using this transformation. See Details for more information.
 #' @param psvAnl Whether analyses that are contained in the input file shall be transferred to the output file (default: FALSE)
 #' @param usePkg Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata and SAS files; "foreign" is the default (it comes with
 #'               base R), but "haven" is newer and more comprehensive
@@ -16,11 +16,12 @@
 #'
 #' @details
 #' * `varXfm` has to be a named list variable where the names can either indicate the type of transformation or the kind and degree of skewness that shall be
-#'   corrected. For the type of transformation, the following names are valid: posSqr, negSqr, posLog, negLog, posInv, negInv; where the second part of the
-#'   name indicates the transformation to be carried out: ...Sqr - square root, ...Log - logarith to the basis 10, ...Inv - inversion, i.e., 1 / original
-#'   value), and where the first part of the name indicates whether the original value is used (pos...) or whether the original value is subtracted from the
-#'   maximum value of that variable (neg...; a constant of 1 is added to the maximum value for Log and Inv). For the degree and kind of skewness, the following
-#'   names are valid: mdrPos, strPos, svrPos, mdrNeg, strNeg, svrNeg (degree: moderate, strong, severe; kind: positive or negaitve).
+#'   corrected. For the type of transformation, the following names are valid: `posSqr`, `negSqr`, `posLog`, `negLog`, `posInv`, `negInv`; where the second
+#'   part of the name indicates the transformation to be carried out: `...Sqr` - square root, `...Log` - logarithm to the basis 10, `...Inv` - inversion, i.e.,
+#'   1 / original value), and where the first part of the name indicates whether the original value is used (`pos...`) or whether the original value is
+#'   subtracted from the maximum value of that variable (`neg...`; a constant of 1 is added to the maximum value for `...Log` and `...Inv` transformations).
+#'   For the degree and kind of skewness, the following names are valid: `mdrPos`, `strPos`, `svrPos`, `mdrNeg`, `strNeg`, `svrNeg` (degree: moderate, strong,
+#'   severe; kind: positive or negative).
 #' * The ellipsis-parameter (`...`) can be used to submit arguments / parameters to the functions that are used for reading and writing the data. By clicking
 #'   on the respective function under “See also”, you can get a more detailed overview over which parameters each of those functions take. The functions are:
 #'   `read_omv` and `write_omv` (for jamovi-files), `read.table` (for CSV / TSV files; using similar defaults as `read.csv` for CSV and `read.delim` for TSV
@@ -70,13 +71,19 @@ transform_vars_omv <- function(dtaInp = NULL, fleOut = "", varXfm = NULL, psvAnl
     if (!is.null(list(...)[["fleInp"]])) stop("Please use the argument dtaInp instead of fleInp.")
     dtaFrm <- inp2DF(dtaInp = dtaInp, usePkg = usePkg, selSet = selSet, ...)
 
+    # check whether all variables in varXfm are also contained in the input data frame
+    if (!all(unique(unlist(varXfm, use.names = FALSE)) %in% names(dtaInp))) {
+        stop(sprintf("All columns / variables given in the parameter varXfm need to be contained in the input data frame (dtaInp), but variable(s) %s are missing.",
+          paste(setdiff(unique(unlist(varXfm, use.names = FALSE)), names(dtaInp)), collapse = ", ")))
+    }
+
     # TO-DO: replace the functionality underneath with compute_omv once implemented
     for (crrNme in names(varXfm)) {
         crrSfx <- toupper(substr(crrNme, 4, 6))
         cmdJmv <- ifelse(crrSfx == "INV", "1 / (RPL_VAR)", sprintf("%s(RPL_VAR)", gsub("SQR", "SQRT", gsub("LOG", "LOG10", crrSfx))))
         for (crrVar in varXfm[[crrNme]]) {
             if        (substr(crrNme, 1, 3) == "pos") {
-                rplVar <- paste0("RPL_VAR", ifelse(substr(crrNme, 4, 6) != "Sqr" && min(dtaFrm[, crrVar]) < 1, " - VMIN(RPL_VAR) + 1", 
+                rplVar <- paste0("RPL_VAR", ifelse(substr(crrNme, 4, 6) != "Sqr" && min(dtaFrm[, crrVar]) < 1, " - VMIN(RPL_VAR) + 1",
                                             ifelse(min(dtaFrm[, crrVar]) < 0, " - VMIN(RPL_VAR)", "")))
             } else if (substr(crrNme, 1, 3) == "neg") {
                 rplVar <- paste0("VMAX(RPL_VAR)", ifelse(substr(crrNme, 4, 6) != "Sqr", " + 1", ""), " - RPL_VAR")

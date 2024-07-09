@@ -41,11 +41,12 @@ Transform skewed variables (aiming at they conform to a normal distribution) in 
 \details{
 \itemize{
 \item \code{varXfm} has to be a named list variable where the names can either indicate the type of transformation or the kind and degree of skewness that shall be
-corrected. For the type of transformation, the following names are valid: posSqr, negSqr, posLog, negLog, posInv, negInv; where the second part of the
-name indicates the transformation to be carried out: ...Sqr - square root, ...Log - logarith to the basis 10, ...Inv - inversion, i.e., 1 / original
-value), and where the first part of the name indicates whether the original value is used (pos...) or whether the original value is subtracted from the
-maximum value of that variable (neg...; a constant of 1 is added to the maximum value for Log and Inv). For the degree and kind of skewness, the following
-names are valid: mdrPos, strPos, svrPos, mdrNeg, strNeg, svrNeg (degree: moderate, strong, severe; kind: positive or negaitve).
+corrected. For the type of transformation, the following names are valid: \code{posSqr}, \code{negSqr}, \code{posLog}, \code{negLog}, \code{posInv}, \code{negInv}; where the second
+part of the name indicates the transformation to be carried out: \code{...Sqr} - square root, \code{...Log} - logarithm to the basis 10, \code{...Inv} - inversion, i.e.,
+1 / original value), and where the first part of the name indicates whether the original value is used (\code{pos...}) or whether the original value is
+subtracted from the maximum value of that variable (\code{neg...}; a constant of 1 is added to the maximum value for \code{...Log} and \code{...Inv} transformations).
+For the degree and kind of skewness, the following names are valid: \code{mdrPos}, \code{strPos}, \code{svrPos}, \code{mdrNeg}, \code{strNeg}, \code{svrNeg} (degree: moderate, strong,
+severe; kind: positive or negative).
 \item The ellipsis-parameter (\code{...}) can be used to submit arguments / parameters to the functions that are used for reading and writing the data. By clicking
 on the respective function under “See also”, you can get a more detailed overview over which parameters each of those functions take. The functions are:
 \code{read_omv} and \code{write_omv} (for jamovi-files), \code{read.table} (for CSV / TSV files; using similar defaults as \code{read.csv} for CSV and \code{read.delim} for TSV

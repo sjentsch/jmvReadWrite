@@ -209,7 +209,7 @@ valLbl <- function(crrCol = NULL, mtaCol = NULL, xtdDta = NULL) {
             if (identical(sort(levels(crrCol)), c("0", "1")))        crrCol <- as.logical(gsub("^1$", "TRUE", gsub("^0$", "FALSE", crrCol)))
             if (identical(sort(levels(crrCol)), c("FALSE", "TRUE"))) crrCol <- as.logical(crrCol)
             if (!is.logical(crrCol) && chkFld(mtaCol, "dataType", "Integer") &&
-              all(vapply(xtdDta[[crrNme]]$labels, function(m) m[1] == as.integer(m[2]), logical(1)))) {
+              all(vapply(xtdDta[[crrNme]]$labels, function(m) grepl("^\\d+$", m[2]) && m[1] == as.integer(m[2]), logical(1)))) {
                 attr(crrCol, "values") <- unlist(lapply(xtdDta[[crrNme]]$labels, function(m) m[1]))
             }
         } else {

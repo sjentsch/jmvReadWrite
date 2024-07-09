@@ -248,7 +248,8 @@ prcFnC <- function(crrCol = NULL, crrFld = NULL, dtaCol = NULL, crrNme = c()) {
                                                                   "as.character(sort(as.numeric(unique(trimws(crrCol)))))",
                                                                   "sort(unique(trimws(crrCol)))"))))
     }
-    if (chkAtt(dtaCol, "values") && !identical(attr(dtaCol, "values"), as.integer(attr(dtaCol, "levels")))) {
+    if (chkAtt(dtaCol, "values") && all(grepl("^\\d+$", attr(dtaCol, "levels"))) &&
+      !identical(attr(dtaCol, "values"), as.integer(attr(dtaCol, "levels")))) {
         clsRmv()
         stop(sprintf(paste("\"values\"-attribute with unexpected values found for column \"%s\".",
                            "Please send the file to sebastian.jentschke@uib.no for debugging."), crrNme))

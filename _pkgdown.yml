@@ -5,6 +5,8 @@ repo:
     source: https://github.com/sjentsch/jmvReadWrite/blob/main/
     issue: https://github.com/sjentsch/jmvReadWrite/issues/
   branch: main
+template:
+  bootstrap: 5
 reference:
 - title: Functions
   desc: |
@@ -27,6 +29,7 @@ reference:
   - replace_omv
   - search_omv
   - sort_omv
+  - transform_vars_omv
   - transpose_omv
 - title: Example datasets
 - contents:

@@ -39,16 +39,21 @@
 #' \dontrun{
 #' # generate skewed variables
 #' set.seed(335)
-#' dtaInp <- data.frame(MP = rnorm(1000) * 1e-1 + rexp(1000, 2) * (1 - 1e-1), MN = rnorm(1000) * 1e-1 - rexp(1000, 2) * (1 - 1e-1),
-#'                      SP = rnorm(1000) * 1e-2 + rexp(1000, 2) * (1 - 1e-2), SN = rnorm(1000) * 1e-2 - rexp(1000, 2) * (1 - 1e-2),
-#'                      EP = rnorm(1000) * 1e-4 + rexp(1000, 2) * (1 - 1e-4), EN = rnorm(1000) * 1e-4 - rexp(1000, 2) * (1 - 1e-4))
+#' dtaInp <- data.frame(MP = rnorm(1000) * 1e-1 + rexp(1000, 2) * (1 - 1e-1),
+#'                      MN = rnorm(1000) * 1e-1 - rexp(1000, 2) * (1 - 1e-1),
+#'                      SP = rnorm(1000) * 1e-2 + rexp(1000, 2) * (1 - 1e-2),
+#'                      SN = rnorm(1000) * 1e-2 - rexp(1000, 2) * (1 - 1e-2),
+#'                      EP = rnorm(1000) * 1e-4 + rexp(1000, 2) * (1 - 1e-4),
+#'                      EN = rnorm(1000) * 1e-4 - rexp(1000, 2) * (1 - 1e-4))
 #' jmv::descriptives(data = dtaInp, skew = TRUE, sw = TRUE)
 #'
-#' crrXfm <- list(posSqr = c("MP"), negSqr = c("MN"), posLog = c("MP", "SP"), negLog = c("SN"), posInv = c("MP", "SP", "EP"), negInv = c("EN"))
+#' crrXfm <- list(posSqr = c("MP"), negSqr = c("MN"), posLog = c("MP", "SP"), negLog = c("SN"),
+#'                posInv = c("MP", "SP", "EP"), negInv = c("EN"))
 #' dtaOut <- jmvReadWrite::transform_vars_omv(dtaInp = dtaInp, varXfm = crrXfm)
 #' jmv::descriptives(data = dtaOut, skew = TRUE, sw = TRUE)
 #'
-#' crrXfm <- list(mdrPos = c("MP"), mdrNeg = c("MN"), strPos = c("SP"), strNeg = c("SN"), svrPos = c("EP"), svrNeg = c("EN"))
+#' crrXfm <- list(mdrPos = c("MP"), mdrNeg = c("MN"), strPos = c("SP"), strNeg = c("SN"),
+#'                svrPos = c("EP"), svrNeg = c("EN"))
 #' dtaOut <- jmvReadWrite::transform_vars_omv(dtaInp = dtaInp, varXfm = crrXfm)
 #' jmv::descriptives(data = dtaOut, skew = TRUE, sw = TRUE)
 #'
@@ -92,7 +97,7 @@ transform_vars_omv <- function(dtaInp = NULL, fleOut = "", varXfm = NULL, psvAnl
             tgtAtt <- list(columnType = "Computed", formula = gsub("RPL_VAR", gsub("RPL_VAR", crrVar, rplVar), cmdJmv))
             dtaFrm[, tgtVar] <- eval(parse(text = gsub("SQRT", "sqrt", gsub("LOG10", "log10", gsub("RPL_VAR",
               gsub("RPL_VAR", paste0("dtaFrm[, \"", crrVar, "\"]"), gsub("VMIN", "min", gsub("VMAX", "max", rplVar))), cmdJmv)))))
-            dtaFrm[tgtVar]   <- jmvReadWrite:::setAtt(names(tgtAtt), inpObj = tgtAtt, outObj = dtaFrm[tgtVar])
+            dtaFrm[tgtVar]   <- setAtt(names(tgtAtt), inpObj = tgtAtt, outObj = dtaFrm[tgtVar])
         }
     }
 

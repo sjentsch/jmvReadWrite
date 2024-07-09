@@ -1,12 +1,25 @@
+# jmvReadWrite 0.4.7
+
+## Enhancements:
+* added `transform_vars_omv`: apply transformations - calculating the square root, the logarithm to the base 10 or
+  an inversion - to make variables (better) conform to a normal contribution
+
+## Bug fixes:
+* fixed small bugs in `read_omv` and `write_omv` to better handle variable labels
+
+---
+
 # jmvReadWrite 0.4.6
+
+## Enhancements:
+* added workflow for `rhub`
+* reduced cyclomatic complexity for `replace_omv`, `wide2long_omv`, and  `jmvAtt`
 
 ## Bug fixes:
 * ensure that the `dataType` attribute is preserved / honoured by `write_omv` (earlier on, the data type
   of a variable / column was determined by a logic and my have changed the class of this column)
 * fixed a bug leading to an error in `write_omv` when columns where completely empty (i.e., if they contained
   only NAs; incl. the respective unit tests)
-* reduced cyclomatic complexity for `replace_omv`, `wide2long_omv`, and  `jmvAtt`
-* added workflow for `rhub`
 
 ---
 

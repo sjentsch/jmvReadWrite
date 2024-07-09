@@ -21,7 +21,8 @@ any supported file type, see Details below}
 \item{fleOut}{Name of the data file to be written (including the path, if required; "FILE_OUT.omv"; default: ""); if empty, the resulting data frame is
 returned instead}
 
-\item{varXfm}{See Details for more information.}
+\item{varXfm}{Named list variable where the name indicates which transformation is to be carried out and where each list entry points to one or more
+variables to be transformed using this transformation. See Details for more information.}
 
 \item{psvAnl}{Whether analyses that are contained in the input file shall be transferred to the output file (default: FALSE)}
 
@@ -60,16 +61,21 @@ and \code{read_xpt} (\code{haven}) / \code{read.xport} (\code{foreign}) for SAS-
 \dontrun{
 # generate skewed variables
 set.seed(335)
-dtaInp <- data.frame(MP = rnorm(1000) * 1e-1 + rexp(1000, 2) * (1 - 1e-1), MN = rnorm(1000) * 1e-1 - rexp(1000, 2) * (1 - 1e-1),
-                     SP = rnorm(1000) * 1e-2 + rexp(1000, 2) * (1 - 1e-2), SN = rnorm(1000) * 1e-2 - rexp(1000, 2) * (1 - 1e-2),
-                     EP = rnorm(1000) * 1e-4 + rexp(1000, 2) * (1 - 1e-4), EN = rnorm(1000) * 1e-4 - rexp(1000, 2) * (1 - 1e-4))
+dtaInp <- data.frame(MP = rnorm(1000) * 1e-1 + rexp(1000, 2) * (1 - 1e-1),
+                     MN = rnorm(1000) * 1e-1 - rexp(1000, 2) * (1 - 1e-1),
+                     SP = rnorm(1000) * 1e-2 + rexp(1000, 2) * (1 - 1e-2),
+                     SN = rnorm(1000) * 1e-2 - rexp(1000, 2) * (1 - 1e-2),
+                     EP = rnorm(1000) * 1e-4 + rexp(1000, 2) * (1 - 1e-4),
+                     EN = rnorm(1000) * 1e-4 - rexp(1000, 2) * (1 - 1e-4))
 jmv::descriptives(data = dtaInp, skew = TRUE, sw = TRUE)
 
-crrXfm <- list(posSqr = c("MP"), negSqr = c("MN"), posLog = c("MP", "SP"), negLog = c("SN"), posInv = c("MP", "SP", "EP"), negInv = c("EN"))
+crrXfm <- list(posSqr = c("MP"), negSqr = c("MN"), posLog = c("MP", "SP"), negLog = c("SN"),
+               posInv = c("MP", "SP", "EP"), negInv = c("EN"))
 dtaOut <- jmvReadWrite::transform_vars_omv(dtaInp = dtaInp, varXfm = crrXfm)
 jmv::descriptives(data = dtaOut, skew = TRUE, sw = TRUE)
 
-crrXfm <- list(mdrPos = c("MP"), mdrNeg = c("MN"), strPos = c("SP"), strNeg = c("SN"), svrPos = c("EP"), svrNeg = c("EN"))
+crrXfm <- list(mdrPos = c("MP"), mdrNeg = c("MN"), strPos = c("SP"), strNeg = c("SN"),
+               svrPos = c("EP"), svrNeg = c("EN"))
 dtaOut <- jmvReadWrite::transform_vars_omv(dtaInp = dtaInp, varXfm = crrXfm)
 jmv::descriptives(data = dtaOut, skew = TRUE, sw = TRUE)
 

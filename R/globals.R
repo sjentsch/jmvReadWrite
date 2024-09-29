@@ -398,6 +398,15 @@ rtnDta <- function(dtaFrm = NULL, fleOut = "", dtaTtl = "", wrtPtB = FALSE, psvA
 }
 
 # =================================================================================================
+# convert matrix from full to sparse - used for proximities_omv and distances_omv
+mtxF2S <- function(dtaFrm = NULL, rmvTrU = FALSE, rmvDgn = FALSE, mtxSps = FALSE) {
+    if (rmvTrU || mtxSps) dtaFrm[upper.tri(dtaFrm)] <- NA
+    if (rmvDgn || mtxSps) diag(dtaFrm) <- NA
+    if (mtxSps) dtaFrm <- dtaFrm[seq(2, ncol(dtaFrm)), seq(1, ncol(dtaFrm) - 1)]
+    return(dtaFrm)       
+}
+
+# =================================================================================================
 # function for copying analyses from one data file to another
 
 xfrAnl <- function(fleOrg = "", fleTgt = "") {

@@ -402,7 +402,7 @@ rtnDta <- function(dtaFrm = NULL, fleOut = "", dtaTtl = "", wrtPtB = FALSE, psvA
 mtxF2S <- function(dtaFrm = NULL, rmvTrU = FALSE, rmvDgn = FALSE, mtxSps = FALSE) {
     if (rmvTrU || mtxSps) dtaFrm[upper.tri(dtaFrm)] <- NA
     if (rmvDgn || mtxSps) diag(dtaFrm) <- NA
-    if (mtxSps) dtaFrm <- dtaFrm[seq(2, ncol(dtaFrm)), seq(1, ncol(dtaFrm) - 1)]
+    if (mtxSps) dtaFrm <- cbind(data.frame(name = names(dtaFrm)[seq(2, ncol(dtaFrm))]), dtaFrm[seq(2, ncol(dtaFrm)), seq(1, ncol(dtaFrm) - 1)])
     return(dtaFrm)       
 }
 

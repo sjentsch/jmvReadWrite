@@ -399,10 +399,18 @@ rtnDta <- function(dtaFrm = NULL, fleOut = "", dtaTtl = "", wrtPtB = FALSE, psvA
 
 # =================================================================================================
 # convert matrix from full to sparse - used for proximities_omv and distances_omv
-mtxF2S <- function(dtaFrm = NULL, rmvTrU = FALSE, rmvDgn = FALSE, mtxSps = FALSE) {
+mtxF2S <- function(dtaFrm = NULL, rmvTrU = FALSE, rmvDgn = FALSE, mtxXps = FALSE, mtxSps = FALSE) {
+    rownames(dtaFrm) <- names(dtaFrm)
+    if (!isSymmetric(as.matrix(dtaFrm))) stop("Input matrix needs to be symmetric.")
+    C <- ncol(dtaFrm)
     if (rmvTrU || mtxSps) dtaFrm[upper.tri(dtaFrm)] <- NA
     if (rmvDgn || mtxSps) diag(dtaFrm) <- NA
-    if (mtxSps) dtaFrm <- cbind(data.frame(name = names(dtaFrm)[seq(2, ncol(dtaFrm))]), dtaFrm[seq(2, ncol(dtaFrm)), seq(1, ncol(dtaFrm) - 1)])
+    if (mtxXps) dtaFrm <- as.data.frame(t(dtaFrm))
+    if (mtxSps) dtaFrm <- cbind(data.frame(Variable = names(dtaFrm)[seq(1, C)[ifelse(mtxXps, -C, -1)]]),
+                                dtaFrm[seq(1, C)[ifelse(mtxXps, -C, -1)], seq(1, C)[ifelse(mtxXps, -1, -C)]])
+    for (crrClm in names(dtaFrm))
+        attr(dtaFrm[, crrClm], "measureType") <- ifelse(crrClm == "Variable", "Nominal", "Continuous")
+
     return(dtaFrm)       
 }
 

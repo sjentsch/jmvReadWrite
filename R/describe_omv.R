@@ -109,7 +109,9 @@ describe_omv <- function(dtaInp = NULL, fleOut = "", dtaTtl = c(), dtaDsc = c(),
     if (!jmvPtB()) stop("The R-packages RProtoBuf and jmvcore must be installed for using describe_omv (see warnings() for further details).")
 
     # check whether dtaDsc is a list, and if so, convert it to a HTML desription
-    if (is.list(dtaDsc)) dtaDsc <- crtHTM(dtaDsc)
+    if (is.list(dtaDsc)) {
+        dtaDsc <- crtHTM(dtaDsc)
+    }
 
     # check whether the data set contains analyses and, if so warn that they will be overwritten
     if (!is.null(attr(dtaFrm, "syntax")) && length(attr(dtaFrm, "syntax")) > 0) {

@@ -123,8 +123,9 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", wrtPtB = FALSE, frcWrt = FALSE
 
         # ID variables represent a special case and are therefore treated first
         # if the jmv-id marker is set or if the measureType is set to "ID" in the original data, or if it is the first column that hasn't the attribute
-        # measureType attached, has values that are unique and not NA and is either a factor or an integer (rounded equals the original value)
-        if (isID(crrCol, i)) {
+        # measureType attached, has values that are unique and not NA, is either a factor or an integer (rounded equals the original value) and has a
+        # name that (as lower-case) matches "id", "name" or "subject"
+        if (isID(crrCol, i, crrNme)) {
             mtaDta$fields[[i]][["measureType"]] <- "ID"
             mtaDta$fields[[i]][["dataType"]]    <- ifelse(chkAtt(dtaFrm[[i]], "dataType"), attr(dtaFrm[[i]], "dataType"), ifelse(is.numeric(crrCol), "Integer", "Text"))
             mtaDta$fields[[i]][["type"]]        <- ifelse(is.numeric(crrCol), "integer", "string")
@@ -380,10 +381,11 @@ fleExs <- function(fleOut = c(), frcWrt = FALSE) {
     }
 }
 
-isID <- function(crrCol = NULL, i = NA) {
+isID <- function(crrCol = NULL, i = NA, crrNme = "") {
     chkAtt(crrCol, "jmv-id", TRUE) || chkAtt(crrCol, "measureType", "ID") ||
-           (i == 1 && !chkAtt(crrCol, "measureType") && !any(duplicated(crrCol) | is.na(crrCol)) &&
-           (is.character(crrCol) || is.factor(crrCol) || (is.numeric(crrCol) && all(crrCol %% 1 == 0))))
+           (i == 1 && !chkAtt(crrCol, "jmv-id") && !chkAtt(crrCol, "measureType") && !any(duplicated(crrCol) | is.na(crrCol)) &&
+           (is.character(crrCol) || is.factor(crrCol) || (is.numeric(crrCol) && all(crrCol %% 1 == 0))) &&
+           (tolower(crrNme) %in% c("id", "name", "subject")))
 }
 
 chkPtB <- function(dtaFrm = NULL, fleOut = c()) {

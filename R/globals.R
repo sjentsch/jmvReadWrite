@@ -463,40 +463,6 @@ isJmv <- function() {
     nzchar(Sys.getenv("JAMOVI_R_VERSION"))
 }
 
-jmvAtt <- function(dtaFrm = NULL) {
-    chkDtF(dtaFrm)
-
-    for (crrNme in names(dtaFrm)) {
-         # if the attributes already exist, go to the next column
-         if (chkAtt(dtaFrm[[crrNme]], "measureType") && chkAtt(dtaFrm[[crrNme]], "dataType")) next
-         # jmv-id
-         if (!is.null(attr(dtaFrm[[crrNme]], "jmv-id")) && attr(dtaFrm[[crrNme]], "jmv-id")) {
-             attr(dtaFrm[[crrNme]], "measureType")  <- "ID"
-             attr(dtaFrm[[crrNme]], "dataType")     <- ifelse(is.integer(dtaFrm[[crrNme]]), "Integer", "Text")
-         } else if (is.integer(dtaFrm[[crrNme]])) {
-             attr(dtaFrm[[crrNme]], "measureType")  <- "Continuous"
-             attr(dtaFrm[[crrNme]], "dataType")     <- "Integer"
-         } else if (is.numeric(dtaFrm[[crrNme]])) {
-             attr(dtaFrm[[crrNme]], "measureType")  <- "Continuous"
-             attr(dtaFrm[[crrNme]], "dataType")     <- "Decimal"
-         } else if (is.factor(dtaFrm[[crrNme]])) {
-             attr(dtaFrm[[crrNme]], "measureType")  <- ifelse(is.ordered(dtaFrm[[crrNme]]), "Ordinal", "Nominal")
-             attr(dtaFrm[[crrNme]], "dataType")     <- ifelse(is.null(attr(dtaFrm[[crrNme]], "values")), "Text", "Integer")
-         } else if (is.logical(dtaFrm[[crrNme]]) || is.character(dtaFrm[[crrNme]])) {
-             crrAtt <- attributes(dtaFrm[[crrNme]])
-             dtaFrm[[crrNme]] <- as.factor(dtaFrm[[crrNme]])
-             dffAtt <- setdiff(names(crrAtt), c("levels", "class"))
-             if (length(dffAtt) > 0) dtaFrm[crrNme] <- setAtt(attLst = dffAtt, inpObj = crrAtt, outObj = dtaFrm[crrNme])
-             attr(dtaFrm[[crrNme]], "measureType")  <- "Nominal"
-             attr(dtaFrm[[crrNme]], "dataType")     <- "Text"
-         } else {
-             stop(sprintf("\n\n%s: Variable type %s not implemented:\n%s\n\n", crrNme, class(dtaFrm[[crrNme]]), trimws(utils::capture.output(utils::str(dtaFrm[[crrNme]])))))
-         }
-    }
-
-    dtaFrm
-}
-
 jmvOpn <- function(dtaFrm = NULL, dtaTtl = "") {
     # on both Windows and Linux, jamovi is in the path, and, hence,
     # Sys.which should give the full location

@@ -442,7 +442,7 @@ rmvQtn <- function(dtaFrm = NULL) {
 rplAtt <- function(dtaFrm = NULL) {
     # extract the attributes from the dataset and its columns and determine which attributes are
     # character
-    dfAtt  <- setdiff(names(attributes(dtaFrm))[vapply(attributes(dtaFrm), is.character, logical(1))], c("names", "row.names", "class"))
+    dfAtt  <- setdiff(names(attributes(dtaFrm))[vapply(attributes(dtaFrm), is.character, logical(1))], c("names", "row.names", "class", "HTML"))
     colAtt <- setdiff(unique(unlist(lapply(lapply(dtaFrm, attributes), names), use.names = FALSE)), c("class"))
 
     # go through the data frame attributes (except the attributes from R) and check their validity

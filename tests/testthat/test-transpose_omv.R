@@ -1,4 +1,4 @@
-test_that("arrange_cols_omv works", {
+test_that("transpose_omv works", {
     set.seed(1)
     tmpDF <- stats::setNames(as.data.frame(matrix(sample(6, 1200, replace = TRUE), nrow = 16)), sprintf("sbj_%03d", seq(75)))
     nmeInp <- tempfile(fileext = ".rds")

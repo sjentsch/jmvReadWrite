@@ -12,7 +12,7 @@ test_that("long2wide_omv works", {
     df4Chk <- read_omv(nmeOut)
     expect_s3_class(df4Chk, "data.frame")
     expect_equal(dim(df4Chk), c(121, 25))
-    expect_equal(vapply(df4Chk, typeof, character(1), USE.NAMES = FALSE), c("integer", rep("double", 24)))
+    expect_equal(vapply(df4Chk, typeof, character(1), USE.NAMES = FALSE), c("character", rep("double", 24)))
     expect_equal(names(df4Chk), c("Year", paste0(rep(c("X_", "Y_"), each = 12), month.abb[rep(1:12, times = 2)])))
     expect_equal(unname(colMeans(df4Chk[-1])), c(51.05398, 51.52200, 50.90146, 47.98040, 46.28997, 53.70601, 49.47946, 49.24704, 49.92602, 44.93970, 49.37357, 47.55488,
                                                  48.56846, 48.96117, 47.64545, 46.51572, 50.94652, 47.33624, 47.53437, 55.55701, 51.50431, 50.19580, 52.81145, 43.68338), tolerance = 1e-4)
@@ -24,7 +24,7 @@ test_that("long2wide_omv works", {
     df4Chk <- read_omv(nmeOut)
     expect_s3_class(df4Chk, "data.frame")
     expect_equal(dim(df4Chk), c(121, 25))
-    expect_equal(vapply(df4Chk, typeof, character(1), USE.NAMES = FALSE), c("integer", rep("double", 24)))
+    expect_equal(vapply(df4Chk, typeof, character(1), USE.NAMES = FALSE), c("character", rep("double", 24)))
     expect_equal(names(df4Chk), c("Year", paste0(rep(c("X_", "Y_"), times = 12), month.abb[rep(1:12, each = 2)])))
     expect_equal(unname(colMeans(df4Chk[-1])), c(51.05398, 48.56846, 51.52200, 48.96117, 50.90146, 47.64545, 47.98040, 46.51572, 46.28997, 50.94652, 53.70601, 47.33624,
                                                  49.47946, 47.53437, 49.24704, 55.55701, 49.92602, 51.50431, 44.93970, 50.19580, 49.37357, 52.81145, 47.55488, 43.68338), tolerance = 1e-4)
@@ -36,7 +36,7 @@ test_that("long2wide_omv works", {
     df4Chk <- read_omv(nmeOut)
     expect_s3_class(df4Chk, "data.frame")
     expect_equal(dim(df4Chk), c(121, 13))
-    expect_equal(vapply(df4Chk, typeof, character(1), USE.NAMES = FALSE), c("integer", rep("double", 12)))
+    expect_equal(vapply(df4Chk, typeof, character(1), USE.NAMES = FALSE), c("character", rep("double", 12)))
     expect_equal(names(df4Chk), c("Year", paste0("X_", month.abb[1:12])))
     expect_equal(unname(colMeans(df4Chk[-1])), c(51.05398, 51.52200, 50.90146, 47.98040, 46.28997, 53.70601, 49.47946, 49.24704, 49.92602, 44.93970, 49.37357, 47.55488), tolerance = 1e-4)
     expect_equal(vapply(df4Chk[-1], attr, character(1), "jmv-desc", USE.NAMES = FALSE),
@@ -47,7 +47,7 @@ test_that("long2wide_omv works", {
     df4Chk <- read_omv(nmeOut)
     expect_s3_class(df4Chk, "data.frame")
     expect_equal(dim(df4Chk), c(121, 13))
-    expect_equal(vapply(df4Chk, typeof, character(1), USE.NAMES = FALSE), c("integer", rep("double", 12)))
+    expect_equal(vapply(df4Chk, typeof, character(1), USE.NAMES = FALSE), c("character", rep("double", 12)))
     expect_equal(names(df4Chk), c("Year", paste0("Y_", month.abb[1:12])))
     expect_equal(unname(colMeans(df4Chk[-1])), c(48.56846, 48.96117, 47.64545, 46.51572, 50.94652, 47.33624, 47.53437, 55.55701, 51.50431, 50.19580, 52.81145, 43.68338), tolerance = 1e-4)
     expect_equal(vapply(df4Chk[-1], attr, character(1), "jmv-desc", USE.NAMES = FALSE),
@@ -68,7 +68,7 @@ test_that("long2wide_omv works", {
     df4Chk <- read_omv(nmeOut)
     expect_s3_class(df4Chk, "data.frame")
     expect_equal(dim(df4Chk), c(121, 25))
-    expect_equal(vapply(df4Chk, typeof, character(1), USE.NAMES = FALSE), c("integer", rep("double", 24)))
+    expect_equal(vapply(df4Chk, typeof, character(1), USE.NAMES = FALSE), c("character", rep("double", 24)))
     expect_equal(names(df4Chk), c("Year", paste0(rep(c("X.", "Y."), each = 12), month.abb[rep(1:12, times = 2)])))
     expect_equal(unname(colMeans(df4Chk[-1])), c(51.05398, 51.52200, 50.90146, 47.98040, 46.28997, 53.70601, 49.47946, 49.24704, 49.92602, 44.93970, 49.37357, 47.55488,
                                                  48.56846, 48.96117, 47.64545, 46.51572, 50.94652, 47.33624, 47.53437, 55.55701, 51.50431, 50.19580, 52.81145, 43.68338), tolerance = 1e-4)

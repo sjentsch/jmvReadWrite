@@ -69,7 +69,7 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", wrtPtB = FALSE, frcWrt = FALSE
     fleExs(fleOut, frcWrt)
 
     # check whether dtaFrm is a data frame and attach dataType and measureType attributes
-    dtaFrm <- jmvAtt(dtaFrm, blnChg = TRUE)
+    dtaFrm <- jmvAtt(dtaFrm, cnvClm = TRUE)
 
     # handle the attributes "variable.labels" and "value.labels" in the format provided bymtaDta <- mtaGlb the R-package "foreign"
     # the attribute "variable.labels" (attached to the data frame) is converted them to the format used by jamovi ("jmv-desc" attached to the data column)
@@ -131,37 +131,31 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", wrtPtB = FALSE, frcWrt = FALSE
             crrLvl <- levels(crrCol)
             # ensure that the "values" attribute is correct
             if (chkAtt(crrCol, "values") && all(grepl("^\\d+$", crrLvl)) &&
-              !identical(attr(dtaCol, "values"), as.integer(attr(dtaCol, "levels")))) {
+              !identical(attr(crrCol, "values"), as.integer(attr(crrCol, "levels")))) {
                 clsRmv()
                 stop(sprintf(paste("\"values\"-attribute with unexpected values found for column \"%s\".",
                                    "Please send the file to sebastian.jentschke@uib.no for debugging."), crrNme))
             }
 
-            # ensure correct conversion: 
-
-
-            
-            xtdDta
-
-            xtdDta[[i]] <- list(labels = lapply(0:1, function(i) list(i, as.character(i), as.character(i), FALSE)))
-#           xtdDta[[i]] <- list(labels = lapply(c(FALSE, TRUE), function(l) list(as.integer(l), as.character(l), as.character(as.integer(l)), FALSE))
-## TO-DO:
-            crrCol <- as.integer(crrCol)
-            # NB: If jamovi imports RData / RDS-files, logical variables, labels are assigned as (0, "FALSE", "0", FALSE) and (1, "TRUE", "1", FALSE)
-            #     however, using "0" and "1" instead of "FALSE" and "TRUE" seems to make more sense
-
-        crrCol <- factor(, eval(parse(text = ifelse(crrFld[["dataType"]] == "Integer",
-                                                                  "as.character(sort(as.numeric(unique(trimws(crrCol)))))",
-                                                                  "sort(unique(trimws(crrCol)))"))))
-
-
+            # columns that have previously been logical or where all factor levels can be converted to integer
+            if        (chkAtt(crrCol, "dataType", "Integer") && identical(crrLvl, c("FALSE", "TRUE"))) {
+                xtdDta[[crrNme]] <- list(labels = lapply(c(TRUE, FALSE),    function(l) list(as.integer(l), as.character(l), as.character(l), FALSE)))
+                crrCol <- intFnI(crrCol, bseNul = TRUE)
+            } else if (chkAtt(crrCol, "dataType", "Integer") && intFnC(crrLvl)) {
+                xtdDta[[crrNme]] <- list(labels = lapply(crrLvl,            function(l) list(as.integer(l),              l,               l,  FALSE)))
+                crrCol <- intFnI(crrCol, bseNul = FALSE)
+            # columns that           or where not all factor levels can be converted to integer
+            } else if (chkAtt(crrCol, "dataType", "Text")) {
+                xtdDta[[crrNme]] <- list(labels = lapply(seq_along(crrLvl), function(l) list(l - 1,               crrLvl[l],       crrLvl[l], FALSE)))
+                crrCol <- intFnI(crrCol, bseNul = TRUE)
+            }
         }
 
         # keep value from "type" if it exists, otherwise determine and set "type" based upon whether the variable is an ID,
         # and upon "dataType"
         mtaDta$fields[[i]][["type"]] <- ifelse(chkAtt(crrCol, "type"), attr(crrCol, "type"),
-                                               ifelse(isID(crrCol), is.numeric(crrCol), "integer", "string"),
-                                               gsub("decimal", "number", gsub("text", "integer", tolower(attr(crrCol, "dataType")))))
+                                               gsub("decimal", "number",
+                                               gsub("text", ifelse(isID(crrCol), "string", "integer"), tolower(attr(crrCol, "dataType")))))
 
         # write to data.bin according to type
         if        (chkFld(mtaDta$fields[[i]], "type", "integer")) {
@@ -225,21 +219,24 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", wrtPtB = FALSE, frcWrt = FALSE
     }
 }
 
-jmvAtt <- function(dtaFrm = NULL, blnChg = FALSE) {
+jmvAtt <- function(dtaFrm = NULL, cnvClm = FALSE) {
     chkDtF(dtaFrm)
 
     for (i in seq_along(dtaFrm)) {
         # if the attributes already exist, go to the next column
-        if (chkAtt(dtaFrm[[i]], "measureType") && chkAtt(dtaFrm[[i]], "dataType") && chkAtt(dtaFrm[[i]], "type")) next
+#       if (chkAtt(dtaFrm[[i]], "measureType") && chkAtt(dtaFrm[[i]], "dataType") && chkAtt(dtaFrm[[i]], "type")) next
 
+        crrNme <- names(dtaFrm)[i]
         # (a) jmv-id
         # ID variables represent a special case and are therefore treated first
         # if the jmv-id marker is set or if the measureType is set to "ID" in the original data, or if it is the first column that hasn't the attribute
         # measureType attached, has values that are unique and not NA, is either a factor or an integer (rounded equals the original value) and has a
         # name that (as lower-case) matches "id", "name" or "subject"
-        if (isID(dtaFrm[[i]], i, names(dtaFrm)[i])) {
+        if (isID(dtaFrm[[i]], i, crrNme)) {
+            attr(dtaFrm[[i]], "jmv-id")      <- TRUE
             attr(dtaFrm[[i]], "measureType") <- "ID"
-            attr(dtaFrm[[i]], "dataType")    <- ifelse(is.integer(dtaFrm[[i]]), "Integer", "Text")
+            attr(dtaFrm[[i]], "dataType")    <- "Text"
+            if (cnvClm) dtaFrm[[i]] <- id_Cnv(dtaFrm[[i]])
         # (b) numerical variables, determine first whether the variable can be integer, if not, use / keep it numeric / float
         } else if (is.integer(dtaFrm[[i]]) || (is.numeric(dtaFrm[[i]]) && detInt(dtaFrm[[i]]))) {
             attr(dtaFrm[[i]], "measureType") <- "Continuous"
@@ -250,46 +247,31 @@ jmvAtt <- function(dtaFrm = NULL, blnChg = FALSE) {
         # (c) factors
         } else if (is.factor(dtaFrm[[i]])) {
             attr(dtaFrm[[i]], "measureType") <- ifelse(is.ordered(dtaFrm[[i]]), "Ordinal", "Nominal")
-            attr(dtaFrm[[i]], "dataType")    <- ifelse(!is.null(attr(dtaFrm[[i]], "values")) || detInt(dtaFrm[[i]]), "Integer", "Text")
-        # (d) logical is converted to factor (if blnChg)
+            attr(dtaFrm[[i]], "dataType")    <- ifelse(!is.null(attr(dtaFrm[[i]], "values")) || intFnC(dtaFrm[[i]]), "Integer", "Text")
+        # (d) logical is converted to factor (if cnvClm)
         } else if (is.logical(dtaFrm[[i]])) {
             attr(dtaFrm[[i]], "measureType") <- "Nominal"
             attr(dtaFrm[[i]], "dataType")    <- "Integer"
-            if (blnChg) {
-                crrAtt <- attributes(dtaFrm[[i]])
-                dtaFrm[[i]] <- factor(dtaFrm[[i]])
-                dtaFrm[i]   <- setAtt(attLst = c(setdiff(names(crrAtt), c("levels", "class")), "values"),
-                                      inpObj = c(crrAtt, list(values = c(0, 1)), outObj = dtaFrm[i])
-                # the following lines would enforce to have TRUE as the first level;
-                # for some reason, jamovi does this when importing, e.g., RDS files
-#               dtaFrm[[i]] <- factor(dtaFrm[[i]], c(TRUE, FALSE), c("TRUE", "FALSE"))
-#               dtaFrm[i]   <- setAtt(attLst = c(setdiff(names(crrAtt), c("levels", "class")), "values"),
-#                                     inpObj = c(crrAtt, list(values = c(1, 0)), outObj = dtaFrm[i]) 
-            }
-        # (e) logical is converted to factor (if blnChg)
+            if (cnvClm) dtaFrm[[i]] <- facLnC(dtaFrm[[i]])
+        # (e) logical is converted to factor (if cnvClm)
         } else if (is.character(dtaFrm[[i]])) {
             attr(dtaFrm[[i]], "measureType") <- "Nominal"
             attr(dtaFrm[[i]], "dataType")    <- ifelse(intFnC(dtaFrm[[i]]), "Integer", "Text")
-            if (blnChg) {
-                crrAtt <- attributes(dtaFrm[[i]])
-                dtaFrm[[i]] <- as.factor(trimws(dtaFrm[[i]]))
-                dffAtt <- setdiff(names(crrAtt), c("levels", "class"))
-                if (length(dffAtt) > 0) dtaFrm[crrNme] <- setAtt(attLst = dffAtt, inpObj = crrAtt, outObj = dtaFrm[crrNme])
-            }
+            if (cnvClm) dtaFrm[[i]] <- facLnC(dtaFrm[[i]])
         # (f) date - jamovi doesn't support it natively, thus the transformation to numeric; back-transformation in R - as.Date(..., origin = "1970-01-01")
-        } else if (blnChg && inherits(dtaFrm[[i]], c("Date", "POSIXt"))) {
+        } else if (cnvClm && inherits(dtaFrm[[i]], c("Date", "POSIXt"))) {
             dtaFrm[[i]] <- as.numeric(dtaFrm[[i]])
             attr(dtaFrm[[i]], "measureType") <- "Continuous"
             attr(dtaFrm[[i]], "dataType")    <- "Decimal"
-            attr(dtaFrm[[i]], "description") <- paste(c(ifelse(nzchar(attr(dtaFrm[[i]], "description")), attr(dtaFrm[[i]], "description"), crrNme),
-                                                         "(date converted to numeric; days since 1970-01-01)"), collapse = " ")
+            attr(dtaFrm[[i]], "description") <- paste(ifelse(chkAtt(dtaFrm[[i]], "description"), attr(dtaFrm[[i]], "description"), crrNme),
+                                                      "(date converted to numeric; days since 1970-01-01)")
         # (g) time - jamovi doesn't support it natively,  thus the transformation to numeric; back-transformation in R - hms::as_hms(...)
-        } else if (blnChg && inherits(dtaFrm[[i]], c("difftime"))) {
+        } else if (cnvClm && inherits(dtaFrm[[i]], c("difftime"))) {
             dtaFrm[[i]] <- as.numeric(dtaFrm[[i]])
             attr(dtaFrm[[i]], "measureType") <- "Continuous"
             attr(dtaFrm[[i]], "dataType")    <- "Decimal"
-            attr(dtaFrm[[i]], "description") <- paste(c(ifelse(nzchar(mtaDta$fields[[i]][["description"]]), mtaDta$fields[[i]][["description"]], crrNme),
-                                                             "(time converted to numeric; sec since 00:00)"), collapse = " ")
+            attr(dtaFrm[[i]], "description") <- paste(ifelse(chkAtt(dtaFrm[[i]], "description"), attr(dtaFrm[[i]], "description"), crrNme),
+                                                      "(time converted to numeric; sec since 00:00)")
         # variable type is not implemented
         } else {
             clsRmv()
@@ -302,8 +284,37 @@ jmvAtt <- function(dtaFrm = NULL, blnChg = FALSE) {
     dtaFrm
 }
 
+id_Cnv <- function(crrCol = NULL) {
+    if (is.character(crrCol)) return(crrCol)
+
+    crrAtt <- attributes(crrCol)
+    dffAtt <- setdiff(names(crrAtt), c("levels", "class"))
+    crrCol <- as.character(crrCol)
+    if (length(dffAtt) > 0) crrCol <- setAtt(attLst = dffAtt, inpObj = crrAtt, outObj = as.data.frame(crrCol))[[1]]
+
+    crrCol
+}
+
+intFnI <- function(crrCol = NULL, bseNul = TRUE) {
+    crrAtt <- attributes(crrCol)
+    dffAtt <- setdiff(names(crrAtt), c("levels", "class"))
+    crrCol <- if (bseNul) as.integer(crrCol) - 1L else as.integer(as.character(crrCol))
+    if (length(dffAtt) > 0) crrCol <- setAtt(attLst = dffAtt, inpObj = crrAtt, outObj = as.data.frame(crrCol))[[1]]
+
+    crrCol
+}
+
+facLnC <- function(crrCol = NULL) {
+    crrAtt <- attributes(crrCol)
+    dffAtt <- setdiff(names(crrAtt), c("levels", "class"))
+    crrCol <- if (is.character(crrCol)) as.factor(trimws(crrCol)) else as.factor(crrCol)
+    if (length(dffAtt) > 0) crrCol <- setAtt(attLst = dffAtt, inpObj = crrAtt, outObj = as.data.frame(crrCol))[[1]]
+
+    crrCol
+}
+
 intFnC <- function(crrCol = NULL) {
-    facLvl <- if (is.facctor(crrCol)) levels(crrCol) else unique(trimws(crrCol))
+    facLvl <- if (is.factor(crrCol)) levels(crrCol) else unique(trimws(crrCol))
 
     all(!is.na(suppressWarnings(as.integer(facLvl)))) && all(as.character(as.integer(facLvl)) == facLvl)
 }
@@ -317,11 +328,11 @@ detInt <- function(crrCol = NULL) {
 
 # determine whether a column likely should get the measureType "Continuous", requiring
 # that there are enough different values and a high value range and variability (sd)
-detCnt <- function(crrCol = NULL) {
-    length(unique(crrCol)) > length(crrCol) / 5 &&
-    length(unique(crrCol)) > diff(range(crrCol, na.rm = TRUE)) / 5 &&
-    stats::sd(crrCol, na.rm = TRUE) > diff(range(crrCol, na.rm = TRUE)) / 10
-}
+#detCnt <- function(crrCol = NULL) {
+#    length(unique(crrCol)) > length(crrCol) / 5 &&
+#    length(unique(crrCol)) > diff(range(crrCol, na.rm = TRUE)) / 5 &&
+#    stats::sd(crrCol, na.rm = TRUE) > diff(range(crrCol, na.rm = TRUE)) / 10
+#}
 
 rmvMta <- function(crrFld = NULL, dtaCol = NULL) {
     if (chkFld(crrFld, "columnType", "Filter")) {
@@ -348,7 +359,6 @@ rmvMta <- function(crrFld = NULL, dtaCol = NULL) {
 }
 
 cnvStr <- function(crrCol = NULL, strHdl = NULL, strPos = NA) {
-    if (!is.character(crrCol)) crrCol <- as.character(crrCol)
     crrCol[is.na(crrCol)] <- ""
     wrtCol <- rep(NA, length(crrCol))
     for (j in seq_along(crrCol)) {

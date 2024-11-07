@@ -21,9 +21,9 @@ test_that("write_omv works", {
     expect_s3_class(dtaDbg$dtaFrm, "data.frame")
     expect_equal(dim(dtaDbg$dtaFrm), c(60, 7))
     expect_equal(names(attributes(dtaDbg$dtaFrm)), c("names", "row.names", "class"))
-    expect_equal(names(attributes(dtaDbg$dtaFrm[[3]])), c("levels", "class", "description"))
-    expect_equal(names(attributes(dtaDbg$dtaFrm[[7]])), c("jmv-desc"))
-    expect_equal(attributes(dtaDbg$dtaFrm[[4]]), NULL)
+    expect_equal(names(attributes(dtaDbg$dtaFrm[[3]])), c("levels", "class", "description", "measureType", "dataType"))
+    expect_equal(names(attributes(dtaDbg$dtaFrm[[7]])), c("jmv-desc", "measureType", "dataType"))
+    expect_equal(names(attributes(dtaDbg$dtaFrm[[4]])), c("measureType", "dataType"))
     expect_equal(lapply(jmvReadWrite::ToothGrowth, class), lapply(dtaDbg$dtaFrm, class))
 
     # add columns with only NAs to the dataset and attach jamovi-attributes to them, write the resulting data frame
@@ -43,20 +43,20 @@ test_that("write_omv works", {
     expect_true(all(grepl("labels", unlist(lapply(dtaDbg$xtdDta, attributes)))))
     expect_s3_class(dtaDbg$dtaFrm, "data.frame")
     expect_equal(dim(dtaDbg$dtaFrm), c(60, 13))
-    expect_equal(names(attributes(dtaDbg$dtaFrm)), c("names", "class", "row.names"))
-    expect_equal(names(attributes(dtaDbg$dtaFrm[[3]])),  c("levels", "class", "description"))
-    expect_equal(names(attributes(dtaDbg$dtaFrm[[7]])),  c("jmv-desc"))
+    expect_equal(names(attributes(dtaDbg$dtaFrm)), c("names", "row.names", "class"))
+    expect_equal(names(attributes(dtaDbg$dtaFrm[[3]])),  c("levels", "class", "description", "measureType", "dataType"))
+    expect_equal(names(attributes(dtaDbg$dtaFrm[[7]])),  c("jmv-desc", "measureType", "dataType"))
     expect_equal(names(attributes(dtaDbg$dtaFrm[[10]])), c("class", "levels", "measureType", "dataType"))
     expect_equal(names(attributes(dtaDbg$dtaFrm[[11]])), c("class", "levels", "measureType", "dataType"))
     expect_equal(names(attributes(dtaDbg$dtaFrm[[12]])), c("levels", "class", "measureType", "dataType"))
     expect_equal(names(attributes(dtaDbg$dtaFrm[[13]])), c("levels", "class", "measureType", "dataType"))
-    expect_equal(attributes(dtaDbg$dtaFrm[[4]]),  NULL)
+    expect_equal(attributes(dtaDbg$dtaFrm[[4]]),  list(measureType = "Continuous", dataType = "Decimal"))
     expect_equal(attributes(dtaDbg$dtaFrm[[8]]),  list(measureType = "Continuous", dataType = "Integer"))
     expect_equal(attributes(dtaDbg$dtaFrm[[9]]),  list(measureType = "Continuous", dataType = "Decimal"))
-    expect_equal(attributes(dtaDbg$dtaFrm[[10]]), list(class =              "factor",  levels = character(0), measureType = "Nominal",    dataType = "Text"))
-    expect_equal(attributes(dtaDbg$dtaFrm[[11]]), list(class = c("ordered", "factor"), levels = character(0), measureType = "Ordinal",    dataType = "Text"))
+    expect_equal(attributes(dtaDbg$dtaFrm[[10]]), list(class =              "factor",  levels = character(0), measureType = "Nominal",    dataType = "Integer"))
+    expect_equal(attributes(dtaDbg$dtaFrm[[11]]), list(class = c("ordered", "factor"), levels = character(0), measureType = "Ordinal",    dataType = "Integer"))
     expect_equal(attributes(dtaDbg$dtaFrm[[12]]), list(levels = character(0), class = "factor",               measureType = "Nominal",    dataType = "Text"))
-    expect_equal(attributes(dtaDbg$dtaFrm[[13]]), list(levels = character(0), class = "factor",               measureType = "Nominal",    dataType = "Text"))
+    expect_equal(attributes(dtaDbg$dtaFrm[[13]]), list(levels = character(0), class = "factor",               measureType = "Nominal",    dataType = "Integer"))
     expect_equal(c(lapply(jmvReadWrite::ToothGrowth, class), list(T1 = "integer", T2 = "numeric", T3 = "factor", T4 = c("ordered", "factor"), T5 = "factor", T6 = "factor")),
                  lapply(dtaDbg$dtaFrm, class))
 
@@ -85,8 +85,8 @@ test_that("write_omv works", {
     unlink(nmeOut)
 
     expect_error(write_omv(data.frame(T1 = sample(9999, 100), T2 = as.complex(rnorm(100))), fleOut = tempfile(fileext = ".omv")),
-      regexp = "Variable type complex not implemented\\. Please send the data file that caused this problem to sebastian\\.jentschke@uib\\.no")
-    expect_equal(write_omv(data.frame(ID = as.factor(seq(100)), T1 = sample(9999, 100), T2 = rnorm(100)), nmeOut, retDbg = TRUE)$mtaDta$field[[1]]$type, "string")
+      regexp = "Variable type \\w+ not implemented\\. Please send the data file that caused this problem to sebastian\\.jentschke@uib\\.no")
+    expect_equal(write_omv(data.frame(ID = as.factor(seq(100)),  T1 = sample(9999, 100), T2 = rnorm(100)), nmeOut, retDbg = TRUE)$mtaDta$field[[1]]$type, "string")
     unlink(nmeOut)
 
     tmpDF <- read_omv(file.path("..", "ToothGrowth.omv"))
@@ -122,6 +122,10 @@ test_that("write_omv works", {
     expect_equal(attr(dtaInp, "jmv-weights"), rep(1, 60))
 
     dtaOut <- jmvReadWrite::ToothGrowth[, 1, drop = FALSE]
+    write_omv(dtaFrm = dtaOut, fleOut = nmeOut)
+    expect_true(chkFle(nmeOut, isZIP = TRUE))
+    expect_true(chkFle(nmeOut, fleCnt = "strings.bin"))
+    unlink(nmeOut)
     dtaOut[c(5, 7, 10), 1] <- as.character(NA)
     write_omv(dtaFrm = dtaOut, fleOut = nmeOut)
     expect_true(chkFle(nmeOut, isZIP = TRUE))
@@ -138,7 +142,7 @@ test_that("write_omv works", {
     df4Chk <- write_omv(dtaFrm = jmvReadWrite::ToothGrowth, fleOut = nmeOut, retDbg = TRUE)$dtaFrm
     Sys.unsetenv("JAMOVI_R_VERSION")
     expect_true(all(vapply(df4Chk, function(x) identical(c("measureType", "dataType") %in% names(attributes(x)), c(TRUE, TRUE)), logical(1))))
-    expect_equal(vapply(df4Chk, function(x) attr(x, "dataType"),    character(1), USE.NAMES = FALSE), c("Text", "Text", "Text", "Decimal", "Text", "Decimal", "Decimal"))
+    expect_equal(vapply(df4Chk, function(x) attr(x, "dataType"),    character(1), USE.NAMES = FALSE), c("Text", "Text", "Integer", "Decimal", "Text", "Decimal", "Decimal"))
     expect_equal(vapply(df4Chk, function(x) attr(x, "measureType"), character(1), USE.NAMES = FALSE), c("ID", "Nominal", "Nominal", "Continuous", "Ordinal", "Continuous", "Continuous"))
     # do not unlink to provoke the error underneath
     expect_error(write_omv(dtaFrm = jmvReadWrite::ToothGrowth, fleOut = nmeOut),
@@ -156,4 +160,32 @@ test_that("write_omv works", {
     expect_true(chkFle(nmeOut, isZIP = TRUE))
     expect_true(chkFle(nmeOut, fleCnt = "01 empty/analysis"))
     unlink(nmeOut)
+
+    tmpDF <- data.frame(ID = sprintf("P_%04d", sample(9999, 100)), I = as.integer(sample(1e6, 100)), D = rnorm(100),
+                        OT = factor(sample(c("low", "middle", "high"), 100, replace = TRUE), levels = c("low", "middle", "high"), ordered = TRUE),
+                        ON = factor(sample(seq(7), 100, replace = TRUE), levels = seq(7), ordered = TRUE),
+                        NT = factor(sample(c("low", "middle", "high"), 100, replace = TRUE), levels = c("low", "middle", "high")),
+                        NN = factor(sample(seq(7), 100, replace = TRUE), levels = seq(7)),
+                        CR = sample(c("low", "middle", "high"), 100, replace = TRUE))
+    attr(tmpDF[["ID"]], "jmv-id")   <- TRUE
+    attr(tmpDF[["ON"]], "values")   <- seq(7)
+    attr(tmpDF[["NN"]], "values")   <- seq(7)
+    attr(tmpDF[["CR"]], "jmv-desc") <- "Trial (is description kept?)"
+    expect_equal(lapply(lapply(jmvAtt(tmpDF), attributes), names), list(ID = c("jmv-id", "measureType", "dataType"),
+        I = c("measureType", "dataType"), D = c("measureType", "dataType"),
+        OT = c("levels", "class", "measureType", "dataType"), ON = c("levels", "class", "values", "measureType", "dataType"),
+        NT = c("levels", "class", "measureType", "dataType"), NN = c("levels", "class", "values", "measureType", "dataType"),
+        CR = c("jmv-desc", "measureType", "dataType")))
+    expect_equal(unlist(attributes(jmvAtt(tmpDF)[["ID"]]), use.names = FALSE), c("TRUE", "ID", "Text"))
+    expect_equal(unlist(attributes(jmvAtt(tmpDF)[["I"]]),  use.names = FALSE), c("Continuous", "Integer"))
+    expect_equal(unlist(attributes(jmvAtt(tmpDF)[["D"]]),  use.names = FALSE), c("Continuous", "Decimal"))
+    expect_equal(unlist(attributes(jmvAtt(tmpDF)[["OT"]]), use.names = FALSE), c("low", "middle", "high", "ordered", "factor", "Ordinal", "Text"))
+    expect_equal(unlist(attributes(jmvAtt(tmpDF)[["ON"]]), use.names = FALSE), c(sprintf("%d", seq(1:7)), "ordered", "factor", sprintf("%d", seq(1:7)), "Ordinal", "Integer"))
+    expect_equal(unlist(attributes(jmvAtt(tmpDF)[["NT"]]), use.names = FALSE), c("low", "middle", "high", "factor", "Nominal", "Text"))
+    expect_equal(unlist(attributes(jmvAtt(tmpDF)[["NN"]]), use.names = FALSE), c(sprintf("%d", seq(1:7)), "factor", sprintf("%d", seq(1:7)), "Nominal", "Integer"))
+    expect_equal(unlist(attributes(jmvAtt(tmpDF)[["CR"]]), use.names = FALSE), c("Trial (is description kept?)", "Nominal", "Text"))
+    expect_error(jmvAtt("Trial"),      regexp = "^Input data are either not a data frame or have incorrect \\(only one or more than two\\) dimensions\\.")
+    expect_error(jmvAtt(data.frame()), regexp = "^The first dimension of the input data frame has not the required size \\(0 < 1\\)\\.")
+    expect_error(jmvAtt(cbind(tmpDF, data.frame(ER = sample(seq.Date(as.Date("2000/01/01"), as.Date("2019/12/31"), by = "day"), 100)))),
+      regexp = "^\\s+\\w+: Variable type \\w+ not implemented.")
 })

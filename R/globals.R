@@ -307,6 +307,12 @@ setAtt <- function(attLst = c(), inpObj = NULL, outObj = NULL) {
     outObj
 }
 
+rmvMsV <- function(dtaFrm = NULL) {
+    for (N in names(dtaFrm))
+        attr(dtaFrm[, N], "missingValues") <- NULL
+    return(dtaFrm)
+}
+
 rmvAtt <- function(attObj = NULL) {
     for (crrAtt in setdiff(names(attributes(attObj)), c("class", "comment", "dim", "jmv-id", "jmv-desc", "levels", "names", "row.names", "values"))) {
         attr(attObj, crrAtt) <- NULL

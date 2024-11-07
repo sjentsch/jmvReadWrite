@@ -119,10 +119,6 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", wrtPtB = FALSE, frcWrt = FALSE
         # remove atrributes that are only used with specific columnTypes
         mtaDta$fields[[i]] <- rmvMta(mtaDta$fields[[i]], dtaFrm[[i]])
 
-        # check that dataType, and measureType are set accordingly to type (attribute and column in the data frame)
-        # dataType: Text, Integer, Decimal
-        # cat(sprintf("%02d: %s - %s - %s - %s\n", i, mtaDta$fields[[i]][["name"]], mtaDta$fields[[i]][["type"]], mtaDta$fields[[i]][["dataType"]], mtaDta$fields[[i]][["measureType"]]))
-
         # assign column from the original data frame to crrCol (so that modifications don't affect the original)
         crrCol <- dtaFrm[[i]]
 
@@ -156,6 +152,9 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", wrtPtB = FALSE, frcWrt = FALSE
         mtaDta$fields[[i]][["type"]] <- ifelse(chkAtt(crrCol, "type"), attr(crrCol, "type"),
                                                gsub("decimal", "number",
                                                gsub("text", ifelse(isID(crrCol), "string", "integer"), tolower(attr(crrCol, "dataType")))))
+
+        # for debugging: check that dataType, and measureType are set accordingly to type (attribute and column in the data frame)
+        #cat(do.call(sprintf, c(fmt = "%02d: %s - %s - %s - %s\n", c(i, mtaDta$fields[[i]][c("name", "type", "dataType", "measureType")]))))
 
         # write to data.bin according to type
         if        (chkFld(mtaDta$fields[[i]], "type", "integer")) {
@@ -224,7 +223,7 @@ jmvAtt <- function(dtaFrm = NULL, cnvClm = FALSE) {
 
     for (i in seq_along(dtaFrm)) {
         # if the attributes already exist, go to the next column
-#       if (chkAtt(dtaFrm[[i]], "measureType") && chkAtt(dtaFrm[[i]], "dataType") && chkAtt(dtaFrm[[i]], "type")) next
+#       if (chkAtt(dtaFrm[[i]], "measureType") && chkAtt(dtaFrm[[i]], "dataType")) next
 
         crrNme <- names(dtaFrm)[i]
         # (a) jmv-id

@@ -226,6 +226,7 @@ clcFrq <- function(m = NULL, t = "") {
                 r[i, j] <- sqrt(clcChi(m[, i]) + clcChi(m[, j])) / sqrt(n)
             } else {
                 stop()
+            }
         }
     }
     r[upper.tri(r)] <- t(r)[upper.tri(r)]
@@ -318,6 +319,6 @@ mtcBin <- function(x, y, t = "") {
     stop(sprint("mtcBin: Method %s is not implemented", t))
 }
 
-t1_Bin <- function(o = c()) sum(max(o[1], o[2], na.rm = T), max(o[3], o[4], na.rm=T), max(o[1], o[3], na.rm=T), max(o[2], o[4], na.rm=T))
+t1_Bin <- function(o = c()) sum(max(o[1], o[2], na.rm = TRUE), max(o[3], o[4], na.rm = TRUE), max(o[1], o[3], na.rm = TRUE), max(o[2], o[4], na.rm = TRUE))
 t2_Bin <- function(o = c()) sum(max(sum(o[1], o[3], na.rm = TRUE), sum(o[2], o[4], na.rm = TRUE), na.rm = TRUE),
                                 max(sum(o[1], o[2], na.rm = TRUE), sum(o[3], o[4], na.rm = TRUE), na.rm = TRUE))

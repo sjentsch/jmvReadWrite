@@ -400,8 +400,9 @@ rtnDta <- function(dtaFrm = NULL, fleOut = "", dtaTtl = "", wrtPtB = FALSE, psvA
 # =================================================================================================
 # convert matrix from full to sparse - used for proximities_omv and distances_omv
 mtxF2S <- function(dtaFrm = NULL, rmvTrU = FALSE, rmvDgn = FALSE, mtxXps = FALSE, mtxSps = FALSE) {
-    rownames(dtaFrm) <- names(dtaFrm)
+    if (diff(dim(dtaFrm)) == 0) rownames(dtaFrm) <- names(dtaFrm)
     if (!isSymmetric(as.matrix(dtaFrm))) stop("Input matrix needs to be symmetric.")
+
     C <- ncol(dtaFrm)
     if (rmvTrU || mtxSps) dtaFrm[upper.tri(dtaFrm)] <- NA
     if (rmvDgn || mtxSps) diag(dtaFrm) <- NA

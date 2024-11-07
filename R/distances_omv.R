@@ -47,8 +47,11 @@
 #'   by the std. dev.), `range` (divide by the range), `max` (divide by the absolute maximum),
 #'   `mean` (divide by the mean), `rescale` (subtract the mean and divide by the range).
 #' * `nmeDst` can be one of the following distance measures.
-#'   (1) For interval data: `euclid` (), `seuclid` (), 
-#'   `block` (), `chebychev` (), `minkowski_p` (NB: needs p), `power_p_r` (NB: needs p and r), `cosine` (), `correlation` ().
+#'   (1) For interval data: `euclid` (Euclidean), `seuclid` (squared Euclidean), `block` (city
+#'   block / Manhattan), `canberra` (Canberra). `chebychev` (maximum distance / suprenum norm /
+#'   Chebychev), `minkowski_p` (Minkowski with power p; NB: needs p), `power_p_r` (Minkowski with
+#'   power p, and the r-th root; NB: needs p and r), `cosine` (cosine between the two vectors),
+#'   `correlation` (correlation between the two vectors).
 #'   (2) For frequency count data: `chisq` (), `ph2` ().
 #'   (3) For binary data, all measure have to optional parts `p` and `np` which indicate presence
 #'   (`p`; defaults to 1 if not given) or absence (`np`; defaults to zero if not given).
@@ -83,12 +86,14 @@
 #'   SAS-transport-files. If you would like to use `haven`, you may need to install it using
 #'   `install.packages("haven", dep = TRUE)`.
 #'
-#' @seealso `distances_omv` internally uses the following functions for reading and writing data
-#'   files in different formats: [jmvReadWrite::read_omv()] and [jmvReadWrite::write_omv()] for
-#'   jamovi-files, [utils::read.table()] for CSV / TSV files, [load()] for reading .RData-files,
-#'   [readRDS()] for .rds-files, [haven::read_sav()] or [foreign::read.spss()] for SPSS-files,
-#'   [haven::read_dta()] or [foreign::read.dta()] for Stata-files, [haven::read_sas()] for
-#'   SAS-data-files, and [haven::read_xpt()] or [foreign::read.xport()] for SAS-transport-files.
+#' @seealso `distances_omv` internally uses the following function for calculating the distances
+#'   for interval data [stats::dist()]. It furthermore uses the following functions for reading
+#'   and writing data files in different formats: [jmvReadWrite::read_omv()] and
+#'   [jmvReadWrite::write_omv()] for jamovi-files, [utils::read.table()] for CSV / TSV files,
+#'   [load()] for reading .RData-files, [readRDS()] for .rds-files, [haven::read_sav()] or
+#'   [foreign::read.spss()] for SPSS-files, [haven::read_dta()] or [foreign::read.dta()] for
+#'   Stata-files, [haven::read_sas()] for SAS-data-files, and [haven::read_xpt()] or
+#'   [foreign::read.xport()] for SAS-transport-files.
 #'
 #' @examples
 #' \dontrun{
@@ -97,79 +102,79 @@
 #' @export distances_omv
 #'
 distances_omv <- function(dtaInp = NULL, fleOut = "", varDst = c(), clmDst = TRUE, stdDst = "none",
-                          nmeDst = "euclidean", mtxSps = FALSE, mtxTrL = FALSE, mtxDgn = TRUE,
+                          nmeDst = "euclid", mtxSps = FALSE, mtxTrL = FALSE, mtxDgn = TRUE,
                           usePkg = c("foreign", "haven"), selSet = "", ...) {
-
-    if (length(varDst) < 2 || !all(nzchar(varDst))) {
-        stop("Calling distances_omv requires giving at least two variables to calculate distances between.")
-    }
 
     # check and import input data set (either as data frame or from a file)
     if (!is.null(list(...)[["fleInp"]])) stop("Please use the argument dtaInp instead of fleInp.")
     dtaFrm <- inp2DF(dtaInp = dtaInp, usePkg = usePkg, selSet = selSet, ...)
 
+    if (!all(nzchar(varDst)) || length(intersect(varDst, names(dtaFrm))) < 2) {
+        stop("Calling distances_omv requires giving at least two (valid) variables to calculate distances between.")
+    }
+
     # convert to matrix, and transpose if necessary ===============================================
     if (clmDst) dtaMtx <- as.matrix(dtaFrm) else dtaMtx <- t(as.matrix(dtaFrm))
 
     # standardize the data ========================================================================
-    if        (grepl("^none$",        stdDst)) {
-    } else if (grepl("^z$",           stdDst)) {
+    if        (grepl("^none$",             stdDst)) {
+    } else if (grepl("^z$",                stdDst)) {
         dtaMtx <- scale(dtaMtx)
-    } else if (grepl("^sd$",          stdDst)) {
+    } else if (grepl("^sd$",               stdDst)) {
         dtaMtx <- scale(dtaMtx, center = FALSE)
-    } else if (grepl("^range$",       stdDst)) {
+    } else if (grepl("^range$",            stdDst)) {
         dtaMtx <- scale(dtaMtx, center = FALSE, scale = (apply(dtaMtx, 2, max) - apply(dtaMtx, 2, min)))
-    } else if (grepl("^max$",         stdDst)) {
-        dtaMtx <- scale(dtaMtx, center = FALSE, scale = apply(abs(dtaMtx), 2, max))
-    } else if (grepl("^mean$",        stdDst)) {
-        dtaMtx <- scale(dtaMtx, center = FALSE, scale = colMeans(dtaMtx))
-    } else if (grepl("^rescale$",     stdDst)) {
+    } else if (grepl("^max$",              stdDst)) {
+        dtaMtx <- scale(dtaMtx, center = FALSE, scale =  apply(abs(dtaMtx), 2, max))
+    } else if (grepl("^mean$",             stdDst)) {
+        dtaMtx <- scale(dtaMtx, center = FALSE, scale =  apply(dtaMtx, 2, mean))
+    } else if (grepl("^rescale$",          stdDst)) {
         dtaMtx <- scale(dtaMtx, center = apply(dtaMtx, 2, min), scale = (apply(dtaMtx, 2, max) - apply(dtaMtx, 2, min)))
     } else {
         stop(sprintf("Invalid standardization: %s. See Details in the help for further information.", stdDst))
     }
     
-    # calculate distances (or similarities) =======================================================
+    # calculate distances (or proximities) ========================================================
     # (1) interval data ---------------------------------------------------------------------------
-    if        (grepl("^euclid$",          nmeDst)) {
-        dstRes <- as.matrix(stats::dist(t(dtaMtx), "euclidean", TRUE, TRUE))
-    } else if (grepl("^seuclid$",         nmeDst)) {
-        dstRes <- as.matrix(stats::dist(t(dtaMtx), "euclidean", TRUE, TRUE) ^ 2)
-    } else if (grepl("^block$",           nmeDst)) {
-        dstRes <- as.matrix(stats::dist(t(dtaMtx), "manhattan", TRUE, TRUE))
-    } else if (grepl("^chebychev$",       nmeDst)) {
-        dstRes <- as.matrix(stats::dist(t(dtaMtx), "maximum",   TRUE, TRUE))
-    } else if (grepl("^minkowski_\\d+$",  nmeDst)) {
-        dstRes <- as.matrix(stats::dist(t(dtaMtx), "minkowski", TRUE, TRUE, p = getP(nmeDst)))
-    } else if (grepl("^power_\\d+_\\d+$", nmeDst)) {
-        dstRes <- as.matrix(stats::dist(t(dtaMtx), "minkowski", TRUE, TRUE, p = getP(nmeDst)) ^ (getP(nmeDst) / getR(nmeDst)))
-    } else if (grepl("^cosine$",          nmeDst)) {
-        dstRes <- clcCos(dtaMtx)
-    } else if (grepl("^correlation$",     nmeDst)) {
-        dstRes <- cor(dtaMtx, use = "pairwise")
-#"canberra",
-#"binary" = "jaccard"
+    if        (grepl("^euclid",             nmeDst)) {
+        dstMtx <- as.matrix(stats::dist(t(dtaMtx), "euclidean", TRUE, TRUE))
+    } else if (grepl("^seuclid",            nmeDst)) {
+        dstMtx <- as.matrix(stats::dist(t(dtaMtx), "euclidean", TRUE, TRUE) ^ 2)
+    } else if (grepl("^block$|^manhattan$", nmeDst)) {
+        dstMtx <- as.matrix(stats::dist(t(dtaMtx), "manhattan", TRUE, TRUE))
+    } else if (grepl("^canberra$",          nmeDst)) {
+        dstMtx <- as.matrix(stats::dist(t(dtaMtx), "canberra",  TRUE, TRUE))
+    } else if (grepl("^chebychev$",         nmeDst)) {
+        dstMtx <- as.matrix(stats::dist(t(dtaMtx), "maximum",   TRUE, TRUE))
+    } else if (grepl("^minkowski_\\d+$",    nmeDst)) {
+        dstMtx <- as.matrix(stats::dist(t(dtaMtx), "minkowski", TRUE, TRUE, p = getP(nmeDst)))
+    } else if (grepl("^power_\\d+_\\d+$",   nmeDst)) {
+        dstMtx <- as.matrix(stats::dist(t(dtaMtx), "minkowski", TRUE, TRUE, p = getP(nmeDst)) ^ (getP(nmeDst) / getR(nmeDst)))
+    } else if (grepl("^cosine$",            nmeDst)) {
+        dstMtx <- clcCos(dtaMtx)
+    } else if (grepl("^correlation$",       nmeDst)) {
+        dstMtx <- cor(dtaMtx, use = "pairwise")
     # (2) frequency count data --------------------------------------------------------------------
-    } else if (grepl("^chisq$|^ph2$",     nmeDst)) {
-        dstRes <- clcFrq(dtaMtx, nmeDst)
+    } else if (grepl("^chisq$|^ph2$",       nmeDst)) {
+        dstMtx <- clcFrq(dtaMtx, nmeDst)
     # (3) binary data -----------------------------------------------------------------------------
     } else if (grepl(paste0("^beuclid|^blwmn|^bseuclid|^bshape|^d$|^d_|^dice|^disper|^hamann|^jaccard|^k[1-2]$|^k[1-2]_|",
-                            "^lambda|^ochiai|^pattern|^phi|^q$|^q_|^rr|^rt|^size|^ss[1-5]|^sm|^y$|^y_|^variance", nmeDst))) {
-        dstRes <- clcBin(dtaMtx, nmeDst)
+                            "^lambda|^ochiai|^pattern|^phi|^q$|^q_|^rr|^rt|^size|^ss[1-5]|^sm|^y$|^y_|^variance"), nmeDst)) {
+        dstMtx <- clcBin(dtaMtx, nmeDst)
     # (4) none ------------------------------------------------------------------------------------
-    } else if (grepl("^none$",            nmeDst)) {
-        dstRes <- dtaMtx
+    } else if (grepl("^none$",              nmeDst)) {
+        dstMtx <- dtaMtx
     # ---------------------------------------------------------------------------------------------
     } else {
         stop(sprintf("Invalid distance measure: %s. See Details in the help for further information.",     nmeDst))
     }
 
     # converting distance matrix back to data frame, and apply mtxF2S
-    dtaFrm <- 
-    if (mtxSps || mtxTrL) dtaFrm <- mtxF2S(dtaFrm, rmvTrU = mtxTrL, rmvDgn = !mtxDgn, mtxSps = mtxSps)
+    dstFrm <- as.data.frame(dstMtx)
+    if (mtxSps || mtxTrL) dstFrm <- mtxF2S(dstFrm, rmvTrU = mtxTrL, rmvDgn = !mtxDgn, mtxSps = mtxSps)
 
     # rtnDta in globals.R (unified function to either write the data frame, open it in a new jamovi session or return it)
-    rtnDta(dtaFrm = dtaFrm, fleOut = fleOut, dtaTtl = jmvTtl("_dist"), psvAnl = psvAnl, dtaInp = dtaInp, ...)
+    rtnDta(dtaFrm = dstFrm, fleOut = fleOut, dtaTtl = jmvTtl("_dist"), ...)
 }
 
 # helper and calculation functions ================================================================
@@ -182,7 +187,7 @@ clcBin <- function(m = NULL, t = "") {
     n <- ncol(m)
     # create a result matrix
 ## TO-DO: change 0 / 1 as default
-    r <- matrix(1, n, n)
+    r <- matrix(1, n, n, dimnames = rep(dimnames(m)[2], 2))
    
     for (i in seq(2, n)) {
         for (j in seq(1, i - 1)) {
@@ -200,7 +205,7 @@ clcChi <- function(x = c()) { t = table(x); sum((t - mean(t)) ^ 2 / mean(t)) }
 clcCos <- function(m = NULL) {
     n <- ncol(m)
     # create a result matrix
-    r <- matrix(1, n, n)
+    r <- matrix(1, n, n, dimnames = rep(dimnames(m)[2], 2))
    
     for (i in seq(2, n)) {
         for (j in seq(1, i - 1)) {
@@ -216,7 +221,7 @@ clcFrq <- function(m = NULL, t = "") {
     n <- ncol(m)
     # create a result matrix
 ## TO-DO: change 0 / 1 as default
-    r <- matrix(1, n, n)
+    r <- matrix(1, n, n, dimnames = rep(dimnames(m)[2], 2))
    
     for (i in seq(2, n)) {
         for (j in seq(1, i - 1)) {
@@ -225,7 +230,7 @@ clcFrq <- function(m = NULL, t = "") {
             } else if (t == "ph2") {
                 r[i, j] <- sqrt(clcChi(m[, i]) + clcChi(m[, j])) / sqrt(n)
             } else {
-                stop()
+                stop(sprint("clcFrq: Method %s is not implemented", t))
             }
         }
     }
@@ -243,7 +248,7 @@ mkeBin <- function(m = NULL, p = 1, np = 0) {
     if (all(apply(m, 2, is.logical))) return(m)
 
     if (all(apply(m, 2, is.numeric))) {
-        r <- matrix(as.logical(m * NA), nrow = nrow(m))
+        r <- matrix(as.logical(m * NA), nrow = nrow(m), dimnames = dimnames(m))
         r[m ==  p] <- TRUE
         r[m == np] <- FALSE
     } else {

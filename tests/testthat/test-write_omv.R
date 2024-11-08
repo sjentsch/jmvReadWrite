@@ -187,4 +187,9 @@ test_that("write_omv works", {
     expect_error(jmvAtt("Trial"),      regexp = "^Input data are either not a data frame or have incorrect \\(only one or more than two\\) dimensions\\.")
     expect_error(jmvAtt(data.frame()), regexp = "^The first dimension of the input data frame has not the required size \\(0 < 1\\)\\.")
     expect_error(jmvAtt(cbind(tmpDF, data.frame(EC = sample(as.complex(seq(10)), 100, replace = TRUE)))), regexp = "^\\s+\\w+: Variable type \\w+ not implemented.")
+
+    tmpCol <- rnorm(100)
+    attr(tmpCol, "Trial") <- "Check whether attribute is preserved"
+    expect_equal(cnvCol(tmpCol, tgtTyp = "integer"), round(tmpCol))
+    expect_equal(attr(cnvCol(tmpCol, tgtTyp = "integer"), "Trial"), "Check whether attribute is preserved")
 })

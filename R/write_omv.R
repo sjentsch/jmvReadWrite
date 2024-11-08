@@ -267,7 +267,7 @@ jmvAtt <- function(dtaFrm = NULL, blnChC = FALSE) {
         # (g) time - jamovi doesn't support it natively,  thus the transformation to numeric; back-transformation in R - hms::as_hms(...)
         } else if (is(dtaFrm[[i]], "difftime")) {
             attr(dtaFrm[[i]], "measureType") <- "Continuous"
-            attr(dtaFrm[[i]], "dataType")    <- "Decimal"
+            attr(dtaFrm[[i]], "dataType")    <- "Integer"
             if (blnChC) {
                 attr(dtaFrm[[i]], "description") <- paste(ifelse(chkAtt(dtaFrm[[i]], "description"), attr(dtaFrm[[i]], "description"), crrNme),
                                                           "(time converted to numeric; sec since 00:00)")
@@ -302,6 +302,9 @@ cnvCol <- function(crrCol = NULL, tgtTyp = "character") {
     } else {
         crrCol <- as(crrCol, tgtTyp)
     }
+    if (length(dffAtt) > 0) crrCol <- setAtt(attLst = dffAtt, inpObj = crrAtt, outObj = as.data.frame(crrCol))[[1]]
+    
+    crrCol
 }
 
 intFnC <- function(crrCol = NULL) {

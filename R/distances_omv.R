@@ -153,7 +153,7 @@ distances_omv <- function(dtaInp = NULL, fleOut = "", varDst = c(), clmDst = TRU
     } else if (grepl("^cosine$",            nmeDst)) {
         dstMtx <- clcCos(dtaMtx)
     } else if (grepl("^correlation$",       nmeDst)) {
-        dstMtx <- cor(dtaMtx, use = "pairwise")
+        dstMtx <- stats::cor(dtaMtx, use = "pairwise")
     # (2) frequency count data --------------------------------------------------------------------
     } else if (grepl("^chisq$|^ph2$",       nmeDst)) {
         dstMtx <- clcFrq(dtaMtx, nmeDst)
@@ -240,8 +240,8 @@ clcFrq <- function(m = NULL, t = "") {
 }
 
 # helper functions: get P (power / present), NP (not present), and R (root)
-getP <-          function(s) c(as.numeric(na.omit(strsplit(s, "_")[[1]][2])), 1)[1]
-getR <- getNP <- function(s) c(as.numeric(na.omit(strsplit(s, "_")[[1]][3])), 0)[1]
+getP <-          function(s) c(as.numeric(stats::na.omit(strsplit(s, "_")[[1]][2])), 1)[1]
+getR <- getNP <- function(s) c(as.numeric(stats::na.omit(strsplit(s, "_")[[1]][3])), 0)[1]
 
 # binary measures: transform the data matrix from numeric into logical
 mkeBin <- function(m = NULL, p = 1, np = 0) {
@@ -321,7 +321,7 @@ mtcBin <- function(x, y, t = "") {
     else if (t == "y")        return((sqrt(o[1] * o[4]) - sqrt(o[2] * o[3])) / sum(sqrt(o[1] * o[4]), sqrt(o[2] * o[3])))
 #   PLACEHOLDER FOR FUTURE IMPLEMENTATIONS
 #   else if (t == "")         return()
-    stop(sprint("mtcBin: Method %s is not implemented", t))
+    stop(sprintf("mtcBin: Method %s is not implemented", t))
 }
 
 t1_Bin <- function(o = c()) sum(max(o[1], o[2], na.rm = TRUE), max(o[3], o[4], na.rm = TRUE), max(o[1], o[3], na.rm = TRUE), max(o[2], o[4], na.rm = TRUE))

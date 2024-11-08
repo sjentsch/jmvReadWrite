@@ -186,6 +186,5 @@ test_that("write_omv works", {
     expect_equal(unlist(attributes(jmvAtt(tmpDF)[["CR"]]), use.names = FALSE), c("Trial (is description kept?)", "Nominal", "Text"))
     expect_error(jmvAtt("Trial"),      regexp = "^Input data are either not a data frame or have incorrect \\(only one or more than two\\) dimensions\\.")
     expect_error(jmvAtt(data.frame()), regexp = "^The first dimension of the input data frame has not the required size \\(0 < 1\\)\\.")
-    expect_error(jmvAtt(cbind(tmpDF, data.frame(ER = sample(seq.Date(as.Date("2000/01/01"), as.Date("2019/12/31"), by = "day"), 100)))),
-      regexp = "^\\s+\\w+: Variable type \\w+ not implemented.")
+    expect_error(jmvAtt(cbind(tmpDF, data.frame(EC = sample(as.complex(seq(10)), 100, replace = TRUE)))), regexp = "^\\s+\\w+: Variable type \\w+ not implemented.")
 })

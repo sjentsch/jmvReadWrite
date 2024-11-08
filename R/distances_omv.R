@@ -179,7 +179,7 @@ distances_omv <- function(dtaInp = NULL, fleOut = "", varDst = c(), clmDst = TRU
 
 # helper and calculation functions ================================================================
 # binary measures: calculation, calls mtcBin for each cell (variable pair comparison / matches)
-clcBin <- function(m = NULL, t = "") {
+clcBin <- function(m = NULL, t = "jaccard") {
     # transform data matrix into a logical matrix
     m <- mkeBin(m, getP(t), getNP(t))
     # extract transformation name
@@ -187,14 +187,14 @@ clcBin <- function(m = NULL, t = "") {
     n <- ncol(m)
     # create a result matrix
 ## TO-DO: change 0 / 1 as default
-    r <- matrix(1, n, n, dimnames = rep(dimnames(m)[2], 2))
+    r <- matrix(0, n, n, dimnames = rep(dimnames(m)[2], 2))
    
     for (i in seq(2, n)) {
         for (j in seq(1, i - 1)) {
             r[i, j] <- mtcBin(m[, i], m[, j], t)
+            r[j, i] <- if (grepl("^k2$", t)) mtcBin(m[, j], m[, i], t) else r[i, j]
         }
     }
-    r[upper.tri(r)] <- t(r)[upper.tri(r)]
     
     r
 }
@@ -209,32 +209,29 @@ clcCos <- function(m = NULL) {
    
     for (i in seq(2, n)) {
         for (j in seq(1, i - 1)) {
-            r[i, j] <- crossprod(m[, i], m[, j]) / sqrt(crossprod(m[, i]) * crossprod(m[, j]))
+            r[i, j] <- r[j, i] <- crossprod(m[, i], m[, j]) / sqrt(crossprod(m[, i]) * crossprod(m[, j]))
         }
     }
-    r[upper.tri(r)] <- t(r)[upper.tri(r)]
     
     r
 }
 
-clcFrq <- function(m = NULL, t = "") {
+clcFrq <- function(m = NULL, t = "chisq") {
     n <- ncol(m)
     # create a result matrix
-## TO-DO: change 0 / 1 as default
-    r <- matrix(1, n, n, dimnames = rep(dimnames(m)[2], 2))
+    r <- matrix(NA, n, n, dimnames = rep(dimnames(m)[2], 2))
    
-    for (i in seq(2, n)) {
-        for (j in seq(1, i - 1)) {
+    for (i in seq(1, n)) {
+        for (j in seq(1, i)) {
             if        (t == "chisq") {
-                r[i, j] <- sqrt(clcChi(m[, i]) + clcChi(m[, j]))
+                r[i, j] <- r[j, i] <- sqrt(clcChi(m[, i]) + clcChi(m[, j]))
             } else if (t == "ph2") {
-                r[i, j] <- sqrt(clcChi(m[, i]) + clcChi(m[, j])) / sqrt(n)
+                r[i, j] <- r[j, i] <- sqrt(clcChi(m[, i]) + clcChi(m[, j])) / sqrt(n)
             } else {
-                stop(sprint("clcFrq: Method %s is not implemented", t))
+                stop(sprintf("clcFrq: Method %s is not implemented.", t))
             }
         }
     }
-    r[upper.tri(r)] <- t(r)[upper.tri(r)]
     
     r
 }
@@ -263,6 +260,7 @@ mkeBin <- function(m = NULL, p = 1, np = 0) {
 # implemented based upon: www.sussex.ac.uk/its/pdfs/SPSS_Statistics_Algorithms_22.pdf
 # see www.itl.nist.gov/div898/software/dataplot/refman2/auxillar/binmatch.htm for further possible measures
 mtcBin <- function(x, y, t = "") {
+    if (!all(is.logical(c(x, y)))) stop("mtcBin: Input columns to the calculation of binary measures must be logical.")
     o <- c(sum(x & y, na.rm = TRUE), sum(x & !y, na.rm = TRUE), sum(!x & y, na.rm = TRUE), sum(!x & !y, na.rm = TRUE))
 
     # binary - dissimilarity - Euclidian distance: binEuc - BEUCLID
@@ -279,10 +277,10 @@ mtcBin <- function(x, y, t = "") {
     else if (t == "dice")     return((o[1] * 2) / sum(o[1], o[-4]))
     # binary - similarity - Dispersion: DISPER
     else if (t == "disper")   return((o[1] * o[4] - o[2] * o[3]) / (sum(o) ^ 2))
-    # binary - similarity - Jaccard: JACCARD
-    else if (t == "jaccard")  return(o[1] / sum(o[-4]))
     # binary - similarity - Hamann: HAMANN
     else if (t == "hamann")   return(sum(o[1], -o[2], -o[3], o[4]) / sum(o))
+    # binary - similarity - Jaccard: JACCARD
+    else if (t == "jaccard")  return(o[1] / sum(o[-4]))
     # binary - similarity - Kulczynski 1: K1
     else if (t == "k1")       return(min(o[1] / sum(o[2], o[3]), 9999.999))
     # binary - similarity - Kulczynski 2: K2
@@ -321,7 +319,7 @@ mtcBin <- function(x, y, t = "") {
     else if (t == "y")        return((sqrt(o[1] * o[4]) - sqrt(o[2] * o[3])) / sum(sqrt(o[1] * o[4]), sqrt(o[2] * o[3])))
 #   PLACEHOLDER FOR FUTURE IMPLEMENTATIONS
 #   else if (t == "")         return()
-    stop(sprintf("mtcBin: Method %s is not implemented", t))
+    stop(sprintf("mtcBin: Method %s is not implemented.", t))
 }
 
 t1_Bin <- function(o = c()) sum(max(o[1], o[2], na.rm = TRUE), max(o[3], o[4], na.rm = TRUE), max(o[1], o[3], na.rm = TRUE), max(o[2], o[4], na.rm = TRUE))

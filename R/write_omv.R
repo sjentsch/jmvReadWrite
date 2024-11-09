@@ -234,52 +234,45 @@ jmvAtt <- function(dtaFrm = NULL, blnChC = FALSE) {
             attr(dtaFrm[[i]], "measureType") <- "ID"
             attr(dtaFrm[[i]], "dataType")    <- "Text"
             if (blnChC) dtaFrm[[i]] <- cnvCol(dtaFrm[[i]], "character")
-        # (b) numerical variables, determine first whether the variable can be integer, if not, use / keep it numeric / float
-        } else if (!is(dtaFrm[[i]], "Date") && (is(dtaFrm[[i]], "integer") || (is(dtaFrm[[i]], "numeric") && detInt(dtaFrm[[i]])))) {
-            attr(dtaFrm[[i]], "measureType") <- "Continuous"
-            attr(dtaFrm[[i]], "dataType")    <- "Integer"
-        } else if (is(dtaFrm[[i]], "numeric")) {
-            attr(dtaFrm[[i]], "measureType") <- "Continuous"
-            attr(dtaFrm[[i]], "dataType")    <- "Decimal"
-        # (c) factors
-        } else if (is(dtaFrm[[i]], "factor")) {
-            attr(dtaFrm[[i]], "measureType") <- ifelse(is.ordered(dtaFrm[[i]]), "Ordinal", "Nominal")
-            attr(dtaFrm[[i]], "dataType")    <- ifelse(!is.null(attr(dtaFrm[[i]], "values")) || intFnC(dtaFrm[[i]]), "Integer", "Text")
-        # (d) logical is converted to factor (if blnChC)
-        } else if (is(dtaFrm[[i]], "logical")) {
-            attr(dtaFrm[[i]], "measureType") <- "Nominal"
-            attr(dtaFrm[[i]], "dataType")    <- "Integer"
-            if (blnChC) dtaFrm[[i]] <- cnvCol(dtaFrm[[i]], "factor")
-        # (e) logical is converted to factor (if blnChC)
-        } else if (is(dtaFrm[[i]], "character")) {
-            attr(dtaFrm[[i]], "measureType") <- "Nominal"
-            attr(dtaFrm[[i]], "dataType")    <- ifelse(intFnC(dtaFrm[[i]]), "Integer", "Text")
-            if (blnChC) dtaFrm[[i]] <- cnvCol(dtaFrm[[i]], "factor")
-        # (f) date - jamovi doesn't support it natively, thus the transformation to numeric; back-transformation in R - as.Date(..., origin = "1970-01-01")
+        # (b) date - jamovi doesn't support it natively, thus the transformation to numeric; back-transformation in R - as.Date(..., origin = "1970-01-01")
+        # NB: must come before the numerical variables since date is an integer from R 4.5
         } else if (is(dtaFrm[[i]], "Date")) {
             attr(dtaFrm[[i]], "measureType") <- "Continuous"
             attr(dtaFrm[[i]], "dataType")    <- "Integer"
             if (blnChC) {
+                dtaFrm[[i]] <- cnvCol(dtaFrm[[i]], "integer")
                 attr(dtaFrm[[i]], "description") <- paste(ifelse(chkAtt(dtaFrm[[i]], "description"), attr(dtaFrm[[i]], "description"), crrNme),
                                                           "(date converted to numeric; days since 1970-01-01)")
-                dtaFrm[[i]] <- cnvCol(dtaFrm[[i]], "integer")
             }
-        # (g) time - jamovi doesn't support it natively,  thus the transformation to numeric; back-transformation in R - hms::as_hms(...)
+        # (c) time - jamovi doesn't support it natively,  thus the transformation to numeric; back-transformation in R - hms::as_hms(...)
         } else if (is(dtaFrm[[i]], "difftime")) {
             attr(dtaFrm[[i]], "measureType") <- "Continuous"
             attr(dtaFrm[[i]], "dataType")    <- "Integer"
             if (blnChC) {
+                dtaFrm[[i]] <- cnvCol(dtaFrm[[i]], "integer")
                 attr(dtaFrm[[i]], "description") <- paste(ifelse(chkAtt(dtaFrm[[i]], "description"), attr(dtaFrm[[i]], "description"), crrNme),
                                                           "(time converted to numeric; sec since 00:00)")
-                dtaFrm[[i]] <- cnvCol(dtaFrm[[i]], "integer")
-            }                                                         
+            }
+        # (d) numerical variables, determine first whether the variable can be integer, if not, use / keep it numeric / float
+        } else if (is(dtaFrm[[i]], "numeric")) {
+            attr(dtaFrm[[i]], "measureType") <- "Continuous"
+            attr(dtaFrm[[i]], "dataType")    <- ifelse(is(dtaFrm[[i]], "integer") || detInt(dtaFrm[[i]]), "Integer", "Decimal")
+        # (e) factors
+        } else if (is(dtaFrm[[i]], "factor")) {
+            attr(dtaFrm[[i]], "measureType") <- ifelse(is.ordered(dtaFrm[[i]]), "Ordinal", "Nominal")
+            attr(dtaFrm[[i]], "dataType")    <- ifelse(!is.null(attr(dtaFrm[[i]], "values")) || intFnC(dtaFrm[[i]]), "Integer", "Text")
+        # (f) logical and character are converted to factor (if blnChC)
+        } else if (is(dtaFrm[[i]], "logical") || is(dtaFrm[[i]], "character")) {
+            attr(dtaFrm[[i]], "measureType") <- "Nominal"
+            attr(dtaFrm[[i]], "dataType")    <- ifelse(is(dtaFrm[[i]], "logical") || intFnC(dtaFrm[[i]]), "Integer", "Text")
+            if (blnChC) dtaFrm[[i]] <- cnvCol(dtaFrm[[i]], "factor")
         # variable type is not implemented
         } else {
             clsRmv()
             stop(sprintf("\n\n%s: Variable type %s not implemented. Please send the data file that caused this problem to sebastian.jentschke@uib.no",
               names(dtaFrm)[i], class(dtaFrm[[i]])))
         }
-        
+
     }
 
     dtaFrm
@@ -303,7 +296,7 @@ cnvCol <- function(crrCol = NULL, tgtTyp = "character") {
         crrCol <- as(crrCol, tgtTyp)
     }
     if (length(dffAtt) > 0) crrCol <- setAtt(attLst = dffAtt, inpObj = crrAtt, outObj = as.data.frame(crrCol))[[1]]
-    
+
     crrCol
 }
 

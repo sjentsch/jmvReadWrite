@@ -22,6 +22,7 @@ URL: https://sjentsch.github.io/jmvReadWrite/
 BugReports: https://github.com/sjentsch/jmvReadWrite/issues
 Depends: R (>= 3.5.0)
 Imports: jsonlite,
+         methods,
          zip
 Suggests: jmv,
           jmvcore (>= 2.4.7),

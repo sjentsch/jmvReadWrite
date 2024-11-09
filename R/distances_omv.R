@@ -295,9 +295,9 @@ clcFrq <- function(m = NULL, t = "chisq") {
     for (i in seq(2, n)) {
         for (j in seq(1, i - 1)) {
             if        (t == "chisq") {
-                r[i, j] <- r[j, i] <- suppressWarnings(chisq.test(rbind(table(m[, i]), table(m[, j])))[["statistic"]])
+                r[i, j] <- r[j, i] <- suppressWarnings(stats::chisq.test(rbind(table(m[, i]), table(m[, j])))[["statistic"]])
             } else if (t == "ph2") {
-                r[i, j] <- r[j, i] <- suppressWarnings(chisq.test(rbind(table(m[, i]), table(m[, j])))[["statistic"]]) / sqrt(nrow(m) * 2)
+                r[i, j] <- r[j, i] <- suppressWarnings(stats::chisq.test(rbind(table(m[, i]), table(m[, j])))[["statistic"]]) / sqrt(nrow(m) * 2)
             } else {
                 stop(sprintf("clcFrq: Method %s is not implemented.", t))
             }

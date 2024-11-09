@@ -236,7 +236,7 @@ jmvAtt <- function(dtaFrm = NULL, blnChC = FALSE) {
             if (blnChC) dtaFrm[[i]] <- cnvCol(dtaFrm[[i]], "character")
         # (b) date - jamovi doesn't support it natively, thus the transformation to numeric; back-transformation in R - as.Date(..., origin = "1970-01-01")
         # NB: must come before the numerical variables since date is an integer from R 4.5
-        } else if (is(dtaFrm[[i]], "Date")) {
+        } else if (methods::is(dtaFrm[[i]], "Date")) {
             attr(dtaFrm[[i]], "measureType") <- "Continuous"
             attr(dtaFrm[[i]], "dataType")    <- "Integer"
             if (blnChC) {
@@ -245,7 +245,7 @@ jmvAtt <- function(dtaFrm = NULL, blnChC = FALSE) {
                                                           "(date converted to numeric; days since 1970-01-01)")
             }
         # (c) time - jamovi doesn't support it natively,  thus the transformation to numeric; back-transformation in R - hms::as_hms(...)
-        } else if (is(dtaFrm[[i]], "difftime")) {
+        } else if (methods::is(dtaFrm[[i]], "difftime")) {
             attr(dtaFrm[[i]], "measureType") <- "Continuous"
             attr(dtaFrm[[i]], "dataType")    <- "Integer"
             if (blnChC) {
@@ -254,17 +254,17 @@ jmvAtt <- function(dtaFrm = NULL, blnChC = FALSE) {
                                                           "(time converted to numeric; sec since 00:00)")
             }
         # (d) numerical variables, determine first whether the variable can be integer, if not, use / keep it numeric / float
-        } else if (is(dtaFrm[[i]], "numeric")) {
+        } else if (is.numeric(dtaFrm[[i]])) {
             attr(dtaFrm[[i]], "measureType") <- "Continuous"
-            attr(dtaFrm[[i]], "dataType")    <- ifelse(is(dtaFrm[[i]], "integer") || detInt(dtaFrm[[i]]), "Integer", "Decimal")
+            attr(dtaFrm[[i]], "dataType")    <- ifelse(is.integer(dtaFrm[[i]]) || detInt(dtaFrm[[i]]), "Integer", "Decimal")
         # (e) factors
-        } else if (is(dtaFrm[[i]], "factor")) {
+        } else if (is.factor(dtaFrm[[i]])) {
             attr(dtaFrm[[i]], "measureType") <- ifelse(is.ordered(dtaFrm[[i]]), "Ordinal", "Nominal")
             attr(dtaFrm[[i]], "dataType")    <- ifelse(!is.null(attr(dtaFrm[[i]], "values")) || intFnC(dtaFrm[[i]]), "Integer", "Text")
         # (f) logical and character are converted to factor (if blnChC)
-        } else if (is(dtaFrm[[i]], "logical") || is(dtaFrm[[i]], "character")) {
+        } else if (is.logical(dtaFrm[[i]]) || is.character(dtaFrm[[i]])) {
             attr(dtaFrm[[i]], "measureType") <- "Nominal"
-            attr(dtaFrm[[i]], "dataType")    <- ifelse(is(dtaFrm[[i]], "logical") || intFnC(dtaFrm[[i]]), "Integer", "Text")
+            attr(dtaFrm[[i]], "dataType")    <- ifelse(is.logical(dtaFrm[[i]]) || intFnC(dtaFrm[[i]]), "Integer", "Text")
             if (blnChC) dtaFrm[[i]] <- cnvCol(dtaFrm[[i]], "factor")
         # variable type is not implemented
         } else {
@@ -279,21 +279,21 @@ jmvAtt <- function(dtaFrm = NULL, blnChC = FALSE) {
 }
 
 cnvCol <- function(crrCol = NULL, tgtTyp = "character") {
-    if (is(crrCol, tgtTyp)) return(crrCol)
+    if (methods::is(crrCol, tgtTyp)) return(crrCol)
 
     # store attributes
     crrAtt <- attributes(crrCol)
     dffAtt <- setdiff(names(crrAtt), c("levels", "class"))
     # pre-processing (trim spaces and round where necessary)
-    if (is(crrCol, "character")) crrCol <- trimws(crrCol)
-    if (is(crrCol, "numeric") && tgtTyp ==  "integer") crrCol <- round(crrCol)
+    if (is.character(crrCol)) crrCol <- trimws(crrCol)
+    if (is.numeric(crrCol) && tgtTyp ==  "integer") crrCol <- round(crrCol)
     # actual conversion; jamovi stores factors differently depending on whether they have the dataType Integer or Text
-    if (is(crrCol, "factor") && tgtTyp == "integer") {
+    if (is.factor(crrCol) && tgtTyp == "integer") {
         crrCol <- if (intFnC(crrCol)) as.integer(as.character(crrCol)) else as.integer(crrCol) - 1L
     } else if (tgtTyp == "factor") {
         crrCol <- as.factor(crrCol)
     } else {
-        crrCol <- as(crrCol, tgtTyp)
+        crrCol <- methods::as(crrCol, tgtTyp)
     }
     if (length(dffAtt) > 0) crrCol <- setAtt(attLst = dffAtt, inpObj = crrAtt, outObj = as.data.frame(crrCol))[[1]]
 

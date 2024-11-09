@@ -203,13 +203,19 @@ management tasks that are frequently required:
   a repository such as OSF, or for generated data sets, e.g. those used in
   teaching.
 
+* [`distances_omv`](https://sjentsch.github.io/jmvReadWrite/reference/distances_omv.html):
+  Calculates a wide range of distances measures (for continuous, frequency or binary data).
+  If can be determined, whether the calculation of the distances should be carried out
+  between columns / variables or between rows / units of observation. The original data can
+  be standardized before the distances are calculated.
+
 * [`long2wide_omv`](https://sjentsch.github.io/jmvReadWrite/reference/long2wide_omv.html):
-  Convert a data set from long to wide format: Time points for repeated
+  Converts a data set from long to wide format: Time points for repeated
   measurements are arranged as rows in the original and converted into
   columns.
 
 * [`wide2long_omv`](https://sjentsch.github.io/jmvReadWrite/reference/wide2long_omv.html):
-  Convert a data set from wide to long format: Time points for repeated
+  Converts a data set from wide to long format: Time points for repeated
   measurements are arranged as columns in the original and converted into
   rows.
 

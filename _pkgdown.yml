@@ -21,6 +21,7 @@ reference:
   - arrange_cols_omv
   - convert_to_omv
   - describe_omv
+  - distances_omv
   - label_vars_omv
   - long2wide_omv
   - wide2long_omv

@@ -1,3 +1,16 @@
+# jmvReadWrite 0.4.8
+
+## Enhancements:
+* added `distances_omv`: calculate a wide range of distance measures (either between variables or between units
+  of observation) on standardized or the original data
+
+## Bug fixes:
+* improved the treatment of factors and how they are stored
+* corrected a bug in the unit tests resulting from that R 4.5 (current development) begins to treat Date variables
+  as integers
+
+---
+
 # jmvReadWrite 0.4.7
 
 ## Enhancements:

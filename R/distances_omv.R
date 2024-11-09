@@ -42,26 +42,37 @@
 #'   `clmDst` is set to `FALSE`, the symmetric matrix that is returned has the size R x R (R being
 #'   the number of rows in the original dataset; it is if `mtxSps` is set to `TRUE`, the size is
 #'   R - 1 x R - 1, see below).
-#' * `stdDst` can be one of the following calculations to standardize the selected variabĺes before
+#' * `stdDst` can be one of the following calculations to standardize the selected variables before
 #'   calculating the distances: `none` (do not standardize; default), `z` (z scores), `sd` (divide
 #'   by the std. dev.), `range` (divide by the range), `max` (divide by the absolute maximum),
 #'   `mean` (divide by the mean), `rescale` (subtract the mean and divide by the range).
 #' * `nmeDst` can be one of the following distance measures.
 #'   (1) For interval data: `euclid` (Euclidean), `seuclid` (squared Euclidean), `block` (city
-#'   block / Manhattan), `canberra` (Canberra). `chebychev` (maximum distance / suprenum norm /
+#'   block / Manhattan), `canberra` (Canberra). `chebychev` (maximum distance / supremum norm /
 #'   Chebychev), `minkowski_p` (Minkowski with power p; NB: needs p), `power_p_r` (Minkowski with
 #'   power p, and the r-th root; NB: needs p and r), `cosine` (cosine between the two vectors),
 #'   `correlation` (correlation between the two vectors).
-#'   (2) For frequency count data: `chisq` (), `ph2` ().
+#'   (2) For frequency count data: `chisq` (chi-square dissimilarity between two sets of
+#'   frequencies), `ph2` (chi-square dissimilarity normalized by the square root of the number
+#'   of values used in the calculation).
 #'   (3) For binary data, all measure have to optional parts `p` and `np` which indicate presence
 #'   (`p`; defaults to 1 if not given) or absence (`np`; defaults to zero if not given).
-#'   (a) matching coefficients: `rr_p_np` (Russell and Rao), `sm_p_np` (), `jaccard_p_np` (),
-#'   `dice_p_np` (), `ss1_p_np` (), `rt_p_np` (), `ss2_p_np` (), `k1_p_np` (), `ss3_p_np` ().
-#'   (b) conditional probabilities: `k2_p_np` (), `ss4_p_np` (), `hamann_p_np` ().
-#'   (c) predictability measures: `lambda_p_np` (), `d_p_np` (), `y_p_np` (), `q_p_np` ().
-#'   (d) other measures: `ochiai_p_np` (), `ss5_p_np` (), `phi_p_np` (), `beuclid_p_np` (),
-#'   `bseuclid_p_np` (), `size_p_np` (), `pattern_p_np` (), `bshape_p_np` (),
-#'   `disper_p_np` (), `variance_p_np` (), `blwmn_p_np` ().
+#'   (a) matching coefficients: `rr_p_np` (Russell and Rao), `sm_p_np` (simple matching),
+#'   `jaccard_p_np` / `jaccards_p_np` (Jaccard similarity; as in SPSS), `jaccardd_p_np` (Jaccard
+#'   dissimiliarity; as in `dist(..., "binary")` in R), `dice_p_np` (Dice or Czekanowski or
+#'   Sorenson similarity), `ss1_p_np` (Sokal and Sneath measure 1), `rt_p_np` (Rogers and
+#'   Tanimoto), `ss2_p_np` (Sokal and Sneath measure 2), `k1_p_np` (Kulczynski measure 1),
+#'   `ss3_p_np` (Sokal and Sneath measure 3).
+#'   (b) conditional probabilities: `k2_p_np` (Kulczynski measure 2), `ss4_p_np` (Sokal and Sneath
+#'   measure 4), `hamann_p_np` (Hamann).
+#'   (c) predictability measures: `lambda_p_np` (Goodman and Kruskal Lambda), `d_p_np` (Anderberg’s
+#'   D), `y_p_np` (Yule’s Y coefficient of colligation), `q_p_np` (Yule’s Q).
+#'   (d) other measures: `ochiai_p_np` (Ochiai), `ss5_p_np` (Sokal and Sneath measure 5),
+#'   `phi_p_np` (fourfold point correlation), `beuclid_p_np` (binary Euclidean distance),
+#'   `bseuclid_p_np` (binary squared Euclidean distance), `size_p_np` (size difference),
+#'   `pattern_p_np` (pattern difference), `bshape_p_np` (binary Shape difference), `disper_p_np`
+#'   (dispersion similarity), `variance_p_np` (variance dissimilarity), `blwmn_p_np` (binary Lance
+#'   and Williams non-metric dissimilarity).
 #'   (4) `none` (only carry out standardization, if stdDst is different from `none`).
 #' * If `mtxSps` is set, a sparse matrix is returned. Those matrices are similar to the format one
 #'   often finds for correlation matrices. The values are only retained in the lower triangular,
@@ -97,6 +108,68 @@
 #'
 #' @examples
 #' \dontrun{
+#' # create matrices for the different types of distance measures: continuous
+#' # (cntFrm), frequency counts (frqFrm) or binary (binFrm); all 20 R x 5 C
+#' set.seed(1)
+#' cntFrm <- stats::setNames(as.data.frame(matrix(rnorm(100, sd = 10),
+#'             ncol = 5)), sprintf("C_%02d", seq(5)))
+#' frqFrm <- stats::setNames(as.data.frame(matrix(sample(seq(10), 100,
+#'             replace = TRUE), ncol = 5)), sprintf("F_%02d", seq(5)))
+#' binFrm <- stats::setNames(as.data.frame(matrix(sample(c(TRUE, FALSE), 100,
+#'             replace = TRUE), ncol = 5)), sprintf("B_%02d", seq(5)))
+#' nmeOut <- tempfile(fileext = ".omv")
+#'
+#' # calculates the distances between columns, nmeDst is not required: "euclid"
+#' # is the default
+#' jmvReadWrite::distances_omv(dtaInp = cntFrm, fleOut = nmeOut, varDst =
+#'   names(cntFrm), nmeDst = "euclid")
+#' dtaFrm <- jmvReadWrite::read_omv(nmeOut)
+#' unlink(nmeOut)
+#' # the resulting matrix (10 x 10) with the Euclidian distances
+#' print(dtaFrm)
+#'
+#' # calculates the (Euclidean) distances between rows (clmDst = FALSE)
+#' jmvReadWrite::distances_omv(dtaInp = cntFrm, fleOut = nmeOut, varDst =
+#'   names(cntFrm), clmDst = FALSE, nmeDst = "euclid")
+#' dtaFrm <- jmvReadWrite::read_omv(nmeOut)
+#' unlink(nmeOut)
+#' # the resulting matrix (20 x 20) with the Euclidian distances
+#' print(dtaFrm)
+#'
+#' # calculates the (Euclidean) distances between columns; the original data
+#' # are z-standardized before calculating the distances (stdDst = "z")
+#' jmvReadWrite::distances_omv(dtaInp = cntFrm, fleOut = nmeOut, varDst =
+#'   names(cntFrm), stdDst = "z", nmeDst = "euclid")
+#' dtaFrm <- jmvReadWrite::read_omv(nmeOut)
+#' unlink(nmeOut)
+#' # the resulting matrix (10 x 10) with the Euclidian distances using the
+#' # z-standardized data
+#' print(dtaFrm)
+#'
+#' # calculates the correlations between columns
+#' jmvReadWrite::distances_omv(dtaInp = cntFrm, fleOut = nmeOut, varDst =
+#'   names(cntFrm), nmeDst = "correlation")
+#' dtaFrm <- jmvReadWrite::read_omv(nmeOut)
+#' unlink(nmeOut)
+#' # the resulting matrix (10 x 10) with the correlations
+#' print(dtaFrm)
+#'
+#' # calculates the chi-square dissimilarity (nmeDst = "chisq") between columns
+#' jmvReadWrite::distances_omv(dtaInp = frqFrm, fleOut = nmeOut, varDst =
+#'   names(frqFrm), nmeDst = "chisq")
+#' dtaFrm <- jmvReadWrite::read_omv(nmeOut)
+#' unlink(nmeOut)
+#' # the resulting matrix (10 x 10) with the chi-square dissimilarities
+#' print(dtaFrm)
+#'
+#' # calculates the Jaccard similarity (nmeDst = "jaccard") between columns
+#' jmvReadWrite::distances_omv(dtaInp = binFrm, fleOut = nmeOut, varDst =
+#'   names(binFrm), nmeDst = "jaccard")
+#' dtaFrm <- jmvReadWrite::read_omv(nmeOut)
+#' unlink(nmeOut)
+#' # the resulting matrix (10 x 10) with the Jaccard similarities
+#' print(dtaFrm)
+#'
 #' }
 #'
 #' @export distances_omv
@@ -133,7 +206,7 @@ distances_omv <- function(dtaInp = NULL, fleOut = "", varDst = c(), clmDst = TRU
     } else {
         stop(sprintf("Invalid standardization: %s. See Details in the help for further information.", stdDst))
     }
-    
+
     # calculate distances (or proximities) ========================================================
     # (1) interval data ---------------------------------------------------------------------------
     if        (grepl("^euclid",             nmeDst)) {
@@ -185,54 +258,52 @@ clcBin <- function(m = NULL, t = "jaccard") {
     # extract transformation name
     t <- strsplit(t, "_")[[1]][1]
     n <- ncol(m)
-    # create a result matrix
-## TO-DO: change 0 / 1 as default
-    r <- matrix(0, n, n, dimnames = rep(dimnames(m)[2], 2))
-   
-    for (i in seq(2, n)) {
-        for (j in seq(1, i - 1)) {
-            r[i, j] <- mtcBin(m[, i], m[, j], t)
-            r[j, i] <- if (grepl("^k2$", t)) mtcBin(m[, j], m[, i], t) else r[i, j]
+    # create a result matrix (first determine what goes into the main diagonal)
+    d <- ifelse(grepl("^d$|^disper$|^k1$|^rr$|^ss3$", t), NA,
+           ifelse(grepl("^beuclid$|^blwmn$|^bseuclid$|^bshape$|^jaccardd$|^pattern$|^size$|^variance$", t), 0, 1))
+    r <- matrix(d, n, n, dimnames = rep(dimnames(m)[2], 2))
+
+    for (i in seq(ifelse(grepl("^rr$|^d$|^disper$", t), 1, 2), n)) {
+        for (j in seq(1, i - ifelse(grepl("^rr$|^d$|^disper$", t), 0, 1))) {
+            r[i, j] <- r[j, i] <- mtcBin(m[, i], m[, j], t)
         }
     }
-    
+
     r
 }
-
-clcChi <- function(x = c()) { t = table(x); sum((t - mean(t)) ^ 2 / mean(t)) }
 
 # measure for continuos variables: cosine (between variable pairs)
 clcCos <- function(m = NULL) {
     n <- ncol(m)
     # create a result matrix
     r <- matrix(1, n, n, dimnames = rep(dimnames(m)[2], 2))
-   
+
     for (i in seq(2, n)) {
         for (j in seq(1, i - 1)) {
             r[i, j] <- r[j, i] <- crossprod(m[, i], m[, j]) / sqrt(crossprod(m[, i]) * crossprod(m[, j]))
         }
     }
-    
+
     r
 }
 
 clcFrq <- function(m = NULL, t = "chisq") {
     n <- ncol(m)
     # create a result matrix
-    r <- matrix(NA, n, n, dimnames = rep(dimnames(m)[2], 2))
-   
-    for (i in seq(1, n)) {
-        for (j in seq(1, i)) {
+    r <- matrix(0, n, n, dimnames = rep(dimnames(m)[2], 2))
+
+    for (i in seq(2, n)) {
+        for (j in seq(1, i - 1)) {
             if        (t == "chisq") {
-                r[i, j] <- r[j, i] <- sqrt(clcChi(m[, i]) + clcChi(m[, j]))
+                r[i, j] <- r[j, i] <- suppressWarnings(chisq.test(rbind(table(m[, i]), table(m[, j])))[["statistic"]])
             } else if (t == "ph2") {
-                r[i, j] <- r[j, i] <- sqrt(clcChi(m[, i]) + clcChi(m[, j])) / sqrt(n)
+                r[i, j] <- r[j, i] <- suppressWarnings(chisq.test(rbind(table(m[, i]), table(m[, j])))[["statistic"]]) / sqrt(nrow(m) * 2)
             } else {
                 stop(sprintf("clcFrq: Method %s is not implemented.", t))
             }
         }
     }
-    
+
     r
 }
 
@@ -270,7 +341,7 @@ mtcBin <- function(x, y, t = "") {
     # binary - dissimilarity - Squared Euclidian distance: BSEUCLID
     else if (t == "bseuclid") return(sum(o[2], o[3]))
     # binary - dissimilarity - Shape: BSHAPE
-    else if (t == "bshape")   return((sum(o) * sum(o[2], o[3]) - sum(o[2], o[3]) ^ 2) / sum(o) ^ 2)
+    else if (t == "bshape")   return((sum(o) * sum(o[2], o[3]) - sum(o[2], -o[3]) ^ 2) / sum(o) ^ 2)
     # binary - similarity - Anderberg's D: D
     else if (t == "d")        return((t1_Bin(o) - t2_Bin(o)) / (2 * sum(o)))
     # binary - similarity - Dice: DICE
@@ -281,10 +352,14 @@ mtcBin <- function(x, y, t = "") {
     else if (t == "hamann")   return(sum(o[1], -o[2], -o[3], o[4]) / sum(o))
     # binary - similarity - Jaccard: JACCARD
     else if (t == "jaccard")  return(o[1] / sum(o[-4]))
+    # binary - similarity - Jaccard
+    else if (t == "jaccards") return(o[1] / sum(o[-4]))
+    # binary - distance - Jaccard (as in R - stats::dist - "binary")
+    else if (t == "jaccardd") return(sum(o[2], o[3]) / sum(o[-4]))
     # binary - similarity - Kulczynski 1: K1
     else if (t == "k1")       return(min(o[1] / sum(o[2], o[3]), 9999.999))
     # binary - similarity - Kulczynski 2: K2
-    else if (t == "k2")       return((o[1] / sum(2 * o[1], o[2]) / sum(o[1], o[3])) / 2)
+    else if (t == "k2")       return(sum(o[1] / sum(o[1], o[2]), o[1] / sum(o[1], o[3])) / 2)
     # binary - similarity - Lambda: LAMBDA
     else if (t == "lambda")   return((t1_Bin(o) - t2_Bin(o)) / (2 * sum(o) - t2_Bin(o)))
     # binary - similarity - Ochiai: OCHIAI
@@ -322,6 +397,11 @@ mtcBin <- function(x, y, t = "") {
     stop(sprintf("mtcBin: Method %s is not implemented.", t))
 }
 
-t1_Bin <- function(o = c()) sum(max(o[1], o[2], na.rm = TRUE), max(o[3], o[4], na.rm = TRUE), max(o[1], o[3], na.rm = TRUE), max(o[2], o[4], na.rm = TRUE))
-t2_Bin <- function(o = c()) sum(max(sum(o[1], o[3], na.rm = TRUE), sum(o[2], o[4], na.rm = TRUE), na.rm = TRUE),
-                                max(sum(o[1], o[2], na.rm = TRUE), sum(o[3], o[4], na.rm = TRUE), na.rm = TRUE))
+t1_Bin <- function(o = c()) {
+    sum(max(o[1], o[2], na.rm = TRUE), max(o[3], o[4], na.rm = TRUE), max(o[1], o[3], na.rm = TRUE), max(o[2], o[4], na.rm = TRUE))
+}
+
+t2_Bin <- function(o = c()) {
+    sum(max(sum(o[1], o[3], na.rm = TRUE), sum(o[2], o[4], na.rm = TRUE), na.rm = TRUE),
+        max(sum(o[1], o[2], na.rm = TRUE), sum(o[3], o[4], na.rm = TRUE), na.rm = TRUE))
+}

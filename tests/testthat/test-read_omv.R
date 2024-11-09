@@ -5,9 +5,9 @@ test_that("read_omv works", {
     # whether the "missingValues"-attribute is an empty list, and whether the factor levels at columns 4, 6, and 8 have the correct length and content
     df4Chk <- read_omv(fleInp = nmeInp, useFlt = FALSE, rmMsVl = FALSE, sveAtt = FALSE, getSyn = FALSE, getHTM = FALSE)
     expect_s3_class(df4Chk, "data.frame")
-    expect_equal(dim(df4Chk), c(60, 17))
+    expect_equal(dim(df4Chk), c(60, 16))
     expect_equal(vapply(df4Chk, typeof, character(1), USE.NAMES = FALSE),
-      c("logical", "integer", "double", "integer", "double", "integer", "double", "integer", "integer", "integer", "double", "double", "double", "integer", "logical", "logical", "integer"))
+      c("logical", "character", "double", "integer", "double", "integer", "double", "integer", "integer", "integer", "double", "double", "double", "integer", "logical", "integer"))
     expect_equal(names(attributes(df4Chk)), c("names", "row.names", "class", "fltLst"))
     expect_equal(names(attributes(df4Chk[[2]])),  c("jmv-id", "missingValues"))
     expect_equal(names(attributes(df4Chk[[4]])),  c("levels", "class", "values", "missingValues"))
@@ -26,23 +26,23 @@ test_that("read_omv works", {
     # read the data set (with the useFlt-argument set TRUE) and test its properties: data frame, size, correct column type (NB: two rows and the first column - "Filter 1" are removed)
     df4Chk <- read_omv(fleInp = nmeInp, useFlt = TRUE, rmMsVl = FALSE, sveAtt = FALSE, getSyn = FALSE, getHTM = FALSE)
     expect_s3_class(df4Chk, "data.frame")
-    expect_equal(dim(df4Chk), c(58, 16))
+    expect_equal(dim(df4Chk), c(58, 15))
     expect_equal(vapply(df4Chk, typeof, character(1), USE.NAMES = FALSE),
-      c("integer", "double", "integer", "double", "integer", "double", "integer", "integer", "integer", "double", "double", "double", "integer", "logical", "logical", "integer"))
+      c("character", "double", "integer", "double", "integer", "double", "integer", "integer", "integer", "double", "double", "double", "integer", "logical", "integer"))
 
     # read the data set (with the rmMsVl-argument set TRUE) and test its properties: data frame, size, correct column type
     df4Chk <- read_omv(fleInp = nmeInp, useFlt = FALSE, rmMsVl = TRUE, sveAtt = FALSE, getSyn = FALSE, getHTM = FALSE)
     expect_s3_class(df4Chk, "data.frame")
-    expect_equal(dim(df4Chk), c(60, 17))
+    expect_equal(dim(df4Chk), c(60, 16))
     expect_equal(vapply(df4Chk, typeof, character(1), USE.NAMES = FALSE),
-      c("logical", "integer", "double", "integer", "double", "integer", "double", "integer", "integer", "integer", "double", "double", "double", "integer", "logical", "logical", "integer"))
+      c("logical", "character", "double", "integer", "double", "integer", "double", "integer", "integer", "integer", "double", "double", "double", "integer", "logical", "integer"))
 
     # read the data set (with the sveAtt-argument set TRUE) and test its properties: data frame, size, correct column type, and several attributes of the whole data frame and columns within it
     df4Chk <- read_omv(fleInp = nmeInp, useFlt = FALSE, rmMsVl = FALSE, sveAtt = TRUE, getSyn = FALSE, getHTM = FALSE)
     expect_s3_class(df4Chk, "data.frame")
-    expect_equal(dim(df4Chk), c(60, 17))
+    expect_equal(dim(df4Chk), c(60, 16))
     expect_equal(vapply(df4Chk, typeof, character(1), USE.NAMES = FALSE),
-      c("logical", "integer", "double", "integer", "double", "integer", "double", "integer", "integer", "integer", "double", "double", "double", "integer", "logical", "logical", "integer"))
+      c("logical", "character", "double", "integer", "double", "integer", "double", "integer", "integer", "integer", "double", "double", "double", "integer", "logical", "integer"))
     expect_equal(names(attributes(df4Chk)), c("names", "row.names", "class", "fltLst", "removedRows", "addedRows", "transforms"))
     expect_equal(names(attributes(df4Chk[[4]])),  c("levels", "class", "values", "name", "id", "columnType", "dataType", "measureType", "formula", "formulaMessage",
                                                     "parentId", "width", "type", "importName", "description", "transform", "edits", "missingValues", "trimLevels"))
@@ -67,11 +67,11 @@ test_that("read_omv works", {
     # read the data set (with the getSyn-argument set TRUE) and test its properties: correct attributes (should contain "syntax" and "protobuf"), as well as the type, size and content of "syntax"
     df4Chk <- read_omv(fleInp = nmeInp, useFlt = FALSE, rmMsVl = FALSE, sveAtt = FALSE, getSyn = FALSE, getHTM = TRUE)
     expect_equal(names(attributes(df4Chk)), c("names", "row.names", "class", "fltLst", "HTML"))
-    expect_vector(attr(df4Chk, "HTML"), character(), 266)
+    expect_vector(attr(df4Chk, "HTML"), character(), 257)
     expect_equal(attr(df4Chk, "HTML")[1],   "<!DOCTYPE html>")
     expect_equal(attr(df4Chk, "HTML")[2],   "<html>")
-    expect_equal(attr(df4Chk, "HTML")[266], "</html>")
-    expect_equal(length(grep("<.*?>", attr(df4Chk, "HTML"))), 75)
+    expect_equal(attr(df4Chk, "HTML")[257], "</html>")
+    expect_equal(length(grep("<.*?>", attr(df4Chk, "HTML"))), 72)
 
     # test cases for code coverage ============================================================================================================================
     # fleInp is not given or empty
@@ -110,9 +110,9 @@ test_that("read_all works", {
     nmeInp <- file.path("..", "ToothGrowth.omv")
     df4Chk <- read_all(nmeInp)
     expect_s3_class(df4Chk, "data.frame")
-    expect_equal(dim(df4Chk), c(60, 17))
+    expect_equal(dim(df4Chk), c(60, 16))
     expect_equal(vapply(df4Chk, typeof, character(1), USE.NAMES = FALSE),
-      c("logical", "integer", "double", "integer", "double", "integer", "double", "integer", "integer", "integer", "double", "double", "double", "integer", "logical", "logical", "integer"))
+      c("logical", "character", "double", "integer", "double", "integer", "double", "integer", "integer", "integer", "double", "double", "double", "integer", "logical", "integer"))
     expect_equal(names(attributes(df4Chk)), c("names", "row.names", "class", "fltLst", "removedRows", "addedRows", "transforms"))
     expect_equal(names(attributes(df4Chk[[4]])),  c("levels", "class", "values", "name", "id", "columnType", "dataType", "measureType", "formula", "formulaMessage",
                                                     "parentId", "width", "type", "importName", "description", "transform", "edits", "missingValues", "trimLevels"))

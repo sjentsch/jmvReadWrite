@@ -418,7 +418,7 @@ mtxF2S <- function(dtaFrm = NULL, rmvTrU = FALSE, rmvDgn = FALSE, mtxXps = FALSE
     for (crrClm in names(dtaFrm))
         attr(dtaFrm[, crrClm], "measureType") <- ifelse(crrClm == "Variable", "Nominal", "Continuous")
 
-    return(dtaFrm)       
+    return(dtaFrm)
 }
 
 # =================================================================================================

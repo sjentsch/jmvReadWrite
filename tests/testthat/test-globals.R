@@ -69,7 +69,7 @@ test_that("globals work", {
     inpDF <- jmvReadWrite::AlbumSales
     inpNme <- file.path("..", "ToothGrowth.omv")
     expect_s3_class(inp2DF(dtaInp = inpNme), "data.frame")
-    expect_equal(dim(inp2DF(dtaInp = inpNme)), c(60, 17))
+    expect_equal(dim(inp2DF(dtaInp = inpNme)), c(60, 16))
 
     inpDF <- jmvReadWrite::AlbumSales
     attr(inpDF, "fleInp") <- file.path("..", "ToothGrowth.omv")
@@ -80,9 +80,10 @@ test_that("globals work", {
     expect_s3_class(df4Chk[[1]], "data.frame")
     expect_s3_class(df4Chk[[2]], "data.frame")
     expect_equal(dim(df4Chk[[1]]), c(200, 5))
-    expect_equal(dim(df4Chk[[2]]), c(60, 17))
+    expect_equal(dim(df4Chk[[2]]), c(60, 16))
     expect_equal(names(df4Chk[[1]]), c("selSbj", "Adverts", "Airplay", "Image", "Sales"))
-    expect_equal(names(df4Chk[[2]]), c("Filter 1", "ID", "logLen", "supp - Transform 1", "len", "supp", "dose", "dose2", "dose3", "Trial", "Residuals", "J", "K", "L", "M", "O", "weights"))
+    expect_equal(names(df4Chk[[2]]),
+      c("Filter 1", "ID", "logLen", "supp - Transform 1", "len", "supp", "dose", "dose2", "dose3", "Trial", "Residuals", "J", "K", "L", "M", "weights"))
     expect_equal(names(attributes(df4Chk[[1]])), c("datalabel", "names", "var.labels", "class", "row.names", "fleInp"))
     expect_equal(attr(df4Chk[[1]], "fleInp"), file.path("..", "ToothGrowth.omv"))
 

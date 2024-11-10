@@ -187,7 +187,7 @@ distances_omv <- function(dtaInp = NULL, fleOut = "", varDst = c(), clmDst = TRU
     }
 
     # convert to matrix, and transpose if necessary ===============================================
-    if (clmDst) dtaMtx <- as.matrix(dtaFrm) else dtaMtx <- t(as.matrix(dtaFrm))
+    if (clmDst) dtaMtx <- as.matrix(dtaFrm[, varDst]) else dtaMtx <- t(as.matrix(dtaFrm[, varDst]))
 
     # standardize the data ========================================================================
     if        (grepl("^none$",             stdDst)) {
@@ -322,12 +322,16 @@ mkeBin <- function(m = NULL, p = 1, np = 0) {
     if (all(apply(m, 2, is.logical))) return(m)
 
     if (all(apply(m, 2, is.numeric))) {
-        r <- matrix(as.logical(m * NA), nrow = nrow(m), dimnames = dimnames(m))
+        r <- matrix(as.logical(NA), nrow = nrow(m), ncol = ncol(m), dimnames = dimnames(m))
         r[m ==  p] <- TRUE
         r[m == np] <- FALSE
+    } else if (all(apply(m, 2, function(c) is.character(c) && all(as.character(c(p, np)) %in% unique(c))))) {
+        r <- matrix(as.logical(NA), nrow = nrow(m), ncol = ncol(m), dimnames = dimnames(m))
+        r[m == as.character(p)]  <- TRUE
+        r[m == as.character(np)] <- FALSE
     } else {
         stop(paste("The input matrix for binary data either needs to be logical (then it will be kept as it is),",
-                   "or numeric (where p and np are used to derive TRUE and FALSE)."))
+                   "numeric or character (for the latter two, p and np are used to derive TRUE and FALSE)."))
     }
 
     r

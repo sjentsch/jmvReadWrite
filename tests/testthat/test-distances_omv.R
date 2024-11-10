@@ -805,10 +805,13 @@ test_that("distances_omv works", {
 
     # check mkeBin
     mt4Chk <- mkeBin(as.matrix(binFm5), 1, 2)
-    expect_equal(dim(mt4Chk), dim(frqFrm))
-    expect_equal(unname(apply(mt4Chk, 2, class)), rep("logical", dim(binFm3)[2]))
+    expect_equal(dim(mt4Chk), dim(binFm5))
+    expect_equal(unname(apply(mt4Chk, 2, class)), rep("logical", dim(binFm5)[2]))
     expect_equal(unname(apply(mt4Chk, 2, table)), unname(apply(binFm5, 2, table)[c(2, 1), ]))
-
+    expect_equal(mt4Chk, mkeBin(as.matrix(as.data.frame(lapply(binFm5, as.factor))), 1, 2))
+    expect_equal(binFrm, as.data.frame(mkeBin(apply(apply(as.matrix(binFrm), 2, as.integer), 2, as.factor))))
+    expect_equal(binFrm, as.data.frame(mkeBin(apply(apply(as.matrix(binFrm), 2, as.integer), 2, as.factor), 1, 0)))
+    expect_equal(binFrm, as.data.frame(mkeBin(as.matrix(as.data.frame(lapply(binFrm, function(c) as.character(as.integer(!c) + 1)))), 1, 2)))
 
     # test cases for error messages ===================================================================================
     expect_error(distances_omv(fleInp = nmeInp, fleOut = nmeOut, varDst = names(cntFrm)),
@@ -822,9 +825,9 @@ test_that("distances_omv works", {
     expect_error(distances_omv(dtaInp = cntFrm, fleOut = nmeOut, varDst = names(cntFrm), nmeDst = "wrong"),
       regexp = "^Invalid distance measure: \\w+\\. See Details in the help for further information\\.")
     expect_error(clcFrq(as.matrix(frqFrm), "wrong"), regexp = "clcFrq: Method wrong is not implemented\\.")
-    expect_error(mkeBin(apply(as.matrix(binFrm), 2, as.character), "TRUE", "FALSE"),
+    expect_error(mkeBin(apply(as.matrix(binFrm), 2, as.complex), "TRUE", "FALSE"),
       regexp = paste("The input matrix for binary data either needs to be logical \\(then it will be kept as it is\\),",
-                     "or numeric \\(where p and np are used to derive TRUE and FALSE\\)."))
+                     "numeric or character \\(for the latter two, p and np are used to derive TRUE and FALSE\\)\\."))
     expect_error(mtcBin(binFm3[, 1], binFm3[, 1], "beuclid"),
       regexp = "mtcBin: Input columns to the calculation of binary measures must be logical\\.")
     expect_error(mtcBin(binFrm[, 1], binFrm[, 2], "wrong"), regexp = "mtcBin: Method wrong is not implemented\\.")

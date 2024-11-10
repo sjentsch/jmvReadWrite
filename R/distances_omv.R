@@ -263,13 +263,14 @@ clcBin <- function(m = NULL, t = "jaccard") {
     # extract transformation name
     t <- strsplit(t, "_")[[1]][1]
     n <- ncol(m)
-    # create a result matrix (first determine what goes into the main diagonal)
-    d <- ifelse(grepl("^d$|^disper$|^k1$|^rr$|^ss3$", t), NA,
-           ifelse(grepl("^beuclid$|^blwmn$|^bseuclid$|^bshape$|^jaccardd$|^pattern$|^size$|^variance$", t), 0, 1))
-    r <- matrix(d, n, n, dimnames = rep(dimnames(m)[2], 2))
+    # create a result matrix
+    r <- matrix(NA, n, n, dimnames = rep(dimnames(m)[2], 2))
 
-    for (i in seq(ifelse(grepl("^rr$|^d$|^disper$", t), 1, 2), n)) {
-        for (j in seq(1, i - ifelse(grepl("^rr$|^d$|^disper$", t), 0, 1))) {
+    for (i in seq(1, n)) {
+        for (j in seq(1, i)) {
+            # skip calculation of distance in the main diagonal for k1 and ss3
+            # (keep NA; if calculated, the limitation to 9999.999 [l. 366 / 392] would hit)
+            if (i == j && grepl("^k1$|^ss3$", t)) next
             r[i, j] <- r[j, i] <- mtcBin(m[, i], m[, j], t)
         }
     }

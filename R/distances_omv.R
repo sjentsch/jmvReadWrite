@@ -231,8 +231,7 @@ distances_omv <- function(dtaInp = NULL, fleOut = "", varDst = c(), clmDst = TRU
     } else if (grepl("^chisq$|^ph2$",       nmeDst)) {
         dstMtx <- clcFrq(dtaMtx, nmeDst)
     # (3) binary data -----------------------------------------------------------------------------
-    } else if (grepl(paste0("^beuclid|^blwmn|^bseuclid|^bshape|^d$|^d_|^dice|^disper|^hamann|^jaccard|^k[1-2]$|^k[1-2]_|",
-                            "^lambda|^ochiai|^pattern|^phi|^q$|^q_|^rr|^rt|^size|^ss[1-5]|^sm|^y$|^y_|^variance"), nmeDst)) {
+    } else if (binDst(nmeDst)) {
         dstMtx <- clcBin(dtaMtx, nmeDst)
     # (4) none ------------------------------------------------------------------------------------
     } else if (grepl("^none$",              nmeDst)) {
@@ -251,6 +250,12 @@ distances_omv <- function(dtaInp = NULL, fleOut = "", varDst = c(), clmDst = TRU
 }
 
 # helper and calculation functions ================================================================
+# binary measures: check whether name is valid
+binDst <- function(nmeDst = "") {
+    grepl(paste0("^beuclid$|^blwmn$|^bseuclid$|^bshape$|^d$|^dice$|^disper$|^hamann$|^jaccard$|^jaccard[s,d]$|^k[1-2]$|^lambda$|",
+                 "^ochiai$|^pattern$|^phi$|^q$|^rr$|^rt$|^size$|^sm$|^ss[1-5]$|^variance$|^y$"), gsub("_\\d+_\\d+$", "", nmeDst))
+}
+
 # binary measures: calculation, calls mtcBin for each cell (variable pair comparison / matches)
 clcBin <- function(m = NULL, t = "jaccard") {
     # transform data matrix into a logical matrix

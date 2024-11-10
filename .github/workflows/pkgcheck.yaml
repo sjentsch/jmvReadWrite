@@ -24,5 +24,3 @@ jobs:
       issues: write
     steps:
       - uses: ropensci-review-tools/pkgcheck-action@main
-        with:
-          append-to-issue: false

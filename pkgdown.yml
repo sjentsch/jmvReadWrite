@@ -3,7 +3,7 @@ pkgdown: 2.1.1
 pkgdown_sha: ~
 articles:
   jmvReadWrite: jmvReadWrite.html
-last_built: 2024-11-10T23:40Z
+last_built: 2024-11-11T00:09Z
 urls:
   reference: https://sjentsch.github.io/jmvReadWrite/reference
   article: https://sjentsch.github.io/jmvReadWrite/articles

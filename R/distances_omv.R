@@ -253,7 +253,7 @@ distances_omv <- function(dtaInp = NULL, fleOut = "", varDst = c(), clmDst = TRU
 # binary measures: check whether name is valid
 binDst <- function(nmeDst = "") {
     grepl(paste0("^beuclid$|^blwmn$|^bseuclid$|^bshape$|^d$|^dice$|^disper$|^hamann$|^jaccard$|^jaccard[s,d]$|^k[1-2]$|^lambda$|",
-                 "^ochiai$|^pattern$|^phi$|^q$|^rr$|^rt$|^size$|^sm$|^ss[1-5]$|^variance$|^y$"), gsub("_\\d+_\\d+$", "", nmeDst))
+                 "^ochiai$|^pattern$|^phi$|^q$|^rr$|^rt$|^size$|^sm$|^ss[1-5]$|^variance$|^y$"), gsub("_\\w+_\\w+$", "", nmeDst))
 }
 
 # binary measures: calculation, calls mtcBin for each cell (variable pair comparison / matches)
@@ -321,10 +321,10 @@ getR <- getNP <- function(s) c(as.numeric(stats::na.omit(strsplit(s, "_")[[1]][3
 mkeBin <- function(m = NULL, p = 1, np = 0) {
     if (all(apply(m, 2, is.logical))) return(m)
 
-    if (all(apply(m, 2, is.numeric))) {
+    if        (all(apply(m, 2, function(c) is.numeric(c)   &&   all(as.numeric(c(p, np)) %in% unique(c))))) {
         r <- matrix(as.logical(NA), nrow = nrow(m), ncol = ncol(m), dimnames = dimnames(m))
-        r[m ==  p] <- TRUE
-        r[m == np] <- FALSE
+        r[m == as.numeric(p)]  <- TRUE
+        r[m == as.numeric(np)] <- FALSE
     } else if (all(apply(m, 2, function(c) is.character(c) && all(as.character(c(p, np)) %in% unique(c))))) {
         r <- matrix(as.logical(NA), nrow = nrow(m), ncol = ncol(m), dimnames = dimnames(m))
         r[m == as.character(p)]  <- TRUE

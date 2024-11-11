@@ -220,9 +220,9 @@ distances_omv <- function(dtaInp = NULL, fleOut = "", varDst = c(), clmDst = TRU
     } else if (grepl("^chebychev$",         nmeDst)) {
         dstMtx <- as.matrix(stats::dist(t(dtaMtx), "maximum",   TRUE, TRUE))
     } else if (grepl("^minkowski_\\d+$",    nmeDst)) {
-        dstMtx <- as.matrix(stats::dist(t(dtaMtx), "minkowski", TRUE, TRUE, p = getP(nmeDst)))
+        dstMtx <- as.matrix(stats::dist(t(dtaMtx), "minkowski", TRUE, TRUE, p = getPw(nmeDst)))
     } else if (grepl("^power_\\d+_\\d+$",   nmeDst)) {
-        dstMtx <- as.matrix(stats::dist(t(dtaMtx), "minkowski", TRUE, TRUE, p = getP(nmeDst)) ^ (getP(nmeDst) / getR(nmeDst)))
+        dstMtx <- as.matrix(stats::dist(t(dtaMtx), "minkowski", TRUE, TRUE, p = getPw(nmeDst)) ^ (getPw(nmeDst) / getRt(nmeDst)))
     } else if (grepl("^cosine$",            nmeDst)) {
         dstMtx <- clcCos(dtaMtx)
     } else if (grepl("^correlation$",       nmeDst)) {
@@ -314,8 +314,10 @@ clcFrq <- function(m = NULL, t = "chisq") {
 }
 
 # helper functions: get P (power / present), NP (not present), and R (root)
-getP <-          function(s) c(as.numeric(stats::na.omit(strsplit(s, "_")[[1]][2])), 1)[1]
-getR <- getNP <- function(s) c(as.numeric(stats::na.omit(strsplit(s, "_")[[1]][3])), 0)[1]
+getP  <- function(s) na.omit(c(strsplit(s, "_")[[1]][2], "1"))[1]
+getNP <- function(s) na.omit(c(strsplit(s, "_")[[1]][3], "0"))[1]
+getPw <- function(s) as.numeric(strsplit(s, "_")[[1]][2])
+getRt <- function(s) as.numeric(strsplit(s, "_")[[1]][3])
 
 # binary measures: transform the data matrix from numeric into logical
 mkeBin <- function(m = NULL, p = 1, np = 0) {

@@ -332,6 +332,9 @@ mkeBin <- function(m = NULL, p = 1, np = 0) {
         r[m == as.character(p)]  <- TRUE
         r[m == as.character(np)] <- FALSE
     } else {
+print(str(m))
+print(p)
+print(np)
         stop(paste("The input matrix for binary data either needs to be logical (then it will be kept as it is),",
                    "numeric or character (for the latter two, p and np are used to derive TRUE and FALSE)."))
     }

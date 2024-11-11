@@ -128,36 +128,9 @@ describe_omv <- function(dtaInp = NULL, fleOut = "", dtaTtl = c(), dtaDsc = c(),
     # add title and description in HMTL
     attr(dtaFrm, "HTML") <- addHTM(attr(dtaFrm, "HTML"), dtaTtl, dtaDsc)
 
-    # add title and description as protobuf
-    if (length(dtaTtl) > 0 && nzchar(dtaTtl)) {
-        ttlPtB <- var2PB(dtaTtl)
-    } else {
-        ttlPtB <- NULL
-    }
-    if (length(dtaDsc) > 0 && nzchar(dtaDsc)) {
-        # gsub("^\\s*<p.*?>|</p>\\s*$", "",
-        splDsc <- splHTM(gsub("(</h\\d>|</p>|</pre>|</code>)", "\n\\1", gsub("</li>", "</li>\n", gsub("<br\\s*/>|<br>", "\n", rplHTM(dtaDsc)))))
-        tgtDsc <- !grepl("<.*?>", splDsc)
-        attDsc <- htmPtB <- list()
-        for (i in seq_along(splDsc)) {
-            if (tgtDsc[i]) {
-                if (is.null(attDsc[["formula"]]) || attDsc[["formula"]] == FALSE) crrIns <- splDsc[i] else crrIns <- list(formula = splDsc[i])
-                htmPtB[[sum(tgtDsc[seq(i)])]] <- var2PB(c(prpAtt(attDsc), list(insert = crrIns)))
-            } else {
-                attDsc <- getAtt(splDsc, i, attDsc)
-            }
-        }
-
-        dscPtB <- RProtoBuf::new(jamovi.coms.AnalysisOption, c = RProtoBuf::new(jamovi.coms.AnalysisOptions, options =
-                      RProtoBuf::new(jamovi.coms.AnalysisOption, c = RProtoBuf::new(jamovi.coms.AnalysisOptions, options = htmPtB)),
-                    hasNames = TRUE, names = "ops"))
-    } else {
-        dscPtB <- NULL
-    }
-    optPtB <- RProtoBuf::new(jamovi.coms.AnalysisOptions, options = c(dscPtB, ttlPtB), hasNames = TRUE,
-      names = c(rep("results//topText", !is.null(dscPtB)), rep("results//heading", !is.null(ttlPtB))))
+    # add title and description as protobuffer (calls optPtB to create protobuffer options)
     attr(dtaFrm, "protobuf")[["01 empty/analysis"]] <-
-      RProtoBuf::new(jamovi.coms.AnalysisResponse, analysisId = 1, name = "empty", ns = "jmv", options = optPtB,
+      RProtoBuf::new(jamovi.coms.AnalysisResponse, analysisId = 1, name = "empty", ns = "jmv", options = optPtB(dtaTtl, dtaDsc),
         results = RProtoBuf::new(jamovi.coms.ResultsElement, title = "Results", status = 3, group = RProtoBuf::new(jamovi.coms.ResultsGroup)),
         status = 3, index = 1, title = "Results", hasTitle = TRUE)
 
@@ -182,6 +155,41 @@ crtHTM <- function(inpDsc = NULL) {
     }
 
     return(outDsc)
+}
+
+# store title and description as protobuffer
+optPtB <- function(dtaTtl = "", dtaDsc = c()) {
+    # create protobuffer for the title
+    if (length(dtaTtl) > 0 && nzchar(dtaTtl)) {
+        ttlPtB <- var2PB(dtaTtl)
+    } else {
+        ttlPtB <- NULL
+    }
+    # create protobuffer for the description
+    if (length(dtaDsc) > 0 && nzchar(dtaDsc)) {
+        # gsub("^\\s*<p.*?>|</p>\\s*$", "",
+        splDsc <- splHTM(gsub("(</h\\d>|</p>|</pre>|</code>)", "\n\\1", gsub("</li>", "</li>\n", gsub("<br\\s*/>|<br>", "\n", rplHTM(dtaDsc)))))
+        tgtDsc <- !grepl("<.*?>", splDsc)
+        attDsc <- htmPtB <- list()
+        for (i in seq_along(splDsc)) {
+            if (tgtDsc[i]) {
+                if (is.null(attDsc[["formula"]]) || attDsc[["formula"]] == FALSE) crrIns <- splDsc[i] else crrIns <- list(formula = splDsc[i])
+                htmPtB[[sum(tgtDsc[seq(i)])]] <- var2PB(c(prpAtt(attDsc), list(insert = crrIns)))
+            } else {
+                attDsc <- getAtt(splDsc, i, attDsc)
+            }
+        }
+
+        dscPtB <- RProtoBuf::new(jamovi.coms.AnalysisOption, c = RProtoBuf::new(jamovi.coms.AnalysisOptions, options =
+                      RProtoBuf::new(jamovi.coms.AnalysisOption, c = RProtoBuf::new(jamovi.coms.AnalysisOptions, options = htmPtB)),
+                    hasNames = TRUE, names = "ops"))
+    } else {
+        dscPtB <- NULL
+    }
+
+    # assemble the two protobuffers (for title, and description) into a AnalysisOptions protobuffer
+    RProtoBuf::new(jamovi.coms.AnalysisOptions, options = c(dscPtB, ttlPtB), hasNames = TRUE,
+      names = c(rep("results//topText", !is.null(dscPtB)), rep("results//heading", !is.null(ttlPtB))))
 }
 
 # split HTML into constituents (i.e., tags and content)

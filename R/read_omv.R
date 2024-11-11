@@ -258,56 +258,13 @@ read_all <- function(fleInp = "", usePkg = c("foreign", "haven"), selSet = "", .
                            error = function(errMsg) tryErr(fleInp, errMsg), warning = function(wrnMsg) tryWrn(fleInp, wrnMsg))
     # SPSS (haven / foreign)
     } else if (hasExt(fleInp, c("sav", "zsav"))) {
-        dtaFrm <- tryCatch({
-                             if        (usePkg == "haven"   && hasPkg("haven"))   {
-                                 hvnTmp <- haven::as_factor(do.call(haven::read_sav, adjArg("haven::read_sav", list(file = fleInp), varArg, "file")), only_labelled = TRUE)
-                                 hvnAdj(as.data.frame(hvnTmp@.Data, col.names = names(hvnTmp)), c("format.spss", "display_width"), jmvLbl = TRUE)
-                             } else if (usePkg == "foreign" && hasPkg("foreign")) {
-                                 fgnLbl(do.call(foreign::read.spss, adjArg("foreign::read.spss", list(file = fleInp, to.data.frame = TRUE), varArg, c("file", "to.data.frame"))))
-                             } else {
-                                 stop(sprintf("In order to read the SPSS-file \"%s\" either of the R-packages \"haven\" or \"foreign\" needs to be installed.", basename(fleInp)))
-                             }
-                           },
-                           error = function(errMsg) tryErr(fleInp, errMsg), warning = function(wrnMsg) tryWrn(fleInp, wrnMsg))
+        dtaFrm <-  getSPSS(fleInp, usePkg, varArg)
     # Stata (haven / foreign)
     } else if (hasExt(fleInp, c("dta"))) {
-        dtaFrm <- tryCatch({
-                             # more recent versions of the Stata-format require "haven" and can't be read with foreign
-                             usePkg <- ifelse(grepl("^<stata_dta><header>", readBin(fleInp, character(), n = 1)), "haven", usePkg)
-                             if        (usePkg == "haven"   && hasPkg("haven"))   {
-                                 hvnTmp <- haven::as_factor(do.call(haven::read_dta, adjArg("haven::read_dta", list(file = fleInp), varArg, "file")), only_labelled = TRUE)
-                                 hvnAdj(as.data.frame(hvnTmp@.Data, col.names = names(hvnTmp)), c("format.stata", "display_width"), jmvLbl = TRUE)
-                             } else if (usePkg == "foreign" && hasPkg("foreign")) {
-                                 fgnLbl(do.call(foreign::read.dta, adjArg("foreign::read.dta", list(file = fleInp), varArg, c("file"))))
-                             } else {
-                                 stop(sprintf("In order to read the Stata-file \"%s\" either of the R-packages \"haven\" or \"foreign\" needs to be installed.", basename(fleInp)))
-                             }
-                           },
-                           error = function(errMsg) tryErr(fleInp, errMsg), warning = function(wrnMsg) tryWrn(fleInp, wrnMsg))
-    # SAS data (haven)
-    } else if (hasExt(fleInp, c("sas7bdat", "sd2", "sd7"))) {
-        dtaFrm <- tryCatch({
-                             if        (usePkg == "haven"   && hasPkg("haven"))   {
-                                 hvnTmp <- haven::as_factor(do.call(haven::read_sas, adjArg("haven::read_sas", list(data_file = fleInp), varArg, "data_file")), only_labelled = TRUE)
-                                 hvnAdj(as.data.frame(hvnTmp@.Data, col.names = names(hvnTmp)), c("format.sas", "display_width"), jmvLbl = TRUE)
-                             } else {
-                                 stop(sprintf("In order to read the SAS-file \"%s\" the R-packages \"haven\" needs to be installed.", basename(fleInp)))
-                             }
-                           },
-                           error = function(errMsg) tryErr(fleInp, errMsg), warning = function(wrnMsg) tryWrn(fleInp, wrnMsg))
-    # SAS-transport-files (haven / foreign)
-    } else if (hasExt(fleInp, c("xpt", "stx", "stc"))) {
-        dtaFrm <- tryCatch({
-                             if        (usePkg == "haven"   && hasPkg("haven"))   {
-                                 hvnTmp <- haven::as_factor(do.call(haven::read_xpt, adjArg("haven::read_xpt", list(file = fleInp), varArg, "file")), only_labelled = TRUE)
-                                 hvnAdj(as.data.frame(hvnTmp@.Data, col.names = names(hvnTmp)), c("format.stata", "display_width"), jmvLbl = TRUE)
-                             } else if (usePkg == "foreign" && hasPkg("foreign")) {
-                                 fgnLbl(do.call(foreign::read.xport, adjArg("foreign::read.xport", list(file = fleInp), varArg, c("file"))))
-                             } else {
-                                 stop(sprintf("In order to read the SAS-transport-file \"%s\" either of the R-packages \"haven\" or \"foreign\" needs to be installed.", basename(fleInp)))
-                             }
-                           },
-                           error = function(errMsg) tryErr(fleInp, errMsg), warning = function(wrnMsg) tryWrn(fleInp, wrnMsg))
+        dtaFrm <- getStata(fleInp, usePkg, varArg)
+    # SAS (haven / foreign [not all formats])
+    } else if (hasExt(fleInp, c("sas7bdat", "sd2", "sd7", "xpt", "stx", "stc"))) {
+        dtaFrm <-   getSAS(fleInp, usePkg, varArg)
     }
 
     # check whether the input data are a data frame with the correct dimensions
@@ -390,7 +347,7 @@ fndSyn <- function(resElm = NULL) {
 }
 
 getHdl <- function(fleOMV = "", crrFle = "", crrMde = "r") {
-    tryCatch(expr  = {
+    tryCatch({
                  zip::unzip(fleOMV, crrFle, exdir = tempdir(), junkpaths = TRUE)
                  file(file.path(tempdir(), list.files(path = tempdir(), pattern = basename(crrFle))), crrMde)
              },
@@ -401,6 +358,71 @@ getHdl <- function(fleOMV = "", crrFle = "", crrMde = "r") {
         )
 }
 
+getSAS   <- function(fleInp = "", usePkg = "", varArg = list()) {
+    # SAS data (haven)
+    if (hasExt(fleInp, c("sas7bdat", "sd2", "sd7"))) {
+        tryCatch({
+                     if        (usePkg == "haven"   && hasPkg("haven"))   {
+                         hvnTmp <- haven::as_factor(do.call(haven::read_sas, adjArg("haven::read_sas", list(data_file = fleInp), varArg, "data_file")), only_labelled = TRUE)
+                         hvnAdj(as.data.frame(hvnTmp@.Data, col.names = names(hvnTmp)), c("format.sas", "display_width"), jmvLbl = TRUE)
+                     } else {
+                         stop(sprintf("In order to read the SAS-file \"%s\" the R-packages \"haven\" needs to be installed.", basename(fleInp)))
+                     }
+                 },
+                 error   = function(errMsg) tryErr(fleInp, errMsg),
+                 warning = function(wrnMsg) tryWrn(fleInp, wrnMsg)
+        )
+    # SAS-transport-files (haven / foreign)
+    } else if (hasExt(fleInp, c("xpt", "stx", "stc"))) {
+        tryCatch({
+                     if        (usePkg == "haven"   && hasPkg("haven"))   {
+                         hvnTmp <- haven::as_factor(do.call(haven::read_xpt, adjArg("haven::read_xpt", list(file = fleInp), varArg, "file")), only_labelled = TRUE)
+                         hvnAdj(as.data.frame(hvnTmp@.Data, col.names = names(hvnTmp)), c("format.stata", "display_width"), jmvLbl = TRUE)
+                     } else if (usePkg == "foreign" && hasPkg("foreign")) {
+                         fgnLbl(do.call(foreign::read.xport, adjArg("foreign::read.xport", list(file = fleInp), varArg, c("file"))))
+                     } else {
+                         stop(sprintf("In order to read the SAS-transport-file \"%s\" either of the R-packages \"haven\" or \"foreign\" needs to be installed.", basename(fleInp)))
+                     }
+                 },
+                 error   = function(errMsg) tryErr(fleInp, errMsg),
+                 warning = function(wrnMsg) tryWrn(fleInp, wrnMsg)
+        )
+    }
+}
+
+getSPSS  <- function(fleInp = "", usePkg = "", varArg = list()) {
+    tryCatch({
+                 if        (usePkg == "haven"   && hasPkg("haven"))   {
+                     hvnTmp <- haven::as_factor(do.call(haven::read_sav, adjArg("haven::read_sav", list(file = fleInp), varArg, "file")), only_labelled = TRUE)
+                     hvnAdj(as.data.frame(hvnTmp@.Data, col.names = names(hvnTmp)), c("format.spss", "display_width"), jmvLbl = TRUE)
+                 } else if (usePkg == "foreign" && hasPkg("foreign")) {
+                     fgnLbl(do.call(foreign::read.spss, adjArg("foreign::read.spss", list(file = fleInp, to.data.frame = TRUE), varArg, c("file", "to.data.frame"))))
+                 } else {
+                     stop(sprintf("In order to read the SPSS-file \"%s\" either of the R-packages \"haven\" or \"foreign\" needs to be installed.", basename(fleInp)))
+                 }
+             },
+             error   = function(errMsg) tryErr(fleInp, errMsg),
+             warning = function(wrnMsg) tryWrn(fleInp, wrnMsg)
+    )
+}
+
+getStata  <- function(fleInp = "", usePkg = "", varArg = list()) {
+    # NB: more recent versions of the Stata-format require "haven" and can't be read with foreign
+    tryCatch({
+                 usePkg <- ifelse(grepl("^<stata_dta><header>", readBin(fleInp, character(), n = 1)), "haven", usePkg)
+                 if        (usePkg == "haven"   && hasPkg("haven"))   {
+                      hvnTmp <- haven::as_factor(do.call(haven::read_dta, adjArg("haven::read_dta", list(file = fleInp), varArg, "file")), only_labelled = TRUE)
+                      hvnAdj(as.data.frame(hvnTmp@.Data, col.names = names(hvnTmp)), c("format.stata", "display_width"), jmvLbl = TRUE)
+                 } else if (usePkg == "foreign" && hasPkg("foreign")) {
+                      fgnLbl(do.call(foreign::read.dta, adjArg("foreign::read.dta", list(file = fleInp), varArg, c("file"))))
+                 } else {
+                      stop(sprintf("In order to read the Stata-file \"%s\" either of the R-packages \"haven\" or \"foreign\" needs to be installed.", basename(fleInp)))
+                 }
+             },
+             error   = function(errMsg) tryErr(fleInp, errMsg),
+             warning = function(wrnMsg) tryWrn(fleInp, wrnMsg)
+    )
+}
 
 getTxt <- function(fleOMV = "", crrFle = "") {
     crrTxt <- readLines(crrHdl <- getHdl(fleOMV, crrFle), warn = FALSE)

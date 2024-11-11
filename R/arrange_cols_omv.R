@@ -58,18 +58,35 @@
 #' @export arrange_cols_omv
 #'
 arrange_cols_omv <- function(dtaInp = NULL, fleOut = "", varOrd = c(), varMve = list(), psvAnl = FALSE, usePkg = c("foreign", "haven"), selSet = "", ...) {
-
-    # check the input parameters: either varOrd or varMve need to be given; if varOrd is given, the given character vectore and all of its elements need to be not empty;
-    # if varMve is given, it needs to be a list, the names can't be empty, and the values need to be integers and can't be zero
-    if ((length(varOrd) < 1 || !is.character(varOrd) || !all(nzchar(varOrd))) &&
-        (length(varMve) < 1 || !is.list(varMve) || !is.character(names(varMve)) || !is.numeric(unlist(varMve)) || !all(unlist(varMve) != 0) || !all(unlist(varMve) %% 1 == 0))) {
-        stop("Calling arrange_cols_omv requires either the parameter varOrd (a character vector) or the parameter varMve (a named list), using the correct format (see Details in help).")
-    }
+    # check input parameters
+    chkOnM(varOrd, varMve)
 
     # check and import input data set (either as data frame or from a file)
     if (!is.null(list(...)[["fleInp"]])) stop("Please use the argument dtaInp instead of fleInp.")
     dtaFrm <- inp2DF(dtaInp = dtaInp, usePkg = usePkg, selSet = selSet, ...)
 
+    # check and update variable order
+    varOrd <- updOrd(dtaFrm, varOrd, varMve)
+
+    # re-arrange to order of variables, while storing and restoring the attributes attached to the whole data frame (column attributes are not affected)
+    attMem <- attributes(dtaFrm)
+    dtaFrm <- dtaFrm[, varOrd]
+    dtaFrm <- setAtt(setdiff(names(attMem), c("names", "row.names", "class", "fltLst")), attMem, dtaFrm)
+
+    # rtnDta in globals.R (unified function to either write the data frame, open it in a new jamovi session or return it)
+    rtnDta(dtaFrm = dtaFrm, fleOut = fleOut, dtaTtl = jmvTtl("_arr_cols"), psvAnl = psvAnl, dtaInp = dtaInp, ...)
+}
+
+chkOnM <- function(varOrd = c(), varMve = list()) {
+    # check the input parameters: either varOrd or varMve need to be given; if varOrd is given, the given character vectore and all of its elements need to be not empty;
+    # if varMve is given, it needs to be a list, the names can't be empty, and the values need to be integers and can't be zero
+    if ((length(varOrd) < 1 || !is.character(varOrd) || !all(nzchar(varOrd))) &&
+        (length(varMve) < 1 || !is.list(varMve) || !is.character(names(varMve)) || !all(vapply(unlist(varMve), function(e) is.numeric(e) && e != 0 && e %% 1 == 0, logical(1))))) {
+        stop("Calling arrange_cols_omv requires either the parameter varOrd (a character vector) or the parameter varMve (a named list), using the correct format (see Details in help).")
+    }
+}
+
+updOrd <- function(dtaFrm = NULL, varOrd = c(), varMve = list()) {
     # re-arrange the order of variables in the data set (varOrd)
     if (length(varOrd) > 0) {
         # [1] check whether all variables in varOrd are not empty and exist in the data set
@@ -103,11 +120,5 @@ arrange_cols_omv <- function(dtaInp = NULL, fleOut = "", varOrd = c(), varMve = 
         warning("Both, varOrd and varMve given as input parameters. varOrd takes precedence.")
     }
 
-    # re-arrange to order of variables, while storing and restoring the attributes attached to the whole data frame (column attributes are not affected)
-    attMem <- attributes(dtaFrm)
-    dtaFrm <- dtaFrm[, varOrd]
-    dtaFrm <- setAtt(setdiff(names(attMem), c("names", "row.names", "class", "fltLst")), attMem, dtaFrm)
-
-    # rtnDta in globals.R (unified function to either write the data frame, open it in a new jamovi session or return it)
-    rtnDta(dtaFrm = dtaFrm, fleOut = fleOut, dtaTtl = jmvTtl("_arr_cols"), psvAnl = psvAnl, dtaInp = dtaInp, ...)
+    varOrd
 }

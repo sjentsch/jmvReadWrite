@@ -122,26 +122,9 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", wrtPtB = FALSE, frcWrt = FALSE
         # assign column from the original data frame to crrCol (so that modifications don't affect the original)
         crrCol <- dtaFrm[[i]]
 
-        # convert factors to integer for saving and store labels / values in xdata.json
+        # factors: store labels / values in xdata.json and convert factors to integer for saving
         if (is.factor(crrCol)) {
-            crrLvl <- levels(crrCol)
-            # ensure that the "values" attribute is correct
-            if (chkAtt(crrCol, "values") && all(grepl("^\\d+$", crrLvl)) &&
-              !identical(attr(crrCol, "values"), as.integer(attr(crrCol, "levels")))) {
-                clsRmv()
-                stop(sprintf(paste("\"values\"-attribute with unexpected values found for column \"%s\".",
-                                   "Please send the file to sebastian.jentschke@uib.no for debugging."), crrNme))
-            }
-
-            # columns that have previously been logical or where all factor levels can be converted to integer
-            if        (chkAtt(crrCol, "dataType", "Integer") && identical(crrLvl, c("FALSE", "TRUE"))) {
-                xtdDta[[crrNme]] <- list(labels = lapply(c(TRUE, FALSE),    function(l) list(as.integer(l), as.character(l), as.character(l), FALSE)))
-            } else if (chkAtt(crrCol, "dataType", "Integer") && intFnC(crrLvl)) {
-                xtdDta[[crrNme]] <- list(labels = lapply(crrLvl,            function(l) list(as.integer(l),              l,               l,  FALSE)))
-            # columns that           or where not all factor levels can be converted to integer
-            } else if (chkAtt(crrCol, "dataType", "Text")) {
-                xtdDta[[crrNme]] <- list(labels = lapply(seq_along(crrLvl), function(l) list(l - 1,               crrLvl[l],       crrLvl[l], FALSE)))
-            }
+            xtdDta[[crrNme]] <- xtdCol(crrCol, crrNme)
             crrCol <- cnvCol(crrCol, "integer")
         }
 
@@ -321,6 +304,27 @@ detInt <- function(crrCol = NULL) {
 #    stats::sd(crrCol, na.rm = TRUE) > diff(range(crrCol, na.rm = TRUE)) / 10
 #}
 
+xtdCol <- function(crrCol = NULL, crrNme = "") {
+    crrLvl <- levels(crrCol)
+    # ensure that the "values" attribute is correct
+    if (chkAtt(crrCol, "values") && all(grepl("^\\d+$", crrLvl)) &&
+      !identical(attr(crrCol, "values"), as.integer(attr(crrCol, "levels")))) {
+        clsRmv()
+        stop(sprintf(paste("\"values\"-attribute with unexpected values found for column \"%s\".",
+                           "Please send the file to sebastian.jentschke@uib.no for debugging."), crrNme))
+    }
+
+    # columns that have previously been logical or where all factor levels can be converted to integer
+    if        (chkAtt(crrCol, "dataType", "Integer") && identical(crrLvl, c("FALSE", "TRUE"))) {
+        return(list(labels = lapply(c(TRUE, FALSE),    function(l) list(as.integer(l), as.character(l), as.character(l), FALSE))))
+    } else if (chkAtt(crrCol, "dataType", "Integer") && intFnC(crrLvl)) {
+        return(list(labels = lapply(crrLvl,            function(l) list(as.integer(l),              l,               l,  FALSE))))
+    # columns that           or where not all factor levels can be converted to integer
+    } else if (chkAtt(crrCol, "dataType", "Text")) {
+        return(list(labels = lapply(seq_along(crrLvl), function(l) list(l - 1,               crrLvl[l],       crrLvl[l], FALSE))))
+    }
+}
+
 rmvMta <- function(crrFld = NULL, dtaCol = NULL) {
     if (chkFld(crrFld, "columnType", "Filter")) {
         # if the variable is a filter, trimLevels is removed in any case
@@ -485,7 +489,7 @@ add2ZIP <- function(fleZIP = "", crrHdl = NULL, crrFle = c(), txtOut = "", ptbOu
     # if a file name is given, open a connection, write whatever is required
     } else if (is.character(crrFle)) {
         crrFle[1] <- rmvTmp(crrFle[1])
-        if (dirname(crrFle[1]) != "." && !dir.exists(file.path(tempdir(), dirname(crrFle[1])))) dir.create(file.path(tempdir(), dirname(crrFle[1])))
+        crtDir(crrFle)
         crrHdl <- file(file.path(tempdir(), crrFle[1]), open = ifelse(length(crrFle) > 1, crrFle[2], "w"))
         if        (all(nzchar(txtOut))) {
             # writing the manifest requires a bit of special handling because of \r\n on Windows vs. \n on Mac / Linux
@@ -502,10 +506,22 @@ add2ZIP <- function(fleZIP = "", crrHdl = NULL, crrFle = c(), txtOut = "", ptbOu
         if (file.exists(fleZIP)) do.call(zip::zip_append, crrPrm) else do.call(zip::zip, crrPrm)
     }
 
-    if (dirname(crrFle[1]) == ".") unlink(file.path(tempdir(), crrFle[1])) else unlink(file.path(tempdir(), dirname(crrFle[1])), recursive = TRUE)
+    delTmp(crrFle)
     rm(crrFle, crrHdl)
 
     return(TRUE)
+}
+
+crtDir <- function(crrFle = c()) {
+    if (dirname(crrFle[1]) != "." && !dir.exists(file.path(tempdir(), dirname(crrFle[1])))) dir.create(file.path(tempdir(), dirname(crrFle[1])))
+
+    return(invisible(NULL))
+}
+
+delTmp <- function(crrFle = c()) {
+    if (dirname(crrFle[1]) == ".") unlink(file.path(tempdir(), crrFle[1])) else unlink(file.path(tempdir(), dirname(crrFle[1])), recursive = TRUE)
+
+    return(invisible(NULL))
 }
 
 rmvTmp <- function(fleNme = "") {

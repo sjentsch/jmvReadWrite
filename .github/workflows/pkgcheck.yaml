@@ -24,3 +24,5 @@ jobs:
       issues: write
     steps:
       - uses: ropensci-review-tools/pkgcheck-action@main
+      with:
+          token: ${{ secrets.PKGCHECK_TOKEN }}

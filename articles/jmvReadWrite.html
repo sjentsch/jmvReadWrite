@@ -54,7 +54,7 @@
                         <h4 data-toc-skip class="author">Sebastian
 Jentschke</h4>
             
-            <h4 data-toc-skip class="date">2024-11-22</h4>
+            <h4 data-toc-skip class="date">2025-01-08</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/sjentsch/jmvReadWrite/blob/main/vignettes/jmvReadWrite.Rmd" class="external-link"><code>vignettes/jmvReadWrite.Rmd</code></a></small>
       <div class="d-none name"><code>jmvReadWrite.Rmd</code></div>
@@ -128,6 +128,8 @@ copied from there.</p>
 <span>        homo <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>        norm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span>    <span class="op">}</span></span>
+<span><span class="co">#&gt; Error in get(paste0(generic, ".", class), envir = get_method_env()) : </span></span>
+<span><span class="co">#&gt;   object 'type_sum.accel' not found</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;  ANOVA</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -217,9 +219,9 @@ jamovi afterwards.</p>
 <span><span class="co">#&gt; [1] "Trial.omv"</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/file.info.html" class="external-link">file.info</a></span><span class="op">(</span><span class="st">"Trial.omv"</span><span class="op">)</span></span>
 <span><span class="co">#&gt;           size isdir mode               mtime               ctime</span></span>
-<span><span class="co">#&gt; Trial.omv 2617 FALSE  644 2024-11-22 13:30:11 2024-11-22 13:30:11</span></span>
+<span><span class="co">#&gt; Trial.omv 2617 FALSE  644 2025-01-08 13:01:46 2025-01-08 13:01:46</span></span>
 <span><span class="co">#&gt;                         atime  uid gid  uname grname</span></span>
-<span><span class="co">#&gt; Trial.omv 2024-11-22 13:30:11 1001 127 runner docker</span></span>
+<span><span class="co">#&gt; Trial.omv 2025-01-08 13:01:46 1001 128 runner docker</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="st">"Trial.omv"</span><span class="op">)</span></span></code></pre></div>
 <p>Although jamovi reads R-data files (.RData, .rda, .rds) <a href="https://sjentsch.github.io/jmvReadWrite/reference/write_omv.html"><code>write_omv</code></a>
 permits to store <code>jamovi</code>-specific attributes (such as

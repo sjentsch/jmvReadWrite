@@ -470,7 +470,7 @@ isJmv <- function() {
     nzchar(Sys.getenv("JAMOVI_R_VERSION"))
 }
 
-jmvOpn <- function(dtaFrm = NULL, dtaTtl = "") {
+jmvOpn <- function(dtaFrm = NULL, dtaTtl = "", rtnOut = TRUE) {
     # on both Windows and Linux, jamovi is in the path, and, hence,
     # Sys.which should give the full location
     jmvEXE <- Sys.which("jamovi")
@@ -494,7 +494,7 @@ jmvOpn <- function(dtaFrm = NULL, dtaTtl = "") {
     if (nzchar(jmvEXE) && file.exists(jmvEXE)) {
         tmpOut <- tempfile(fileext = ".omv")
         jmvReadWrite::write_omv(dtaFrm, fleOut = tmpOut)
-        system2(jmvEXE, args = paste0(" --temp --title=\"", dtaTtl, "\" ", tmpOut), stderr = TRUE, stdout = TRUE)
+        system2(jmvEXE, args = paste0(" --temp --title=\"", dtaTtl, "\" ", tmpOut), stderr = rtnOut, stdout = rtnOut)
     } else {
         stop(sprintf("The position of the jamovi executable could not be determined or it was not found at the determined position. Determined position: %s", jmvEXE))
     }

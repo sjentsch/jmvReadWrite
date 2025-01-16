@@ -172,6 +172,9 @@ jmvPtB <- function() {
         # TRUE (first line - is.null = TRUE) or FALSE (second line - !is.null = FALSE) are returned
         tryCatch(expr  =             return(is.null(RProtoBuf::readProtoFiles(flePtB))),
                  error = function(e) return(!is.null(message("Error when loading protocol definition, syntax can\'t be extracted:\n", e))))
+    } else {
+        warning("The package RProtoBuf can not be initialized, try re-installing it.\n\n")
+        return(FALSE)
     }
 }
 

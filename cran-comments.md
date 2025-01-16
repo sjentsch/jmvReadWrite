@@ -1,12 +1,10 @@
 # CRAN Notes - jmvReadWrite
 
 ## Current version
-0.4.8
-* added `distances_omv`: calculate a wide range of distance measures (either between variables or between units
-  of observation) on standardized or the original data
-* improved the treatment of factors and how they are stored
-* corrected a bug in the unit tests resulting from that R 4.5 (current development) begins to treat Date variables
-  as integers
+0.4.9
+
+* added parameter `rtnOut` to `jmvOpn` (preventing the output from system2 to be returned, used for the jamovi module `Rj`)
+* corrected a bug in `jmvPtB` handling if `requireNamespace("RProtoBuf")` returns `FALSE`
 
 ## Test environments
 * `devtools::check()`

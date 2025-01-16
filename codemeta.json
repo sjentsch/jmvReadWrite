@@ -7,13 +7,13 @@
   "codeRepository": "https://github.com/sjentsch/jmvReadWrite",
   "issueTracker": "https://github.com/sjentsch/jmvReadWrite/issues",
   "license": "https://spdx.org/licenses/AGPL-3.0",
-  "version": "0.4.8",
+  "version": "0.4.9",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "R",
     "url": "https://r-project.org"
   },
-  "runtimePlatform": "R version 4.4.1 (2024-06-14)",
+  "runtimePlatform": "R version 4.4.2 (2024-10-31)",
   "provider": {
     "@id": "https://cran.r-project.org",
     "@type": "Organization",
@@ -185,11 +185,11 @@
     },
     "SystemRequirements": null
   },
-  "fileSize": "913.378KB",
+  "fileSize": "915.666KB",
   "citation": [
     {
       "@type": "SoftwareSourceCode",
-      "datePublished": "2024",
+      "datePublished": "2025",
       "author": [
         {
           "@type": "Person",
@@ -200,7 +200,7 @@
       ],
       "name": "jmvReadWrite: Read and Write jamovi Files",
       "url": "https://CRAN.R-project.org/package=jmvReadWrite",
-      "description": "R package version 0.4.8"
+      "description": "R package version 0.4.9"
     }
   ],
   "relatedLink": ["https://sjentsch.github.io/jmvReadWrite/", "https://CRAN.R-project.org/package=jmvReadWrite"],

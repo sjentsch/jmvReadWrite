@@ -314,8 +314,8 @@ clcFrq <- function(m = NULL, t = "chisq") {
 }
 
 # helper functions: get P (power / present), NP (not present), and R (root)
-getP  <- function(s) na.omit(c(strsplit(s, "_")[[1]][2], "1"))[1]
-getNP <- function(s) na.omit(c(strsplit(s, "_")[[1]][3], "0"))[1]
+getP  <- function(s) stats::na.omit(c(strsplit(s, "_")[[1]][2], "1"))[1]
+getNP <- function(s) stats::na.omit(c(strsplit(s, "_")[[1]][3], "0"))[1]
 getPw <- function(s) as.numeric(strsplit(s, "_")[[1]][2])
 getRt <- function(s) as.numeric(strsplit(s, "_")[[1]][3])
 

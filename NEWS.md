@@ -1,3 +1,13 @@
+# jmvReadWrite 0.4.9
+
+## Enhancements:
+* added parameter `rtnOut` to `jmvOpn` (preventing the output from system2 to be returned, used for the jamovi module `Rj`)
+
+## Bug fixes:
+* corrected a bug in `jmvPtB` handling if `requireNamespace("RProtoBuf")` returns `FALSE`
+
+---
+
 # jmvReadWrite 0.4.8
 
 ## Enhancements:

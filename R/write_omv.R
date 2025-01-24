@@ -68,13 +68,18 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", wrtPtB = FALSE, frcWrt = FALSE
     chkExt(fleOut, "omv")
     fleExs(fleOut, frcWrt)
 
-    # check whether dtaFrm is a data frame and attach dataType and measureType attributes
-    dtaFrm <- jmvAtt(dtaFrm, blnChC = TRUE)
+    # [1] handle the attributes "variable.labels" and "value.labels" in the format provided by the R-package "foreign"
+    #     the attribute "variable.labels" (attached to the data frame) is converted them to the format used by jamovi ("jmv-desc" attached to the data column)
+    # [2] clean tibble attributes, particularly convert haven_labelled to either factors or numeric / integer
+    if (chkAtt(dtaFrm, "variable.labels"))
+        dtaFrm <- fgnLbl(dtaFrm)
+    if (methods::is(dtaFrm, "tbl_df") || any(vapply(dtaFrm, function(C) methods::is(C, "haven_labelled"), logical(1))))
+        dtaFrm <- clnTbl(dtaFrm, c("format.sas", "format.spss", "format.stata", "display_width"), jmvLbl = TRUE)
+    if (chkAtt(dtaFrm, "label.table"))
+        stop("R-foreign-style value labels need to be implemented. Please send the data file that caused this problem to sebastian.jentschke@uib.no")
 
-    # handle the attributes "variable.labels" and "value.labels" in the format provided bymtaDta <- mtaGlb the R-package "foreign"
-    # the attribute "variable.labels" (attached to the data frame) is converted them to the format used by jamovi ("jmv-desc" attached to the data column)
-    if (chkAtt(dtaFrm, "variable.labels")) dtaFrm <- fgnLbl(dtaFrm)
-    if (chkAtt(dtaFrm, "label.table")) stop("R-foreign-style value labels need to be implemented. Please send the data file that caused this problem to sebastian.jentschke@uib.no")
+    # check whether dtaFrm is a data frame, remove tibble attributes (if necessary) and attach dataType and measureType attributes
+    dtaFrm <- jmvAtt(dtaFrm, blnChC = TRUE)
 
     # initialize metadata.json
     mtaDta <- mtaGlb
@@ -219,13 +224,13 @@ jmvAtt <- function(dtaFrm = NULL, blnChC = FALSE) {
             if (blnChC) dtaFrm[[i]] <- cnvCol(dtaFrm[[i]], "character")
         # (b) date - jamovi doesn't support it natively, thus the transformation to numeric; back-transformation in R - as.Date(..., origin = "1970-01-01")
         # NB: must come before the numerical variables since date is an integer from R 4.5
-        } else if (methods::is(dtaFrm[[i]], "Date")) {
+        } else if (methods::is(dtaFrm[[i]], "Date") || methods::is(dtaFrm[[i]], "POSIXct") || methods::is(dtaFrm[[i]], "POSIXlt")) {
             attr(dtaFrm[[i]], "measureType") <- "Continuous"
             attr(dtaFrm[[i]], "dataType")    <- "Integer"
             if (blnChC) {
                 dtaFrm[[i]] <- cnvCol(dtaFrm[[i]], "integer")
                 attr(dtaFrm[[i]], "description") <- paste(ifelse(chkAtt(dtaFrm[[i]], "description"), attr(dtaFrm[[i]], "description"), crrNme),
-                                                          "(date converted to numeric; days since 1970-01-01)")
+                                                          "(date converted to integer; days since 1970-01-01)")
             }
         # (c) time - jamovi doesn't support it natively,  thus the transformation to numeric; back-transformation in R - hms::as_hms(...)
         } else if (methods::is(dtaFrm[[i]], "difftime")) {
@@ -234,7 +239,7 @@ jmvAtt <- function(dtaFrm = NULL, blnChC = FALSE) {
             if (blnChC) {
                 dtaFrm[[i]] <- cnvCol(dtaFrm[[i]], "integer")
                 attr(dtaFrm[[i]], "description") <- paste(ifelse(chkAtt(dtaFrm[[i]], "description"), attr(dtaFrm[[i]], "description"), crrNme),
-                                                          "(time converted to numeric; sec since 00:00)")
+                                                          "(time converted to integer; sec since 00:00)")
             }
         # (d) numerical variables, determine first whether the variable can be integer, if not, use / keep it numeric / float
         } else if (is.numeric(dtaFrm[[i]])) {
@@ -267,7 +272,8 @@ cnvCol <- function(crrCol = NULL, tgtTyp = "character") {
     # store attributes
     crrAtt <- attributes(crrCol)
     dffAtt <- setdiff(names(crrAtt), c("levels", "class"))
-    # pre-processing (trim spaces and round where necessary)
+    # pre-processing (convert date, trim spaces and round where necessary)
+    if (methods::is(crrCol, "POSIXct")) crrCol <- as.Date(crrCol)
     if (is.character(crrCol)) crrCol <- trimws(crrCol)
     if (is.numeric(crrCol) && tgtTyp ==  "integer") crrCol <- round(crrCol)
     # actual conversion; jamovi stores factors differently depending on whether they have the dataType Integer or Text

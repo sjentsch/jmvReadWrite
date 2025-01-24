@@ -98,17 +98,23 @@ test_that("write_omv works", {
     unlink(nmeOut)
 
     set.seed(1)
-    dtaOut <- cbind(dtaOut, data.frame(Bool = sample(c(TRUE, FALSE), colOut, TRUE),
-                                       Date = sample(seq(as.Date("1999/01/01"), as.Date("2000/01/01"), by = "day"), colOut),
-                                       Time = sample(as.difftime(tim = seq(0, 3600), units = "secs"), colOut)))
+    dtaOut <- cbind(dtaOut, data.frame(Bool  =            sample(c(TRUE, FALSE), colOut, TRUE),
+                                       Date1 =            sample(seq(as.Date("1999/01/01"), as.Date("2000/01/01"), by = "day"), colOut),
+                                       Date2 = as.POSIXct(sample(seq(as.Date("1999/01/01"), as.Date("2000/01/01"), by = "day"), colOut)),
+                                       Date3 = as.POSIXlt(sample(seq(as.Date("1999/01/01"), as.Date("2000/01/01"), by = "day"), colOut)),
+                                       Time  =            sample(as.difftime(tim = seq(0, 3600), units = "secs"), colOut)))
     write_omv(dtaFrm = dtaOut, fleOut = nmeOut)
     dtaInp <- read_omv(fleInp = nmeOut)
     unlink(nmeOut)
     expect_equal(as.integer(table(dtaInp[["Bool"]])), c(29, 31))
-    expect_equal(c(mean(dtaInp[["Date"]]), sd(dtaInp[["Date"]])), c(10787.3667, 108.7002), tolerance = 1e-4)
-    expect_equal(attr(dtaInp[["Date"]], "jmv-desc"), "Date (date converted to numeric; days since 1970-01-01)")
-    expect_equal(c(mean(dtaInp[["Time"]]), sd(dtaInp[["Time"]])), c(1538.367, 1041.579), tolerance = 1e-4)
-    expect_equal(attr(dtaInp[["Time"]], "jmv-desc"), "Time (time converted to numeric; sec since 00:00)")
+    expect_equal(c(mean(dtaInp[["Date1"]]), sd(dtaInp[["Date1"]])), c(10787.3667, 108.7002), tolerance = 1e-4)
+    expect_equal(attr(dtaInp[["Date1"]], "jmv-desc"), "Date1 (date converted to integer; days since 1970-01-01)")
+    expect_equal(c(mean(dtaInp[["Date2"]]), sd(dtaInp[["Date2"]])), c(10767.2330, 108.2620), tolerance = 1e-4)
+    expect_equal(attr(dtaInp[["Date2"]], "jmv-desc"), "Date2 (date converted to integer; days since 1970-01-01)")
+    expect_equal(c(mean(dtaInp[["Date3"]]), sd(dtaInp[["Date3"]])), c(10762.8000, 112.2584), tolerance = 1e-4)
+    expect_equal(attr(dtaInp[["Date3"]], "jmv-desc"), "Date3 (date converted to integer; days since 1970-01-01)")
+    expect_equal(c(mean(dtaInp[["Time"]]),  sd(dtaInp[["Time"]])),   c(2090.8000, 978.9000), tolerance = 1e-4)
+    expect_equal(attr(dtaInp[["Time"]], "jmv-desc"), "Time (time converted to integer; sec since 00:00)")
     dtaOut <- read_omv(file.path("..", "ToothGrowth.omv"))
     attr(dtaOut, "jmv-weights-name") <- "weights"
     attr(dtaOut, "jmv-weights") <- as.vector(dtaOut[, "weights"])

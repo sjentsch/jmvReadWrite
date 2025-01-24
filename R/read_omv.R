@@ -465,7 +465,7 @@ clnTbb <- function(dtaFrm = NULL, rmvAtt = c(), jmvLbl = FALSE) {
         if (jmvLbl && !is.null(attr(dtaFrm[[crrCol]], "label"))) {
             if (nzchar(gsub("variable label", "", attr(dtaFrm[[crrCol]], "label"))))
                 attr(dtaFrm[[crrCol]], "jmv-desc") <- attr(dtaFrm[[crrCol]], "label")
-            attr(dtaFrm[[crrCol]], "label")    <- NULL
+            attr(dtaFrm[[crrCol]], "label") <- NULL
         }
     }
 

@@ -252,10 +252,14 @@ read_all <- function(fleInp = "", usePkg = c("foreign", "haven"), selSet = "", .
                              rdaTmp[[ifelse(selSet == "", names(rdaTmp)[1], selSet)]]
                            },
                            error = function(errMsg) tryErr(fleInp, errMsg), warning = function(wrnMsg) tryWrn(fleInp, wrnMsg))
+        if (methods::is(dtaFrm, "tbl_df") || any(vapply(dtaFrm, function(C) methods::is(C, "haven_labelled"), logical(1))))
+            dtaFrm <- clnTbb(dtaFrm, c("format.sas", "format.spss", "format.stata", "display_width"), jmvLbl = TRUE)
     # RDS
     } else if (hasExt(fleInp, c("rds"))) {
         dtaFrm <- tryCatch(do.call(readRDS, adjArg("readRDS", list(file = fleInp), varArg, "file")),
                            error = function(errMsg) tryErr(fleInp, errMsg), warning = function(wrnMsg) tryWrn(fleInp, wrnMsg))
+        if (methods::is(dtaFrm, "tbl_df") || any(vapply(dtaFrm, function(C) methods::is(C, "haven_labelled"), logical(1))))
+            dtaFrm <- clnTbb(dtaFrm, c("format.sas", "format.spss", "format.stata", "display_width"), jmvLbl = TRUE)
     # SPSS (haven / foreign)
     } else if (hasExt(fleInp, c("sav", "zsav"))) {
         dtaFrm <-  getSPSS(fleInp, usePkg, varArg)
@@ -324,9 +328,9 @@ clsHdl <- function(crrHdl = NULL) {
 fgnLbl <- function(dtaFrm = NULL) {
     if (!is.null(attr(dtaFrm, "variable.labels"))) {
         varLbl <- trimws(attr(dtaFrm, "variable.labels"))
-        for (crrCol in names(dtaFrm)) {
-            if (crrCol %in% names(varLbl) && varLbl[[crrCol]] != "") {
-                attr(dtaFrm[[crrCol]], "jmv-desc") <- varLbl[[crrCol]]
+        for (crrNme in names(dtaFrm)) {
+            if (crrNme %in% names(varLbl) && varLbl[[crrNme]] != "") {
+                attr(dtaFrm[[crrNme]], "jmv-desc") <- varLbl[[crrNme]]
             }
         }
         attr(dtaFrm, "variable.labels") <- NULL
@@ -439,33 +443,34 @@ getTxt <- function(fleOMV = "", crrFle = "") {
 
 clnTbb <- function(dtaFrm = NULL, rmvAtt = c(), jmvLbl = FALSE) {
     # convert tibble to data.frame (remove tbl_df, tbl from class)
-    class(dtaFrm) <- setdiff(class(dtaFrm), c("tbl_df", "tbl"))
+    class(dtaFrm) <- setdiff(class(dtaFrm), c("tbl_df", "tbl", rmvAtt))
 
-    for (crrCol in names(dtaFrm)) {
+    for (crrNme in names(dtaFrm)) {
         othAtt <- c()
         # convert haven_labelled to factors
-        if (methods::is(dtaFrm[[crrCol]], "haven_labelled")) {
-            tmpLbl <- gsub("value label", "", names(attr(dtaFrm[[crrCol]], "labels")))
+        if (methods::is(dtaFrm[[crrNme]], "haven_labelled")) {
+            tmpLbl <- gsub("value label", "", names(attr(dtaFrm[[crrNme]], "labels")))
             othAtt <- "labels"
             if (all(nzchar(tmpLbl))) {
-                dtaFrm[[crrCol]] <- cnvCol(dtaFrm[[crrCol]], "factor")
-                levels(dtaFrm[[crrCol]]) <- tmpLbl
+                dtaFrm[[crrNme]] <- cnvCol(dtaFrm[[crrNme]], "factor")
+                levels(dtaFrm[[crrNme]]) <- tmpLbl
             } else if (!any(nzchar(tmpLbl))) {
-                tgtTyp <- ifelse(all(as.numeric(dtaFrm[[crrCol]]) %% 1 == 0, na.rm = TRUE), "integer", "numeric")
-                dtaFrm[[crrCol]] <- cnvCol(dtaFrm[[crrCol]], tgtTyp)
+                class(dtaFrm[[crrNme]]) <- setdiff(class(dtaFrm[[crrNme]]), c("haven_labelled", "vctrs_vctr"))
+                if (is.numeric(dtaFrm[[crrNme]]) && all(dtaFrm[[crrNme]] %% 1 == 0, na.rm = TRUE))
+                    class(dtaFrm[[crrNme]]) <- gsub("numeric", "integer", class(dtaFrm[[crrNme]]))
             }
         }
         # remove attributes given in rmvAtt (and "labels" from haven_labelled)
         for (crrAtt in c(rmvAtt, othAtt)) {
-            if (! is.null(attr(dtaFrm[[crrCol]], crrAtt))) {
-                attr(dtaFrm[[crrCol]], crrAtt) <- NULL
+            if (! is.null(attr(dtaFrm[[crrNme]], crrAtt))) {
+                attr(dtaFrm[[crrNme]], crrAtt) <- NULL
             }
         }
         # convert label to jamovi label
-        if (jmvLbl && !is.null(attr(dtaFrm[[crrCol]], "label"))) {
-            if (nzchar(gsub("variable label", "", attr(dtaFrm[[crrCol]], "label"))))
-                attr(dtaFrm[[crrCol]], "jmv-desc") <- attr(dtaFrm[[crrCol]], "label")
-            attr(dtaFrm[[crrCol]], "label") <- NULL
+        if (jmvLbl && !is.null(attr(dtaFrm[[crrNme]], "label"))) {
+            if (nzchar(gsub("variable label", "", attr(dtaFrm[[crrNme]], "label"))))
+                attr(dtaFrm[[crrNme]], "jmv-desc") <- attr(dtaFrm[[crrNme]], "label")
+            attr(dtaFrm[[crrNme]], "label") <- NULL
         }
     }
 
@@ -473,8 +478,8 @@ clnTbb <- function(dtaFrm = NULL, rmvAtt = c(), jmvLbl = FALSE) {
 }
 
 rmvQtn <- function(dtaFrm = NULL) {
-    for (crrCol in names(which(vapply(dtaFrm, is.character, logical(1))))) {
-        dtaFrm[[crrCol]] <- trimws(gsub("\"", "", dtaFrm[[crrCol]]))
+    for (crrNme in names(which(vapply(dtaFrm, is.character, logical(1))))) {
+        dtaFrm[[crrNme]] <- trimws(gsub("\"", "", dtaFrm[[crrNme]]))
     }
 
     dtaFrm
@@ -499,9 +504,9 @@ rplAtt <- function(dtaFrm = NULL) {
         lstAtt <- lapply(dtaFrm, attr, crrAtt)
         lstAtt <- lstAtt[!vapply(lstAtt, is.null, logical(1))]
         if (!any(vapply(lstAtt, is.character, logical(1)))) next
-#       for (crrCol in names(lstAtt)[vapply(lstAtt, function(x) !all(validEnc(x)), logical(1))]) {
-        for (crrCol in names(lstAtt)) {
-            attr(dtaFrm[[crrCol]], crrAtt) <- rplStr(attr(dtaFrm[[crrCol]], crrAtt), paste0(c(crrCol, crrAtt), collapse = " - "))
+#       for (crrNme in names(lstAtt)[vapply(lstAtt, function(x) !all(validEnc(x)), logical(1))]) {
+        for (crrNme in names(lstAtt)) {
+            attr(dtaFrm[[crrNme]], crrAtt) <- rplStr(attr(dtaFrm[[crrNme]], crrAtt), paste0(c(crrNme, crrAtt), collapse = " - "))
         }
     }
     # re-establish the correct order of the data frame attributes

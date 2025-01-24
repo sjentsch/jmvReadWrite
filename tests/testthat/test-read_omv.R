@@ -173,7 +173,7 @@ test_that("read_all works", {
 
     # test cases for clnTbl in RData and RDS
     fleInp <- tempfile()
-    if (requireNamespace("haven")) {
+    if (requireNamespace("haven", quietly = TRUE)) {
         haven::write_sav(jmvReadWrite::ToothGrowth, paste0(fleInp, ".sav"))
         tmpDta <- haven::read_sav(paste0(fleInp, ".sav"))
         unlink(paste0(fleInp, ".sav"))
@@ -229,7 +229,7 @@ test_that("read_all works", {
     suppressMessages(expect_error(read_all(fleInp, usePkg = "foreign"),
       regexp = "^Input data are either not a data frame or have incorrect \\(only one or more than two\\) dimensions\\."))
     unlink(fleInp)
-    if (requireNamespace("haven")) {
+    if (requireNamespace("haven", quietly = TRUE)) {
         haven::write_sav(jmvReadWrite::ToothGrowth, fleInp)
         df4Chk <- read_all(fleInp, usePkg = "haven")
         expect_equal(attributes(df4Chk), list(names = c("ID", "supp", "supp2", "dose", "dose2", "len", "logLen"), row.names = seq(60), class = "data.frame"))
@@ -246,7 +246,7 @@ test_that("read_all works", {
     suppressMessages(expect_error(read_all(fleInp, usePkg = "foreign"),
       regexp = "^Input data are either not a data frame or have incorrect \\(only one or more than two\\) dimensions\\."))
     unlink(fleInp)
-    if (requireNamespace("haven")) {
+    if (requireNamespace("haven", quietly = TRUE)) {
         haven::write_dta(jmvReadWrite::ToothGrowth, fleInp)
         df4Chk <- read_all(fleInp, usePkg = "haven")
         expect_equal(attributes(df4Chk), list(names = c("ID", "supp", "supp2", "dose", "dose2", "len", "logLen"), row.names = seq(60), class = "data.frame"))
@@ -262,7 +262,7 @@ test_that("read_all works", {
     suppressMessages(expect_error(read_all(fleInp, usePkg = "foreign"),
       regexp = "^Input data are either not a data frame or have incorrect \\(only one or more than two\\) dimensions\\."))
     unlink(fleInp)
-    if (requireNamespace("haven")) {
+    if (requireNamespace("haven", quietly = TRUE)) {
         suppressWarnings(haven::write_sas(jmvReadWrite::ToothGrowth, fleInp))
         df4Chk <- read_all(fleInp, usePkg = "haven")
         expect_equal(attributes(df4Chk), list(names = c("ID", "supp", "supp2", "dose", "dose2", "len", "logLen"), class = "data.frame", row.names = seq(60)))
@@ -277,7 +277,7 @@ test_that("read_all works", {
     suppressMessages(expect_error(read_all(fleInp, usePkg = "foreign"),
       regexp = "^Input data are either not a data frame or have incorrect \\(only one or more than two\\) dimensions\\."))
     unlink(fleInp)
-    if (requireNamespace("haven")) {
+    if (requireNamespace("haven", quietly = TRUE)) {
         haven::write_xpt(jmvReadWrite::ToothGrowth, fleInp)
         df4Chk <- read_all(fleInp, usePkg = "haven")
         expect_equal(attributes(df4Chk), list(names = c("ID", "supp", "supp2", "dose", "dose2", "len", "logLen"), class = "data.frame", row.names = seq(60)))

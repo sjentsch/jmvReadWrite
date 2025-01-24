@@ -463,7 +463,7 @@ clnTbb <- function(dtaFrm = NULL, rmvAtt = c(), jmvLbl = FALSE) {
         }
         # convert label to jamovi label
         if (jmvLbl && !is.null(attr(dtaFrm[[crrCol]], "label"))) {
-            if (nzchar(gsub("variable label", "", attr(dtaFrm[[crrCol]], "label")))) 
+            if (nzchar(gsub("variable label", "", attr(dtaFrm[[crrCol]], "label"))))
                 attr(dtaFrm[[crrCol]], "jmv-desc") <- attr(dtaFrm[[crrCol]], "label")
             attr(dtaFrm[[crrCol]], "label")    <- NULL
         }

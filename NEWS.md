@@ -1,3 +1,13 @@
+# jmvReadWrite 0.4.10
+
+## Enhancements:
+* renamed `hvnAdj` to `clnTbb` and improved it (better “cleaning” of data read via `haven`)
+
+## Bug fixes:
+* corrected / improved writing of date values
+
+---
+
 # jmvReadWrite 0.4.9
 
 ## Enhancements:

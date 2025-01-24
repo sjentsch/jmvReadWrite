@@ -60,7 +60,7 @@ pkgdown::build_reference_index()
 devtools::build_manual(path = "doc")
 # NB: build_manual uses LaTeX which needs to be installed using those steps (on Ubuntu):
 # (1) sudo apt install texlive-latex-base 
-# (2) tlmgr init-usertree#
+# (2) tlmgr init-usertree
 # (3) tlmgr option repository https://pi.kwarc.info/historic/systems/texlive/2023/tlnet-final
 # NB: (a) https://pi.kwarc.info is a mirror of TeX materials, see here for other options: https://tug.org/historic/;
 #     (b) adjust 2023 to the TexLive version on the system

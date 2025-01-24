@@ -364,7 +364,7 @@ getSAS   <- function(fleInp = "", usePkg = "", varArg = list()) {
         tryCatch({
                      if        (usePkg == "haven"   && hasPkg("haven"))   {
                          hvnTmp <- haven::as_factor(do.call(haven::read_sas, adjArg("haven::read_sas", list(data_file = fleInp), varArg, "data_file")), only_labelled = TRUE)
-                         hvnAdj(as.data.frame(hvnTmp@.Data, col.names = names(hvnTmp)), c("format.sas", "display_width"), jmvLbl = TRUE)
+                         clnTbb(as.data.frame(hvnTmp@.Data, col.names = names(hvnTmp)), c("format.sas", "display_width"), jmvLbl = TRUE)
                      } else {
                          stop(sprintf("In order to read the SAS-file \"%s\" the R-packages \"haven\" needs to be installed.", basename(fleInp)))
                      }
@@ -377,7 +377,7 @@ getSAS   <- function(fleInp = "", usePkg = "", varArg = list()) {
         tryCatch({
                      if        (usePkg == "haven"   && hasPkg("haven"))   {
                          hvnTmp <- haven::as_factor(do.call(haven::read_xpt, adjArg("haven::read_xpt", list(file = fleInp), varArg, "file")), only_labelled = TRUE)
-                         hvnAdj(as.data.frame(hvnTmp@.Data, col.names = names(hvnTmp)), c("format.stata", "display_width"), jmvLbl = TRUE)
+                         clnTbb(as.data.frame(hvnTmp@.Data, col.names = names(hvnTmp)), c("format.sas", "display_width"), jmvLbl = TRUE)
                      } else if (usePkg == "foreign" && hasPkg("foreign")) {
                          fgnLbl(do.call(foreign::read.xport, adjArg("foreign::read.xport", list(file = fleInp), varArg, c("file"))))
                      } else {
@@ -394,7 +394,7 @@ getSPSS  <- function(fleInp = "", usePkg = "", varArg = list()) {
     tryCatch({
                  if        (usePkg == "haven"   && hasPkg("haven"))   {
                      hvnTmp <- haven::as_factor(do.call(haven::read_sav, adjArg("haven::read_sav", list(file = fleInp), varArg, "file")), only_labelled = TRUE)
-                     hvnAdj(as.data.frame(hvnTmp@.Data, col.names = names(hvnTmp)), c("format.spss", "display_width"), jmvLbl = TRUE)
+                     clnTbb(as.data.frame(hvnTmp@.Data, col.names = names(hvnTmp)), c("format.spss", "display_width"), jmvLbl = TRUE)
                  } else if (usePkg == "foreign" && hasPkg("foreign")) {
                      fgnLbl(do.call(foreign::read.spss, adjArg("foreign::read.spss", list(file = fleInp, to.data.frame = TRUE), varArg, c("file", "to.data.frame"))))
                  } else {
@@ -412,7 +412,7 @@ getStata  <- function(fleInp = "", usePkg = "", varArg = list()) {
                  usePkg <- ifelse(grepl("^<stata_dta><header>", readBin(fleInp, character(), n = 1)), "haven", usePkg)
                  if        (usePkg == "haven"   && hasPkg("haven"))   {
                       hvnTmp <- haven::as_factor(do.call(haven::read_dta, adjArg("haven::read_dta", list(file = fleInp), varArg, "file")), only_labelled = TRUE)
-                      hvnAdj(as.data.frame(hvnTmp@.Data, col.names = names(hvnTmp)), c("format.stata", "display_width"), jmvLbl = TRUE)
+                      clnTbb(as.data.frame(hvnTmp@.Data, col.names = names(hvnTmp)), c("format.stata", "display_width"), jmvLbl = TRUE)
                  } else if (usePkg == "foreign" && hasPkg("foreign")) {
                       fgnLbl(do.call(foreign::read.dta, adjArg("foreign::read.dta", list(file = fleInp), varArg, c("file"))))
                  } else {
@@ -437,15 +437,34 @@ getTxt <- function(fleOMV = "", crrFle = "") {
     crrTxt
 }
 
-hvnAdj <- function(dtaFrm = NULL, rmvAtt = c(), jmvLbl = FALSE) {
-   for (crrCol in names(dtaFrm)) {
-       for (crrAtt in rmvAtt) {
-             if (! is.null(attr(dtaFrm[[crrCol]], crrAtt))) {
-                 attr(dtaFrm[[crrCol]], crrAtt) <- NULL
-             }
+clnTbb <- function(dtaFrm = NULL, rmvAtt = c(), jmvLbl = FALSE) {
+    # convert tibble to data.frame (remove tbl_df, tbl from class)
+    class(dtaFrm) <- setdiff(class(dtaFrm), c("tbl_df", "tbl"))
+
+    for (crrCol in names(dtaFrm)) {
+        othAtt <- c()
+        # convert haven_labelled to factors
+        if (methods::is(dtaFrm[[crrCol]], "haven_labelled")) {
+            tmpLbl <- gsub("value label", "", names(attr(dtaFrm[[crrCol]], "labels")))
+            othAtt <- "labels"
+            if (all(nzchar(tmpLbl))) {
+                dtaFrm[[crrCol]] <- cnvCol(dtaFrm[[crrCol]], "factor")
+                levels(dtaFrm[[crrCol]]) <- tmpLbl
+            } else if (!any(nzchar(tmpLbl))) {
+                tgtTyp <- ifelse(all(as.numeric(dtaFrm[[crrCol]]) %% 1 == 0, na.rm = TRUE), "integer", "numeric")
+                dtaFrm[[crrCol]] <- cnvCol(dtaFrm[[crrCol]], tgtTyp)
+            }
         }
+        # remove attributes given in rmvAtt (and "labels" from haven_labelled)
+        for (crrAtt in c(rmvAtt, othAtt)) {
+            if (! is.null(attr(dtaFrm[[crrCol]], crrAtt))) {
+                attr(dtaFrm[[crrCol]], crrAtt) <- NULL
+            }
+        }
+        # convert label to jamovi label
         if (jmvLbl && !is.null(attr(dtaFrm[[crrCol]], "label"))) {
-            attr(dtaFrm[[crrCol]], "jmv-desc") <- attr(dtaFrm[[crrCol]], "label")
+            if (nzchar(gsub("variable label", "", attr(dtaFrm[[crrCol]], "label")))) 
+                attr(dtaFrm[[crrCol]], "jmv-desc") <- attr(dtaFrm[[crrCol]], "label")
             attr(dtaFrm[[crrCol]], "label")    <- NULL
         }
     }

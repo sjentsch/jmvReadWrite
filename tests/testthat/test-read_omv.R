@@ -228,10 +228,23 @@ test_that("read_all works", {
     unlink(fleInp)
 
     dtaTmp <- jmvReadWrite::ToothGrowth
-    expect_null(attributes(hvnAdj(dtaTmp, c("jmv-id", "jmv-desc"))[[1]]))
-    expect_null(attributes(hvnAdj(dtaTmp, c("jmv-id", "jmv-desc"))[[7]]))
+    expect_null(attributes(clnTbb(dtaTmp, c("jmv-id", "jmv-desc"))[[1]]))
+    expect_null(attributes(clnTbb(dtaTmp, c("jmv-id", "jmv-desc"))[[7]]))
     attr(dtaTmp[[6]], "label") <- "Trial for label conversion"
-    expect_equal(attributes(hvnAdj(dtaTmp, jmvLbl = TRUE)[[6]]), list(`jmv-desc` = "Trial for label conversion"))
+    expect_equal(attributes(clnTbb(dtaTmp, jmvLbl = TRUE)[[6]]), list(`jmv-desc` = "Trial for label conversion"))
+
+    dtaTmp <- structure(list(value = structure(c(1, 2, 4), format.sas = "LEVELS", class = c("haven_labelled", "vctrs_vctr", "double"),
+                             labels = c(level1 = 1, level2 = 2, level3 = 4))), class = c("tbl_df", "tbl", "data.frame"), row.names = c(NA, -3L))
+    expect_equal(attributes(clnTbb(dtaTmp)), list(names = "value", row.names = seq(3), class = "data.frame"))
+    expect_equal(attributes(clnTbb(dtaTmp)[, "value"]), list(levels = c("level1", "level2", "level3"), class = "factor", format.sas = "LEVELS"))
+    expect_equal(attributes(clnTbb(dtaTmp, rmvAtt = "format.sas")[, "value"]), list(levels = c("level1", "level2", "level3"), class = "factor"))
+
+    dtaTmp <- structure(list(value = structure(c(4, 2, 1), format.sas = "LEVELS", class = c("haven_labelled", "vctrs_vctr", "double"),
+                             labels = c(`value label` = 1, `value label` = 2, `value label` = 4))), class = c("tbl_df", "tbl", "data.frame"), row.names = c(NA, -3L))
+    expect_equal(attributes(clnTbb(dtaTmp)), list(names = "value", row.names = seq(3), class = "data.frame"))
+    expect_equal(attributes(clnTbb(dtaTmp)[, "value"]), list(format.sas = "LEVELS"))
+    expect_null(attributes(clnTbb(dtaTmp, rmvAtt = "format.sas")[, "value"]))
+    expect_equal(as.integer(clnTbb(dtaTmp)[, "value"]), c(4, 2, 1))
 
     dtaTmp <- jmvReadWrite::AlbumSales[-1]
     attr(dtaTmp, "variable.labels") <- c(Adverts = "Advertsing budget (thousands)",

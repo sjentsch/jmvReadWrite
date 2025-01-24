@@ -100,6 +100,14 @@ test_that("read_omv works", {
     suppressMessages(expect_null(getHdl(fleOMV = nmeTmp, crrFle = "MANIFEST.MF")))
     unlink(nmeTmp)
 
+    # convert vector of 0 and 1 into logical
+    tmpCol <- sample(c(0, 1), 100, replace = TRUE)
+    cl4Chk <- valLbl(crrCol = tmpCol, mtaCol = list(name = "A", columnType = "Data", dataType = "Integer"),
+                     xtdDta = list(A = list(labels = list(list(0, "0", "0", FALSE), list(1, "1", "1", FALSE)))))
+    expect_true(is.logical(cl4Chk))
+    expect_null(attributes(cl4Chk))
+    expect_equal(c(mean(cl4Chk), sd(cl4Chk)), c(mean(tmpCol), sd(tmpCol)))
+
     # unimplemented columnType when assigning value labels
     expect_error(valLbl(mtaCol = list(name = "Trial", columnType = "Trial", dataType = "Trial"), xtdDta = list(Trial = NULL)),
       regexp = "Error when reading value label - likely the column type is not implemented \\(yet\\): Trial - Trial - Trial")
@@ -163,6 +171,26 @@ test_that("read_all works", {
     expect_equal(dim(df4Chk), c(100, 1))
     unlink(nmeInp)
 
+    # test cases for clnTbl in RData and RDS
+    fleInp <- tempfile()
+    if (requireNamespace("haven")) {
+        haven::write_sav(jmvReadWrite::ToothGrowth, paste0(fleInp, ".sav"))
+        tmpDta <- haven::read_sav(paste0(fleInp, ".sav"))
+        unlink(paste0(fleInp, ".sav"))
+        save(tmpDta, file = paste0(fleInp, ".RData"))
+        df4Chk <- read_all(paste0(fleInp, ".RData"))
+        expect_equal(attributes(df4Chk), list(row.names = seq(60), names = c("ID", "supp", "supp2", "dose", "dose2", "len", "logLen"), class = "data.frame"))
+        expect_equal(lapply(df4Chk, attributes), list(ID = NULL, supp = list(levels = c("OJ", "VC"), class = "factor"), supp2 = list(levels = c("1", "2"), class = "factor"),
+                                                      dose = NULL, dose2 = list(levels = c("0.5", "1.0", "2.0"), class = "factor"), len = NULL, logLen = NULL))
+        unlink(paste0(fleInp, ".RData"))
+        saveRDS(tmpDta, file = paste0(fleInp, ".rds"))
+        df4Chk <- read_all(paste0(fleInp, ".rds"))
+        expect_equal(attributes(df4Chk), list(row.names = seq(60), names = c("ID", "supp", "supp2", "dose", "dose2", "len", "logLen"), class = "data.frame"))
+        expect_equal(lapply(df4Chk, attributes), list(ID = NULL, supp = list(levels = c("OJ", "VC"), class = "factor"), supp2 = list(levels = c("1", "2"), class = "factor"),
+                                                      dose = NULL, dose2 = list(levels = c("0.5", "1.0", "2.0"), class = "factor"), len = NULL, logLen = NULL))
+        unlink(paste0(fleInp, ".rds"))
+    }
+
     # test cases for CSV / TSV
     nmeInp <- tempfile(fileext = ".tsv")
     write.table(D1, file = nmeInp, sep = "\t")
@@ -201,6 +229,14 @@ test_that("read_all works", {
     suppressMessages(expect_error(read_all(fleInp, usePkg = "foreign"),
       regexp = "^Input data are either not a data frame or have incorrect \\(only one or more than two\\) dimensions\\."))
     unlink(fleInp)
+    if (requireNamespace("haven")) {
+        haven::write_sav(jmvReadWrite::ToothGrowth, fleInp)
+        df4Chk <- read_all(fleInp, usePkg = "haven")
+        expect_equal(attributes(df4Chk), list(names = c("ID", "supp", "supp2", "dose", "dose2", "len", "logLen"), row.names = seq(60), class = "data.frame"))
+        expect_equal(lapply(df4Chk, attributes), list(ID = NULL, supp = list(levels = c("OJ", "VC"), class = "factor"), supp2 = list(levels = c("1", "2"), class = "factor"),
+                                                      dose = NULL, dose2 = list(levels = c("0.5", "1.0", "2.0"), class = "factor"), len = NULL, logLen = NULL))
+        unlink(fleInp)
+    }
 
     fleInp <- tempfile(fileext = ".dta")
     writeBin("<stata_dta><header><release>117</release><byteorder>LSF</byteorder><K>\x8f", con = fleInp)
@@ -210,6 +246,14 @@ test_that("read_all works", {
     suppressMessages(expect_error(read_all(fleInp, usePkg = "foreign"),
       regexp = "^Input data are either not a data frame or have incorrect \\(only one or more than two\\) dimensions\\."))
     unlink(fleInp)
+    if (requireNamespace("haven")) {
+        haven::write_dta(jmvReadWrite::ToothGrowth, fleInp)
+        df4Chk <- read_all(fleInp, usePkg = "haven")
+        expect_equal(attributes(df4Chk), list(names = c("ID", "supp", "supp2", "dose", "dose2", "len", "logLen"), row.names = seq(60), class = "data.frame"))
+        expect_equal(lapply(df4Chk, attributes), list(ID = NULL, supp = list(levels = c("OJ", "VC"), class = "factor"), supp2 = list(levels = c("1", "2"), class = "factor"),
+                                                      dose = NULL, dose2 = list(levels = c("0.5", "1.0", "2.0"), class = "factor"), len = NULL, logLen = NULL))
+        unlink(fleInp)
+    }
 
     fleInp <- tempfile(fileext = ".sas7bdat")
     writeBin("", con = fleInp)
@@ -218,6 +262,13 @@ test_that("read_all works", {
     suppressMessages(expect_error(read_all(fleInp, usePkg = "foreign"),
       regexp = "^Input data are either not a data frame or have incorrect \\(only one or more than two\\) dimensions\\."))
     unlink(fleInp)
+    if (requireNamespace("haven")) {
+        suppressWarnings(haven::write_sas(jmvReadWrite::ToothGrowth, fleInp))
+        df4Chk <- read_all(fleInp, usePkg = "haven")
+        expect_equal(attributes(df4Chk), list(names = c("ID", "supp", "supp2", "dose", "dose2", "len", "logLen"), class = "data.frame", row.names = seq(60)))
+        expect_equal(lapply(df4Chk, attributes), list(ID = NULL, supp = NULL, supp2 = NULL, dose = NULL, dose2 = NULL, len = NULL, logLen = NULL))
+        unlink(fleInp)
+    }
 
     fleInp <- tempfile(fileext = ".xpt")
     writeBin("HEADER RECORD*******LIBRARY HEADER RECORD!!!!!!!", con = fleInp)
@@ -226,6 +277,13 @@ test_that("read_all works", {
     suppressMessages(expect_error(read_all(fleInp, usePkg = "foreign"),
       regexp = "^Input data are either not a data frame or have incorrect \\(only one or more than two\\) dimensions\\."))
     unlink(fleInp)
+    if (requireNamespace("haven")) {
+        haven::write_xpt(jmvReadWrite::ToothGrowth, fleInp)
+        df4Chk <- read_all(fleInp, usePkg = "haven")
+        expect_equal(attributes(df4Chk), list(names = c("ID", "supp", "supp2", "dose", "dose2", "len", "logLen"), class = "data.frame", row.names = seq(60)))
+        expect_equal(lapply(df4Chk, attributes), list(ID = NULL, supp = NULL, supp2 = NULL, dose = NULL, dose2 = NULL, len = NULL, logLen = NULL))
+        unlink(fleInp)
+    }
 
     dtaTmp <- jmvReadWrite::ToothGrowth
     expect_null(attributes(clnTbb(dtaTmp, c("jmv-id", "jmv-desc"))[[1]]))

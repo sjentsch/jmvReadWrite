@@ -194,6 +194,14 @@ test_that("write_omv works", {
     expect_error(jmvAtt(data.frame()), regexp = "^The first dimension of the input data frame has not the required size \\(0 < 1\\)\\.")
     expect_error(jmvAtt(cbind(tmpDF, data.frame(EC = sample(as.complex(seq(10)), 100, replace = TRUE)))), regexp = "^\\s+\\w+: Variable type \\w+ not implemented.")
 
+    tmpDF  <- structure(list(value = structure(c(1, 2, 4), format.sas = "LEVELS", class = c("haven_labelled", "vctrs_vctr", "double"),
+                             labels = c(level1 = 1, level2 = 2, level3 = 4))), class = c("tbl_df", "tbl", "data.frame"), row.names = c(NA, -3L))
+    df4Chk <- write_omv(dtaFrm = tmpDF, fleOut = nmeOut, retDbg = TRUE)$dtaFrm
+    unlink(nmeOut)
+    expect_equal(attributes(df4Chk), list(names = "value", row.names = seq(3), class = "data.frame"))
+    expect_equal(attributes(df4Chk[, "value"]),
+        list(levels = c("level1", "level2", "level3"), class = "factor", measureType = "Nominal", dataType = "Text"))
+
     tmpCol <- rnorm(100)
     attr(tmpCol, "Trial") <- "Check whether attribute is preserved"
     expect_equal(cnvCol(tmpCol, tgtTyp = "integer"), round(tmpCol))

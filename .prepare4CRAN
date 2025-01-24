@@ -39,6 +39,9 @@ devtools::test_coverage()
 covr::codecov(token = "2f521d97-d1e2-4baf-b05b-0b569a7c6f0f")  # jmvReadWrite
 covr::codecov(token = "821f2b2f-e305-49b2-ab96-7f328530f6ed")  # jTransform
 
+# some sed commands to correct commen misformattings
+#sed -i -e's/[[:space:]]*$//' R/*.R && sed -i '${/^$/d}' R/*.R && sed -i 's/=/ = /g' R/*.h.R && sed -i 's/  =  / = /g' R/*.h.R && sed -i 's/ = = / == /g' R/*.h.R && sed -i 's/c(1,0,0)/c(1, 0, 0)/' R/*.h.R && sed -i "s/'auto'/\"auto\"/" R/*.h.R
+
 # ================================================================================================================================================
 # REMEMBER: error messages from R are not always pointing to the place where the error occurs - especially when using commands like build_readme()
 # ================================================================================================================================================
@@ -89,7 +92,7 @@ V="v$(grep "^Version:" DESCRIPTION | cut -d: -f2 | sed -e 's/ //')"
 git tag -a "${V}" $(git log | grep -m1 commit | sed 's/commit\s*//') -m "CRAN submission: $(git log --date=format:'%Y-%m-%d' | grep -m1 "^Date" | sed 's/Date:\s*//')" -s; git commit -a -m "Tagged CRAN-package on github"; git push origin "${V}"
 # optional: Use the tag to create a release on GitHub
 
- 
+
 # other helpful commands: =========================================================================
 devtools::revdep()                    # shows reverse imports of the package
 devtools::revdep_maintainers()        # ... and their maintainers

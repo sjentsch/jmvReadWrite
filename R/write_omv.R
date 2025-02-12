@@ -266,35 +266,6 @@ jmvAtt <- function(dtaFrm = NULL, blnChC = FALSE) {
     dtaFrm
 }
 
-cnvCol <- function(crrCol = NULL, tgtTyp = "character") {
-    if (methods::is(crrCol, tgtTyp)) return(crrCol)
-
-    # store attributes
-    crrAtt <- attributes(crrCol)
-    dffAtt <- setdiff(names(crrAtt), c("levels", "class"))
-    # pre-processing (convert date, trim spaces and round where necessary)
-    if (methods::is(crrCol, "POSIXct")) crrCol <- as.Date(crrCol)
-    if (is.character(crrCol)) crrCol <- trimws(crrCol)
-    if (is.numeric(crrCol) && tgtTyp ==  "integer") crrCol <- round(crrCol)
-    # actual conversion; jamovi stores factors differently depending on whether they have the dataType Integer or Text
-    if (is.factor(crrCol) && tgtTyp == "integer") {
-        crrCol <- if (intFnC(crrCol)) as.integer(as.character(crrCol)) else as.integer(crrCol) - 1L
-    } else if (tgtTyp == "factor") {
-        crrCol <- as.factor(crrCol)
-    } else {
-        crrCol <- methods::as(crrCol, tgtTyp)
-    }
-    if (length(dffAtt) > 0) crrCol <- setAtt(attLst = dffAtt, inpObj = crrAtt, outObj = as.data.frame(crrCol))[[1]]
-
-    crrCol
-}
-
-intFnC <- function(crrCol = NULL) {
-    facLvl <- if (is.factor(crrCol)) levels(crrCol) else unique(trimws(crrCol))
-
-    all(!is.na(suppressWarnings(as.integer(facLvl)))) && all(as.character(as.integer(facLvl)) == facLvl)
-}
-
 # determine whether a column is (i.e., can become) integer without loosing data
 detInt <- function(crrCol = NULL) {
     is.numeric(crrCol) && !all(is.na(crrCol)) &&

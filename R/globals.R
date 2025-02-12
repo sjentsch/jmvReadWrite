@@ -9,11 +9,6 @@ if (getRversion() >= "2.15.1") {
 }
 
 # =================================================================================================
-# define characters from latin1 (after enc2utf8) and their respective replacements
-lstRpl <- rbind(c("<84>",   "<93>",   "<c4>",   "<d6>",   "<dc>",   "<df>",   "<e4>",   "<f6>",   "<fc>"),
-                c("\u0084", "\u0093", "\u00c4", "\u00d6", "\u00dc", "\u00df", "\u00e4", "\u00f6", "\u00fc"))
-
-# =================================================================================================
 # the next lines store the currently supported versions (stored in meta / MANIFEST.MF)
 # and the string that precedes the version number
 lstMnf <- list(mnfVer = c("Manifest-Version",        "1.0"),
@@ -144,6 +139,58 @@ clsRmv <- function() {
 
     return(TRUE)
 }
+
+# =================================================================================================
+# convert columns to another class (e.g., integer to factor) preserving attributes, check whether
+# a column contains / can be converted into integers, and convert undefined characters into UTF-8
+
+cnvCol <- function(crrCol = NULL, tgtTyp = "character") {
+    if (methods::is(crrCol, tgtTyp)) return(crrCol)
+
+    # store attributes
+    crrAtt <- attributes(crrCol)
+    dffAtt <- setdiff(names(crrAtt), c("levels", "class"))
+    # pre-processing (convert date, trim spaces and round where necessary)
+    if (methods::is(crrCol, "POSIXct")) crrCol <- as.Date(crrCol)
+    if (is.character(crrCol)) crrCol <- trimws(crrCol)
+    if (is.numeric(crrCol) && tgtTyp ==  "integer") crrCol <- round(crrCol)
+    # actual conversion; jamovi stores factors differently depending on whether they have the dataType Integer or Text
+    if (is.factor(crrCol) && tgtTyp == "integer") {
+        crrCol <- if (intFnC(crrCol)) as.integer(as.character(crrCol)) else as.integer(crrCol) - 1L
+    } else if (tgtTyp == "factor") {
+        # tibble: conversion if the source is a column with the type dbl+lbl
+        if ("labels" %in% names(crrAtt)) {
+            crrCol <- factor(crrCol, levels = unname(crrAtt$labels), labels = names(crrAtt$labels))
+            dffAtt <- setdiff(dffAtt, "labels")
+        # foreign: conversion if the source is a column that has the attribute "value.labels"
+        } else if ("value.labels" %in% names(crrAtt)) {
+            crrCol <- factor(crrCol, levels = unname(crrAtt$value.labels), labels = cnvUTF(names(crrAtt$value.labels)))
+            dffAtt <- setdiff(dffAtt, "value.labels")
+        # “usual” columns (without specified attributes)
+        } else {
+            crrCol <- as.factor(crrCol)
+        }
+    } else {
+        crrCol <- methods::as(crrCol, tgtTyp)
+    }
+    if (length(dffAtt) > 0) crrCol <- setAtt(attLst = dffAtt, inpObj = crrAtt, outObj = as.data.frame(crrCol))[[1]]
+
+    crrCol
+}
+
+intFnC <- function(crrCol = NULL) {
+    facLvl <- if (is.factor(crrCol)) levels(crrCol) else unique(trimws(crrCol))
+
+    all(!is.na(suppressWarnings(as.integer(facLvl)))) && all(as.character(as.integer(facLvl)) == facLvl)
+}
+
+cnvUTF <- function(inpStr = c()) {
+    # assign "latin1" to those entries that have special characters (e.g., ä, æ, ß, etc.)
+    Encoding(inpStr) == "latin1"
+    # return a trimmed version of the input vector that is converted into UTF-8
+    trimws(enc2utf8(inpStr))
+}
+
 
 # =================================================================================================
 # initializing and handling ProtoBuffers

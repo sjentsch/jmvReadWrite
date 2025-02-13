@@ -44,7 +44,7 @@ chkDir <- function(fleNme = "", wrtPrm = TRUE) {
     TRUE
 }
 
-chkDtF <- function(dtaFrm = NULL, minSze = c(1, 1)) {
+chkDtF <- function(dtaFrm = NULL, minSze = c(0, 1)) {
     if (length(minSze) != 2) minSze <- rep(minSze[1], 2)
     if (is.null(dtaFrm) || !is.data.frame(dtaFrm) || length(dim(dtaFrm)) != 2) {
         stop("Input data are either not a data frame or have incorrect (only one or more than two) dimensions.")

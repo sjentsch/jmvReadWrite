@@ -328,8 +328,9 @@ clsHdl <- function(crrHdl = NULL) {
 }
 
 clnFgn <- function(dtaFrm = NULL) {
-    if (!is.null(attr(dtaFrm, "variable.labels"))) {
+    if (chkAtt(dtaFrm, "variable.labels")) {
         varLbl <- attr(dtaFrm, "variable.labels")
+        Encoding(varLbl) <- "latin1"
         for (crrNme in names(dtaFrm)) {
             if (crrNme %in% names(varLbl) && varLbl[[crrNme]] != "") {
                 attr(dtaFrm[[crrNme]], "jmv-desc") <- cnvUTF(varLbl[[crrNme]])
@@ -338,11 +339,15 @@ clnFgn <- function(dtaFrm = NULL) {
         attr(dtaFrm, "variable.labels") <- NULL
     }
     for (N in seq_along(dtaFrm)) {
-        if (!is.null(attr(dtaFrm[, N], "value.labels"))) {
-            names(attr(dtaFrm[, N], "value.labels")) <- cnvUTF(names(attr(dtaFrm[, N], "value.labels")))
+        if (chkAtt(dtaFrm[, N], "value.labels")) {
+            crrLbl <- names(attr(dtaFrm[, N], "value.labels"))
+            names(attr(dtaFrm[, N], "value.labels")) <- cnvUTF(crrLbl)
             dtaFrm[, N] <- cnvCol(dtaFrm[, N], "factor")
         }
     }
+    # remove user-defined missings
+    if (chkAtt(dtaFrm, "missings"))    attr(dtaFrm, "missings")    <- NULL
+    if (chkAtt(dtaFrm, "label.table")) attr(dtaFrm, "label.table") <- NULL
 
     dtaFrm
 }
@@ -442,9 +447,9 @@ getSPSS  <- function(fleInp = "", usePkg = "", varArg = list()) {
                            warning = function(wrnMsg) tryErr(fleInp, wrnMsg))
         clnTbb(as.data.frame(hvnTmp@.Data, col.names = names(hvnTmp)), c("format.spss", "display_width"), jmvLbl = TRUE)
     } else if (usePkg == "foreign" && hasPkg("foreign")) {
-        fgnTmp <- tryCatch(do.call(foreign::read.spss,
-                             adjArg("foreign::read.spss", list(file = fleInp, to.data.frame = TRUE, max.value.labels = FALSE), varArg,
-                               c("file", "to.data.frame", "max.value.labels"))),
+        fgnTmp <- tryCatch(suppressWarnings(do.call(foreign::read.spss,
+                             adjArg("foreign::read.spss", list(file = fleInp, to.data.frame = TRUE, trim_values = TRUE, trim.factor.names = TRUE),
+                               varArg, c("file", "to.data.frame", "trim_values", "trim.factor.names")))),
                            error   = function(errMsg) tryErr(fleInp, errMsg))
         clnFgn(fgnTmp)
     } else {

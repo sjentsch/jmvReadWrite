@@ -277,7 +277,7 @@ read_all <- function(fleInp = "", usePkg = c("foreign", "haven"), selSet = "", .
     }
 
     # check whether the input data are a data frame with the correct dimensions
-    chkDtF(dtaFrm)
+    if (!is.null(dtaFrm)) chkDtF(dtaFrm)
 
     dtaFrm
 }
@@ -353,6 +353,7 @@ clnFgn <- function(dtaFrm = NULL) {
 }
 
 clnTbb <- function(dtaFrm = NULL, rmvAtt = c(), jmvLbl = FALSE) {
+    if (is.null(dtaFrm)) return(dtaFrm)
     # convert tibble to data.frame (remove tbl_df, tbl from class)
     class(dtaFrm) <- setdiff(class(dtaFrm), c("tbl_df", "tbl", rmvAtt))
 
@@ -368,7 +369,9 @@ clnTbb <- function(dtaFrm = NULL, rmvAtt = c(), jmvLbl = FALSE) {
                 if (is.numeric(dtaFrm[[crrNme]]) && all(dtaFrm[[crrNme]] %% 1 == 0, na.rm = TRUE))
                     class(dtaFrm[[crrNme]]) <- gsub("numeric", "integer", class(dtaFrm[[crrNme]]))
             } else {
-                stop(sprintf("Trouble with factor conversion: %s\n", crrNme))
+                tmpLbl[!nzchar(tmpLbl)] <- sprintf("%d", which(!nzchar(tmpLbl)))
+                names(attr(dtaFrm[[crrNme]], "labels")) <- tmpLbl
+                dtaFrm[[crrNme]] <- cnvCol(dtaFrm[[crrNme]], "factor")
             }
         }
         # remove attributes given in rmvAtt
@@ -416,20 +419,21 @@ getSAS   <- function(fleInp = "", usePkg = "", varArg = list()) {
     # SAS data (haven)
     if (hasExt(fleInp, c("sas7bdat", "sd2", "sd7"))) {
         if        (usePkg == "haven"   && hasPkg("haven"))   {
-            hvnTmp <- tryCatch(haven::as_factor(do.call(haven::read_sas, adjArg("haven::read_sas", list(data_file = fleInp), varArg, "data_file")), only_labelled = TRUE),
+            hvnTmp <- tryCatch(do.call(haven::read_sas, adjArg("haven::read_sas", list(data_file = fleInp), varArg, "data_file")),
                                error   = function(errMsg) tryErr(fleInp, errMsg),
                                warning = function(wrnMsg) tryErr(fleInp, wrnMsg))
-            clnTbb(as.data.frame(hvnTmp@.Data, col.names = names(hvnTmp)), c("format.sas", "display_width"), jmvLbl = TRUE)
+            if (is.null(hvnTmp)) return(hvnTmp)
+            clnTbb(hvnTmp, c("format.sas", "display_width"), jmvLbl = TRUE)
         } else {
             stop(sprintf("In order to read the SAS-file \"%s\" the R-packages \"haven\" needs to be installed.", basename(fleInp)))
         }
     # SAS-transport-files (haven / foreign)
     } else if (hasExt(fleInp, c("xpt", "stx", "stc"))) {
         if        (usePkg == "haven"   && hasPkg("haven"))   {
-            hvnTmp <- tryCatch(haven::as_factor(do.call(haven::read_xpt, adjArg("haven::read_xpt", list(file = fleInp), varArg, "file")), only_labelled = TRUE),
+            hvnTmp <- tryCatch(do.call(haven::read_xpt, adjArg("haven::read_xpt", list(file = fleInp), varArg, "file")),
                                error   = function(errMsg) tryErr(fleInp, errMsg),
                                warning = function(wrnMsg) tryErr(fleInp, wrnMsg))
-            clnTbb(as.data.frame(hvnTmp@.Data, col.names = names(hvnTmp)), c("format.sas", "display_width"), jmvLbl = TRUE)
+            clnTbb(hvnTmp, c("format.sas", "display_width"), jmvLbl = TRUE)
         } else if (usePkg == "foreign" && hasPkg("foreign")) {
             fgnTmp <- tryCatch(do.call(foreign::read.xport, adjArg("foreign::read.xport", list(file = fleInp), varArg, c("file"))),
                                error   = function(errMsg) tryErr(fleInp, errMsg))
@@ -442,10 +446,10 @@ getSAS   <- function(fleInp = "", usePkg = "", varArg = list()) {
 
 getSPSS  <- function(fleInp = "", usePkg = "", varArg = list()) {
     if        (usePkg == "haven"   && hasPkg("haven"))   {
-        hvnTmp <- tryCatch(haven::as_factor(do.call(haven::read_sav, adjArg("haven::read_sav", list(file = fleInp), varArg, "file")), only_labelled = TRUE),
+        hvnTmp <- tryCatch(do.call(haven::read_sav, adjArg("haven::read_sav", list(file = fleInp), varArg, "file")),
                            error   = function(errMsg) tryErr(fleInp, errMsg),
                            warning = function(wrnMsg) tryErr(fleInp, wrnMsg))
-        clnTbb(as.data.frame(hvnTmp@.Data, col.names = names(hvnTmp)), c("format.spss", "display_width"), jmvLbl = TRUE)
+        clnTbb(hvnTmp, c("format.spss", "display_width"), jmvLbl = TRUE)
     } else if (usePkg == "foreign" && hasPkg("foreign")) {
         fgnTmp <- tryCatch(suppressWarnings(do.call(foreign::read.spss,
                              adjArg("foreign::read.spss", list(file = fleInp, to.data.frame = TRUE, trim_values = TRUE, trim.factor.names = TRUE),
@@ -461,10 +465,10 @@ getStata  <- function(fleInp = "", usePkg = "", varArg = list()) {
     # NB: more recent versions of the Stata-format require "haven" and can't be read with foreign
     usePkg <- ifelse(grepl("^<stata_dta><header>", readBin(fleInp, character(), n = 1)), "haven", usePkg)
     if        (usePkg == "haven"   && hasPkg("haven"))   {
-        hvnTmp <- tryCatch(haven::as_factor(do.call(haven::read_dta, adjArg("haven::read_dta", list(file = fleInp), varArg, "file")), only_labelled = TRUE),
+        hvnTmp <- tryCatch(do.call(haven::read_dta, adjArg("haven::read_dta", list(file = fleInp), varArg, "file")),
                            error   = function(errMsg) tryErr(fleInp, errMsg),
                            warning = function(wrnMsg) tryErr(fleInp, wrnMsg))
-        clnTbb(as.data.frame(hvnTmp@.Data, col.names = names(hvnTmp)), c("format.stata", "display_width"), jmvLbl = TRUE)
+        clnTbb(hvnTmp, c("format.stata", "display_width"), jmvLbl = TRUE)
     } else if (usePkg == "foreign" && hasPkg("foreign")) {
         tmpFgn <- tryCatch(do.call(foreign::read.dta, adjArg("foreign::read.dta", list(file = fleInp), varArg, c("file"))),
                            error = function(errMsg) tryErr(fleInp, errMsg))

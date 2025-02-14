@@ -191,7 +191,7 @@ test_that("write_omv works", {
     expect_equal(unlist(attributes(jmvAtt(tmpDF)[["NN"]]), use.names = FALSE), c(sprintf("%d", seq(1:7)), "factor", sprintf("%d", seq(1:7)), "Nominal", "Integer"))
     expect_equal(unlist(attributes(jmvAtt(tmpDF)[["CR"]]), use.names = FALSE), c("Trial (is description kept?)", "Nominal", "Text"))
     expect_error(jmvAtt("Trial"),      regexp = "^Input data are either not a data frame or have incorrect \\(only one or more than two\\) dimensions\\.")
-    expect_error(jmvAtt(data.frame()), regexp = "^The first dimension of the input data frame has not the required size \\(0 < 1\\)\\.")
+    expect_error(jmvAtt(data.frame()), regexp = "^The second dimension of the input data frame has not the required size \\(0 < 1\\)\\.")
     expect_error(jmvAtt(cbind(tmpDF, data.frame(EC = sample(as.complex(seq(10)), 100, replace = TRUE)))), regexp = "^\\s+\\w+: Variable type \\w+ not implemented.")
 
     tmpDF  <- structure(list(value = structure(c(1, 2, 4), format.sas = "LEVELS", class = c("haven_labelled", "vctrs_vctr", "double"),

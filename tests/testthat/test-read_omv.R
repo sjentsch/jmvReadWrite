@@ -144,27 +144,13 @@ test_that("read_all works", {
     expect_error(read_all(),   regexp = "^File name to the input data file needs to be given as parameter \\(fleInp = \\.\\.\\.\\)\\.")
     expect_error(read_all(""), regexp = "^File name to the input data file needs to be given as parameter \\(fleInp = \\.\\.\\.\\)\\.")
 
-    # replace strings in attributes, etc.
-    # actual replacement
-    expect_equal(rplStr(strMod = "<c4><d6><dc><df><e4><f6><fc>", crrAtt = "Trial"), "ÄÖÜßäöü")
-    expect_error(rplStr(strMod = "<c3><28>", crrAtt = "Trial"),
-      regexp = "^The current data set still contains an invalid character \\(\".*\"\\) in attribute: \".*\"\\.")
-    # finding attributes that may contain such strings
-    tmpDF <- read_omv(nmeInp)
-    attr(tmpDF, "fltLst") <- "Filter <c4><d6><dc><df><e4><f6><fc>"
-    attr(tmpDF[["weights"]], "description") <- "<c4><d6><dc><df><e4><f6><fc>"
-    df4Chk <- rplAtt(dtaFrm = tmpDF)
-    expect_equal(attr(df4Chk, "fltLst"), "Filter ÄÖÜßäöü")
-    expect_equal(attr(df4Chk[["weights"]], "description"), "ÄÖÜßäöü")
-
     # more than one object when using Rdata
     D1 <- data.frame(A = runif(n = 100))
     D2 <- data.frame(B = runif(n = 100))
     nmeInp <- tempfile(fileext = ".rda")
     save(list = ls()[grepl("D[1-2]", ls())], file = nmeInp)
     # throw error when selSet is not sepcified
-    suppressMessages(expect_error(read_all(nmeInp),
-      regexp = "^Input data are either not a data frame or have incorrect \\(only one or more than two\\) dimensions\\."))
+    expect_message(expect_null(read_all(nmeInp)), regexp = "^File \".*\" couldn't be read\\.\nThe error message was: The Rdata-file must include only one object\\.")
     # check whether reading works correct with using selSet
     df4Chk <- read_all(nmeInp, selSet = "D1")
     expect_s3_class(df4Chk, class = "data.frame")
@@ -218,21 +204,20 @@ test_that("read_all works", {
 
     nmeInp <- tempfile(fileext = ".csv")
     writeBin("X1,X2\n1.2,2.2\n7.1,3.2", nmeInp)
-    suppressMessages(expect_error(read_all(nmeInp),
-      regexp = "^Input data are either not a data frame or have incorrect \\(only one or more than two\\) dimensions\\."))
+    expect_message(expect_null(read_all(nmeInp)),
+      regexp = "^Warnings were issued when reading the file \".*\"\\.\nThe warning was: line 3 appears to contain embedded nulls")
     unlink(nmeInp)
 
     fleInp <- tempfile(fileext = ".sav")
     writeBin("$FL2@(#) IBM SPSS STATISTICS 64-bit Linux 25.0.0.0              \002", con = fleInp)
-    suppressMessages(expect_error(read_all(fleInp, usePkg = "haven"),
-      regexp = "^Input data are either not a data frame or have incorrect \\(only one or more than two\\) dimensions\\."))
-    suppressMessages(expect_error(read_all(fleInp, usePkg = "foreign"),
-      regexp = "^Input data are either not a data frame or have incorrect \\(only one or more than two\\) dimensions\\."))
+    expect_message(expect_null(read_all(fleInp, usePkg = "haven")),
+      regexp = "^File \".*\" couldn't be read\\.\nThe error message was: Failed to parse .*: Unable to read from file\\.")
+    expect_message(expect_null(read_all(fleInp, usePkg = "foreign")), regexp = "^File \".*\" couldn't be read\\.")
     unlink(fleInp)
     if (requireNamespace("haven", quietly = TRUE)) {
         haven::write_sav(jmvReadWrite::ToothGrowth, fleInp)
         df4Chk <- read_all(fleInp, usePkg = "haven")
-        expect_equal(attributes(df4Chk), list(names = c("ID", "supp", "supp2", "dose", "dose2", "len", "logLen"), row.names = seq(60), class = "data.frame"))
+        expect_equal(attributes(df4Chk), list(row.names = seq(60), names = c("ID", "supp", "supp2", "dose", "dose2", "len", "logLen"), class = "data.frame"))
         expect_equal(lapply(df4Chk, attributes), list(ID = NULL, supp = list(levels = c("OJ", "VC"), class = "factor"), supp2 = list(levels = c("1", "2"), class = "factor"),
                                                       dose = NULL, dose2 = list(levels = c("0.5", "1.0", "2.0"), class = "factor"), len = NULL, logLen = NULL))
         unlink(fleInp)
@@ -240,16 +225,15 @@ test_that("read_all works", {
 
     fleInp <- tempfile(fileext = ".dta")
     writeBin("<stata_dta><header><release>117</release><byteorder>LSF</byteorder><K>\x8f", con = fleInp)
-    suppressMessages(expect_error(read_all(fleInp, usePkg = "haven"),
-      regexp = "^Input data are either not a data frame or have incorrect \\(only one or more than two\\) dimensions\\."))
-    writeBin("", con = fleInp)
-    suppressMessages(expect_error(read_all(fleInp, usePkg = "foreign"),
-      regexp = "^Input data are either not a data frame or have incorrect \\(only one or more than two\\) dimensions\\."))
+    suppressWarnings(expect_message(expect_null(read_all(fleInp, usePkg = "haven")),
+      regexp = "File \".*\" couldn't be read\\.\nThe error message was: Failed to parse .*: Unable to read from file\\."))
+    suppressWarnings(expect_message(expect_null(read_all(fleInp, usePkg = "foreign")),
+      regexp = "File \".*\" couldn't be read\\.\nThe error message was: not a Stata version 5-12 .dta file"))
     unlink(fleInp)
     if (requireNamespace("haven", quietly = TRUE)) {
         haven::write_dta(jmvReadWrite::ToothGrowth, fleInp)
         df4Chk <- read_all(fleInp, usePkg = "haven")
-        expect_equal(attributes(df4Chk), list(names = c("ID", "supp", "supp2", "dose", "dose2", "len", "logLen"), row.names = seq(60), class = "data.frame"))
+        expect_equal(attributes(df4Chk), list(row.names = seq(60), names = c("ID", "supp", "supp2", "dose", "dose2", "len", "logLen"), class = "data.frame"))
         expect_equal(lapply(df4Chk, attributes), list(ID = NULL, supp = list(levels = c("OJ", "VC"), class = "factor"), supp2 = list(levels = c("1", "2"), class = "factor"),
                                                       dose = NULL, dose2 = list(levels = c("0.5", "1.0", "2.0"), class = "factor"), len = NULL, logLen = NULL))
         unlink(fleInp)
@@ -257,30 +241,28 @@ test_that("read_all works", {
 
     fleInp <- tempfile(fileext = ".sas7bdat")
     writeBin("", con = fleInp)
-    suppressMessages(expect_error(capture_output(read_all(fleInp, usePkg = "haven")),
-      regexp = "^Input data are either not a data frame or have incorrect \\(only one or more than two\\) dimensions\\."))
-    suppressMessages(expect_error(read_all(fleInp, usePkg = "foreign"),
-      regexp = "^Input data are either not a data frame or have incorrect \\(only one or more than two\\) dimensions\\."))
+    invisible(capture.output(expect_message(expect_null(read_all(fleInp, usePkg = "haven")), "File \".*\" couldn't be read")))
+    expect_error(read_all(fleInp, usePkg = "foreign"), "In order to read the SAS-file \".*\" the R-packages \"haven\" needs to be installed\\.")
     unlink(fleInp)
     if (requireNamespace("haven", quietly = TRUE)) {
         suppressWarnings(haven::write_sas(jmvReadWrite::ToothGrowth, fleInp))
         df4Chk <- read_all(fleInp, usePkg = "haven")
-        expect_equal(attributes(df4Chk), list(names = c("ID", "supp", "supp2", "dose", "dose2", "len", "logLen"), class = "data.frame", row.names = seq(60)))
+        expect_equal(attributes(df4Chk), list(class = "data.frame", row.names = seq(60), names = c("ID", "supp", "supp2", "dose", "dose2", "len", "logLen")))
         expect_equal(lapply(df4Chk, attributes), list(ID = NULL, supp = NULL, supp2 = NULL, dose = NULL, dose2 = NULL, len = NULL, logLen = NULL))
         unlink(fleInp)
     }
 
     fleInp <- tempfile(fileext = ".xpt")
     writeBin("HEADER RECORD*******LIBRARY HEADER RECORD!!!!!!!", con = fleInp)
-    suppressMessages(expect_error(read_all(fleInp, usePkg = "haven"),
-      regexp = "^Input data are either not a data frame or have incorrect \\(only one or more than two\\) dimensions\\."))
-    suppressMessages(expect_error(read_all(fleInp, usePkg = "foreign"),
-      regexp = "^Input data are either not a data frame or have incorrect \\(only one or more than two\\) dimensions\\."))
+    expect_message(expect_null(read_all(fleInp, usePkg = "haven")),
+      regexp = "^File \".*\" couldn't be read\\.\nThe error message was: Failed to parse .*: Unable to read from file\\.")
+    expect_message(expect_null(read_all(fleInp, usePkg = "foreign")),
+      regexp = "^File \".*\" couldn't be read\\.\nThe error message was: file not in SAS transfer format")
     unlink(fleInp)
     if (requireNamespace("haven", quietly = TRUE)) {
         haven::write_xpt(jmvReadWrite::ToothGrowth, fleInp)
         df4Chk <- read_all(fleInp, usePkg = "haven")
-        expect_equal(attributes(df4Chk), list(names = c("ID", "supp", "supp2", "dose", "dose2", "len", "logLen"), class = "data.frame", row.names = seq(60)))
+        expect_equal(attributes(df4Chk), list(class = "data.frame", row.names = seq(60), names = c("ID", "supp", "supp2", "dose", "dose2", "len", "logLen")))
         expect_equal(lapply(df4Chk, attributes), list(ID = NULL, supp = NULL, supp2 = NULL, dose = NULL, dose2 = NULL, len = NULL, logLen = NULL))
         unlink(fleInp)
     }
@@ -309,5 +291,5 @@ test_that("read_all works", {
                                          Airplay = "No. of plays on radio",
                                          Image = "Band image rating (0-10)",
                                          Sales = "Album sales (thousands)")
-    expect_identical(vapply(fgnLbl(dtaTmp), attr, character(1), "jmv-desc"), attr(dtaTmp, "variable.labels"))
+    expect_identical(vapply(clnFgn(dtaTmp), attr, character(1), "jmv-desc"), attr(dtaTmp, "variable.labels"))
 })

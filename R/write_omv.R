@@ -72,7 +72,7 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", wrtPtB = FALSE, frcWrt = FALSE
     #     the attribute "variable.labels" (attached to the data frame) is converted them to the format used by jamovi ("jmv-desc" attached to the data column)
     # [2] clean tibble attributes, particularly convert haven_labelled to either factors or numeric / integer
     if (chkAtt(dtaFrm, "variable.labels"))
-        dtaFrm <- fgnLbl(dtaFrm)
+        dtaFrm <- clnFgn(dtaFrm)
     if (methods::is(dtaFrm, "tbl_df") || any(vapply(dtaFrm, function(C) methods::is(C, "haven_labelled"), logical(1))))
         dtaFrm <- clnTbb(dtaFrm, c("format.sas", "format.spss", "format.stata", "display_width"), jmvLbl = TRUE)
     if (chkAtt(dtaFrm, "label.table"))

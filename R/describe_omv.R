@@ -92,11 +92,7 @@
 describe_omv <- function(dtaInp = NULL, fleOut = "", dtaTtl = c(), dtaDsc = c(), usePkg = c("foreign", "haven"), selSet = "", ...) {
 
     # check the input parameters: either dtaTtl or dtaDsc need to be given (and in the correct format)
-    if ((!is.character(dtaTtl) || length(dtaTtl) != 1 || !nzchar(dtaTtl)) &&
-        (((!is.character(dtaDsc) || length(dtaDsc) != 1 || !nzchar(dtaDsc)) &&
-          (!is.list(dtaDsc) || !all(c("description", "variables", "references", "license") %in% names(dtaDsc)))))) {
-        stop("Calling describe_omv requires either the parameter dtaTtl (character vector) or the parameter dtaDsc (character vector or named list).")
-    }
+    dscPrm(dtaTtl, dtaDsc)
 
     # check and import input data set (either as data frame or from a file)
     if (!is.null(list(...)[["fleInp"]])) stop("Please use the argument dtaInp instead of fleInp.")
@@ -138,6 +134,43 @@ describe_omv <- function(dtaInp = NULL, fleOut = "", dtaTtl = c(), dtaDsc = c(),
     rtnDta(dtaFrm = dtaFrm, fleOut = fleOut, dtaTtl = jmvTtl("_desc"), wrtPtB = TRUE, ...)
 }
 
+# =================================================================================================
+# helper functions (in alphabetical order)
+# =================================================================================================
+
+# add / replace HTML for title and description within index.html
+addHTM <- function(crrHTM = "", dtaTtl = c(), dtaDsc = c()) {
+    vldHTM <- which(!grepl("^\\s*$", crrHTM))
+    fndTtl <- grep("<h1.*?>", crrHTM[vldHTM])[1]
+    if (length(dtaTtl) > 0 && nzchar(dtaTtl)) {
+        splLne <- splHTM(crrHTM[vldHTM[fndTtl + 0]])
+        splLne[grep("<h1.*?>", splLne) + 1] <- dtaTtl
+        crrHTM[vldHTM[fndTtl + 0]] <- paste0(splLne, collapse = "")
+    }
+    if (length(dtaDsc) > 0 && nzchar(dtaDsc)) {
+        # issue warning if the target line hasn't the expected format
+        if (!grepl("^\\s*<p.*?></p>\\s*$", crrHTM[vldHTM[fndTtl + 1]])) {
+            warning(sprintf("Unexpected HTML to be replaced with description: %s\n\n", crrHTM[vldHTM[fndTtl + 1]]))
+        }
+        # assign description embedded in <div> / </div> tags
+        crrHTM[vldHTM[fndTtl + 1]] <- paste0("<div class=\"note\">", clnHTM(dtaDsc, toHTM = TRUE), "</div>")
+    }
+
+    return(crrHTM)
+}
+
+# ensure that the input line is concatened (if required) and remove leading and trailing <p> / </p> tags,
+# then split the input (into HTML tags and content) and replace characters that have a HTML-function (e.g., "/")
+# in the content
+clnHTM <- function(inpLne = c(), toHTM = FALSE) {
+    inpLne <- vapply(inpLne, function(x) paste0(ifelse(grepl("^\\s*<p.*?>|^\\s*<li.*?>", x), "", "<p>"), x, ifelse(grepl("</p.*?>\\s*$|</li.*?>\\s*$", x), "", "</p>")),
+                character(1), USE.NAMES = FALSE)
+    splLne <- splHTM(paste0(inpLne, collapse = ""))
+    selCnt <- !grepl("<.*?>", splLne)
+    splLne[selCnt] <- rplHTM(splLne[selCnt], toHTM)
+    return(paste0(splLne, collapse = ""))
+}
+
 # create HTML from the list-version of dtaDsc
 crtHTM <- function(inpDsc = NULL) {
     outDsc <- c()
@@ -157,82 +190,13 @@ crtHTM <- function(inpDsc = NULL) {
     return(outDsc)
 }
 
-# store title and description as protobuffer
-optPtB <- function(dtaTtl = "", dtaDsc = c()) {
-    # create protobuffer for the title
-    if (length(dtaTtl) > 0 && nzchar(dtaTtl)) {
-        ttlPtB <- var2PB(dtaTtl)
-    } else {
-        ttlPtB <- NULL
+# check input parameters
+dscPrm <- function(dtaTtl = c(), dtaDsc = NULL) {
+    if ((!is.character(dtaTtl) || length(dtaTtl) != 1 || !nzchar(dtaTtl)) &&
+        (((!is.character(dtaDsc) || length(dtaDsc) != 1 || !nzchar(dtaDsc)) &&
+          (!is.list(dtaDsc) || !all(c("description", "variables", "references", "license") %in% names(dtaDsc)))))) {
+        stop("Calling describe_omv requires either the parameter dtaTtl (character vector) or the parameter dtaDsc (character vector or named list).")
     }
-    # create protobuffer for the description
-    if (length(dtaDsc) > 0 && nzchar(dtaDsc)) {
-        # gsub("^\\s*<p.*?>|</p>\\s*$", "",
-        splDsc <- splHTM(gsub("(</h\\d>|</p>|</pre>|</code>)", "\n\\1", gsub("</li>", "</li>\n", gsub("<br\\s*/>|<br>", "\n", rplHTM(dtaDsc)))))
-        tgtDsc <- !grepl("<.*?>", splDsc)
-        attDsc <- htmPtB <- list()
-        for (i in seq_along(splDsc)) {
-            if (tgtDsc[i]) {
-                if (is.null(attDsc[["formula"]]) || attDsc[["formula"]] == FALSE) crrIns <- splDsc[i] else crrIns <- list(formula = splDsc[i])
-                htmPtB[[sum(tgtDsc[seq(i)])]] <- var2PB(c(prpAtt(attDsc), list(insert = crrIns)))
-            } else {
-                attDsc <- getAtt(splDsc, i, attDsc)
-            }
-        }
-
-        dscPtB <- RProtoBuf::new(jamovi.coms.AnalysisOption, c = RProtoBuf::new(jamovi.coms.AnalysisOptions, options =
-                      RProtoBuf::new(jamovi.coms.AnalysisOption, c = RProtoBuf::new(jamovi.coms.AnalysisOptions, options = htmPtB)),
-                    hasNames = TRUE, names = "ops"))
-    } else {
-        dscPtB <- NULL
-    }
-
-    # assemble the two protobuffers (for title, and description) into a AnalysisOptions protobuffer
-    RProtoBuf::new(jamovi.coms.AnalysisOptions, options = c(dscPtB, ttlPtB), hasNames = TRUE,
-      names = c(rep("results//topText", !is.null(dscPtB)), rep("results//heading", !is.null(ttlPtB))))
-}
-
-# split HTML into constituents (i.e., tags and content)
-splHTM <- function(vecChr = "") {
-        splChr <- gsub("^\\s+\\n|\\n\\s+$", "\n", strsplit(vecChr, "(?=[<>])", perl = TRUE)[[1]])
-        rplDsc <- grep("<", splChr)
-        # has HTML tags
-        if (length(rplDsc) > 0) {
-            if (!all(splChr[rplDsc + 2] == ">")) {
-                stop(paste("Error when decoding HTML. Please check whether the HTML-string the you used for the description is valid (i.e., no typos, etc.).",
-                           "If it is valid, send it to sebastian.jentschke@uib.no"))
-            }
-            splChr[rplDsc + 1] <- paste0("<", splChr[rplDsc + 1], ">")
-            return(splChr[-c(rplDsc, rplDsc + 2)])
-        } else {
-            return(splChr)
-        }
-}
-
-# ensure that the input line is concatened (if required) and remove leading and trailing <p> / </p> tags,
-# then split the input (into HTML tags and content) and replace characters that have a HTML-function (e.g., "/")
-# in the content
-clnHTM <- function(inpLne = c(), toHTM = FALSE) {
-    inpLne <- vapply(inpLne, function(x) paste0(ifelse(grepl("^\\s*<p.*?>|^\\s*<li.*?>", x), "", "<p>"), x, ifelse(grepl("</p.*?>\\s*$|</li.*?>\\s*$", x), "", "</p>")),
-                character(1), USE.NAMES = FALSE)
-    splLne <- splHTM(paste0(inpLne, collapse = ""))
-    selCnt <- !grepl("<.*?>", splLne)
-    splLne[selCnt] <- rplHTM(splLne[selCnt], toHTM)
-    return(paste0(splLne, collapse = ""))
-}
-
-rplHTM <- function(inpVec = c(), toHTM = FALSE) {
-    if (toHTM) {
-        return(gsub("\\/", "&#x2F;", inpVec))
-    } else {
-        return(gsub("&nbsp;", " ", gsub("&#x2F;", "/",   inpVec)))
-    }
-}
-
-# find the next HTML tag of a particular type
-nxtAtt <- function(vecChr = c(), vecPos = NA, addTrm = c()) {
-    grep(paste(c(paste0(c("</", "<"), gsub("<(\\w+)\\s+.*", "\\1", vecChr[vecPos])), addTrm), collapse = "|"),
-      vecChr[seq(vecPos + 1, length(vecChr))])[1] + vecPos
 }
 
 # transform HTML tags into attributes (bold, italic, heading, etc.)
@@ -318,6 +282,47 @@ getAtt <- function(vecChr = c(), vecPos = NA, lstAtt = list()) {
     return(lstAtt)
 }
 
+# find the next HTML tag of a particular type
+nxtAtt <- function(vecChr = c(), vecPos = NA, addTrm = c()) {
+    grep(paste(c(paste0(c("</", "<"), gsub("<(\\w+)\\s+.*", "\\1", vecChr[vecPos])), addTrm), collapse = "|"),
+      vecChr[seq(vecPos + 1, length(vecChr))])[1] + vecPos
+}
+
+# store title and description as protobuffer
+optPtB <- function(dtaTtl = "", dtaDsc = c()) {
+    # create protobuffer for the title
+    if (length(dtaTtl) > 0 && nzchar(dtaTtl)) {
+        ttlPtB <- var2PB(dtaTtl)
+    } else {
+        ttlPtB <- NULL
+    }
+    # create protobuffer for the description
+    if (length(dtaDsc) > 0 && nzchar(dtaDsc)) {
+        # gsub("^\\s*<p.*?>|</p>\\s*$", "",
+        splDsc <- splHTM(gsub("(</h\\d>|</p>|</pre>|</code>)", "\n\\1", gsub("</li>", "</li>\n", gsub("<br\\s*/>|<br>", "\n", rplHTM(dtaDsc)))))
+        tgtDsc <- !grepl("<.*?>", splDsc)
+        attDsc <- htmPtB <- list()
+        for (i in seq_along(splDsc)) {
+            if (tgtDsc[i]) {
+                if (is.null(attDsc[["formula"]]) || attDsc[["formula"]] == FALSE) crrIns <- splDsc[i] else crrIns <- list(formula = splDsc[i])
+                htmPtB[[sum(tgtDsc[seq(i)])]] <- var2PB(c(prpAtt(attDsc), list(insert = crrIns)))
+            } else {
+                attDsc <- getAtt(splDsc, i, attDsc)
+            }
+        }
+
+        dscPtB <- RProtoBuf::new(jamovi.coms.AnalysisOption, c = RProtoBuf::new(jamovi.coms.AnalysisOptions, options =
+                      RProtoBuf::new(jamovi.coms.AnalysisOption, c = RProtoBuf::new(jamovi.coms.AnalysisOptions, options = htmPtB)),
+                    hasNames = TRUE, names = "ops"))
+    } else {
+        dscPtB <- NULL
+    }
+
+    # assemble the two protobuffers (for title, and description) into a AnalysisOptions protobuffer
+    RProtoBuf::new(jamovi.coms.AnalysisOptions, options = c(dscPtB, ttlPtB), hasNames = TRUE,
+      names = c(rep("results//topText", !is.null(dscPtB)), rep("results//heading", !is.null(ttlPtB))))
+}
+
 prpAtt <- function(lstAtt = NULL) {
     # for list entries (<li>), the attribute "list" needs to be removed (it is only attached to the "\n" at
     # the end), and formulas are encoded by wrapping the "insert" (i.e., the attribute itself must not be
@@ -330,23 +335,27 @@ prpAtt <- function(lstAtt = NULL) {
     if (length(crrAtt) > 0) return(list(attributes = crrAtt)) else return(invisible(NULL))
 }
 
-# add / replace HTML for title and description within index.html
-addHTM <- function(crrHTM = "", dtaTtl = c(), dtaDsc = c()) {
-    vldHTM <- which(!grepl("^\\s*$", crrHTM))
-    fndTtl <- grep("<h1.*?>", crrHTM[vldHTM])[1]
-    if (length(dtaTtl) > 0 && nzchar(dtaTtl)) {
-        splLne <- splHTM(crrHTM[vldHTM[fndTtl + 0]])
-        splLne[grep("<h1.*?>", splLne) + 1] <- dtaTtl
-        crrHTM[vldHTM[fndTtl + 0]] <- paste0(splLne, collapse = "")
+rplHTM <- function(inpVec = c(), toHTM = FALSE) {
+    if (toHTM) {
+        return(gsub("\\/", "&#x2F;", inpVec))
+    } else {
+        return(gsub("&nbsp;", " ", gsub("&#x2F;", "/",   inpVec)))
     }
-    if (length(dtaDsc) > 0 && nzchar(dtaDsc)) {
-        # issue warning if the target line hasn't the expected format
-        if (!grepl("^\\s*<p.*?></p>\\s*$", crrHTM[vldHTM[fndTtl + 1]])) {
-            warning(sprintf("Unexpected HTML to be replaced with description: %s\n\n", crrHTM[vldHTM[fndTtl + 1]]))
-        }
-        # assign description embedded in <div> / </div> tags
-        crrHTM[vldHTM[fndTtl + 1]] <- paste0("<div class=\"note\">", clnHTM(dtaDsc, toHTM = TRUE), "</div>")
-    }
+}
 
-    return(crrHTM)
+# split HTML into constituents (i.e., tags and content)
+splHTM <- function(vecChr = "") {
+        splChr <- gsub("^\\s+\\n|\\n\\s+$", "\n", strsplit(vecChr, "(?=[<>])", perl = TRUE)[[1]])
+        rplDsc <- grep("<", splChr)
+        # has HTML tags
+        if (length(rplDsc) > 0) {
+            if (!all(splChr[rplDsc + 2] == ">")) {
+                stop(paste("Error when decoding HTML. Please check whether the HTML-string the you used for the description is valid (i.e., no typos, etc.).",
+                           "If it is valid, send it to sebastian.jentschke@uib.no"))
+            }
+            splChr[rplDsc + 1] <- paste0("<", splChr[rplDsc + 1], ">")
+            return(splChr[-c(rplDsc, rplDsc + 2)])
+        } else {
+            return(splChr)
+        }
 }

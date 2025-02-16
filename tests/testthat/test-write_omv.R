@@ -1,7 +1,7 @@
 test_that("write_omv works", {
     # check whether writing the data is working (file existence, size, contents [.omv-files are ZIP archives and must contain files that include meta, metadata.json, data.bin])
     dtaOut <- jmvReadWrite::ToothGrowth
-    colOut <- dim(dtaOut)[1]
+    rowOut <- dim(dtaOut)[1]
     nmeOut <- tempfile(fileext = ".omv")
     dtaDbg <- write_omv(dtaFrm = dtaOut, fleOut = nmeOut, retDbg = TRUE)
     expect_true(file.exists(nmeOut))
@@ -60,13 +60,73 @@ test_that("write_omv works", {
     expect_equal(c(lapply(jmvReadWrite::ToothGrowth, class), list(T1 = "integer", T2 = "numeric", T3 = "factor", T4 = c("ordered", "factor"), T5 = "factor", T6 = "factor")),
                  lapply(dtaDbg$dtaFrm, class))
 
+    nmeTmp <- tempfile(fileext = ".omt")
+    write_omv(dtaFrm = dtaOut, fleOut = nmeTmp)
+    expect_true(file.exists(nmeTmp))
+    expect_gt(file.info(nmeTmp)$size, 1)
+    expect_true(chkFle(nmeTmp, isZIP = TRUE))
+    expect_true(chkFle(nmeTmp, fleCnt = "meta"))
+    expect_true(chkFle(nmeTmp, fleCnt = "metadata.json"))
+    expect_true(chkFle(nmeTmp, fleCnt = "data.bin"))
+    dtaTmp <- read_omv(nmeTmp)
+    expect_s3_class(dtaTmp, "data.frame")
+    expect_equal(dim(dtaTmp), c(0, 7))
+    expect_equal(names(attributes(dtaTmp)), c("names", "row.names", "removedRows", "addedRows", "transforms", "class"))
+    expect_equal(names(attributes(dtaTmp[[3]]))[1:10],
+      c("levels", "class", "values", "jmv-desc", "name", "id", "columnType", "dataType", "measureType", "formula"))
+    expect_equal(names(attributes(dtaTmp[[7]]))[1:10],
+      c("jmv-desc", "name", "id", "columnType", "dataType", "measureType", "formula", "formulaMessage", "parentId", "width"))
+    expect_equal(unname(unlist(attributes(dtaTmp[[1]]))),
+      c("TRUE", "ID", "1", "Data", "Text", "ID", "", "", "0", "100", "string", "", "", "0"))
+    expect_equal(unname(unlist(attributes(dtaTmp[[4]]))),
+      c("dose", "4", "Data", "Decimal", "Continuous", "", "", "0", "100", "number", "", "", "0"))
+    expect_equal(lapply(jmvReadWrite::ToothGrowth, class), lapply(dtaTmp, class))
+    unlink(nmeTmp)
+
+    nmeTmp <- tempfile(fileext = ".omt")
+    # NB: edits (in addCol) and addedRows should be reset (empty object of the same type, i.e., list())
+    addCol <- setAtt(c("columnType", "dataType", "measureType", "formula", "edits"),
+                     list(columnType = "Computed", dataType = "Decimal", measureType = "Continuous", formula = "LOG10(len)", edits = list(start = 0, end = 499)),
+                     setNames(dtaOut[, 7, FALSE], "logLenC"))
+    write_omv(dtaFrm = setAtt("addedRows", list(addedRows = list(start = 0, end = 499)), cbind(dtaOut, addCol)), fleOut = nmeTmp)
+    expect_true(file.exists(nmeTmp))
+    expect_gt(file.info(nmeTmp)$size, 1)
+    expect_true(chkFle(nmeTmp, isZIP = TRUE))
+    expect_true(chkFle(nmeTmp, fleCnt = "meta"))
+    expect_true(chkFle(nmeTmp, fleCnt = "metadata.json"))
+    expect_true(chkFle(nmeTmp, fleCnt = "data.bin"))
+    dtaTmp <- read_omv(nmeTmp)
+    expect_s3_class(dtaTmp, "data.frame")
+    expect_equal(dim(dtaTmp), c(0, 8))
+    expect_equal(attributes(dtaTmp), list(names = c("ID", "supp", "supp2", "dose", "dose2", "len", "logLen", "logLenC"), row.names = integer(0),
+                                          removedRows = list(), addedRows = list(), transforms = list(), class = "data.frame"))
+    expect_equal(names(attributes(dtaTmp[[3]]))[1:10],
+      c("levels", "class", "values", "jmv-desc", "name", "id", "columnType", "dataType", "measureType", "formula"))
+    expect_equal(names(attributes(dtaTmp[[7]]))[1:10],
+      c("jmv-desc", "name", "id", "columnType", "dataType", "measureType", "formula", "formulaMessage", "parentId", "width"))
+    expect_equal(names(attributes(dtaTmp[[8]]))[1:10],
+      c("jmv-desc", "name", "id", "columnType", "dataType", "measureType", "formula", "formulaMessage", "parentId", "width"))
+    expect_equal(unname(unlist(attributes(dtaTmp[[1]]))),
+      c("TRUE", "ID", "1", "Data", "Text", "ID", "", "", "0", "100", "string", "", "", "0"))
+    expect_equal(unname(unlist(attributes(dtaTmp[[4]]))),
+      c("dose", "4", "Data", "Decimal", "Continuous", "", "", "0", "100", "number", "", "", "0"))
+    expect_equal(unname(unlist(attributes(dtaTmp[[7]]))),
+      c("Natural logarithm of the tooth length (len)", "logLen", "7", "Data", "Decimal", "Continuous",
+        "",           "", "0", "100", "number", "", "Natural logarithm of the tooth length (len)", "0"))
+    expect_equal(unname(unlist(attributes(dtaTmp[[8]]))),
+      c("Natural logarithm of the tooth length (len)", "logLenC", "8", "Computed", "Decimal", "Continuous",
+        "LOG10(len)", "", "0", "100", "number", "", "Natural logarithm of the tooth length (len)", "0"))
+    expect_equal(c(lapply(jmvReadWrite::ToothGrowth, class), list(logLenC = "numeric")), lapply(dtaTmp, class))
+    unlink(nmeTmp)
+
     # test cases for code coverage ============================================================================================================================
     expect_error(write_omv(NULL, nmeOut), regexp = "^The data frame to be written needs to be given as parameter \\(dtaFrm = \\.\\.\\.\\)\\.")
     expect_error(write_omv(data.frame(T1 = sample(9999, 100), T2 = as.complex(rnorm(100))), nmeOut),
       regexp = "Variable type \\w+ not implemented\\. Please send the data file that caused this problem to sebastian\\.jentschke@uib\\.no")
     expect_error(write_omv(dtaDbg$dtaFrm), regexp = "^Output file name needs to be given as parameter \\(fleOut = \\.\\.\\.\\)\\.")
     expect_error(add2ZIP(fleZIP = nmeOut, crrHdl = NULL),
-      regexp = "fleZIP \\(a character with a file name\\), and either crrHdl \\(with a connection\\) or crrFle \\(with a file name and \\[optionally\\] a writing mode\\) need to be given as arguments.")
+      regexp = paste0("fleZIP \\(a character with a file name\\), and either crrHdl \\(with a connection\\) or crrFle \\(with a file name",
+                      " and \\[optionally\\] a writing mode\\) need to be given as arguments."))
     expect_error(add2ZIP(fleZIP = nmeOut, crrHdl = 1),
       regexp = "^Parameter isn't a file handle pointing to a file to be zipped\\:")
 
@@ -98,11 +158,11 @@ test_that("write_omv works", {
     unlink(nmeOut)
 
     set.seed(1)
-    dtaOut <- cbind(dtaOut, data.frame(Bool  =            sample(c(TRUE, FALSE), colOut, TRUE),
-                                       Date1 =            sample(seq(as.Date("1999/01/01"), as.Date("2000/01/01"), by = "day"), colOut),
-                                       Date2 = as.POSIXct(sample(seq(as.Date("1999/01/01"), as.Date("2000/01/01"), by = "day"), colOut)),
-                                       Date3 = as.POSIXlt(sample(seq(as.Date("1999/01/01"), as.Date("2000/01/01"), by = "day"), colOut)),
-                                       Time  =            sample(as.difftime(tim = seq(0, 3600), units = "secs"), colOut)))
+    dtaOut <- cbind(dtaOut, data.frame(Bool  =            sample(c(TRUE, FALSE), rowOut, TRUE),
+                                       Date1 =            sample(seq(as.Date("1999/01/01"), as.Date("2000/01/01"), by = "day"), rowOut),
+                                       Date2 = as.POSIXct(sample(seq(as.Date("1999/01/01"), as.Date("2000/01/01"), by = "day"), rowOut)),
+                                       Date3 = as.POSIXlt(sample(seq(as.Date("1999/01/01"), as.Date("2000/01/01"), by = "day"), rowOut)),
+                                       Time  =            sample(as.difftime(tim = seq(0, 3600), units = "secs"), rowOut)))
     write_omv(dtaFrm = dtaOut, fleOut = nmeOut)
     dtaInp <- read_omv(fleInp = nmeOut)
     unlink(nmeOut)

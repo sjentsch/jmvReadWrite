@@ -36,11 +36,12 @@
 <h2 class="pkg-version" data-toc-text="0.4.10" id="jmvreadwrite-0410">jmvReadWrite 0.4.10<a class="anchor" aria-label="anchor" href="#jmvreadwrite-0410"></a></h2>
 <div class="section level3">
 <h3 id="enhancements-0-4-10">Enhancements:<a class="anchor" aria-label="anchor" href="#enhancements-0-4-10"></a></h3>
-<ul><li>renamed <code>hvnAdj</code> to <code>clnTbb</code> and improved it (better “cleaning” of data read via <code>haven</code>)</li>
-</ul></div>
-<div class="section level3">
-<h3 id="bug-fixes-0-4-10">Bug fixes:<a class="anchor" aria-label="anchor" href="#bug-fixes-0-4-10"></a></h3>
-<ul><li>corrected / improved writing of date values</li>
+<ul><li>permitting to read and write jamovi templates (<code>.omt</code>; incl. unit tests)</li>
+<li>reorganizing and cleaning the code (particularly in <code>read_all</code>)</li>
+<li>improvement in <code>read_all</code> when reading files (improved exception handling, etc.)</li>
+<li>renamed <code>hvnAdj</code> to <code>clnTbb</code> and improved it (better “cleaning” of data read via <code>haven</code>)</li>
+<li>renamed <code>fgnLbl</code> to <code>clnFgn</code> (including improvements to convert variable labels into their jamovi equivalents)</li>
+<li>reducing cyclomatic complexity</li>
 </ul><hr></div>
 </div>
     <div class="section level2">

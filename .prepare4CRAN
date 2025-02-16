@@ -39,7 +39,7 @@ devtools::test_coverage()
 covr::codecov(token = "2f521d97-d1e2-4baf-b05b-0b569a7c6f0f")  # jmvReadWrite
 covr::codecov(token = "821f2b2f-e305-49b2-ab96-7f328530f6ed")  # jTransform
 
-# some sed commands to correct commen misformattings
+# some sed commands to correct common misformattings
 #sed -i -e's/[[:space:]]*$//' R/*.R && sed -i '${/^$/d}' R/*.R && sed -i 's/=/ = /g' R/*.h.R && sed -i 's/  =  / = /g' R/*.h.R && sed -i 's/ = = / == /g' R/*.h.R && sed -i 's/c(1,0,0)/c(1, 0, 0)/' R/*.h.R && sed -i "s/'auto'/\"auto\"/" R/*.h.R
 
 # ================================================================================================================================================

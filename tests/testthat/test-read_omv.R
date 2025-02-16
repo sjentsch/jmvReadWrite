@@ -273,18 +273,49 @@ test_that("read_all works", {
     attr(dtaTmp[[6]], "label") <- "Trial for label conversion"
     expect_equal(attributes(clnTbb(dtaTmp, jmvLbl = TRUE)[[6]]), list(`jmv-desc` = "Trial for label conversion"))
 
-    dtaTmp <- structure(list(value = structure(c(1, 2, 4), format.sas = "LEVELS", class = c("haven_labelled", "vctrs_vctr", "double"),
-                             labels = c(level1 = 1, level2 = 2, level3 = 4))), class = c("tbl_df", "tbl", "data.frame"), row.names = c(NA, -3L))
-    expect_equal(attributes(clnTbb(dtaTmp)), list(names = "value", row.names = seq(3), class = "data.frame"))
-    expect_equal(attributes(clnTbb(dtaTmp)[, "value"]), list(levels = c("level1", "level2", "level3"), class = "factor", format.sas = "LEVELS"))
-    expect_equal(attributes(clnTbb(dtaTmp, rmvAtt = "format.sas")[, "value"]), list(levels = c("level1", "level2", "level3"), class = "factor"))
+    set.seed(2)
+    dtaTmp <- structure(list(value = structure(sample(c(1, 2, 4), 200, replace = TRUE), format.sas = "LEVELS", class = c("haven_labelled", "vctrs_vctr", "double"),
+                             labels = c(`Level 1` = 1, `Level 2` = 2, `Level 3` = 4))), class = c("tbl_df", "tbl", "data.frame"), row.names = c(NA, -200L))
+    expect_s3_class(clnTbb(dtaTmp), "data.frame")
+    expect_s3_class(clnTbb(dtaTmp)[, "value"], "factor")
+    expect_equal(attributes(clnTbb(dtaTmp)), list(names = "value", row.names = seq(200), class = "data.frame"))
+    expect_equal(attributes(clnTbb(dtaTmp)[, "value"]), list(levels = sprintf("Level %d", seq(3)), class = "factor", format.sas = "LEVELS"))
+    expect_equal(attributes(clnTbb(dtaTmp, rmvAtt = "format.sas")[, "value"]), list(levels = sprintf("Level %d", seq(3)), class = "factor"))
+    expect_equal(as.integer(table(clnTbb(dtaTmp)[, "value"])), c(71, 69, 60))
+    expect_equal(names(table(clnTbb(dtaTmp)[, "value"])), sprintf("Level %d", seq(3)))
 
-    dtaTmp <- structure(list(value = structure(c(4, 2, 1), format.sas = "LEVELS", class = c("haven_labelled", "vctrs_vctr", "double"),
-                             labels = c(`value label` = 1, `value label` = 2, `value label` = 4))), class = c("tbl_df", "tbl", "data.frame"), row.names = c(NA, -3L))
-    expect_equal(attributes(clnTbb(dtaTmp)), list(names = "value", row.names = seq(3), class = "data.frame"))
+    dtaTmp <- structure(list(value = structure(sample(c(1, 2, 4), 200, replace = TRUE), format.sas = "LEVELS", class = c("haven_labelled", "vctrs_vctr", "double"),
+                             labels = setNames(c(1, 2, 4), rep("", 3)))), class = c("tbl_df", "tbl", "data.frame"), row.names = c(NA, -200L))
+    expect_s3_class(clnTbb(dtaTmp), "data.frame")
+    expect_type(clnTbb(dtaTmp)[, "value"], "integer")
+    expect_equal(attributes(clnTbb(dtaTmp)), list(names = "value", row.names = seq(200), class = "data.frame"))
     expect_equal(attributes(clnTbb(dtaTmp)[, "value"]), list(format.sas = "LEVELS"))
     expect_null(attributes(clnTbb(dtaTmp, rmvAtt = "format.sas")[, "value"]))
-    expect_equal(as.integer(clnTbb(dtaTmp)[, "value"]), c(4, 2, 1))
+    expect_equal(as.integer(clnTbb(dtaTmp)[, "value"])[1:10], c(4, 4, 2, 2, 4, 2, 4, 1, 2, 4))
+    expect_equal(as.integer(table(clnTbb(dtaTmp)[, "value"])), c(66, 67, 67))
+    expect_equal(names(table(clnTbb(dtaTmp)[, "value"])), sprintf("%d", c(1, 2, 4)))
+
+    dtaTmp <- structure(list(value = structure(sample(c(1, 2, 4), 200, replace = TRUE), format.sas = "LEVELS", class = c("haven_labelled", "vctrs_vctr", "double"),
+                             labels = setNames(c(1, 2, 4), rep("value label", 3)))), class = c("tbl_df", "tbl", "data.frame"), row.names = c(NA, -200L))
+    expect_s3_class(clnTbb(dtaTmp), "data.frame")
+    expect_type(clnTbb(dtaTmp)[, "value"], "integer")
+    expect_equal(attributes(clnTbb(dtaTmp)), list(names = "value", row.names = seq(200), class = "data.frame"))
+    expect_equal(attributes(clnTbb(dtaTmp)[, "value"]), list(format.sas = "LEVELS"))
+    expect_null(attributes(clnTbb(dtaTmp, rmvAtt = "format.sas")[, "value"]))
+    expect_equal(as.integer(clnTbb(dtaTmp)[, "value"])[1:10], c(1, 1, 2, 1, 1, 4, 1, 2, 1, 1))
+    expect_equal(as.integer(table(clnTbb(dtaTmp)[, "value"])), c(70, 72, 58))
+    expect_equal(names(table(clnTbb(dtaTmp)[, "value"])), sprintf("%d", c(1, 2, 4)))
+
+    dtaTmp <- structure(list(value = structure(sample(seq(4), 200, replace = TRUE), format.sas = "LEVELS", class = c("haven_labelled", "vctrs_vctr", "double"),
+                             labels = setNames(seq(4), c("Smallest", "", "", "Largest")))), class = c("tbl_df", "tbl", "data.frame"), row.names = c(NA, -200L))
+    expect_s3_class(clnTbb(dtaTmp), "data.frame")
+    expect_s3_class(clnTbb(dtaTmp)[, "value"], "factor")
+    expect_equal(attributes(clnTbb(dtaTmp)), list(names = "value", row.names = seq(200), class = "data.frame"))
+    expect_equal(attributes(clnTbb(dtaTmp)[, "value"]), list(levels = c("Smallest", "2", "3", "Largest"), class = "factor", format.sas = "LEVELS"))
+    expect_equal(attributes(clnTbb(dtaTmp, rmvAtt = "format.sas")[, "value"]), list(levels = c("Smallest", "2", "3", "Largest"), class = "factor"))
+    expect_equal(as.integer(clnTbb(dtaTmp)[, "value"])[1:10], c(4, 2, 1, 3, 2, 1, 3, 3, 2, 2))
+    expect_equal(as.integer(table(clnTbb(dtaTmp)[, "value"])), c(52, 47, 46, 55))
+    expect_equal(names(table(clnTbb(dtaTmp)[, "value"])), c("Smallest", "2", "3", "Largest"))
 
     dtaTmp <- jmvReadWrite::AlbumSales[-1]
     attr(dtaTmp, "variable.labels") <- c(Adverts = "Advertsing budget (thousands)",

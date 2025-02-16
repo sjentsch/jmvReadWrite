@@ -65,7 +65,7 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", wrtPtB = FALSE, frcWrt = FALSE
     # check that the file name isn't empty, that the destination directory exists and that it ends in .omv
     fleOut <- nrmFle(fleOut)
     chkDir(fleOut)
-    chkExt(fleOut, "omv")
+    chkExt(fleOut, c("omv", "omt"))
     fleExs(fleOut, frcWrt)
 
     # [1] handle the attributes "variable.labels" and "value.labels" in the format provided by the R-package "foreign"
@@ -93,7 +93,7 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", wrtPtB = FALSE, frcWrt = FALSE
     }
     mtaDta <- setAtt(names(mtaDta), dtaFrm, mtaDta)
     # the number of rows and columns has to be adjusted to the current data set
-    mtaDta$rowCount    <- nrow(dtaFrm)
+    mtaDta$rowCount    <- ifelse(hasExt(fleOut, "omt"), 0, nrow(dtaFrm))
     mtaDta$columnCount <- ncol(dtaFrm)
     # create the entries for storing the column specific information
     mtaDta$fields      <- rep(list(mtaFld), mtaDta$columnCount)
@@ -143,25 +143,27 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", wrtPtB = FALSE, frcWrt = FALSE
         #cat(do.call(sprintf, c(fmt = "%02d: %s - %s - %s - %s\n", c(i, mtaDta$fields[[i]][c("name", "type", "dataType", "measureType")]))))
 
         # write to data.bin according to type
-        if        (chkFld(mtaDta$fields[[i]], "type", "integer")) {
-            wrtCol <- as.integer(crrCol)
-        } else if (chkFld(mtaDta$fields[[i]], "type", "number"))  {
-            wrtCol <- as.double(crrCol)
-        } else if (chkFld(mtaDta$fields[[i]], "type", "string"))  {
-            wrtCol <- cnvStr(crrCol, strHdl, strPos)
-            strPos <- attr(wrtCol, "strPos")
-            wrtCol <- as.integer(wrtCol)
+        if (!hasExt(fleOut, "omt")) {
+            if        (chkFld(mtaDta$fields[[i]], "type", "integer")) {
+                wrtCol <- as.integer(crrCol)
+            } else if (chkFld(mtaDta$fields[[i]], "type", "number"))  {
+                wrtCol <- as.double(crrCol)
+            } else if (chkFld(mtaDta$fields[[i]], "type", "string"))  {
+                wrtCol <- cnvStr(crrCol, strHdl, strPos)
+                strPos <- attr(wrtCol, "strPos")
+                wrtCol <- as.integer(wrtCol)
+            }
+            writeBin(wrtCol, binHdl, endian = "little")
+            # remove temporary variables for writing the current column
+            rm(wrtCol)
         }
-        writeBin(wrtCol, binHdl, endian = "little")
 
-        # remove temporary variables for modifying and storing the current column from the data set
-        rm(crrCol, wrtCol)
+        # remove temporary variables for modifying the current column from the data set
+        rm(crrCol)
     }
 
-    # double check whether ID is unique
-    if (unqID(mtaDta$fields)) {
-        for (i in seq_along(mtaDta$fields)) mtaDta$fields[[i]][["id"]] <- i
-    }
+    # ensure that the column-ID is not empty(NA) and unique
+    mtaDta$fields <- unqID(mtaDta$fields)
 
     # compress data.bin and discard the temporary file
     add2ZIP(fleOut, crrHdl = binHdl)
@@ -188,9 +190,14 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", wrtPtB = FALSE, frcWrt = FALSE
         add2ZIP(fleOut, crrFle = "index.html", txtOut = htmTxt())
     }
 
-    # write ProtoBuffers
-    if (wrtPtB && chkPtB(dtaFrm, fleOut)) {
+    # write ProtoBuffers: if the argument wrtPtB is set and the data set contains no
+    # protobuffers, an error message is thrown; for templates, protobuffers are written
+    # (if they exist), but their non-existence doesn't result in an error message
+    if ((wrtPtB || hasExt(fleOut, "omt")) && hasPtB(dtaFrm)) {
         add2ZIP(fleOut, crrFle = c(names(attr(dtaFrm, "protobuf")[1]), "wb"), ptbOut = attr(dtaFrm, "protobuf")[[1]])
+    } else if (wrtPtB && !hasPtB(dtaFrm)) {
+        unlink(fleOut)
+        stop("The data frame (dtaFrm) must contain the attribute \"protobuf\", there has to be at least one of them, and it has to be of the correct type (a RProtoBuf).")
     }
 
     # handle weights
@@ -208,9 +215,6 @@ jmvAtt <- function(dtaFrm = NULL, blnChC = FALSE) {
     chkDtF(dtaFrm)
 
     for (i in seq_along(dtaFrm)) {
-        # if the attributes already exist, go to the next column
-#       if (chkAtt(dtaFrm[[i]], "measureType") && chkAtt(dtaFrm[[i]], "dataType")) next
-
         crrNme <- names(dtaFrm)[i]
         # (a) jmv-id
         # ID variables represent a special case and are therefore treated first
@@ -222,34 +226,26 @@ jmvAtt <- function(dtaFrm = NULL, blnChC = FALSE) {
             attr(dtaFrm[[i]], "measureType") <- "ID"
             attr(dtaFrm[[i]], "dataType")    <- "Text"
             if (blnChC) dtaFrm[[i]] <- cnvCol(dtaFrm[[i]], "character")
-        # (b) date - jamovi doesn't support it natively, thus the transformation to numeric; back-transformation in R - as.Date(..., origin = "1970-01-01")
-        # NB: must come before the numerical variables since date is an integer from R 4.5
-        } else if (methods::is(dtaFrm[[i]], "Date") || methods::is(dtaFrm[[i]], "POSIXct") || methods::is(dtaFrm[[i]], "POSIXlt")) {
+        # (b) date and time - jamovi doesn't support it natively, thus the transformation to integer;
+        # back-transformation in R: as.Date(..., origin = "1970-01-01") / hms::as_hms(...)
+        # NB: must come before the numerical variables since date values are an integer since R 4.5
+        } else if (isDnT(dtaFrm[[i]])) {
             attr(dtaFrm[[i]], "measureType") <- "Continuous"
             attr(dtaFrm[[i]], "dataType")    <- "Integer"
             if (blnChC) {
+                # assign the description before the conversion (description depends on the original type)
+                attr(dtaFrm[[i]], "description") <- dscDnT(dtaFrm[[i]], crrNme)
                 dtaFrm[[i]] <- cnvCol(dtaFrm[[i]], "integer")
-                attr(dtaFrm[[i]], "description") <- paste(ifelse(chkAtt(dtaFrm[[i]], "description"), attr(dtaFrm[[i]], "description"), crrNme),
-                                                          "(date converted to integer; days since 1970-01-01)")
             }
-        # (c) time - jamovi doesn't support it natively,  thus the transformation to numeric; back-transformation in R - hms::as_hms(...)
-        } else if (methods::is(dtaFrm[[i]], "difftime")) {
-            attr(dtaFrm[[i]], "measureType") <- "Continuous"
-            attr(dtaFrm[[i]], "dataType")    <- "Integer"
-            if (blnChC) {
-                dtaFrm[[i]] <- cnvCol(dtaFrm[[i]], "integer")
-                attr(dtaFrm[[i]], "description") <- paste(ifelse(chkAtt(dtaFrm[[i]], "description"), attr(dtaFrm[[i]], "description"), crrNme),
-                                                          "(time converted to integer; sec since 00:00)")
-            }
-        # (d) numerical variables, determine first whether the variable can be integer, if not, use / keep it numeric / float
+        # (c) numerical variables, determine first whether the variable can be integer, if not, use / keep it numeric / float
         } else if (is.numeric(dtaFrm[[i]])) {
             attr(dtaFrm[[i]], "measureType") <- "Continuous"
             attr(dtaFrm[[i]], "dataType")    <- ifelse(is.integer(dtaFrm[[i]]) || detInt(dtaFrm[[i]]), "Integer", "Decimal")
-        # (e) factors
+        # (d) factors
         } else if (is.factor(dtaFrm[[i]])) {
             attr(dtaFrm[[i]], "measureType") <- ifelse(is.ordered(dtaFrm[[i]]), "Ordinal", "Nominal")
             attr(dtaFrm[[i]], "dataType")    <- ifelse(!is.null(attr(dtaFrm[[i]], "values")) || intFnC(dtaFrm[[i]]), "Integer", "Text")
-        # (f) logical and character are converted to factor (if blnChC)
+        # (e) logical and character are converted to factor (if blnChC)
         } else if (is.logical(dtaFrm[[i]]) || is.character(dtaFrm[[i]])) {
             attr(dtaFrm[[i]], "measureType") <- "Nominal"
             attr(dtaFrm[[i]], "dataType")    <- ifelse(is.logical(dtaFrm[[i]]) || intFnC(dtaFrm[[i]]), "Integer", "Text")
@@ -280,6 +276,15 @@ detInt <- function(crrCol = NULL) {
 #    length(unique(crrCol)) > diff(range(crrCol, na.rm = TRUE)) / 5 &&
 #    stats::sd(crrCol, na.rm = TRUE) > diff(range(crrCol, na.rm = TRUE)) / 10
 #}
+
+isDnT  <- function(crrCol) {
+    methods::is(crrCol, "Date") || methods::is(crrCol, "POSIXct") || methods::is(crrCol, "POSIXlt") || methods::is(crrCol, "difftime")
+}
+
+dscDnT <- function(crrCol = NULL, crrNme = "") {
+    paste(ifelse(chkAtt(crrCol, "description"), attr(crrCol, "description"), crrNme),
+          ifelse(methods::is(crrCol, "difftime"), "(time converted to integer; sec since 00:00)", "(date converted to integer; days since 1970-01-01)"))
+}
 
 xtdCol <- function(crrCol = NULL, crrNme = "") {
     crrLvl <- levels(crrCol)
@@ -340,9 +345,13 @@ cnvStr <- function(crrCol = NULL, strHdl = NULL, strPos = NA) {
     wrtCol
 }
 
-unqID <- function(allFld = NULL) {
-    id_Lst <- unlist(lapply(seq_along(allFld), function(i) allFld[[i]][["id"]]))
-    any(is.na(id_Lst)) || any(duplicated(id_Lst))
+unqID <- function(mtaFld = NULL) {
+    id_Lst <- unlist(lapply(seq_along(mtaFld), function(i) mtaFld[[i]][["id"]]))
+    if (any(is.na(id_Lst)) || any(duplicated(id_Lst))) {
+        for (i in seq_along(mtaFld)) mtaFld[[i]][["id"]] <- i
+    }
+
+    mtaFld
 }
 
 fleExs <- function(fleOut = c(), frcWrt = FALSE) {
@@ -362,13 +371,8 @@ isID <- function(crrCol = NULL, i = NA, crrNme = "") {
            (tolower(crrNme) %in% c("id", "name", "subject")))
 }
 
-chkPtB <- function(dtaFrm = NULL, fleOut = c()) {
-    if (is.null(attr(dtaFrm, "protobuf")) || length(attr(dtaFrm, "protobuf")) < 1 || !inherits(attr(dtaFrm, "protobuf")[[1]], "Message")) {
-        unlink(fleOut)
-        stop("The data frame (dtaFrm) must contain the attribute \"protobuf\", there has to be at least one of them, and it has to be of the correct type (a RProtoBuf).")
-    }
-
-    TRUE
+hasPtB <- function(dtaFrm = NULL) {
+    chkAtt(dtaFrm, "protobuf") && inherits(attr(dtaFrm, "protobuf")[[1]], "Message")
 }
 
 # convert to JSON and do some beatifying (adding spaces for increased legibility)

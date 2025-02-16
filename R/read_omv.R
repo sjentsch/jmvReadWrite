@@ -38,7 +38,9 @@ read_omv <- function(fleInp = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = TRUE,
     if (nchar(fleInp) == 0) stop("File name to the input data file needs to be given as parameter (fleInp = ...).")
 
     # check and format input file names - do not use chkExt here
-    if (tolower(tools::file_ext(fleInp)) != "omv") stop("read_omv only reads jamovi files (.omv), use convert_to_omv first, if you want to read other files types.")
+    if (!hasExt(fleInp, c("omv", "omt"))) {
+        stop("read_omv only reads jamovi files (.omv / .omt), use convert_to_omv first, if you want to read other files types.")
+    }
     fleInp <- fmtFlI(fleInp, maxLng = 1)
     fleLst <- zip::zip_list(fleInp)$filename
     # check whether the file list contains either the file "meta" (newer jamovi file format) or MANIFEST.MF (older format)
@@ -85,13 +87,15 @@ read_omv <- function(fleInp = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = TRUE,
         } else if (chkFld(mtaCol, "type", "string"))  {
             crrCol <- vector("character", length = rowNum)
             crrIdx <- readBin(binHdl, integer(), n = rowNum)
-            for (j in seq(rowNum)) {
-                if (is.na(crrIdx[j])) next
-                if (crrIdx[j] == strPos) {
-                    crrCol[j] <- readBin(strHdl, "character", n = 1)
-                    strPos <- strPos + length(charToRaw(crrCol[j])) + 1
-                } else {
-                    stop("Mismatch between the assumed and the actual position in the file when reading string variables.")
+            if (rowNum > 0) {
+                for (j in seq(rowNum)) {
+                    if (is.na(crrIdx[j])) next
+                    if (crrIdx[j] == strPos) {
+                        crrCol[j] <- readBin(strHdl, "character", n = 1)
+                        strPos <- strPos + length(charToRaw(crrCol[j])) + 1
+                    } else {
+                        stop("Mismatch between the assumed and the actual position in the file when reading string variables.")
+                    }
                 }
             }
             rm(crrIdx)
@@ -153,6 +157,12 @@ read_omv <- function(fleInp = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = TRUE,
     # as data frame dimensions, the latter stored in the variables / columns)
     if (sveAtt) {
         dtaFrm <- setAtt(setdiff(names(mtaGlb), c("rowCount", "columnCount", "fields")), mtaDta, dtaFrm)
+    }
+
+    # reset some attributes ("addedRows" [for the data.frame] and "edits" for each column) for jamovi templates (.omt)
+    if (hasExt(fleInp, "omt")) {
+        dtaFrm <- rstAtt(dtaFrm, "addedRows")
+        for (crrNme in names(dtaFrm)) dtaFrm[[crrNme]] <- rstAtt(dtaFrm[[crrNme]], "edits")
     }
 
     # handle weights
@@ -232,8 +242,8 @@ read_all <- function(fleInp = "", usePkg = c("foreign", "haven"), selSet = "", .
     usePkg <- match.arg(usePkg)
     dtaFrm <- NULL
 
-    # OMV
-    if        (hasExt(fleInp, c("omv"))) {
+    # OMV / OMT
+    if        (hasExt(fleInp, c("omv", "omt"))) {
         dtaFrm <- tryCatch(do.call(read_omv, adjArg("read_omv", list(fleInp = fleInp), varArg, "fleInp")),
                            error   = function(errMsg) tryErr(fleInp, errMsg),
                            warning = function(wrnMsg) tryWrn(fleInp, wrnMsg))
@@ -328,6 +338,9 @@ clsHdl <- function(crrHdl = NULL) {
 }
 
 clnFgn <- function(dtaFrm = NULL) {
+    if (is.null(dtaFrm)) return(dtaFrm)
+    chkDtF(dtaFrm)
+
     if (chkAtt(dtaFrm, "variable.labels")) {
         varLbl <- attr(dtaFrm, "variable.labels")
         Encoding(varLbl) <- "latin1"
@@ -338,24 +351,16 @@ clnFgn <- function(dtaFrm = NULL) {
         }
         attr(dtaFrm, "variable.labels") <- NULL
     }
-    for (N in seq_along(dtaFrm)) {
-        if (chkAtt(dtaFrm[, N], "value.labels")) {
-            crrLbl <- names(attr(dtaFrm[, N], "value.labels"))
-            names(attr(dtaFrm[, N], "value.labels")) <- cnvUTF(crrLbl)
-            dtaFrm[, N] <- cnvCol(dtaFrm[, N], "factor")
-        }
-    }
-    # remove user-defined missings
-    if (chkAtt(dtaFrm, "missings"))    attr(dtaFrm, "missings")    <- NULL
-    if (chkAtt(dtaFrm, "label.table")) attr(dtaFrm, "label.table") <- NULL
 
     dtaFrm
 }
 
 clnTbb <- function(dtaFrm = NULL, rmvAtt = c(), jmvLbl = FALSE) {
     if (is.null(dtaFrm)) return(dtaFrm)
+
     # convert tibble to data.frame (remove tbl_df, tbl from class)
     class(dtaFrm) <- setdiff(class(dtaFrm), c("tbl_df", "tbl", rmvAtt))
+    chkDtF(dtaFrm)
 
     for (crrNme in names(dtaFrm)) {
         # convert haven_labelled to factors

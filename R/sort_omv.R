@@ -83,10 +83,10 @@ srtFrm <- function(dtaFrm = NULL, varSrt = c()) {
                 paste0(s, "dtaFrm[[\"", sub("^-", "", x), "\"]]"))
             }, character(1)), collapse = ", "), ")")))
         # sorting makes the data.frame lose it's attributes which are therefore stored and later restored
-        attMem <- lapply(dtaFrm, attributes)
+        attLst <- bckAtt(dtaFrm)
         dtaFrm <- dtaFrm[srtOrd, , drop = FALSE]
         rownames(dtaFrm) <- NULL
-        for (n in names(attMem)[!vapply(attMem, is.null, logical(1))]) attributes(dtaFrm[[n]]) <- attMem[[n]]
+        dtaFrm <- rstAtt(dtaFrm, attLst)
     }
 
     dtaFrm

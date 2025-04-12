@@ -90,13 +90,8 @@ merge_cols_omv <- function(dtaInp = NULL, fleOut = "", typMrg = c("outer", "inne
     if (!is.null(list(...)[["fleInp"]])) stop("Please use the argument dtaInp instead of fleInp.")
     dtaFrm <- inp2DF(dtaInp = dtaInp, minDF = 2, maxDF = Inf, rmvEmp = TRUE, usePkg = usePkg, selSet = selSet, ...)
 
-    # store attributes and remove empty lines from the data sets
-    attCol <- list()
-    for (i in seq_along(dtaFrm)) {
-        attCol <- c(attCol, lapply(dtaFrm[[i]][, setdiff(names(dtaFrm[[i]]), names(attCol))], attributes))
-        dtaFrm[[i]] <- dtaFrm[[i]][!apply(is.na(dtaFrm[[i]]), 1, all), ]
-    }
-    attDF <- attributes(dtaFrm[[1]])
+    # store attributes from the data sets
+    attLst <- bckAtt(dtaFrm, bckCol = TRUE)
 
     # check the matching variable(s)
     varBy <- chkByV(varBy, dtaFrm)
@@ -109,7 +104,7 @@ merge_cols_omv <- function(dtaInp = NULL, fleOut = "", typMrg = c("outer", "inne
     for (i in setdiff(seq_along(dtaFrm), 1)) {
         tmpMrg <- do.call(merge, c(list(x = tmpMrg, y = dtaFrm[[i]], by.x = varBy[[1]], by.y = varBy[[i]]), crrArg[!grepl("^x$|^y$|^by.x$|^by.y$", names(crrArg))]))
         # if there are duplicate columns (i.e., columns with the same name in two of the input data sets), unify them
-        for (unfClm in setdiff(names(attCol), names(tmpMrg))) {
+        for (unfClm in setdiff(names(attLst[["dtaCol"]]), names(tmpMrg))) {
             dplClm <- grep(paste0(unfClm, "\\."), names(tmpMrg))
             if (length(dplClm) == 0) next
             names(tmpMrg)[dplClm[1]] <- unfClm
@@ -120,7 +115,7 @@ merge_cols_omv <- function(dtaInp = NULL, fleOut = "", typMrg = c("outer", "inne
                 } else {
                     addClm <- sprintf("%s_%d", unfClm, sum(grepl(paste0(unfClm, "_"), names(tmpMrg))) + 2)
                     names(tmpMrg)[dplClm[i]] <- addClm
-                    attCol[[addClm]] <- attCol[[unfClm]]
+                    attLst[["dtaCol"]][[addClm]] <- attLst[["dtaCol"]][[unfClm]]
                 }
             }
             if (length(rmvClm) > 0) tmpMrg <- tmpMrg[, rmvClm]
@@ -132,12 +127,7 @@ merge_cols_omv <- function(dtaInp = NULL, fleOut = "", typMrg = c("outer", "inne
     dtaFrm <- srtFrm(dtaFrm, varSrt)
 
     # restore attributes
-    for (crrAtt in setdiff(names(attDF), c("names", "row.names", "class"))) attr(dtaFrm, crrAtt) <- attDF[[crrAtt]]
-    for (crrNme in names(dtaFrm)) {
-        if (!is.null(attCol[[crrNme]])) {
-            dtaFrm[crrNme] <- setAtt(setdiff(names(attCol[[crrNme]]), names(attributes(dtaFrm[crrNme]))), attCol[[crrNme]], dtaFrm[crrNme])
-        }
-    }
+    dtaFrm <- rstAtt(dtaFrm, attLst)
 
     # rtnDta in globals.R (unified function to either write the data frame, open it in a new jamovi session or return it)
     rtnDta(dtaFrm = dtaFrm, fleOut = fleOut, dtaTtl = jmvTtl("_mrg_cols"), psvAnl = psvAnl, dtaInp = dtaInp, ...)

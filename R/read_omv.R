@@ -159,10 +159,10 @@ read_omv <- function(fleInp = "", useFlt = FALSE, rmMsVl = FALSE, sveAtt = TRUE,
         dtaFrm <- setAtt(setdiff(names(mtaGlb), c("rowCount", "columnCount", "fields")), mtaDta, dtaFrm)
     }
 
-    # reset some attributes ("addedRows" [for the data.frame] and "edits" for each column) for jamovi templates (.omt)
+    # reset / empty some attributes ("addedRows" [for the data.frame] and "edits" for each column) for jamovi templates (.omt)
     if (hasExt(fleInp, "omt")) {
-        dtaFrm <- rstAtt(dtaFrm, "addedRows")
-        for (crrNme in names(dtaFrm)) dtaFrm[[crrNme]] <- rstAtt(dtaFrm[[crrNme]], "edits")
+        dtaFrm <- nllAtt(dtaFrm, "addedRows")
+        for (crrNme in names(dtaFrm)) dtaFrm[[crrNme]] <- nllAtt(dtaFrm[[crrNme]], "edits")
     }
 
     # handle weights

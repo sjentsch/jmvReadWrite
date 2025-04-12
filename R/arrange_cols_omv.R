@@ -69,9 +69,9 @@ arrange_cols_omv <- function(dtaInp = NULL, fleOut = "", varOrd = c(), varMve = 
     varOrd <- updOrd(dtaFrm, varOrd, varMve)
 
     # re-arrange to order of variables, while storing and restoring the attributes attached to the whole data frame (column attributes are not affected)
-    attMem <- attributes(dtaFrm)
+    attLst <- bckAtt(dtaFrm)
     dtaFrm <- dtaFrm[, varOrd]
-    dtaFrm <- setAtt(setdiff(names(attMem), c("names", "row.names", "class", "fltLst")), attMem, dtaFrm)
+    dtaFrm <- rstAtt(dtaFrm, attLst)
 
     # rtnDta in globals.R (unified function to either write the data frame, open it in a new jamovi session or return it)
     rtnDta(dtaFrm = dtaFrm, fleOut = fleOut, dtaTtl = jmvTtl("_arr_cols"), psvAnl = psvAnl, dtaInp = dtaInp, ...)

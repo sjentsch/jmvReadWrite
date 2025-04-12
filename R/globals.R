@@ -310,7 +310,19 @@ fcnArg <- function(fcnNme = c()) {
 
 
 # =================================================================================================
-# functions for handling setting and storing metadata-information
+# functions for handling setting and storing metadata-information / attributes
+
+bckAtt <- function(dtaFrm = NULL, bckCol = FALSE) {
+    attLst <- list(dtaFrm = list(), dtaCol = list())
+    if (is.null(dtaFrm)) return(attLst)
+    if (is.data.frame(dtaFrm)) dtaFrm <- list(dtaFrm)
+    for (i in seq_along(dtaFrm)) {
+        attLst[["dtaCol"]] <- c(attLst[["dtaCol"]], lapply(dtaFrm[[i]][, setdiff(names(dtaFrm[[i]]), names(attLst[["dtaCol"]]))], attributes))
+    }
+    attLst[["dtaFrm"]] <- attributes(dtaFrm[[1]])
+
+    attLst
+}
 
 setAtt <- function(attLst = c(), inpObj = NULL, outObj = NULL) {
     if (!is.character(attLst)) stop("setAtt: The parameter attLst is supposed to be a character vector.")
@@ -374,12 +386,23 @@ rmvAtt <- function(attObj = NULL, att2Rm = NULL) {
     attObj
 }
 
-rstAtt <- function(attObj = NULL, att2Rs = c()) {
+nllAtt <- function(attObj = NULL, att2Rs = c()) {
     for (crrAtt in att2Rs) {
         if (crrAtt %in% names(attributes(attObj))) attr(attObj, crrAtt) <- methods::as(c(), class(attr(attObj, crrAtt)))
     }
 
     attObj
+}
+
+rstAtt <- function(dtaFrm = NULL, attLst = NULL) {
+    for (crrAtt in setdiff(names(attLst[["dtaFrm"]]), c("names", "row.names", "class", "fltLst"))) attr(dtaFrm, crrAtt) <- attLst[["dtaFrm"]][[crrAtt]]
+    for (crrNme in names(dtaFrm)) {
+        if (!is.null(attLst[["dtaCol"]][[crrNme]])) {
+            dtaFrm[crrNme] <- setAtt(setdiff(names(attLst[["dtaCol"]][[crrNme]]), names(attributes(dtaFrm[crrNme]))), attLst[["dtaCol"]][[crrNme]], dtaFrm[crrNme])
+        }
+    }
+
+    dtaFrm
 }
 
 chkAtt <- function(attObj = NULL, attNme = "", attVal = NULL) {

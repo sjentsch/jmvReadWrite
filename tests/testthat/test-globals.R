@@ -76,7 +76,9 @@ test_that("globals work", {
     expect_equal(setdiff(names(attributes(jmvReadWrite::AlbumSales)), names(attributes(rmvAtt(jmvReadWrite::AlbumSales)))), c("datalabel", "var.labels"))
     unlink(nmeOMV)
 
-    tmpDF <- rstAtt(jmvReadWrite::AlbumSales, c("datalabel", "var.labels"))
+    expect_equal(bckAtt(NULL), list(dtaFrm = list(), dtaCol = list()))
+
+    tmpDF <- nllAtt(jmvReadWrite::AlbumSales, c("datalabel", "var.labels"))
     expect_equal(names(attributes(tmpDF)), names(attributes(jmvReadWrite::AlbumSales)))
     expect_equal(attr(tmpDF, "datalabel"),  character(0))
     expect_equal(attr(tmpDF, "var.labels"), character(0))

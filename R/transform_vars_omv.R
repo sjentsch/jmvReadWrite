@@ -77,7 +77,7 @@ transform_vars_omv <- function(dtaInp = NULL, fleOut = "", varXfm = NULL, psvAnl
     dtaFrm <- inp2DF(dtaInp = dtaInp, usePkg = usePkg, selSet = selSet, ...)
 
     # check whether all variables in varXfm are also contained in the input data frame
-    if (!all(unique(unlist(varXfm, use.names = FALSE)) %in% names(dtaInp))) {
+    if (!all(unique(unlist(varXfm, use.names = FALSE)) %in% names(dtaFrm))) {
         stop(sprintf("All columns / variables given in the parameter varXfm need to be contained in the input data frame (dtaInp), but variable(s) %s are missing.",
           paste(setdiff(unique(unlist(varXfm, use.names = FALSE)), names(dtaInp)), collapse = ", ")))
     }
@@ -88,8 +88,8 @@ transform_vars_omv <- function(dtaInp = NULL, fleOut = "", varXfm = NULL, psvAnl
         cmdJmv <- ifelse(crrSfx == "INV", "1 / (RPL_VAR)", sprintf("%s(RPL_VAR)", gsub("SQR", "SQRT", gsub("LOG", "LOG10", crrSfx))))
         for (crrVar in varXfm[[crrNme]]) {
             if        (substr(crrNme, 1, 3) == "pos") {
-                rplVar <- paste0("RPL_VAR", ifelse(substr(crrNme, 4, 6) != "Sqr" && min(dtaFrm[, crrVar]) < 1, " - VMIN(RPL_VAR) + 1",
-                                            ifelse(min(dtaFrm[, crrVar]) < 0, " - VMIN(RPL_VAR)", "")))
+                rplVar <- paste0("RPL_VAR", ifelse(crrSfx != "SQR" && min(dtaFrm[, crrVar], na.rm = TRUE) < 1, " - VMIN(RPL_VAR) + 1",
+                                            ifelse(min(dtaFrm[, crrVar], na.rm = TRUE) < 0, " - VMIN(RPL_VAR)", "")))
             } else if (substr(crrNme, 1, 3) == "neg") {
                 rplVar <- paste0("VMAX(RPL_VAR)", ifelse(substr(crrNme, 4, 6) != "Sqr", " + 1", ""), " - RPL_VAR")
             }

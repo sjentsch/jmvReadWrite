@@ -138,7 +138,7 @@ clsRmv <- function() {
         rm(crrFle)
     }
 
-    return(TRUE)
+    TRUE
 }
 
 # =================================================================================================
@@ -218,11 +218,11 @@ jmvPtB <- function() {
         # try reading the protobuffer-file (if it can be read / parsed, tryCatch returns TRUE and the syntax can be extracted)
         # the is.null() is a way to enforce one-liners: either command readProtoFiles and message returns NULL and hence, either
         # TRUE (first line - is.null = TRUE) or FALSE (second line - !is.null = FALSE) are returned
-        tryCatch(expr  =             return(is.null(RProtoBuf::readProtoFiles(flePtB))),
-                 error = function(e) return(!is.null(message("Error when loading protocol definition, syntax can\'t be extracted:\n", e))))
+        tryCatch(expr  = is.null(RProtoBuf::readProtoFiles(flePtB)),
+                 error = function(e) !is.null(message("Error when loading protocol definition, syntax can\'t be extracted:\n", e)))
     } else {
         warning("The package RProtoBuf can not be initialized, try re-installing it.\n\n")
-        return(FALSE)
+        FALSE
     }
 }
 
@@ -373,7 +373,8 @@ setAtt <- function(attLst = c(), inpObj = NULL, outObj = NULL) {
 rmvMsV <- function(dtaFrm = NULL) {
     for (N in names(dtaFrm))
         attr(dtaFrm[, N], "missingValues") <- NULL
-    return(dtaFrm)
+
+    dtaFrm
 }
 
 rmvAtt <- function(attObj = NULL, att2Rm = NULL) {
@@ -477,14 +478,14 @@ rtnDta <- function(dtaFrm = NULL, fleOut = "", dtaTtl = "", wrtPtB = FALSE, psvA
                 warning("psvAnl is only possible if dtaInp is a file name (analyses are not stored in data frames, only in the jamovi files).")
             }
         }
-        return(invisible(NULL))
+        invisible(NULL)
     } else if (isJmv() && is.character(fleOut)) {
         if (psvAnl) warning("psvAnl is only possible if fleOut is a file name (analyses are not stored in data frames, only in the jamovi files).")
         jmvOpn(dtaFrm, dtaTtl = dtaTtl)
-        return(invisible(NULL))
+        invisible(NULL)
     } else {
         if (psvAnl) warning("psvAnl is only possible if fleOut is a file name (analyses are not stored in data frames, only in the jamovi files).")
-        return(dtaFrm)
+        dtaFrm
     }
 }
 
@@ -503,7 +504,7 @@ mtxF2S <- function(dtaFrm = NULL, rmvTrU = FALSE, rmvDgn = FALSE, mtxXps = FALSE
     for (crrClm in names(dtaFrm))
         attr(dtaFrm[, crrClm], "measureType") <- ifelse(crrClm == "Variable", "Nominal", "Continuous")
 
-    return(dtaFrm)
+    dtaFrm
 }
 
 # =================================================================================================
@@ -542,11 +543,10 @@ xfrAnl <- function(fleOrg = "", fleTgt = "") {
 getOS <- function() {
     sysInf <- Sys.info()
     if (!is.null(sysInf)) {
-        return(tolower(gsub("Darwin", "macos", sysInf[["sysname"]])))
+        tolower(gsub("Darwin", "macos", sysInf[["sysname"]]))
     } else {
-        return(ifelse(grepl("^darwin",   R.version$os), "macos",
-               ifelse(grepl("linux-gnu", R.version$os), "linux",
-               tolower(.Platform$OS.type))))
+        ifelse(grepl("^darwin",   R.version$os), "macos",
+          ifelse(grepl("linux-gnu", R.version$os), "linux", tolower(.Platform$OS.type)))
     }
 }
 

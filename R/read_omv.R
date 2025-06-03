@@ -415,7 +415,7 @@ getHdl <- function(fleOMV = "", crrFle = "", crrMde = "r") {
              error = function(errMsg) {
                  message(sprintf("The file \"%s\" could not be extracted from \"%s\".\nPlease send the file to sebastian.jentschke@uib.no!\nError message: %s\n",
                            crrFle, fleOMV, errMsg))
-                 return(invisible(NULL))
+                 invisible(NULL)
              }
         )
 }

@@ -19,6 +19,7 @@ reference:
     Functions for carrying out often required data management tasks for jamovi's omv-files
 - contents:
   - arrange_cols_omv
+  - combine_cols_omv
   - convert_to_omv
   - describe_omv
   - distances_omv

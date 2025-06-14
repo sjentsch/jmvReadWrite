@@ -7,8 +7,12 @@
 #' @param fleOut Name of the data file to be written (including the path, if required;
 #'               "FILE_OUT.omv"; default: ""); if empty, the resulting data frame is returned
 #'               instead.
-#' @param varPrs Variable (default: list()) containing a list of lists where each nested list
-#'               contains the names of pairs of variables to be combined.
+#' @param varPrs Definition of variable pairs; a list containing either list(s) or character
+#'               vector(s) with the names of pairs of variables to be combined (default: list()) 
+#' @param mdeCmb Mode of combining the variables when conflicting values occur, either "none",
+#'               "first", or "second", see Details below
+#' @param psvAnl Whether analyses that are contained in the input file shall be transferred to the
+#'               output file (TRUE / FALSE; default: FALSE)
 #' @param usePkg Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata,
 #'               and SAS files; "foreign" is the default (it comes with base R), but "haven" is
 #'               newer and more comprehensive.
@@ -20,7 +24,15 @@
 #'         columns removed
 #'
 #' @details
-#' * 
+#' * The need to combine two columns into one is quite common after merging columns or rows (using,
+#'   e.g., merge_cols_omv or merge_rows_omv). `varPrs` defines the variable pairs to be combined.
+#'   It is a list containing the pairs of variables to be combined, either as list or as character
+#'   vector; e.g., list(c("A", "B"), c("C", "D")) or list(list("A", "B"), list("C", "D")). `mdeCmb`
+#'   defines what to to if values in the first and the second variable of a variable pair contain
+#'   conflicting / different values: "none" does not merge the variables (and instead throws an
+#'   error), "first" makes that the values from the first variable of each pair are taken if the
+#'   values are conflicting, and "second" use the values from the second variable of each pair in
+#'   case of conflicts.
 #' * The ellipsis-parameter (`...`) can be used to submit arguments / parameters to the functions
 #'   that are used for reading and writing the data. By clicking on the respective function under
 #'   “See also”, you can get a more detailed overview over which parameters each of those functions
@@ -42,23 +54,45 @@
 #'
 #' @examples
 #' \dontrun{
+#' dtaInp <- jmvReadWrite::bfi_sample2
+#' # create two new columns each of which contains a subset of the original variable
+#' selRow <- rnorm(nrow(dtaInp)) < 0
+#' dtaInp[selRow,  "A1_1"] <- dtaInp[selRow,  "A1"]
+#' dtaInp[!selRow, "A1_2"] <- dtaInp[!selRow, "A1"]
+#' head(dtaInp[, c("A1_1", "A1_2")])
 #'
 #' }
 #'
 #' @export combine_cols_omv
 #'
-combine_cols_omv <- function(dtaInp = NULL, fleOut = "", varPrs = list(), usePkg = c("foreign", "haven"),
-                             selSet = "", ...) {
+combine_cols_omv <- function(dtaInp = NULL, fleOut = "", varPrs = list(), mdeCmb = c("none", "first", "second"),
+                             psvAnl = FALSE, usePkg = c("foreign", "haven"), selSet = "", ...) {
 
     # check and import input data set (either as data frame or from a file)
     if (!is.null(list(...)[["fleInp"]])) stop("Please use the argument dtaInp instead of fleInp.")
+    mdeCmb <- match.arg(mdeCmb)
     dtaFrm <- inp2DF(dtaInp = dtaInp, usePkg = usePkg, selSet = selSet, ...)
 
-    if (!all(nzchar(varDst)) || length(intersect(varDst, names(dtaFrm))) < 2) {
-        stop("Calling distances_omv requires giving at least two (valid) variables to calculate distances between.")
+    if (!all(nzchar(unlist(varPrs))) || length(intersect(unlist(varPrs), names(dtaFrm))) < 2 ||
+        !all(vapply(varPrs, function(v) isa(v, 'character') || isa(v, 'list'), logical(1)))) {
+        stop("Calling combine_cols_omv requires giving a list with at least one (valid) variable pair to combine.")
     }
 
+    for (crrPrs in varPrs) {
+        if (is.list(crrPrs)) crrPrs <- as.character(crrPrs)
+        # all values are equal (or NA) -> replace NAs in variable 1 with the respective rows from variable 2
+        if (all(dtaFrm[, crrPrs[1]] == dtaFrm[, crrPrs[2]], na.rm=TRUE) || mdeCmb == "first") {
+            dtaFrm[is.na(dtaFrm[, crrPrs[1]]), crrPrs[1]] <- dtaFrm[is.na(dtaFrm[, crrPrs[1]]), crrPrs[2]]
+        } else if (mdeCmb == "second") {
+            dtaFrm[!is.na(dtaFrm[, crrPrs[2]]), crrPrs[1]] <- dtaFrm[!is.na(dtaFrm[, crrPrs[2]]), crrPrs[2]]
+        } else if (mdeCmb == "none") {
+            stop(sprintf("Mismatching values in the variable pair %s.",  paste(crrPrs, collapse = " - ")))
+        }
+        dtaFrm <- dtaFrm[, setdiff(names(dtaFrm), crrPrs[2])]
+    }
 
+    # rtnDta in globals.R (unified function to either write the data frame, open it in a new jamovi session or return it)
+    rtnDta(dtaFrm = dtaFrm, fleOut = fleOut, dtaTtl = jmvTtl("_cmb_cols"), psvAnl = psvAnl, dtaInp = dtaInp, ...)
 }
 
 match_col <- function() {

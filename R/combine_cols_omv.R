@@ -95,15 +95,16 @@ combine_cols_omv <- function(dtaInp = NULL, fleOut = "", varPrs = list(), mdeCmb
     mdeCmb <- match.arg(mdeCmb)
     dtaFrm <- inp2DF(dtaInp = dtaInp, usePkg = usePkg, selSet = selSet, ...)
 
-    if (!all(nzchar(unlist(varPrs))) || length(intersect(unlist(varPrs), names(dtaFrm))) < 2 ||
-        !all(vapply(varPrs, function(v) isa(v, 'character') || isa(v, 'list'), logical(1)))) {
-        stop("Calling combine_cols_omv requires giving a list with at least one (valid) variable pair to combine.")
+    if (!all(is.character(unlist(varPrs))) || !all(nzchar(unlist(varPrs))) ||
+        !all(unlist(varPrs) %in% names(dtaInp)) || !all(vapply(varPrs, length, numeric(1)) == 2) ||
+        !all(vapply(varPrs, function(v) isa(v, "character") || isa(v, "list"), logical(1)))) {
+        stop("The parameter varPrs needs to be a list with at least one (valid) variable pair to combine.")
     }
 
     for (crrPrs in varPrs) {
         if (is.list(crrPrs)) crrPrs <- as.character(crrPrs)
         # all values are equal (or NA) -> replace NAs in variable 1 with the respective rows from variable 2
-        if (all(dtaFrm[, crrPrs[1]] == dtaFrm[, crrPrs[2]], na.rm=TRUE) || mdeCmb == "first") {
+        if (all(dtaFrm[, crrPrs[1]] == dtaFrm[, crrPrs[2]], na.rm = TRUE) || mdeCmb == "first") {
             dtaFrm[is.na(dtaFrm[, crrPrs[1]]), crrPrs[1]] <- dtaFrm[is.na(dtaFrm[, crrPrs[1]]), crrPrs[2]]
         } else if (mdeCmb == "second") {
             dtaFrm[!is.na(dtaFrm[, crrPrs[2]]), crrPrs[1]] <- dtaFrm[!is.na(dtaFrm[, crrPrs[2]]), crrPrs[2]]

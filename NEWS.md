@@ -1,11 +1,32 @@
+# jmvReadWrite 0.4.11
+
+## Enhancements:
+* added `combine_cols_omv`
+* added functions `bckAtt` and `rstAtt` (backup and restore attributes) -
+  renaming the old `rstAtt`-function (for emptying attributes) to `nllAtt`, and
+  changed code in `arrange_cols_omv`, `merge_cols_omv`, and `sort_omv` to to
+  use those functions, added unit tests for `bckAtt`
+* changes suggested by lintr (implicit return, etc.)
+
+## Bug fixes:
+* corrected a bug in `transform_vars_omv` in cases where the to be transformed
+  variable contained NAs
+* corrected a bug (check for character) occurring when the variable to match is
+  not a character
+
+---
+
 # jmvReadWrite 0.4.10
 
 ## Enhancements:
 * permitting to read and write jamovi templates (`.omt`; incl. unit tests)
 * reorganizing and cleaning the code (particularly in `read_all`)
-* improvement in `read_all` when reading files (improved exception handling, etc.)
-* renamed `hvnAdj` to `clnTbb` and improved it (better “cleaning” of data read via `haven`)
-* renamed `fgnLbl` to `clnFgn` (including improvements to convert variable labels into their jamovi equivalents)
+* improvement in `read_all` when reading files (improved exception handling,
+  etc.)
+* renamed `hvnAdj` to `clnTbb` and improved it (better “cleaning” of data read
+  via `haven`)
+* renamed `fgnLbl` to `clnFgn` (including improvements to convert variable
+  labels into their jamovi equivalents)
 * reducing cyclomatic complexity
 
 ---
@@ -13,34 +34,39 @@
 # jmvReadWrite 0.4.9
 
 ## Enhancements:
-* added parameter `rtnOut` to `jmvOpn` (preventing the output from system2 to be returned, used for the jamovi module `Rj`)
+* added parameter `rtnOut` to `jmvOpn` (preventing the output from system2 to
+  be returned, used for the jamovi module `Rj`)
 
 ## Bug fixes:
-* corrected a bug in `jmvPtB` handling if `requireNamespace("RProtoBuf")` returns `FALSE`
+* corrected a bug in `jmvPtB` handling if `requireNamespace("RProtoBuf")`
+  returns `FALSE`
 
 ---
 
 # jmvReadWrite 0.4.8
 
 ## Enhancements:
-* added `distances_omv`: calculate a wide range of distance measures (either between variables or between units
-  of observation) on standardized or the original data
+* added `distances_omv`: calculate a wide range of distance measures (either
+  between variables or between units of observation) on standardized or the
+  original data
 
 ## Bug fixes:
 * improved the treatment of factors and how they are stored
-* corrected a bug in the unit tests resulting from that R 4.5 (current development) begins to treat Date variables
-  as integers
+* corrected a bug in the unit tests resulting from that R 4.5 (current
+  development) begins to treat Date variables as integers
 
 ---
 
 # jmvReadWrite 0.4.7
 
 ## Enhancements:
-* added `transform_vars_omv`: apply transformations - calculating the square root, the logarithm to the base 10 or
-  an inversion - to make variables (better) conform to a normal contribution (incl. unit tests)
+* added `transform_vars_omv`: apply transformations - calculating the square
+  root, the logarithm to the base 10 or an inversion - to make variables
+  (better) conform to a normal contribution (incl. unit tests)
 
 ## Bug fixes:
-* fixed small bugs in `read_omv` and `write_omv` to better handle variable labels
+* fixed small bugs in `read_omv` and `write_omv` to better handle variable
+  labels
 
 ---
 
@@ -48,40 +74,47 @@
 
 ## Enhancements:
 * added workflow for `rhub`
-* reduced cyclomatic complexity for `replace_omv`, `wide2long_omv`, and  `jmvAtt`
+* reduced cyclomatic complexity for `replace_omv`, `wide2long_omv`, and
+  `jmvAtt`
 
 ## Bug fixes:
-* ensure that the `dataType` attribute is preserved / honoured by `write_omv` (earlier on, the data type
-  of a variable / column was determined by a logic and my have changed the class of this column)
-* fixed a bug leading to an error in `write_omv` when columns where completely empty (i.e., if they contained
-  only NAs; incl. the respective unit tests)
+* ensure that the `dataType` attribute is preserved / honoured by `write_omv`
+  (earlier on, the data type of a variable / column was determined by a logic
+  and my have changed the class of this column)
+* fixed a bug leading to an error in `write_omv` when columns where completely
+  empty (i.e., if they contained only NAs; incl. the respective unit tests)
 
 ---
 
 # jmvReadWrite 0.4.5
 
 ## Bug fix:
-* change `long2wide_omv` so that it to handle (omit) NAs when aggregating values (incl. unit tests)
+* change `long2wide_omv` so that it to handle (omit) NAs when aggregating
+  values (incl. unit tests)
 
 ---
 
 # jmvReadWrite 0.4.4
 
 ## Enhancements:
-* added `var_labels_omv` (assign labels to variables in a data set; including unit tests, and files for
-  the tests and the examples)
+* added `var_labels_omv` (assign labels to variables in a data set; including
+  unit tests, and files for the tests and the examples)
 
 ---
 
 # jmvReadWrite 0.4.3
 
 ## Bug fixes and enhancements:
-* replaced `sapply` with `vapply` or `lapply` (in accordance with `goodpractice`)
+* replaced `sapply` with `vapply` or `lapply` (in accordance with
+  `goodpractice`)
 * reducing cyclomatic complexity to 30
-* fixed bugs and created test cases for `rplAtt` (replace non-UTF with UTF characters, part of `read_omv`)
+* fixed bugs and created test cases for `rplAtt` (replace non-UTF with UTF
+  characters, part of `read_omv`)
 * added `invisible(NULL)`where NULL or nothing was returned 
-* adjust `strsplit` in `long2wide_omv` and `wide2long_omv` in order to permit having “.” as varSep
-* added `codemeta.json`, badge about package status, and how to contribute to the package (for `pkgcheck`)
+* adjust `strsplit` in `long2wide_omv` and `wide2long_omv` in order to permit
+  having “.” as varSep
+* added `codemeta.json`, badge about package status, and how to contribute to
+  the package (for `pkgcheck`)
 * added documentation of return value to `convert_to_omv`
 
 ---

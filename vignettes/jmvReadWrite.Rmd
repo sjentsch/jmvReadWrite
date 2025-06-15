@@ -150,7 +150,7 @@ names(wrtDta)
 # check whether the file was written to the disk, get the file information (size, etc.)
 # and delete the file afterwards
 list.files(".", "Trial.omv")
-file.info("Trial.omv")
+file.info("Trial.omv")[, c("size", "isdir", "mode")]
 unlink("Trial.omv")
 ```
 

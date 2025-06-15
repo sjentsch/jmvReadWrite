@@ -74,7 +74,7 @@ The results should be identical apart from that the table output looks nicer in
 other cosmetic differences.
 
 If you want to copy the syntax generated in jamovi, you have to switch on the
-[`Syntax Mode`](https://jamovi.readthedocs.io/en/latest/usermanual/um_6_jamovi_and_R.html#syntax-mode).
+[`Syntax Mode`](https://jamovi.readthedocs.io/en/latest/usermanual/um_6_jamovi_and_R/#syntax-mode).
 Afterwards, the syntax is shown at the top of the analysis and can be copied
 from there.
 

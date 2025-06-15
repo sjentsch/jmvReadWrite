@@ -8,9 +8,9 @@
 #'               "FILE_OUT.omv"; default: ""); if empty, the resulting data frame is returned
 #'               instead.
 #' @param varPrs Definition of variable pairs; a list containing either list(s) or character
-#'               vector(s) with the names of pairs of variables to be combined (default: list()) 
+#'               vector(s) with the names of pairs of variables to be combined (default: list()).
 #' @param mdeCmb Mode of combining the variables when conflicting values occur, either "none",
-#'               "first", or "second", see Details below
+#'               "first", or "second" (default: "none"), see Details below.
 #' @param psvAnl Whether analyses that are contained in the input file shall be transferred to the
 #'               output file (TRUE / FALSE; default: FALSE)
 #' @param usePkg Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata,
@@ -55,12 +55,34 @@
 #' @examples
 #' \dontrun{
 #' dtaInp <- jmvReadWrite::bfi_sample2
-#' # create two new columns each of which contains a subset of the original variable
+#' # create a new column (A1_1) containing a subset of the values in the original variable
+#' # whereas those lines are replaced with NAs
+#' set.seed(1)
 #' selRow <- rnorm(nrow(dtaInp)) < 0
-#' dtaInp[selRow,  "A1_1"] <- dtaInp[selRow,  "A1"]
-#' dtaInp[!selRow, "A1_2"] <- dtaInp[!selRow, "A1"]
-#' head(dtaInp[, c("A1_1", "A1_2")])
+#' dtaInp[selRow,  "A1_1"] <- dtaInp[selRow, "A1"]
+#' dtaInp[selRow,  "A1"]   <- NA
+#' head(dtaInp[, c("A1", "A1_1")])
+#' dtaOut <- combine_cols_omv(dtaInp, varPrs = list(c("A1", "A1_1")))
+#' # show the differences before and after combining the values in the columns and ensure
+#' # that all values are the same as in the original data set
+#' dtaInp[, "A1"]
+#' dtaOut[, "A1"]
+#' all(dtaOut[, "A1"] == jmvReadWrite::bfi_sample2[, "A1"])
 #'
+#' # create a new column, containing values that are different from the original variable
+#' dtaInp <- jmvReadWrite::bfi_sample2
+#' dtaInp[selRow,  "A1_1"] <- dtaInp[selRow,  "A1"] + 1
+#' # [1] if mdeCmb is "none" (or if mdeCmb is not given - "none" is the default) an error would be
+#' # thrown (therefore the next line is commented out)
+#' # dtaOut <- combine_cols_omv(dtaInp, varPrs = list(c("A1", "A1_1")), mdeCmb = "none")
+#' # [2] if mdeCmb is "first", missing values are replaced and values from the first column ("A1")
+#' # take precedence if the values are unequal
+#' dtaOut <- combine_cols_omv(dtaInp, varPrs = list(c("A1", "A1_1")), mdeCmb = "first")
+#' head(cbind(dtaOut[, "A1"], dtaInp[, c("A1", "A1_1")]))
+#' # [3] if mdeCmb is "second", missing values are replaced and values from the second column
+#' # ("A1_1") take precedence if the values are unequal
+#' dtaOut <- combine_cols_omv(dtaInp, varPrs = list(c("A1", "A1_1")), mdeCmb = "second")
+#' head(cbind(dtaOut[, "A1"], dtaInp[, c("A1", "A1_1")]))
 #' }
 #'
 #' @export combine_cols_omv
@@ -93,8 +115,4 @@ combine_cols_omv <- function(dtaInp = NULL, fleOut = "", varPrs = list(), mdeCmb
 
     # rtnDta in globals.R (unified function to either write the data frame, open it in a new jamovi session or return it)
     rtnDta(dtaFrm = dtaFrm, fleOut = fleOut, dtaTtl = jmvTtl("_cmb_cols"), psvAnl = psvAnl, dtaInp = dtaInp, ...)
-}
-
-match_col <- function() {
-
 }

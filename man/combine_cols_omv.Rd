@@ -9,6 +9,8 @@ combine_cols_omv(
   dtaInp = NULL,
   fleOut = "",
   varPrs = list(),
+  mdeCmb = c("none", "first", "second"),
+  psvAnl = FALSE,
   usePkg = c("foreign", "haven"),
   selSet = "",
   ...
@@ -23,8 +25,14 @@ type, see Details below.}
 "FILE_OUT.omv"; default: ""); if empty, the resulting data frame is returned
 instead.}
 
-\item{varPrs}{Variable (default: list()) containing a list of lists where each nested list
-contains the names of pairs of variables to be combined.}
+\item{varPrs}{Definition of variable pairs; a list containing either list(s) or character
+vector(s) with the names of pairs of variables to be combined (default: list()).}
+
+\item{mdeCmb}{Mode of combining the variables when conflicting values occur, either "none",
+"first", or "second" (default: "none"), see Details below.}
+
+\item{psvAnl}{Whether analyses that are contained in the input file shall be transferred to the
+output file (TRUE / FALSE; default: FALSE)}
 
 \item{usePkg}{Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata,
 and SAS files; "foreign" is the default (it comes with base R), but "haven" is
@@ -45,7 +53,15 @@ Combines pairs of columns from a raw data matrix in .omv-files for the statistic
 }
 \details{
 \itemize{
-\item 
+\item The need to combine two columns into one is quite common after merging columns or rows (using,
+e.g., merge_cols_omv or merge_rows_omv). \code{varPrs} defines the variable pairs to be combined.
+It is a list containing the pairs of variables to be combined, either as list or as character
+vector; e.g., list(c("A", "B"), c("C", "D")) or list(list("A", "B"), list("C", "D")). \code{mdeCmb}
+defines what to to if values in the first and the second variable of a variable pair contain
+conflicting / different values: "none" does not merge the variables (and instead throws an
+error), "first" makes that the values from the first variable of each pair are taken if the
+values are conflicting, and "second" use the values from the second variable of each pair in
+case of conflicts.
 \item The ellipsis-parameter (\code{...}) can be used to submit arguments / parameters to the functions
 that are used for reading and writing the data. By clicking on the respective function under
 “See also”, you can get a more detailed overview over which parameters each of those functions
@@ -61,7 +77,35 @@ SAS-transport-files. If you would like to use \code{haven}, you may need to inst
 }
 \examples{
 \dontrun{
+dtaInp <- jmvReadWrite::bfi_sample2
+# create a new column (A1_1) containing a subset of the values in the original variable
+# whereas those lines are replaced with NAs
+set.seed(1)
+selRow <- rnorm(nrow(dtaInp)) < 0
+dtaInp[selRow,  "A1_1"] <- dtaInp[selRow, "A1"]
+dtaInp[selRow,  "A1"]   <- NA
+head(dtaInp[, c("A1", "A1_1")])
+dtaOut <- combine_cols_omv(dtaInp, varPrs = list(c("A1", "A1_1")))
+# show the differences before and after combining the values in the columns and ensure
+# that all values are the same as in the original data set
+dtaInp[, "A1"]
+dtaOut[, "A1"]
+all(dtaOut[, "A1"] == jmvReadWrite::bfi_sample2[, "A1"])
 
+# create a new column, containing values that are different from the original variable
+dtaInp <- jmvReadWrite::bfi_sample2
+dtaInp[selRow,  "A1_1"] <- dtaInp[selRow,  "A1"] + 1
+# [1] if mdeCmb is "none" (or if mdeCmb is not given - "none" is the default) an error would be
+# thrown (therefore the next line is commented out)
+# dtaOut <- combine_cols_omv(dtaInp, varPrs = list(c("A1", "A1_1")), mdeCmb = "none")
+# [2] if mdeCmb is "first", missing values are replaced and values from the first column ("A1")
+# take precedence if the values are unequal
+dtaOut <- combine_cols_omv(dtaInp, varPrs = list(c("A1", "A1_1")), mdeCmb = "first")
+head(cbind(dtaOut[, "A1"], dtaInp[, c("A1", "A1_1")]))
+# [3] if mdeCmb is "second", missing values are replaced and values from the second column
+# ("A1_1") take precedence if the values are unequal
+dtaOut <- combine_cols_omv(dtaInp, varPrs = list(c("A1", "A1_1")), mdeCmb = "second")
+head(cbind(dtaOut[, "A1"], dtaInp[, c("A1", "A1_1")]))
 }
 
 }

@@ -2,8 +2,9 @@
 % Please edit documentation in R/merge_cols_omv.R
 \name{merge_cols_omv}
 \alias{merge_cols_omv}
-\title{Merges two or more data files by adding the content of other input files as columns to the first input file and outputs them as files for the statistical
-spreadsheet 'jamovi' (\url{https://www.jamovi.org})}
+\title{Merges two or more data files by adding the content of other input files as columns to the first
+input file and outputs them as files for the statistical spreadsheet 'jamovi'
+(\url{https://www.jamovi.org})}
 \usage{
 merge_cols_omv(
   dtaInp = NULL,
@@ -18,61 +19,85 @@ merge_cols_omv(
 )
 }
 \arguments{
-\item{dtaInp}{Either a data frame (with the attribute "fleInp" containing the files to merge) or vector with the names of the input files (including the
-path, if required; "FILENAME.ext"; default: NULL); files can be of any supported file type, see Details below}
+\item{dtaInp}{Either a data frame (with the attribute "fleInp" containing the files to merge) or
+vector with the names of the input files (including the path, if required;
+"FILENAME.ext"; default: NULL); files can be of any supported file type, see
+Details below}
 
-\item{fleOut}{Name of the data file to be written (including the path, if required; "FILE_OUT.omv"; default: ""); if empty, the resulting data frame is
-returned instead}
+\item{fleOut}{Name of the data file to be written (including the path, if required;
+"FILE_OUT.omv"; default: ""); if empty, the resulting data frame is returned
+instead}
 
-\item{typMrg}{Type of merging operation: "outer" (default), "inner", "left" or "right"; see Details below}
+\item{typMrg}{Type of merging operation: "outer" (default), "inner", "left" or "right"; see
+Details below}
 
-\item{varBy}{Name of the variable by which the data sets are matched, can either be a string, a character or a list (see Details below; default: list())}
+\item{varBy}{Name of the variable by which the data sets are matched, can either be a string,
+a character or a list (see Details below; default: list())}
 
-\item{varSrt}{Variable(s) that are used to sort the data frame (see Details; if empty, the order after merging is kept; default: c())}
+\item{varSrt}{Variable(s) that are used to sort the data frame (see Details; if empty, the order
+after merging is kept; default: c())}
 
-\item{psvAnl}{Whether analyses that are contained in the input file shall be transferred to the output file (TRUE / FALSE; default: FALSE)}
+\item{psvAnl}{Whether analyses that are contained in the input file shall be transferred to the
+output file (TRUE / FALSE; default: FALSE)}
 
-\item{usePkg}{Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata and SAS files; "foreign" is the default (it comes with
-base R), but "haven" is newer and more comprehensive}
+\item{usePkg}{Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata
+and SAS files; "foreign" is the default (it comes with base R), but "haven" is
+newer and more comprehensive}
 
-\item{selSet}{Name of the data set that is to be selected from the workspace (only applies when reading .RData-files)}
+\item{selSet}{Name of the data set that is to be selected from the workspace (only applies when
+reading .RData-files)}
 
 \item{...}{Additional arguments passed on to methods; see Details below}
 }
 \value{
-a data frame (only returned if \code{fleOut} is empty) where the columns of all input data sets (given in the \code{dtaInp}-argument) are concatenated
+a data frame (only returned if \code{fleOut} is empty) where the columns of all input data
+sets (given in the \code{dtaInp}-argument) are concatenated
 }
 \description{
-Merges two or more data files by adding the content of other input files as columns to the first input file and outputs them as files for the statistical
-spreadsheet 'jamovi' (\url{https://www.jamovi.org})
+Merges two or more data files by adding the content of other input files as columns to the first
+input file and outputs them as files for the statistical spreadsheet 'jamovi'
+(\url{https://www.jamovi.org})
 }
 \details{
 \itemize{
-\item Using data frames with the input parameter \code{dtaInp} is primarily thought to be used when calling \code{merge_cols_omv} from the jamovi-modules \code{jTransform} and
-\code{Rj}. For the use in R, it is strongly recommended to use a character vector with the file names instead.
-\item There are four different types of merging operations (defined via \code{typMrg}): "outer" keeps all cases (but columns in the resulting data set may contain
-empty cells / missing values if same input data sets did not have a row containing the matching variable (defined in \code{varBy}). "inner" keeps only those
-cases where all datasets contain the same value in the matching variable, for "left" all cases from the first data set in \code{dtaInp} are kept (whereas cases
-that are only contained in the second or any later input data set are dropped), for "right" all cases from the second (or any higher) data set in \code{dtaInp}
-are kept. The behaviour of "left" and "right" may be somewhat difficult to predict in case of merging several data sets, therefore "outer" might be a
-safer choice if several data sets are merged.
-\item The variable that is used for matching (\code{varBy}) can either be a string (if all datasets contain a matching variable with the same name), a character
-vector (containing more than one matching variables that are contained in / the same for all data sets) or a list with the same length as dtaInp. In such
-list, each cell can again contain either a string (one matching variable for each data set in dtaInp) or a character vector (several matching variables
-for each data set in dtaInp; NB: all character vectors in the cells of the list must have the same length as it is necessary to always use the same number
-of matching variables when merging).
-\item \code{varSrt} can be either a character or a character vector (with one or more variables respectively). The sorting order for a particular variable can be
-inverted with preceding the variable name with "-". Please note that this doesn't make sense and hence throws a warning for certain variable types (e.g.,
-factors).
-\item The ellipsis-parameter (\code{...}) can be used to submit arguments / parameters to the functions that are used for transforming or reading the data. By
-clicking on the respective function under “See also”, you can get a more detailed overview over which parameters each of those functions take.
-\item Adding columns uses \code{merge}. \code{typMrg} is implemented by setting \code{TRUE} or \code{FALSE} to \code{all.x} and \code{all.y} in \code{merge}, \code{varBy} matches \code{by.x} and \code{by.y}.
-The help for \code{merge} can be accessed by clicking on the link under “See also”.
-\item The functions for reading and writing the data are: \code{read_omv} and \code{write_omv} (for jamovi-files), \code{read.table} (for CSV / TSV files; using similar
-defaults as \code{read.csv} for CSV and \code{read.delim} for TSV which both are based upon \code{read.table}), \code{load} (for .RData-files), \code{readRDS} (for .rds-files),
-\code{read_sav} (needs R-package \code{haven}) or \code{read.spss} (needs R-package \code{foreign}) for SPSS-files, \code{read_dta} (\code{haven}) / \code{read.dta} (\code{foreign}) for
-Stata-files, \code{read_sas} (\code{haven}) for SAS-data-files, and \code{read_xpt} (\code{haven}) / \code{read.xport} (\code{foreign}) for SAS-transport-files. If you would like to
-use \code{haven}, you may need to install it using \code{install.packages("haven", dep = TRUE)}.
+\item Using data frames with the input parameter \code{dtaInp} is primarily thought to be used when
+calling \code{merge_cols_omv} from the jamovi-modules \code{jTransform} and \code{Rj}. For the use in R, it
+is strongly recommended to use a character vector with the file names instead.
+\item There are four different types of merging operations (defined via \code{typMrg}): "outer" keeps all
+cases (but columns in the resulting data set may contain empty cells / missing values if same
+input data sets did not have a row containing the matching variable (defined in \code{varBy}).
+"inner" keeps only those cases where all datasets contain the same value in the matching
+variable, for "left" all cases from the first data set in \code{dtaInp} are kept (whereas cases
+that are only contained in the second or any later input data set are dropped), for "right"
+all cases from the second (or any higher) data set in \code{dtaInp} are kept. The behaviour of
+"left" and "right" may be somewhat difficult to predict in case of merging several data sets,
+therefore "outer" might be a safer choice if several data sets are merged.
+\item The variable that is used for matching (\code{varBy}) can either be a string (if all datasets
+contain a matching variable with the same name), a character vector (containing more than one
+matching variables that are contained in / the same for all data sets) or a list with the same
+length as dtaInp. In such list, each cell can again contain either a string (one matching
+variable for each data set in dtaInp) or a character vector (several matching variables for
+each data set in dtaInp; NB: all character vectors in the cells of the list must have the same
+length as it is necessary to always use the same number of matching variables when merging).
+\item \code{varSrt} can be either a character or a character vector (with one or more variables
+respectively). The sorting order for a particular variable can be inverted with preceding the
+variable name with "-". Please note that this doesn't make sense and hence throws a warning
+for certain variable types (e.g., factors).
+\item The ellipsis-parameter (\code{...}) can be used to submit arguments / parameters to the functions
+that are used for transforming or reading the data. By clicking on the respective function
+under “See also”, you can get a more detailed overview over which parameters each of those
+functions take.
+\item Adding columns uses \code{merge}. \code{typMrg} is implemented by setting \code{TRUE} or \code{FALSE} to \code{all.x}
+and \code{all.y} in \code{merge}, \code{varBy} matches \code{by.x} and \code{by.y}. The help for \code{merge} can be
+accessed by clicking on the link under “See also”.
+\item The functions for reading and writing the data are: \code{read_omv} and \code{write_omv} (for
+jamovi-files), \code{read.table} (for CSV / TSV files; using similar defaults as \code{read.csv} for CSV
+and \code{read.delim} for TSV which both are based upon \code{read.table}), \code{load} (for .RData-files),
+\code{readRDS} (for .rds-files), \code{read_sav} (needs R-package \code{haven}) or \code{read.spss} (needs
+R-package \code{foreign}) for SPSS-files, \code{read_dta} (\code{haven}) / \code{read.dta} (\code{foreign}) for
+Stata-files, \code{read_sas} (\code{haven}) for SAS-data-files, and \code{read_xpt} (\code{haven}) / \code{read.xport}
+(\code{foreign}) for SAS-transport-files. If you would like to use \code{haven}, you may need to install
+it using \code{install.packages("haven", dep = TRUE)}.
 }
 }
 \examples{
@@ -111,8 +136,11 @@ unlink(nmeOut)
 
 }
 \seealso{
-\code{merge_cols_omv} internally uses the following functions: Adding columns uses \code{\link[=merge]{merge()}}. For reading and writing data files in different formats:
-\code{\link[=read_omv]{read_omv()}} and \code{\link[=write_omv]{write_omv()}} for jamovi-files, \code{\link[utils:read.table]{utils::read.table()}} for CSV / TSV files, \code{\link[=load]{load()}} for reading .RData-files,
-\code{\link[=readRDS]{readRDS()}} for .rds-files, \code{\link[haven:read_spss]{haven::read_sav()}} or \code{\link[foreign:read.spss]{foreign::read.spss()}} for SPSS-files, \code{\link[haven:read_dta]{haven::read_dta()}} or \code{\link[foreign:read.dta]{foreign::read.dta()}} for Stata-files,
-\code{\link[haven:read_sas]{haven::read_sas()}} for SAS-data-files, and \code{\link[haven:read_xpt]{haven::read_xpt()}} or \code{\link[foreign:read.xport]{foreign::read.xport()}} for SAS-transport-files.
+\code{merge_cols_omv} internally uses the following functions: Adding columns uses
+\code{\link[=merge]{merge()}}. For reading and writing data files in different formats: \code{\link[=read_omv]{read_omv()}}
+and \code{\link[=write_omv]{write_omv()}} for jamovi-files, \code{\link[utils:read.table]{utils::read.table()}} for CSV / TSV files,
+\code{\link[=load]{load()}} for reading .RData-files, \code{\link[=readRDS]{readRDS()}} for .rds-files, \code{\link[haven:read_spss]{haven::read_sav()}} or
+\code{\link[foreign:read.spss]{foreign::read.spss()}} for SPSS-files, \code{\link[haven:read_dta]{haven::read_dta()}} or \code{\link[foreign:read.dta]{foreign::read.dta()}} for
+Stata-files, \code{\link[haven:read_sas]{haven::read_sas()}} for SAS-data-files, and \code{\link[haven:read_xpt]{haven::read_xpt()}} or
+\code{\link[foreign:read.xport]{foreign::read.xport()}} for SAS-transport-files.
 }

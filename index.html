@@ -23,7 +23,7 @@
 
     <a class="navbar-brand me-2" href="index.html">jmvReadWrite</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.10</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.11</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -168,11 +168,9 @@
 <span><span class="co"># and delete the file afterwards</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="st">"."</span>, <span class="st">"Trial.omv"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "Trial.omv"</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/file.info.html" class="external-link">file.info</a></span><span class="op">(</span><span class="st">"Trial.omv"</span><span class="op">)</span></span>
-<span><span class="co">#&gt;           size isdir mode               mtime               ctime</span></span>
-<span><span class="co">#&gt; Trial.omv 2617 FALSE  644 2025-02-17 00:38:11 2025-02-17 00:38:11</span></span>
-<span><span class="co">#&gt;                         atime   uid  gid  uname grname</span></span>
-<span><span class="co">#&gt; Trial.omv 2025-02-17 00:38:11 87448 4601 sje025 ansatt</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/file.info.html" class="external-link">file.info</a></span><span class="op">(</span><span class="st">"Trial.omv"</span><span class="op">)</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"size"</span>, <span class="st">"isdir"</span>, <span class="st">"mode"</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="co">#&gt;           size isdir mode</span></span>
+<span><span class="co">#&gt; Trial.omv 2617 FALSE  644</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="st">"Trial.omv"</span><span class="op">)</span></span></code></pre></div>
 <p>Although jamovi reads R-data files (.RData, .rda, .rds) <a href="https://sjentsch.github.io/jmvReadWrite/reference/write_omv.html"><code>write_omv</code></a> permits to store <code>jamovi</code>-specific attributes (such as variable labels) in addition. Please note that if you are reading from an <code>.omv</code>-file in order to write back to an <code>.omv</code>-file (perhaps after some modifications), it is recommended to leave the <code>sveAtt</code>-attribute set to <code>TRUE</code> (which is the default).</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
@@ -201,6 +199,7 @@
 <p><code>jmvReadWrite</code> contains a number of helper functions that assist you with data management tasks that are frequently required:</p>
 <ul>
 <li><p><a href="https://sjentsch.github.io/jmvReadWrite/reference/arrange_cols_omv.html"><code>arrange_cols_omv</code></a>: Re-arranges the columns of your data file in a requested order.</p></li>
+<li><p><a href="https://sjentsch.github.io/jmvReadWrite/reference/combine_cols_omv.html"><code>combine_cols_omv</code></a>: Combines the data from two columns into one. The function assumes that the data contained in the two columns are the same. It checks for (and thereby ensures) equality and replaces missing values in one column by replacing those with values from the second column (if those are not missing as well).</p></li>
 <li><p><a href="https://sjentsch.github.io/jmvReadWrite/reference/convert_to_omv.html"><code>convert_to_omv</code></a>: Converts data sets from other file formats into jamovi-format. This function may be helpful if you have to convert a larger amount of files.</p></li>
 <li><p><a href="https://sjentsch.github.io/jmvReadWrite/reference/describe_omv.html"><code>describe_omv</code></a>: Adds a title and a description to a data set. This function may be helpful for documenting what is contained in a data set, e.g. for publishing them in a repository such as OSF, or for generated data sets, e.g. those used in teaching.</p></li>
 <li><p><a href="https://sjentsch.github.io/jmvReadWrite/reference/distances_omv.html"><code>distances_omv</code></a>: Calculates a wide range of distances measures (for continuous, frequency or binary data). If can be determined, whether the calculation of the distances should be carried out between columns / variables or between rows / units of observation. The original data can be standardized before the distances are calculated.</p></li>

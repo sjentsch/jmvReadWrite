@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">jmvReadWrite</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.10</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.11</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -32,6 +32,22 @@
       <small>Source: <a href="https://github.com/sjentsch/jmvReadWrite/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.4.11" id="jmvreadwrite-0411">jmvReadWrite 0.4.11<a class="anchor" aria-label="anchor" href="#jmvreadwrite-0411"></a></h2>
+<div class="section level3">
+<h3 id="enhancements-0-4-11">Enhancements:<a class="anchor" aria-label="anchor" href="#enhancements-0-4-11"></a></h3>
+<ul><li>added <code>combine_cols_omv</code>
+</li>
+<li>added functions <code>bckAtt</code> and <code>rstAtt</code> (backup and restore attributes) - renaming the old <code>rstAtt</code>-function (for emptying attributes) to <code>nllAtt</code>, and changed code in <code>arrange_cols_omv</code>, <code>merge_cols_omv</code>, and <code>sort_omv</code> to to use those functions, added unit tests for <code>bckAtt</code>
+</li>
+<li>changes suggested by lintr (implicit return, etc.)</li>
+</ul></div>
+<div class="section level3">
+<h3 id="bug-fixes-0-4-11">Bug fixes:<a class="anchor" aria-label="anchor" href="#bug-fixes-0-4-11"></a></h3>
+<ul><li>corrected a bug in <code>transform_vars_omv</code> in cases where the to be transformed variable contained NAs</li>
+<li>corrected a bug (check for character) occurring when the variable to match is not a character</li>
+</ul><hr></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.4.10" id="jmvreadwrite-0410">jmvReadWrite 0.4.10<a class="anchor" aria-label="anchor" href="#jmvreadwrite-0410"></a></h2><p class="text-muted">CRAN release: 2025-02-16</p>
 <div class="section level3">

@@ -197,6 +197,10 @@ management tasks that are frequently required:
   Converts data sets from other file formats into jamovi-format. This function
   may be helpful if you have to convert a larger amount of files.
 
+* [`create_analyses_omv`](https://sjentsch.github.io/jmvReadWrite/reference/create_analyses_omv.html):
+  Adds analyses (based upon a vector with jamovi-functions, such as those produced when the Syntax
+  Mode is switched on in jamovi) to a data set.
+
 * [`describe_omv`](https://sjentsch.github.io/jmvReadWrite/reference/describe_omv.html):
   Adds a title and a description to a data set. This function may be helpful
   for documenting what is contained in a data set, e.g. for publishing them in

@@ -2,6 +2,7 @@
 
 export(arrange_cols_omv)
 export(convert_to_omv)
+export(create_analyses_omv)
 export(describe_omv)
 export(label_vars_omv)
 export(long2wide_omv)

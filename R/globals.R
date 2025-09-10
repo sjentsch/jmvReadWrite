@@ -56,9 +56,10 @@ chkDtF <- function(dtaFrm = NULL, minSze = c(0, 1)) {
 }
 
 chkExt <- function(fleNme = "", extNme = c("")) {
-    if (!hasExt(fleNme, extNme)) {
-        stop(sprintf("File name (%s) contains an unsupported file extension (%s).", basename(fleNme),
-          paste(paste0(".", extNme[tools::file_ext(fleNme) != extNme]), collapse = ", ")))
+    if (any(nzchar(tools::file_ext(fleNme))) && !hasExt(fleNme, extNme)) {
+        stop(sprintf("File name (%s) contains an unsupported file extension (%s).",
+                     basename(fleNme),
+                     paste(paste0(".", tools::file_ext(fleNme)[tools::file_ext(fleNme) != extNme]), collapse = ", ")))
     }
     TRUE
 }

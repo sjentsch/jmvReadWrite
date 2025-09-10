@@ -12,7 +12,7 @@
 #' @param selSet Name of the data set that is to be selected from the workspace (only applies when reading .RData-files)
 #' @param ...    Additional arguments passed on to methods; see Details below
 #'
-#' @return a data frame (only returned if `fleOut` is empty) where the order of variables / columns of the input data set is re-arranged
+#' @return a data frame (only returned if `fleOut` is empty) where a description and a title are added to the input data
 #'
 #' @details
 #' * The aim of this function is to add a title and a data set description to jamovi data files. Two typical use cases would be (1) to help creating data sets

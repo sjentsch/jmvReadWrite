@@ -34,7 +34,7 @@ base R), but "haven" is newer and more comprehensive}
 \item{...}{Additional arguments passed on to methods; see Details below}
 }
 \value{
-a data frame (only returned if \code{fleOut} is empty) where the order of variables / columns of the input data set is re-arranged
+a data frame (only returned if \code{fleOut} is empty) where a description and a title are added to the input data
 }
 \description{
 Adds a title and a description for a data set stored as .omv-file for the statistical spreadsheet 'jamovi' (\url{https://www.jamovi.org})

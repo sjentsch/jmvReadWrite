@@ -21,7 +21,8 @@ write_omv(
 
 \item{wrtPtB}{Whether to write protocol buffers (see Details; default: FALSE)}
 
-\item{frcWrt}{Whether to overwrite existing files with the same name (see Details; default: FALSE)}
+\item{frcWrt}{Whether to overwrite existing files with the same name (see
+Details; default: FALSE)}
 
 \item{retDbg}{Whether to return a list with debugging information (see
 Value; default: FALSE)}

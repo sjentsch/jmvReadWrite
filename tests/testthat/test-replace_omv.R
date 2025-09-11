@@ -34,7 +34,7 @@ test_that("replace_omv works", {
     expect_error(replace_omv(dtaInp = tmpDF, rplLst = list(c(1, 2), c(3, 4, 5), c(6, 7))),
       regexp = "^Calling replace_omv requires the parameter rplLst \\(a list where each entry is a vector with length 2; see Details in help\\)\\.")
     expect_error(replace_omv(fleInp = tmpDF, rplLst = list(c(1, 2))),    regexp = "^Please use the argument dtaInp instead of fleInp\\.")
-    expect_error(replace_omv(dtaInp = cbind(tmpDF, data.frame(AD2 = as.complex(tmpDF$age))), rplLst = list(c(24, NA))), regexp = "Variable type \\w+ not implemented:")
+    expect_error(replace_omv(dtaInp = cbind(tmpDF, data.frame(AD2 = as.complex(tmpDF$age))), rplLst = list(c(24, NA))), regexp = "Variable type \\w+ not implemented.")
     expect_error(replace_omv(dtaInp = tmpDF, rplLst = list(c(1, 6)), varInc = c("not_a_var")), regexp = "^All variables in varInc must be contained in the original data set \\(\\w+ are not\\)\\.")
     expect_error(replace_omv(dtaInp = tmpDF, rplLst = list(c(1, 6)), varExc = c("not_a_var")), regexp = "^All variables in varExc must be contained in the original data set \\(\\w+ are not\\)\\.")
 

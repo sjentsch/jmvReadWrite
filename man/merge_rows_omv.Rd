@@ -72,7 +72,6 @@ use \code{haven}, you may need to install it using \code{install.packages("haven
 }
 }
 \examples{
-\dontrun{
 dtaInp <- jmvReadWrite::bfi_sample2
 nmeInp <- paste0(tempfile(), "_", 1:3, ".rds")
 nmeOut <- tempfile(fileext = ".omv")
@@ -115,7 +114,7 @@ cat(dim(dtaInp), dim(dtaOut))
 # reduced by 3 (i.e., "A1", "A2", "A3")
 
 unlink(nmeInp)
-}
+
 
 }
 \seealso{

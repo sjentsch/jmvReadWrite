@@ -203,14 +203,27 @@ wide2long_omv <- function(dtaInp = NULL, fleOut = "", varLst = c(), varExc = c()
         crrNmV <- names(crrVry)
         dffSpl[crrPos] <- NA
     }
-    # remove attributes from reshape attached to the data set
+    # remove attributes from reshape attached to the data set, and row.names
     attr(dtaFrm, "reshapeLong") <- NULL
+    row.names(dtaFrm) <- NULL
 
-    # sort data set (if varSrt is not empty, otherwise sort after the first variable in varID (defining the participant)
-    dtaFrm <- srtFrm(dtaFrm, c(rep(varSrt, length(varSrt) > 0), rep(varID[1], length(varSrt) >= 0)))
     # correct the column order (ID should come first, otherwise the order is kept with the transformed variables inserted into
     # were the respective original (i.e., before the transformation) variables were
     dtaFrm <- dtaFrm[, ordCol(names(dtaFrm), dtaNmV, varID, varLst)]
+
+    # if varTme was a variable vector, assign the names in it to the columns beginning with the time prefix
+    if (length(varTme) > 1) {
+        selClm <- grepl(paste0("^", pfxTme), names(dtaFrm))
+        if (sum(selClm) == length(varTme)) {
+            names(dtaFrm)[selClm] <- varTme
+#           varID[grepl(paste0("^", pfxTme), varID)] <- varTme
+        } else {
+            warning("The number of splits (defined by the variables in varLst and varSep) is not matching the length of varTme.")
+        }
+    }
+
+    # sort data set (if varSrt is not empty, otherwise sort after the first variable in varID (defining the participant)
+    dtaFrm <- srtFrm(dtaFrm, c(rep(varSrt, length(varSrt) > 0), rep(varID[1], length(varSrt) >= 0)))
 
     # remove the jmv-id, and change the measurement type to "Nominal" (if it was ID; -> the ID variable may be used
     # in analyses, e.g. as random-effects-variable, and this wouldn't be possible if it were still marked as "ID")

@@ -142,7 +142,7 @@ test_that("describe_omv works", {
         expect_warning(df4Chk <- describe_omv(dtaInp = file.path("..", "ToothGrowth.omv"), dtaTtl = "ToothGrowth"),
           regexp = "^The data set contains analyses\\. Those will be overwritten\\.")
         expect_s3_class(df4Chk, "data.frame")
-        expect_equal(dim(df4Chk), c(60, 17))
+        expect_equal(dim(df4Chk), c(60, 16))
         expect_equal(names(attributes(df4Chk)), c("names", "row.names", "class", "fltLst", "removedRows", "addedRows", "transforms", "HTML", "protobuf"))
         expect_length(attr(df4Chk, "protobuf")[[1]]$options$options, 1)
         expect_equal(attr(df4Chk, "protobuf")[[1]]$options$names, c("results//heading"))

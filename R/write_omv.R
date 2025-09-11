@@ -31,7 +31,6 @@
 #'   file.
 #'
 #' @examples
-#' \dontrun{
 #' # use the data set "ToothGrowth" and, if it exists, write it as
 #' # jamovi-file using write_omv()
 #' jmvReadWrite::ToothGrowth
@@ -55,7 +54,7 @@
 #' print(file.info(nmeOut)$size)
 #' # -> approx. 2600 (size may differ on different OSes)
 #' unlink(nmeOut)
-#' }
+#'
 #'
 #' @export write_omv
 
@@ -66,18 +65,21 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", wrtPtB = FALSE, frcWrt = FALSE
     # check that the file name isn't empty, that the destination directory exists and that it ends in .omv
     fleOut <- nrmFle(fleOut)
     chkDir(fleOut)
-    chkExt(fleOut, "omv")
+    chkExt(fleOut, c("omv", "omt"))
     fleExs(fleOut, frcWrt)
 
-    # check whether dtaFrm is a data frame
-    # attach dataType and measureType attributes when inside jamovi
-    chkDtF(dtaFrm)
-    if (isJmv()) dtaFrm <- jmvAtt(dtaFrm)
+    # [1] handle the attributes "variable.labels" and "value.labels" in the format provided by the R-package "foreign"
+    #     the attribute "variable.labels" (attached to the data frame) is converted them to the format used by jamovi ("jmv-desc" attached to the data column)
+    # [2] clean tibble attributes, particularly convert haven_labelled to either factors or numeric / integer
+    if (chkAtt(dtaFrm, "variable.labels"))
+        dtaFrm <- clnFgn(dtaFrm)
+    if (methods::is(dtaFrm, "tbl_df") || any(vapply(dtaFrm, function(C) methods::is(C, "haven_labelled"), logical(1))))
+        dtaFrm <- clnTbb(dtaFrm, c("format.sas", "format.spss", "format.stata", "display_width"), jmvLbl = TRUE)
+    if (chkAtt(dtaFrm, "label.table"))
+        stop("R-foreign-style value labels need to be implemented. Please send the data file that caused this problem to sebastian.jentschke@uib.no")
 
-    # handle the attributes "variable.labels" and "value.labels" in the format provided bymtaDta <- mtaGlb the R-package "foreign"
-    # the attribute "variable.labels" (attached to the data frame) is converted them to the format used by jamovi ("jmv-desc" attached to the data column)
-    if (chkAtt(dtaFrm, "variable.labels")) dtaFrm <- fgnLbl(dtaFrm)
-    if (chkAtt(dtaFrm, "label.table")) stop("R-foreign-style value labels need to be implemented. Please send the data file that caused this problem to sebastian.jentschke@uib.no")
+    # check whether dtaFrm is a data frame, remove tibble attributes (if necessary) and attach dataType and measureType attributes
+    dtaFrm <- jmvAtt(dtaFrm, blnChC = TRUE)
 
     # initialize metadata.json
     mtaDta <- mtaGlb
@@ -91,7 +93,7 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", wrtPtB = FALSE, frcWrt = FALSE
     }
     mtaDta <- setAtt(names(mtaDta), dtaFrm, mtaDta)
     # the number of rows and columns has to be adjusted to the current data set
-    mtaDta$rowCount    <- nrow(dtaFrm)
+    mtaDta$rowCount    <- ifelse(hasExt(fleOut, "omt"), 0, nrow(dtaFrm))
     mtaDta$columnCount <- ncol(dtaFrm)
     # create the entries for storing the column specific information
     mtaDta$fields      <- rep(list(mtaFld), mtaDta$columnCount)
@@ -119,85 +121,49 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", wrtPtB = FALSE, frcWrt = FALSE
         # the first ("jmv-desc") takes precedence, if all are NULL, the content of mtaDta$fields serves as fallback-option
         mtaDta$fields[[i]][["description"]] <- c(attr(dtaFrm[[i]], "jmv-desc"), mtaDta$fields[[i]][["description"]], attr(dtaFrm[[i]], "label"))[1]
 
-        # assign column from the original data frame to crrCol (so that modifications don't affect the original)
-        crrCol <- dtaFrm[[i]]
-
-        # ID variables represent a special case and are therefore treated first
-        # if the jmv-id marker is set or if the measureType is set to "ID" in the original data, or if it is the first column that hasn't the attribute
-        # measureType attached, has values that are unique and not NA and is either a factor or an integer (rounded equals the original value)
-        if (isID(crrCol, i)) {
-            mtaDta$fields[[i]][["measureType"]] <- "ID"
-            mtaDta$fields[[i]][["dataType"]]    <- ifelse(chkAtt(dtaFrm[[i]], "dataType"), attr(dtaFrm[[i]], "dataType"), ifelse(is.numeric(crrCol), "Integer", "Text"))
-            mtaDta$fields[[i]][["type"]]        <- ifelse(is.numeric(crrCol), "integer", "string")
-        # afterwards, the different variable types for each column of the original data frame are tested
-        # an overview about how jamovi treats variable types internally and as which types they are written
-        # can be found in the function jmvAtt under globals.R
-        # [a] logical
-        } else if (is.logical(crrCol)) {
-            crrCol <- as.integer(crrCol)
-            mtaDta$fields[[i]][["dataType"]]    <- ifelse(chkAtt(dtaFrm[[i]], "dataType"), attr(dtaFrm[[i]], "dataType"), "Integer")
-            mtaDta$fields[[i]][["type"]]        <- "integer"
-            # measureType not set as the correct type ("Nominal") is already the default
-            xtdDta[[crrNme]] <- list(labels = lapply(0:1, function(i) list(i, as.character(i), as.character(i), FALSE)))
-            # NB: If jamovi imports RData / RDS-files, logical variables, labels are assigned as (0, "FALSE", "0", FALSE) and (1, "TRUE", "1", false)
-            #     however, using "0" and "1" instead of "FALSE" and "TRUE" seems to make more sense
-        # [b] factors or characters / strings
-        } else if (is.factor(crrCol) || is.character(crrCol)) {
-            crrCol <- prcFnC(crrCol, mtaDta$fields[[i]], dtaFrm[[i]], crrNme)
-            mtaDta$fields[[i]] <- attr(crrCol, "crrFld")
-            xtdDta[[crrNme]]   <- attr(crrCol, "crrLbl")
-        # [c] numerical (integer / decimals)
-        } else if (is.numeric(crrCol)) {
-            crrCol <- prcNum(crrCol, mtaDta$fields[[i]])
-            mtaDta$fields[[i]] <- attr(crrCol, "crrFld")
-        # [d] dates / times - jamovi actually doesn't support it but i perhaps makes most sense to implement it as numeric
-        # can be transformed back in R using - as.Date(..., origin = "1970-01-01") and hms::as_hms(...)
-        } else if (inherits(crrCol, c("Date", "POSIXt"))) {
-            crrCol <- as.numeric(crrCol)
-            mtaDta$fields[[i]][["type"]]        <- "number"
-            mtaDta$fields[[i]][["dataType"]]    <- "Decimal"
-            mtaDta$fields[[i]][["measureType"]] <- "Continuous"
-            mtaDta$fields[[i]][["description"]] <- paste(c(ifelse(nzchar(mtaDta$fields[[i]][["description"]]), mtaDta$fields[[i]][["description"]], crrNme),
-                                                         "(date converted to numeric; days since 1970-01-01)"), collapse = " ")
-        } else if (inherits(crrCol, c("difftime"))) {
-            crrCol <- as.numeric(crrCol)
-            mtaDta$fields[[i]][["type"]]        <- "number"
-            mtaDta$fields[[i]][["dataType"]]    <- "Decimal"
-            mtaDta$fields[[i]][["measureType"]] <- "Continuous"
-            mtaDta$fields[[i]][["description"]] <- paste(c(ifelse(nzchar(mtaDta$fields[[i]][["description"]]), mtaDta$fields[[i]][["description"]], crrNme),
-                                                         "(time converted to numeric; sec since 00:00)"), collapse = " ")
-        } else {
-            clsRmv()
-            stop(sprintf("Variable type %s not implemented. Please send the data file that caused this problem to sebastian.jentschke@uib.no", class(crrCol)))
-        }
-
         # remove atrributes that are only used with specific columnTypes
         mtaDta$fields[[i]] <- rmvMta(mtaDta$fields[[i]], dtaFrm[[i]])
 
-        # check that dataType, and measureType are set accordingly to type (attribute and column in the data frame)
-        # dataType: Text, Integer, Decimal
-        # cat(sprintf("%02d: %s - %s - %s - %s\n", i, mtaDta$fields[[i]][["name"]], mtaDta$fields[[i]][["type"]], mtaDta$fields[[i]][["dataType"]], mtaDta$fields[[i]][["measureType"]]))
+        # assign column from the original data frame to crrCol (so that modifications don't affect the original)
+        crrCol <- dtaFrm[[i]]
+
+        # factors: store labels / values in xdata.json and convert factors to integer for saving
+        if (is.factor(crrCol)) {
+            xtdDta[[crrNme]] <- xtdCol(crrCol, crrNme)
+            crrCol <- cnvCol(crrCol, "integer")
+        }
+
+        # keep value from "type" if it exists, otherwise determine and set "type" based upon whether the variable is an ID,
+        # and upon "dataType"
+        mtaDta$fields[[i]][["type"]] <- ifelse(chkAtt(crrCol, "type"), attr(crrCol, "type"),
+                                               gsub("decimal", "number",
+                                               gsub("text", ifelse(isID(crrCol), "string", "integer"), tolower(attr(crrCol, "dataType")))))
+
+        # for debugging: check that dataType, and measureType are set accordingly to type (attribute and column in the data frame)
+        #cat(do.call(sprintf, c(fmt = "%02d: %s - %s - %s - %s\n", c(i, mtaDta$fields[[i]][c("name", "type", "dataType", "measureType")]))))
 
         # write to data.bin according to type
-        if        (chkFld(mtaDta$fields[[i]], "type", "integer")) {
-            wrtCol <- as.integer(crrCol)
-        } else if (chkFld(mtaDta$fields[[i]], "type", "number"))  {
-            wrtCol <- as.double(crrCol)
-        } else if (chkFld(mtaDta$fields[[i]], "type", "string"))  {
-            wrtCol <- cnvStr(crrCol, strHdl, strPos)
-            strPos <- attr(wrtCol, "strPos")
-            wrtCol <- as.integer(wrtCol)
+        if (!hasExt(fleOut, "omt")) {
+            if        (chkFld(mtaDta$fields[[i]], "type", "integer")) {
+                wrtCol <- as.integer(crrCol)
+            } else if (chkFld(mtaDta$fields[[i]], "type", "number"))  {
+                wrtCol <- as.double(crrCol)
+            } else if (chkFld(mtaDta$fields[[i]], "type", "string"))  {
+                wrtCol <- cnvStr(crrCol, strHdl, strPos)
+                strPos <- attr(wrtCol, "strPos")
+                wrtCol <- as.integer(wrtCol)
+            }
+            writeBin(wrtCol, binHdl, endian = "little")
+            # remove temporary variables for writing the current column
+            rm(wrtCol)
         }
-        writeBin(wrtCol, binHdl, endian = "little")
 
-        # remove temporary variables for modifying and storing the current column from the data set
-        rm(crrCol, wrtCol)
+        # remove temporary variables for modifying the current column from the data set
+        rm(crrCol)
     }
 
-    # double check whether ID is unique
-    if (unqID(mtaDta$fields)) {
-        for (i in seq_along(mtaDta$fields)) mtaDta$fields[[i]][["id"]] <- i
-    }
+    # ensure that the column-ID is not empty(NA) and unique
+    mtaDta$fields <- unqID(mtaDta$fields)
 
     # compress data.bin and discard the temporary file
     add2ZIP(fleOut, crrHdl = binHdl)
@@ -255,9 +221,14 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", wrtPtB = FALSE, frcWrt = FALSE
 #        }
 #    }
 
-    # write ProtoBuffers
-    if (wrtPtB && chkPtB(dtaFrm, fleOut)) {
+    # write ProtoBuffers: if the argument wrtPtB is set and the data set contains no
+    # protobuffers, an error message is thrown; for templates, protobuffers are written
+    # (if they exist), but their non-existence doesn't result in an error message
+    if ((wrtPtB || hasExt(fleOut, "omt")) && hasPtB(dtaFrm)) {
         add2ZIP(fleOut, crrFle = c(names(attr(dtaFrm, "protobuf")[1]), "wb"), ptbOut = attr(dtaFrm, "protobuf")[[1]])
+    } else if (wrtPtB && !hasPtB(dtaFrm)) {
+        unlink(fleOut)
+        stop("The data frame (dtaFrm) must contain the attribute \"protobuf\", there has to be at least one of them, and it has to be of the correct type (a RProtoBuf).")
     }
 
     # handle weights
@@ -271,90 +242,100 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", wrtPtB = FALSE, frcWrt = FALSE
     }
 }
 
-prcFnC <- function(crrCol = NULL, crrFld = NULL, dtaCol = NULL, crrNme = c()) {
-    if (is.character(crrCol)) {
-        # if "dataType" is already stored in the data frame, keep it, otherwise determine whether the factor levels are more likely to be "Integer" or "Text"
-        crrFld[["dataType"]] <- ifelse(chkAtt(dtaCol, "dataType"), attr(dtaCol, "dataType"),
-                                              ifelse(!any(is.na(suppressWarnings(as.numeric(crrCol)))), "Integer", "Text"))
-        crrCol <- factor(trimws(crrCol), eval(parse(text = ifelse(crrFld[["dataType"]] == "Integer",
-                                                                  "as.character(sort(as.numeric(unique(trimws(crrCol)))))",
-                                                                  "sort(unique(trimws(crrCol)))"))))
-    }
-    if (chkAtt(dtaCol, "values") && !identical(attr(dtaCol, "values"), as.integer(attr(dtaCol, "levels")))) {
-        clsRmv()
-        stop(sprintf(paste("\"values\"-attribute with unexpected values found for column \"%s\".",
-                           "Please send the file to sebastian.jentschke@uib.no for debugging."), crrNme))
-    }
-    # NB: If jamovi imports RData / RDS-files, character variables are given "ID" (measureType) / "Text" (dataType)
-    #     however, converting them to factors and exporting those seems to make more sense
-    facLvl <- attr(crrCol, "levels")
-    # above must be kept at crrCol as the original column might be character and was converted above
-    facOrd <- is.ordered(dtaCol)
-    crrLbl <- NULL
-    if (chkAtt(dtaCol, "values")) {
-        crrCol <- attr(dtaCol, "values")[as.vector.factor(crrCol, mode = "integer")]
-        if (length(facLvl) > 0) {
-            crrLbl <- list(labels = lapply(seq_along(facLvl), function(j) list(attr(dtaCol, "values")[j], facLvl[[j]], facLvl[[j]], FALSE)))
+jmvAtt <- function(dtaFrm = NULL, blnChC = FALSE) {
+    chkDtF(dtaFrm)
+
+    for (i in seq_along(dtaFrm)) {
+        crrNme <- names(dtaFrm)[i]
+        # (a) jmv-id
+        # ID variables represent a special case and are therefore treated first
+        # if the jmv-id marker is set or if the measureType is set to "ID" in the original data, or if it is the first column that hasn't the attribute
+        # measureType attached, has values that are unique and not NA, is either a factor or an integer (rounded equals the original value) and has a
+        # name that (as lower-case) matches "id", "name" or "subject"
+        if (isID(dtaFrm[[i]], i, crrNme)) {
+            attr(dtaFrm[[i]], "jmv-id")      <- TRUE
+            attr(dtaFrm[[i]], "measureType") <- "ID"
+            attr(dtaFrm[[i]], "dataType")    <- "Text"
+            if (blnChC) dtaFrm[[i]] <- cnvCol(dtaFrm[[i]], "character")
+        # (b) date and time - jamovi doesn't support it natively, thus the transformation to integer;
+        # back-transformation in R: as.Date(..., origin = "1970-01-01") / hms::as_hms(...)
+        # NB: must come before the numerical variables since date values are an integer since R 4.5
+        } else if (isDnT(dtaFrm[[i]])) {
+            attr(dtaFrm[[i]], "measureType") <- "Continuous"
+            attr(dtaFrm[[i]], "dataType")    <- "Integer"
+            if (blnChC) {
+                # assign the description before the conversion (description depends on the original type)
+                attr(dtaFrm[[i]], "description") <- dscDnT(dtaFrm[[i]], crrNme)
+                dtaFrm[[i]] <- cnvCol(dtaFrm[[i]], "integer")
+            }
+        # (c) numerical variables, determine first whether the variable can be integer, if not, use / keep it numeric / float
+        } else if (is.numeric(dtaFrm[[i]])) {
+            attr(dtaFrm[[i]], "measureType") <- "Continuous"
+            attr(dtaFrm[[i]], "dataType")    <- ifelse(is.integer(dtaFrm[[i]]) || detInt(dtaFrm[[i]]), "Integer", "Decimal")
+        # (d) factors
+        } else if (is.factor(dtaFrm[[i]])) {
+            attr(dtaFrm[[i]], "measureType") <- ifelse(is.ordered(dtaFrm[[i]]), "Ordinal", "Nominal")
+            attr(dtaFrm[[i]], "dataType")    <- ifelse(!is.null(attr(dtaFrm[[i]], "values")) || intFnC(dtaFrm[[i]]), "Integer", "Text")
+        # (e) logical and character are converted to factor (if blnChC)
+        } else if (is.logical(dtaFrm[[i]]) || is.character(dtaFrm[[i]])) {
+            attr(dtaFrm[[i]], "measureType") <- "Nominal"
+            attr(dtaFrm[[i]], "dataType")    <- ifelse(is.logical(dtaFrm[[i]]) || intFnC(dtaFrm[[i]]), "Integer", "Text")
+            if (blnChC) dtaFrm[[i]] <- cnvCol(dtaFrm[[i]], "factor")
+        # variable type is not implemented
+        } else {
+            clsRmv()
+            stop(sprintf("\n\n%s: Variable type %s not implemented. Please send the data file that caused this problem to sebastian.jentschke@uib.no",
+              names(dtaFrm)[i], class(dtaFrm[[i]])))
         }
-    } else {
-        crrCol <- as.vector.factor(crrCol, mode = "integer") - 1
-        if (length(facLvl) > 0) {
-            crrLbl <- list(labels = lapply(seq_along(facLvl), function(j) list(j - 1,                     facLvl[[j]], facLvl[[j]], FALSE)))
-        }
+
     }
-    # if "dataType" is already stored in the data frame, keep it, otherwise determine whether the factor levels are more likely to be "Integer" or "Text"
-    crrFld[["dataType"]] <- ifelse(chkAtt(dtaCol, "dataType"), attr(dtaCol, "dataType"),
-        ifelse(chkAtt(dtaCol, "values"), "Integer",
-        ifelse(all(!is.na(suppressWarnings(as.integer(facLvl)))) && all(as.character(as.integer(facLvl)) == facLvl), "Integer", "Text")))
-    crrFld[["type"]]     <- "integer"
-    # if "measureType" is already stored in the data frame, keep it, otherwise set it to "Ordinal" if the properties indicate it to be likely
-    # ("Nominal" is already the default)
-    if (facOrd) crrFld[["measureType"]] <- ifelse(chkAtt(dtaCol, "measureType"), attr(dtaCol, "measureType"), "Ordinal")
-    # the code below permitted to "guess" whether a factor likely was ordered, but this lead to some problems when storing reshaped data
-#           if (facOrd || (chkFld(crrFld, "dataType", "Integer") && length(facLvl) > 5 && !any(is.na(c(as.integer(facLvl), crrCol))) &&
-#                          stats::sd(diff(as.integer(facLvl))) < diff(range(crrCol)) / 10)) {
-#               crrFld[["measureType"]] <- ifelse(chkAtt(dtaCol, "measureType"), attr(dtaCol, "measureType"), "Ordinal")
-#           }
 
-     attr(crrCol, "crrFld") <- crrFld
-     attr(crrCol, "crrLbl") <- crrLbl
-
-     crrCol
-}
-
-prcNum <- function(crrCol = NULL, crrFld = NULL) {
-    # determine type (how values are stored) and dataType (used by jamovi ~ R: Decimal ~ numeric, Integer ~ integer)
-    if        (chkAtt(crrCol, "dataType")) {
-        crrFld[["type"]]     <- gsub("decimal", "number", tolower(attr(crrCol, "dataType")))
-        crrFld[["dataType"]] <- attr(crrCol, "dataType")
-    } else if (detInt(crrCol)) {
-        crrFld[["type"]]     <- "integer"
-        crrFld[["dataType"]] <- "Integer"
-    } else {
-        crrFld[["type"]]     <- "number"
-        crrFld[["dataType"]] <- "Decimal"
-    }
-    # if "measureType" is already stored in the data frame, keep it; otherwise assign "Continuous" if the dataType is Decimal" or
-    crrFld[["measureType"]] <- ifelse(chkAtt(crrCol, "measureType"), attr(crrCol, "measureType"),
-                                        ifelse(crrFld[["dataType"]] == "Decimal" || detCnt(crrCol), "Continuous", crrFld[["measureType"]]))
-
-    attr(crrCol, "crrFld") <- crrFld
-    crrCol
+    dtaFrm
 }
 
 # determine whether a column is (i.e., can become) integer without loosing data
 detInt <- function(crrCol = NULL) {
-    !all(is.na(crrCol)) &&
+    is.numeric(crrCol) && !all(is.na(crrCol)) &&
     max(abs(crrCol), na.rm = TRUE) <= .Machine$integer.max &&
     all(abs(crrCol - round(crrCol)) < sqrt(.Machine$double.eps), na.rm = TRUE)
 }
 
 # determine whether a column likely should get the measureType "Continuous", requiring
 # that there are enough different values and a high value range and variability (sd)
-detCnt <- function(crrCol = NULL) {
-    length(unique(crrCol)) > length(crrCol) / 5 &&
-    length(unique(crrCol)) > diff(range(crrCol, na.rm = TRUE)) / 5 &&
-    stats::sd(crrCol, na.rm = TRUE) > diff(range(crrCol, na.rm = TRUE)) / 10
+#detCnt <- function(crrCol = NULL) {
+#    length(unique(crrCol)) > length(crrCol) / 5 &&
+#    length(unique(crrCol)) > diff(range(crrCol, na.rm = TRUE)) / 5 &&
+#    stats::sd(crrCol, na.rm = TRUE) > diff(range(crrCol, na.rm = TRUE)) / 10
+#}
+
+isDnT  <- function(crrCol) {
+    methods::is(crrCol, "Date") || methods::is(crrCol, "POSIXct") || methods::is(crrCol, "POSIXlt") || methods::is(crrCol, "difftime")
+}
+
+dscDnT <- function(crrCol = NULL, crrNme = "") {
+    paste(ifelse(chkAtt(crrCol, "description"), attr(crrCol, "description"), crrNme),
+          ifelse(methods::is(crrCol, "difftime"), "(time converted to integer; sec since 00:00)", "(date converted to integer; days since 1970-01-01)"))
+}
+
+xtdCol <- function(crrCol = NULL, crrNme = "") {
+    crrLvl <- levels(crrCol)
+    # ensure that the "values" attribute is correct
+    if (chkAtt(crrCol, "values") && all(grepl("^\\d+$", crrLvl)) &&
+      !identical(attr(crrCol, "values"), as.integer(attr(crrCol, "levels")))) {
+        clsRmv()
+        stop(sprintf(paste("\"values\"-attribute with unexpected values found for column \"%s\".",
+                           "Please send the file to sebastian.jentschke@uib.no for debugging."), crrNme))
+    }
+
+    # columns that have previously been logical or where all factor levels can be converted to integer
+    if        (chkAtt(crrCol, "dataType", "Integer") && identical(crrLvl, c("FALSE", "TRUE"))) {
+        return(list(labels = lapply(c(TRUE, FALSE),    function(l) list(as.integer(l), as.character(l), as.character(l), FALSE))))
+    } else if (chkAtt(crrCol, "dataType", "Integer") && intFnC(crrLvl)) {
+        return(list(labels = lapply(crrLvl,            function(l) list(as.integer(l),              l,               l,  FALSE))))
+    # columns that           or where not all factor levels can be converted to integer
+    } else if (chkAtt(crrCol, "dataType", "Text")) {
+        return(list(labels = lapply(seq_along(crrLvl), function(l) list(l - 1,               crrLvl[l],       crrLvl[l], FALSE))))
+    }
 }
 
 rmvMta <- function(crrFld = NULL, dtaCol = NULL) {
@@ -382,7 +363,6 @@ rmvMta <- function(crrFld = NULL, dtaCol = NULL) {
 }
 
 cnvStr <- function(crrCol = NULL, strHdl = NULL, strPos = NA) {
-    if (!is.character(crrCol)) crrCol <- as.character(crrCol)
     crrCol[is.na(crrCol)] <- ""
     wrtCol <- rep(NA, length(crrCol))
     for (j in seq_along(crrCol)) {
@@ -396,9 +376,13 @@ cnvStr <- function(crrCol = NULL, strHdl = NULL, strPos = NA) {
     wrtCol
 }
 
-unqID <- function(allFld = NULL) {
-    id_Lst <- unlist(lapply(seq_along(allFld), function(i) allFld[[i]][["id"]]))
-    any(is.na(id_Lst)) || any(duplicated(id_Lst))
+unqID <- function(mtaFld = NULL) {
+    id_Lst <- unlist(lapply(seq_along(mtaFld), function(i) mtaFld[[i]][["id"]]))
+    if (any(is.na(id_Lst)) || any(duplicated(id_Lst))) {
+        for (i in seq_along(mtaFld)) mtaFld[[i]][["id"]] <- i
+    }
+
+    mtaFld
 }
 
 fleExs <- function(fleOut = c(), frcWrt = FALSE) {
@@ -411,19 +395,15 @@ fleExs <- function(fleOut = c(), frcWrt = FALSE) {
     }
 }
 
-isID <- function(crrCol = NULL, i = NA) {
+isID <- function(crrCol = NULL, i = NA, crrNme = "") {
     chkAtt(crrCol, "jmv-id", TRUE) || chkAtt(crrCol, "measureType", "ID") ||
-           (i == 1 && !chkAtt(crrCol, "measureType") && !any(duplicated(crrCol) | is.na(crrCol)) &&
-           (is.character(crrCol) || is.factor(crrCol) || (is.numeric(crrCol) && all(crrCol %% 1 == 0))))
+           (i == 1 && !chkAtt(crrCol, "jmv-id") && !chkAtt(crrCol, "measureType") && !any(duplicated(crrCol) | is.na(crrCol)) &&
+           (is.character(crrCol) || is.factor(crrCol) || (is.numeric(crrCol) && all(crrCol %% 1 == 0))) &&
+           (tolower(crrNme) %in% c("id", "name", "subject")))
 }
 
-chkPtB <- function(dtaFrm = NULL, fleOut = c()) {
-    if (is.null(attr(dtaFrm, "protobuf")) || length(attr(dtaFrm, "protobuf")) < 1 || !inherits(attr(dtaFrm, "protobuf")[[1]], "Message")) {
-        unlink(fleOut)
-        stop("The data frame (dtaFrm) must contain the attribute \"protobuf\", there has to be at least one of them, and it has to be of the correct type (a RProtoBuf).")
-    }
-
-    TRUE
+hasPtB <- function(dtaFrm = NULL) {
+    chkAtt(dtaFrm, "protobuf") && inherits(attr(dtaFrm, "protobuf")[[1]], "Message")
 }
 
 # convert to JSON and do some beatifying (adding spaces for increased legibility)
@@ -521,7 +501,7 @@ add2ZIP <- function(fleZIP = "", crrHdl = NULL, crrFle = c(), txtOut = "", ptbOu
     # if a file name is given, open a connection, write whatever is required
     } else if (is.character(crrFle)) {
         crrFle[1] <- rmvTmp(crrFle[1])
-        if (dirname(crrFle[1]) != "." && !dir.exists(file.path(tempdir(), dirname(crrFle[1])))) dir.create(file.path(tempdir(), dirname(crrFle[1])))
+        crtDir(crrFle)
         crrHdl <- file(file.path(tempdir(), crrFle[1]), open = ifelse(length(crrFle) > 1, crrFle[2], "w"))
         if        (all(nzchar(txtOut))) {
             # writing the manifest requires a bit of special handling because of \r\n on Windows vs. \n on Mac / Linux
@@ -538,10 +518,22 @@ add2ZIP <- function(fleZIP = "", crrHdl = NULL, crrFle = c(), txtOut = "", ptbOu
         if (file.exists(fleZIP)) do.call(zip::zip_append, crrPrm) else do.call(zip::zip, crrPrm)
     }
 
-    if (dirname(crrFle[1]) == ".") unlink(file.path(tempdir(), crrFle[1])) else unlink(file.path(tempdir(), dirname(crrFle[1])), recursive = TRUE)
+    delTmp(crrFle)
     rm(crrFle, crrHdl)
 
     return(TRUE)
+}
+
+crtDir <- function(crrFle = c()) {
+    if (dirname(crrFle[1]) != "." && !dir.exists(file.path(tempdir(), dirname(crrFle[1])))) dir.create(file.path(tempdir(), dirname(crrFle[1])))
+
+    return(invisible(NULL))
+}
+
+delTmp <- function(crrFle = c()) {
+    if (dirname(crrFle[1]) == ".") unlink(file.path(tempdir(), crrFle[1])) else unlink(file.path(tempdir(), dirname(crrFle[1])), recursive = TRUE)
+
+    return(invisible(NULL))
 }
 
 rmvTmp <- function(fleNme = "") {

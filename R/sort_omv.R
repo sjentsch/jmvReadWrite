@@ -31,7 +31,6 @@
 #'   SAS-data-files, and [haven::read_xpt()] or [foreign::read.xport()] for SAS-transport-files.
 #'
 #' @examples
-#' \dontrun{
 #' nmeInp <- system.file("extdata", "AlbumSales.omv", package = "jmvReadWrite")
 #' nmeOut <- tempfile(fileext = ".omv")
 #' jmvReadWrite::sort_omv(dtaInp = nmeInp, fleOut = nmeOut, varSrt = "Image")
@@ -52,7 +51,7 @@
 #' cat(is.unsorted(-dtaFrm$Image))
 #' # if the sign of the variable is changed, it returns FALSE (i.e., the variable is
 #' # NOT unsorted)
-#' }
+#'
 #'
 #' @export sort_omv
 #'
@@ -83,10 +82,10 @@ srtFrm <- function(dtaFrm = NULL, varSrt = c()) {
                 paste0(s, "dtaFrm[[\"", sub("^-", "", x), "\"]]"))
             }, character(1)), collapse = ", "), ")")))
         # sorting makes the data.frame lose it's attributes which are therefore stored and later restored
-        attMem <- lapply(dtaFrm, attributes)
+        attLst <- bckAtt(dtaFrm)
         dtaFrm <- dtaFrm[srtOrd, , drop = FALSE]
         rownames(dtaFrm) <- NULL
-        for (n in names(attMem)[!vapply(attMem, is.null, logical(1))]) attributes(dtaFrm[[n]]) <- attMem[[n]]
+        dtaFrm <- rstAtt(dtaFrm, attLst)
     }
 
     dtaFrm

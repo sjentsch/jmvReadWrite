@@ -1,16 +1,18 @@
 test_that("wide2long_omv works", {
-    # rather simple data set ("." as varSep) ==================================================================================================================
+    # rather simple data set ("." as varSep) ==========================================================================
     set.seed(1)
-    dtaTmp <- cbind(data.frame(Year = 1900:2020), as.data.frame(matrix(runif(121 * 12, 0, 100), nrow = 121, dimnames = list(1:121, paste0("X.", month.abb[1:12])))))
-    for (i in 1:12) attr(dtaTmp[[i + 1]], "jmv-desc") <- paste0("Test variable (Month: ", month.abb[i], ")")
+    nmeTmp <- list(seq(121), paste0("X.", month.abb[seq(12)]))
+    dtaTmp <- cbind(data.frame(Year = 1900:2020), as.data.frame(matrix(runif(121 * 12, 0, 100), nrow = 121, dimnames = nmeTmp)))
+    for (i in seq(12)) attr(dtaTmp[[i + 1]], "jmv-desc") <- paste0("Test variable (Month: ", month.abb[i], ")")
     nmeInp <- tempfile(fileext = ".rds")
     nmeOut <- tempfile(fileext = "_L.omv")
     saveRDS(dtaTmp, nmeInp)
 
-    expect_null(wide2long_omv(dtaInp = nmeInp, fleOut = nmeOut, varLst = setdiff(names(dtaTmp), "Year"), varID = "Year", varTme = "Month", varSep = "."))
+    expect_null(wide2long_omv(dtaInp = nmeInp, fleOut = nmeOut, varLst = setdiff(names(dtaTmp), "Year"),
+                              varID = "Year", varTme = "Month", varSep = "."))
     df4Chk <- read_omv(nmeOut)
     expect_s3_class(df4Chk, "data.frame")
-    expect_equal(dim(df4Chk), c(1452, 3))
+    expect_equal(dim(df4Chk), c(121 * 12, 3))
     expect_equal(vapply(df4Chk, typeof, character(1), USE.NAMES = FALSE), c("integer", "integer", "double"))
     expect_equal(names(df4Chk), c("Year", "Month", "X"))
     expect_equal(names(attributes(df4Chk)), c("names", "row.names", "class", "removedRows", "addedRows", "transforms"))
@@ -20,18 +22,35 @@ test_that("wide2long_omv works", {
     expect_equal(c(mean(df4Chk[[3]]), sd(df4Chk[[3]])), c(49.33121, 28.93480), tolerance = 1e-4)
     unlink(nmeOut)
 
-    # rather simple data set ("_" as varSep) ==================================================================================================================
+    expect_null(wide2long_omv(dtaInp = nmeInp, fleOut = nmeOut, varLst = setdiff(names(dtaTmp), "Year"), varID = "Year", varSep = "."))
+    df4Chk <- read_omv(nmeOut)
+    expect_s3_class(df4Chk, "data.frame")
+    expect_equal(dim(df4Chk), c(121 * 12, 3))
+    expect_equal(vapply(df4Chk, typeof, character(1), USE.NAMES = FALSE), c("integer", "integer", "double"))
+    expect_equal(names(df4Chk), c("Year", "cond", "X"))
+    expect_equal(names(attributes(df4Chk)), c("names", "row.names", "class", "removedRows", "addedRows", "transforms"))
+    expect_equal(names(attributes(df4Chk[[3]])), c("jmv-desc", "name", "id", "columnType", "dataType", "measureType", "formula", "formulaMessage",
+                                                   "parentId", "width", "type", "importName", "description", "transform", "edits", "missingValues"))
+    expect_equal(attr(df4Chk[[3]], "jmv-desc"), "Test variable")
+    expect_equal(c(mean(df4Chk[[3]]), sd(df4Chk[[3]])), c(49.33121, 28.93480), tolerance = 1e-4)
+    unlink(nmeOut)
+
+    unlink(nmeInp)
+
+    # rather simple data set ("_" as varSep) ==========================================================================
     set.seed(1)
-    dtaTmp <- cbind(data.frame(Year = 1900:2020), as.data.frame(matrix(runif(121 * 12, 0, 100), nrow = 121, dimnames = list(1:121, paste0("X_", month.abb[1:12])))))
-    for (i in 1:12) attr(dtaTmp[[i + 1]], "jmv-desc") <- paste0("Test variable (Month: ", month.abb[i], ")")
+    nmeTmp <- list(seq(121), paste0("X_", month.abb[seq(12)]))
+    dtaTmp <- cbind(data.frame(Year = 1900:2020), as.data.frame(matrix(runif(121 * 12, 0, 100), nrow = 121, dimnames = nmeTmp)))
+    for (i in seq(12)) attr(dtaTmp[[i + 1]], "jmv-desc") <- paste0("Test variable (Month: ", month.abb[i], ")")
     nmeInp <- tempfile(fileext = ".rds")
     nmeOut <- tempfile(fileext = "_L.omv")
     saveRDS(dtaTmp, nmeInp)
 
-    expect_null(wide2long_omv(dtaInp = nmeInp, fleOut = nmeOut, varLst = setdiff(names(dtaTmp), "Year"), varID = "Year", varTme = "Month", varSep = "_"))
+    expect_null(wide2long_omv(dtaInp = nmeInp, fleOut = nmeOut, varLst = setdiff(names(dtaTmp), "Year"),
+                              varID = "Year", varTme = "Month", varSep = "_"))
     df4Chk <- read_omv(nmeOut)
     expect_s3_class(df4Chk, "data.frame")
-    expect_equal(dim(df4Chk), c(1452, 3))
+    expect_equal(dim(df4Chk), c(121 * 12, 3))
     expect_equal(vapply(df4Chk, typeof, character(1), USE.NAMES = FALSE), c("integer", "integer", "double"))
     expect_equal(names(df4Chk), c("Year", "Month", "X"))
     expect_equal(names(attributes(df4Chk)), c("names", "row.names", "class", "removedRows", "addedRows", "transforms"))
@@ -41,11 +60,12 @@ test_that("wide2long_omv works", {
     expect_equal(c(mean(df4Chk[[3]]), sd(df4Chk[[3]])), c(49.33121, 28.93480), tolerance = 1e-4)
     unlink(nmeOut)
 
-    expect_null(wide2long_omv(dtaInp = nmeInp, fleOut = nmeOut, varLst = setdiff(names(dtaTmp), "Year"), varID = "Year", varTme = "Month", varSep = "_"))
+    expect_null(wide2long_omv(dtaInp = nmeInp, fleOut = nmeOut, varLst = setdiff(names(dtaTmp), "Year"), varID = "Year"))
     df4Chk <- read_omv(nmeOut)
     expect_s3_class(df4Chk, "data.frame")
-    expect_equal(dim(df4Chk), c(1452, 3))
+    expect_equal(dim(df4Chk), c(121 * 12, 3))
     expect_equal(vapply(df4Chk, typeof, character(1), USE.NAMES = FALSE), c("integer", "integer", "double"))
+    expect_equal(names(df4Chk), c("Year", "cond", "X"))
     expect_equal(names(attributes(df4Chk)), c("names", "row.names", "class", "removedRows", "addedRows", "transforms"))
     expect_equal(names(attributes(df4Chk[[3]])), c("jmv-desc", "name", "id", "columnType", "dataType", "measureType", "formula", "formulaMessage",
                                                    "parentId", "width", "type", "importName", "description", "transform", "edits", "missingValues"))
@@ -53,21 +73,22 @@ test_that("wide2long_omv works", {
     expect_equal(c(mean(df4Chk[[3]]), sd(df4Chk[[3]])), c(49.33121, 28.93480), tolerance = 1e-4)
     unlink(nmeOut)
 
-    expect_null(wide2long_omv(dtaInp = nmeInp, fleOut = nmeOut, varLst = setdiff(names(dtaTmp), "Year"), varID = "Year", varTme = "Month", varSrt = c("Year", "Month")))
+    expect_null(wide2long_omv(dtaInp = nmeInp, fleOut = nmeOut, varLst = setdiff(names(dtaTmp), "Year"),
+                              varID = "Year", varTme = "Month", varSrt = c("Year", "Month")))
     df4Chk <- read_omv(nmeOut)
     expect_s3_class(df4Chk, "data.frame")
-    expect_equal(dim(df4Chk), c(1452, 3))
+    expect_equal(dim(df4Chk), c(121 * 12, 3))
     expect_false(is.unsorted(df4Chk[["Year"]]))
     expect_true(all(df4Chk[["Month"]] == rep(sort(month.abb), length(unique(df4Chk[["Year"]])))))
     unlink(nmeOut)
 
-    df4Chk <- wide2long_omv(dtaInp = nmeInp, varLst = setdiff(names(dtaTmp), "Year"), varID = "Year", varTme = "Month", varSrt = c("Year", "Month"))
+    df4Chk <- wide2long_omv(dtaInp = nmeInp, varLst = setdiff(names(dtaTmp), "Year"), varID = "Year",
+                            varTme = "Month", varSrt = c("Year", "Month"))
     expect_s3_class(df4Chk, "data.frame")
-    expect_equal(dim(df4Chk), c(1452, 3))
+    expect_equal(dim(df4Chk), c(121 * 12, 3))
     expect_false(is.unsorted(df4Chk[["Year"]]))
     expect_true(all(df4Chk[["Month"]] == rep(sort(month.abb), length(unique(df4Chk[["Year"]])))))
 
-    # test cases for code coverage ============================================================================================================================
     expect_error(wide2long_omv(fleInp = nmeInp, varID = "Year", varTme = "Month", varSep = "_"), regexp = "Please use the argument dtaInp instead of fleInp\\.")
     expect_error(wide2long_omv(dtaInp = dtaTmp, fleOut = nmeOut, varLst = names(dtaTmp), varTme = "Month", varSep = "_", varSrt = c("Year", "Month")),
       regexp = "^\\s+The variable separator \\(.*\\) must be contained in all variables in the variable list \\(varLst\\)\\.")
@@ -92,8 +113,7 @@ test_that("wide2long_omv works", {
     expect_error(ordCol(varNme = c("Year", "Month", "X"), dtaNmV = names(dtaTmp), varID = c("Year", "Trial"), varLst = names(dtaTmp)[-1]),
       regexp = "^Mismatch between old and new variable order - old: .*; new: .*\\.")
 
-
-    dtaTmp <- data.frame(ID = as.character(1:121), A = runif(121), B = runif(121), C = runif(121))
+    dtaTmp <- data.frame(ID = as.character(seq(121)), A = runif(121), B = runif(121), C = runif(121))
     attributes(dtaTmp[[1]]) <- list(`jmv-id` = TRUE, measureType = "ID")
     expect_output(wide2long_omv(dtaInp = dtaTmp, fleOut = nmeOut, varSep = "", varID = "ID"),
                   "Variable list \\(varLst\\) was generated using all variables in the data frame except those defined in varExc or varID \\(ID\\).")
@@ -104,8 +124,9 @@ test_that("wide2long_omv works", {
     expect_equal(vapply(df4Chk, class, character(1), USE.NAMES = FALSE), c("factor", "factor", "numeric"))
     expect_equal(table(df4Chk$cond), table(c(rep("A", 121), rep("B", 121), rep("C", 121))))
 
+    unlink(nmeInp)
 
-    # more complex data set ===================================================================================================================================
+    # more complex data set ===========================================================================================
     set.seed(1)
     tgtTmp <- c(0.002, 0.03, 0.02, 0.450, 0.530, 0.510)
     dtaTmp <- cbind(data.frame(ID = as.factor(sprintf("sbj_%03d", seq(100))), sex = as.factor(sample(rep(c("female", "male"), 50)))),
@@ -135,8 +156,93 @@ test_that("wide2long_omv works", {
     expect_equal(df4Chk[, "cond3"], as.factor(rep(rep(c("BLUE", "GREEN", "RED", "YELLOW"), each = 2), times = 600)))
     expect_equal(df4Chk[, "cond4"], as.factor(rep(c("1", "2"), times = 2400)))
     expect_equal(unname(colMeans(dtaTmp[3:50])), aggregate(x = df4Chk[, "measure", drop = FALSE], by = df4Chk[, c("cond4", "cond3", "cond2", "cond1")], FUN = mean)[, 5])
-
-
     unlink(nmeOut)
+
+    # more complex data set, varTme as a vector =======================================================================
+    set.seed(1)
+    nmeTmp <- list(seq(121), sprintf("X_%s_T%d", rep(month.abb[seq(12)], each = 2), rep(seq(2), 12)))
+    dtaTmp <- cbind(data.frame(Year = 1900:2020), as.data.frame(matrix(runif(121 * 24, 0, 100), nrow = 121, dimnames = nmeTmp)))
+    for (i in seq(12)) for (j in seq(2)) attr(dtaTmp[[i * 2 + j - 1]], "jmv-desc") <- sprintf("Test variable (Month: %s, Test: T%d)", month.abb[i], j)
+    nmeInp <- tempfile(fileext = ".rds")
+    nmeOut <- tempfile(fileext = "_L.omv")
+    saveRDS(dtaTmp, nmeInp)
+
+    expect_null(wide2long_omv(dtaInp = nmeInp, fleOut = nmeOut, varLst = setdiff(names(dtaTmp), "Year"), varID = "Year",
+                              varTme = c("Month", "Test"), varSep = "_"))
+    df4Chk <- read_omv(nmeOut)
+    expect_s3_class(df4Chk, "data.frame")
+    expect_equal(dim(df4Chk), c(121 * 24, 4))
+    expect_equal(vapply(df4Chk, typeof, character(1), USE.NAMES = FALSE), c(rep("integer", 3), "double"))
+    expect_equal(names(df4Chk), c("Year", "Month", "Test", "X"))
+    expect_equal(names(attributes(df4Chk)), c("names", "row.names", "class", "removedRows", "addedRows", "transforms"))
+    expect_equal(names(attributes(df4Chk[[4]])), c("jmv-desc", "name", "id", "columnType", "dataType", "measureType", "formula", "formulaMessage",
+                                                   "parentId", "width", "type", "importName", "description", "transform", "edits", "missingValues"))
+    expect_equal(attr(df4Chk[[4]], "jmv-desc"), "Test variable")
+    expect_equal(c(mean(df4Chk[[4]]), sd(df4Chk[[4]])), c(49.30143, 29.22032), tolerance = 1e-4)
+    unlink(nmeOut)
+
+    expect_null(wide2long_omv(dtaInp = nmeInp, fleOut = nmeOut, varLst = setdiff(names(dtaTmp), "Year"), varID = "Year", varSep = "_"))
+    df4Chk <- read_omv(nmeOut)
+    expect_s3_class(df4Chk, "data.frame")
+    expect_equal(dim(df4Chk), c(121 * 24, 4))
+    expect_equal(vapply(df4Chk, typeof, character(1), USE.NAMES = FALSE), c(rep("integer", 3), "double"))
+    expect_equal(names(df4Chk), c("Year", "cond1", "cond2", "X"))
+    expect_equal(names(attributes(df4Chk)), c("names", "row.names", "class", "removedRows", "addedRows", "transforms"))
+    expect_equal(names(attributes(df4Chk[[4]])), c("jmv-desc", "name", "id", "columnType", "dataType", "measureType", "formula", "formulaMessage",
+                                                   "parentId", "width", "type", "importName", "description", "transform", "edits", "missingValues"))
+    expect_equal(attr(df4Chk[[4]], "jmv-desc"), "Test variable")
+    expect_equal(c(mean(df4Chk[[4]]), sd(df4Chk[[4]])), c(49.30143, 29.22032), tolerance = 1e-4)
+    unlink(nmeOut)
+
+    expect_warning(wide2long_omv(dtaInp = nmeInp, fleOut = nmeOut, varLst = setdiff(names(dtaTmp), "Year"),
+                                 varID = "Year", varTme = c("Month", "Test", "AddCol")),
+                   regexp = "The number of splits \\(defined by the variables in varLst and varSep\\) is not matching the length of varTme\\.")
+    df4Chk <- read_omv(nmeOut)
+    expect_s3_class(df4Chk, "data.frame")
+    expect_equal(dim(df4Chk), c(121 * 24, 4))
+    expect_equal(vapply(df4Chk, typeof, character(1), USE.NAMES = FALSE), c(rep("integer", 3), "double"))
+    expect_equal(names(df4Chk), c("Year", "cond1", "cond2", "X"))
+    expect_equal(names(attributes(df4Chk)), c("names", "row.names", "class", "removedRows", "addedRows", "transforms"))
+    expect_equal(names(attributes(df4Chk[[4]])), c("jmv-desc", "name", "id", "columnType", "dataType", "measureType", "formula", "formulaMessage",
+                                                   "parentId", "width", "type", "importName", "description", "transform", "edits", "missingValues"))
+    expect_equal(attr(df4Chk[[4]], "jmv-desc"), "Test variable")
+    expect_equal(c(mean(df4Chk[[4]]), sd(df4Chk[[4]])), c(49.30143, 29.22032), tolerance = 1e-4)
+    unlink(nmeOut)
+
+    expect_null(wide2long_omv(dtaInp = nmeInp, fleOut = nmeOut, varLst = setdiff(names(dtaTmp), "Year"), varID = "Year",
+                              varTme = c("Month", "Test"), varSrt = c("Year", "Month")))
+    df4Chk <- read_omv(nmeOut)
+    expect_s3_class(df4Chk, "data.frame")
+    expect_equal(dim(df4Chk), c(121 * 24, 4))
+    expect_false(is.unsorted(df4Chk[["Year"]]))
+    expect_true(all(df4Chk[["Month"]] == rep(rep(sort(month.abb), each = 2), length(unique(df4Chk[["Year"]])))))
+    unlink(nmeOut)
+
+    df4Chk <- wide2long_omv(dtaInp = nmeInp, varLst = setdiff(names(dtaTmp), "Year"), varID = "Year",
+                            varTme = c("Month", "Test"), varSrt = c("Year", "Month"))
+    expect_s3_class(df4Chk, "data.frame")
+    expect_equal(dim(df4Chk), c(121 * 24, 4))
+    expect_false(is.unsorted(df4Chk[["Year"]]))
+    expect_true(all(df4Chk[["Month"]] == rep(rep(sort(month.abb), each = 2), length(unique(df4Chk[["Year"]])))))
+
+    expect_null(wide2long_omv(dtaInp = nmeInp, fleOut = nmeOut, varLst = setdiff(names(dtaTmp), "Year"), varID = "Year",
+                              varTme = c("Month", "Test"), varSrt = c("Year", "Test", "Month")))
+    df4Chk <- read_omv(nmeOut)
+    expect_s3_class(df4Chk, "data.frame")
+    expect_equal(dim(df4Chk), c(121 * 24, 4))
+    expect_false(is.unsorted(df4Chk[["Year"]]))
+    expect_true(all(df4Chk[["Month"]] == rep(sort(month.abb), length(unique(df4Chk[["Year"]])) * 2)))
+    unlink(nmeOut)
+
+    expect_error(wide2long_omv(dtaInp = nmeInp, varLst = setdiff(names(dtaTmp), "Year"),
+                               varID = "Year", varSrt = c("Year", "Month", "AddCol")),
+      regexp = "The variable\\(s\\) Month, AddCol are not contained in the current data set\\.")
+
+    expect_error(
+      expect_warning(wide2long_omv(dtaInp = nmeInp, varLst = setdiff(names(dtaTmp), "Year"),
+                                   varID = "Year", varTme = c("Year", "Month", "AddCol"), varSrt = c("Year", "Month", "AddCol")),
+                     regexp = "The number of splits \\(defined by the variables in varLst and varSep\\) is not matching the length of varTme\\."),
+      regexp = "The variable\\(s\\) Month, AddCol are not contained in the current data set\\.")
+
     unlink(nmeInp)
 })

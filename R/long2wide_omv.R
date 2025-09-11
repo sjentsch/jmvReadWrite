@@ -45,7 +45,6 @@
 #'   [foreign::read.dta()] for Stata-files, [haven::read_sas()] for SAS-data-files, and [haven::read_xpt()] or [foreign::read.xport()] for SAS-transport-files.
 #'
 #' @examples
-#' \dontrun{
 #' # generate a test dataframe with 100 (imaginary) participants / units of
 #' #  observation (ID), 8 measurement (measure) of one variable (X)
 #' dtaInp <- data.frame(ID = rep(as.character(seq(1, 100)), each = 8),
@@ -96,7 +95,7 @@
 #'
 #' unlink(nmeInp)
 #' unlink(nmeOut)
-#' }
+#'
 #'
 #' @export long2wide_omv
 #'

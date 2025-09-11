@@ -50,7 +50,6 @@ and \code{read_xpt} (\code{haven}) / \code{read.xport} (\code{foreign}) for SAS-
 }
 }
 \examples{
-\dontrun{
 set.seed(1)
 tmpDF <- stats::setNames(as.data.frame(matrix(sample(6, 1200, replace = TRUE), nrow = 16)),
                          sprintf("sbj_\%03d", seq(75)))
@@ -71,7 +70,7 @@ str(dtaFrm)
 # alternatively, the character vector with the desired variable names (of the same length as
 # the number of rows in tmpDF) may be given, "Trl" can easily be exchanged by the name of your
 # questionnaire, experimental conditions, etc.
-}
+
 
 }
 \seealso{

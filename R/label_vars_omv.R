@@ -33,7 +33,6 @@
 #'   SAS-data-files, and [haven::read_xpt()] or [foreign::read.xport()] for SAS-transport-files.
 #'
 #' @examples
-#' \dontrun{
 #' # use one of the data files included in the package, but only the first 28 columns
 #' # (the latter columns contain data for testing calculations, etc.)
 #' nmeInp <- system.file("extdata", "bfi_sample.omv", package = "jmvReadWrite")
@@ -66,7 +65,7 @@
 #' jmvReadWrite::label_vars_omv(dtaInp = dtaInp, fleOut = nmeOut, varLbl = lblChr)
 #' lapply(jmvReadWrite::read_omv(nmeOut), attr, "jmv-desc")
 #' unlink(nmeOut)
-#' }
+#'
 #'
 #' @export label_vars_omv
 #'

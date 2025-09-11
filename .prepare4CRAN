@@ -1,6 +1,4 @@
 # compare the files in inst/extdata (write and read again)
-for (crrFle in list.files('R')) { source(file.path('R', crrFle)) }
-OR
 devtools::load_all()
 
 for (blnAtt in c(TRUE, FALSE)) {
@@ -39,6 +37,9 @@ devtools::test_coverage()
 covr::codecov(token = "2f521d97-d1e2-4baf-b05b-0b569a7c6f0f")  # jmvReadWrite
 covr::codecov(token = "821f2b2f-e305-49b2-ab96-7f328530f6ed")  # jTransform
 
+# some sed commands to correct common misformattings
+#sed -i -e's/[[:space:]]*$//' R/*.R && sed -i '${/^$/d}' R/*.R && sed -i 's/=/ = /g' R/*.h.R && sed -i 's/  =  / = /g' R/*.h.R && sed -i 's/ = = / == /g' R/*.h.R && sed -i 's/c(1,0,0)/c(1, 0, 0)/' R/*.h.R && sed -i "s/'auto'/\"auto\"/" R/*.h.R
+
 # ================================================================================================================================================
 # REMEMBER: error messages from R are not always pointing to the place where the error occurs - especially when using commands like build_readme()
 # ================================================================================================================================================
@@ -48,12 +49,20 @@ system("gedit DESCRIPTION NEWS.md inst/CITATION")  # jmvReadWrite
 
 # building / updating README, PDF manual, and the HTML documentation
 # add new functions to _pkgdown.yml and to vignettes/jmvReadWrite.Rmd if required
+#system("gedit _pkgdown.yml vignettes/jmvReadWrite.Rmd")  # jmvReadWrite
 devtools::build_readme()
 pkgdown::clean_site()
 pkgdown::build_site()
 pkgdown::build_reference(run_dont_run = TRUE, preview = FALSE)
 pkgdown::build_reference_index()
-devtools::build_manual(path="doc")
+devtools::build_manual(path = "doc")
+# NB: build_manual uses LaTeX which needs to be installed using those steps (on Ubuntu):
+# (1) sudo apt install texlive-latex-base 
+# (2) tlmgr init-usertree
+# (3) tlmgr option repository https://pi.kwarc.info/historic/systems/texlive/2023/tlnet-final
+# NB: (a) https://pi.kwarc.info is a mirror of TeX materials, see here for other options: https://tug.org/historic/;
+#     (b) adjust 2023 to the TexLive version on the system
+# (4) tlmgr install inconsolata xkeyval times
 
 # the package itself (tar.gz) - build() also builds vignettes
 # ping-pong between build() and check() until all errors, warnings, notes are resolved 
@@ -64,6 +73,8 @@ devtools::check(force_suggests = TRUE, incoming = TRUE, remote = TRUE, env_vars 
 devtools::check_win_devel()
 
 # the next stage of ping-pong, either build on the standard platforms
+# NB: ensure that everything is commited; rhub runs on the code on GitHub!
+# ------------------------------------------------------------------------
 #rhub::rc_submit(platforms=c("linux", "windows", "macos", "macos-arm64"))
 rhub::rhub_check(platforms=c("linux", "windows", "macos", "macos-arm64"))
 # running github actions requires a personal access token: https://github.com/settings/profile
@@ -83,10 +94,10 @@ devtools::release()
 
 # on the shell (after the submission got accepted):
 V="v$(grep "^Version:" DESCRIPTION | cut -d: -f2 | sed -e 's/ //')"
-git tag -a "${V}" $(git log | grep -m1 commit | sed 's/commit\s*//') -m "CRAN submission: $(git log --date=format:'%Y-%m-%d' | grep -m1 "^Date" | sed 's/Date:\s*//')" -s && git commit -a -m "Tagged CRAN-package on github" && git push origin "${V}"
+git tag -a "${V}" $(git log | grep -m1 commit | sed 's/commit\s*//') -m "CRAN submission: $(git log --date=format:'%Y-%m-%d' | grep -m1 "^Date" | sed 's/Date:\s*//')" -s; git commit -a -m "Tagged CRAN-package on github"; git push origin "${V}"
 # optional: Use the tag to create a release on GitHub
 
- 
+
 # other helpful commands: =========================================================================
 devtools::revdep()                    # shows reverse imports of the package
 devtools::revdep_maintainers()        # ... and their maintainers

@@ -55,7 +55,6 @@ and \code{read_xpt} (\code{haven}) / \code{read.xport} (\code{foreign}) for SAS-
 }
 }
 \examples{
-\dontrun{
 # use one of the data files included in the package, but only the first 28 columns
 # (the latter columns contain data for testing calculations, etc.)
 nmeInp <- system.file("extdata", "bfi_sample.omv", package = "jmvReadWrite")
@@ -88,7 +87,7 @@ head(lblChr)
 jmvReadWrite::label_vars_omv(dtaInp = dtaInp, fleOut = nmeOut, varLbl = lblChr)
 lapply(jmvReadWrite::read_omv(nmeOut), attr, "jmv-desc")
 unlink(nmeOut)
-}
+
 
 }
 \seealso{

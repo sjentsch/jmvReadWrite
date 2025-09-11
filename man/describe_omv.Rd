@@ -64,7 +64,6 @@ and \code{read_xpt} (\code{haven}) / \code{read.xport} (\code{foreign}) for SAS-
 }
 }
 \examples{
-\dontrun{
 dtaFrm <- jmvReadWrite::ToothGrowth[, c("len", "supp", "dose")]
 nmeOut <- tempfile(fileext = ".omv")
 
@@ -107,7 +106,7 @@ chrDsc <- paste0("<p><strong>Trial – all formattings:</strong><br/><strong>bol
 jmvReadWrite::describe_omv(dtaInp = dtaFrm, fleOut = nmeOut, dtaTtl = "ToothGrowth",
   dtaDsc = chrDsc)
 unlink(nmeOut)
-}
+
 
 }
 \seealso{

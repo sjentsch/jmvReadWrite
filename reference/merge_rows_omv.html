@@ -139,8 +139,7 @@ use <code>haven</code>, you may need to install it using <code>install.packages(
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
-<span class="r-in"><span><span class="va">dtaInp</span> <span class="op">&lt;-</span> <span class="fu">jmvReadWrite</span><span class="fu">::</span><span class="va"><a href="bfi_sample2.html">bfi_sample2</a></span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">dtaInp</span> <span class="op">&lt;-</span> <span class="fu">jmvReadWrite</span><span class="fu">::</span><span class="va"><a href="bfi_sample2.html">bfi_sample2</a></span></span></span>
 <span class="r-in"><span><span class="va">nmeInp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"_"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">3</span>, <span class="st">".rds"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">nmeOut</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".omv"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">nmeInp</span><span class="op">)</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="va">dtaInp</span><span class="op">[</span><span class="op">-</span><span class="va">i</span> <span class="op">-</span> <span class="fl">1</span><span class="op">]</span>, <span class="va">nmeInp</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">)</span></span></span>
@@ -148,19 +147,23 @@ use <code>haven</code>, you may need to install it using <code>install.packages(
 <span class="r-in"><span><span class="co"># each data set (for demonstration purposes, A1 in the first, A2 in the second, ...)</span></span></span>
 <span class="r-in"><span><span class="fu">jmvReadWrite</span><span class="fu">::</span><span class="fu">merge_rows_omv</span><span class="op">(</span>dtaInp <span class="op">=</span> <span class="va">nmeInp</span>, fleOut <span class="op">=</span> <span class="va">nmeOut</span>, colInd <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.info.html" class="external-link">file.info</a></span><span class="op">(</span><span class="va">nmeOut</span><span class="op">)</span><span class="op">$</span><span class="va">size</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10936</span>
 <span class="r-in"><span><span class="co"># -&gt; 10767 (size may differ on different OSes)</span></span></span>
 <span class="r-in"><span><span class="va">dtaOut</span> <span class="op">&lt;-</span> <span class="fu">jmvReadWrite</span><span class="fu">::</span><span class="fu"><a href="read_omv.html">read_omv</a></span><span class="op">(</span><span class="va">nmeOut</span>, sveAtt <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="va">nmeOut</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># read the data set where the three original datasets were added as rows and show</span></span></span>
 <span class="r-in"><span><span class="co"># the variable names</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">dtaInp</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ID A1 A2 A3 A4 A5 C1 C2 C3 C4 C5 E1 E2 E3 E4 E5 N1 N2 N3 N4 N5 O1 O2 O3 O4 O5 gender age ID2</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">dtaOut</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> fleInd ID A2 A3 A4 A5 C1 C2 C3 C4 C5 E1 E2 E3 E4 E5 N1 N2 N3 N4 N5 O1 O2 O3 O4 O5 gender age ID2 A1</span>
 <span class="r-in"><span><span class="co"># compared to the input data set, we have the same variable names; fleInd (switched</span></span></span>
 <span class="r-in"><span><span class="co"># on by colInd = TRUE and showing from which data set the rows are coming from) is</span></span></span>
 <span class="r-in"><span><span class="co"># new and A1 is moved to the end of the list (the "original" order of variables may</span></span></span>
 <span class="r-in"><span><span class="co"># not always be preserved and columns missing from at least one of the input data</span></span></span>
 <span class="r-in"><span><span class="co"># sets may be added at the end)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">dtaInp</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">dtaOut</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 250 29 750 30</span>
 <span class="r-in"><span><span class="co"># the first dimension of the data sets (rows) is now three times of that of the input</span></span></span>
 <span class="r-in"><span><span class="co"># data set (250 -&gt; 750), the second dimension (columns / variables) is increased by 1</span></span></span>
 <span class="r-in"><span><span class="co"># (for "fleInd")</span></span></span>
@@ -173,16 +176,19 @@ use <code>haven</code>, you may need to install it using <code>install.packages(
 <span class="r-in"><span><span class="co"># read the data set where the three original datasets were added as rows and show</span></span></span>
 <span class="r-in"><span><span class="co"># the variable names</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">dtaInp</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ID A1 A2 A3 A4 A5 C1 C2 C3 C4 C5 E1 E2 E3 E4 E5 N1 N2 N3 N4 N5 O1 O2 O3 O4 O5 gender age ID2</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">dtaOut</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ID A4 A5 C1 C2 C3 C4 C5 E1 E2 E3 E4 E5 N1 N2 N3 N4 N5 O1 O2 O3 O4 O5 gender age ID2</span>
 <span class="r-in"><span><span class="co"># compared to the input data set, the variables that were missing in at least one</span></span></span>
 <span class="r-in"><span><span class="co"># data set (i.e., "A1", "A2" and "A3") are removed</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">dtaInp</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">dtaOut</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 250 29 750 26</span>
 <span class="r-in"><span><span class="co"># the first dimension of the data sets (rows) is now three times of that of the</span></span></span>
 <span class="r-in"><span><span class="co"># input data set (250 -&gt; 750), the second dimension (columns / variables) is</span></span></span>
 <span class="r-in"><span><span class="co"># reduced by 3 (i.e., "A1", "A2", "A3")</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="va">nmeInp</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
+<span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

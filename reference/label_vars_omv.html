@@ -115,14 +115,97 @@ SAS-data-files, and <code><a href="https://haven.tidyverse.org/reference/read_xp
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
-<span class="r-in"><span><span class="co"># use one of the data files included in the package, but only the first 28 columns</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># use one of the data files included in the package, but only the first 28 columns</span></span></span>
 <span class="r-in"><span><span class="co"># (the latter columns contain data for testing calculations, etc.)</span></span></span>
 <span class="r-in"><span><span class="va">nmeInp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"bfi_sample.omv"</span>, package <span class="op">=</span> <span class="st">"jmvReadWrite"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">dtaInp</span> <span class="op">&lt;-</span> <span class="fu">jmvReadWrite</span><span class="fu">::</span><span class="fu"><a href="read_omv.html">read_omv</a></span><span class="op">(</span><span class="va">nmeInp</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">28</span><span class="op">]</span></span></span>
 <span class="r-in"><span><span class="va">nmeOut</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".omv"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># in the original file, the variable labels – attr(*, "jmv-desc") - are empty</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">dtaInp</span>, <span class="va">attr</span>, <span class="st">"jmv-desc"</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ID</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $A1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $A2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $A3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $A4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $A5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $C1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $C2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $C3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $C4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $C5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $E1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $E2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $E3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $E4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $E5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $N1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $N2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $N3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $N4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $N5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $O1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $O2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $O3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $O4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $O5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $gender</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $age</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> NULL</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span><span class="co"># the definition of the variable labels can be read from a file with two columns,</span></span></span>
 <span class="r-in"><span><span class="co"># the first containing the variable name, the second the variable labels</span></span></span>
 <span class="r-in"><span><span class="co"># you can easily create such a file in Excel and save it as CSV</span></span></span>
@@ -130,25 +213,286 @@ SAS-data-files, and <code><a href="https://haven.tidyverse.org/reference/read_xp
 <span class="r-in"><span><span class="va">lblFle</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"label_example.csv"</span>, package <span class="op">=</span> <span class="st">"jmvReadWrite"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">lblDtF</span> <span class="op">&lt;-</span> <span class="fu">utils</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span><span class="va">lblFle</span>, header <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">lblDtF</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 'data.frame':	28 obs. of  2 variables:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ V1: chr  "ID" "A1" "A2" "A3" ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ V2: chr  "Respondent ID" "Am indifferent to the feelings of others. (R)" "Inquire about others' well-being." "Know how to comfort others." ...</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># there are three options to give the varLbl parameter:</span></span></span>
 <span class="r-in"><span><span class="co"># (1) as file name, ...</span></span></span>
 <span class="r-in"><span><span class="fu">jmvReadWrite</span><span class="fu">::</span><span class="fu">label_vars_omv</span><span class="op">(</span>dtaInp <span class="op">=</span> <span class="va">dtaInp</span>, fleOut <span class="op">=</span> <span class="va">nmeOut</span>, varLbl <span class="op">=</span> <span class="va">lblFle</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fu">jmvReadWrite</span><span class="fu">::</span><span class="fu"><a href="read_omv.html">read_omv</a></span><span class="op">(</span><span class="va">nmeOut</span><span class="op">)</span>, <span class="va">attr</span>, <span class="st">"jmv-desc"</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ID</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Respondent ID"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $A1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Am indifferent to the feelings of others. (R)"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $A2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Inquire about others' well-being."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $A3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Know how to comfort others."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $A4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Love children."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $A5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Make people feel at ease."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $C1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Am exacting in my work."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $C2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Continue until everything is perfect."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $C3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Do things according to a plan."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $C4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Do things in a half-way manner. (R)"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $C5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Waste my time. (R)"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $E1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Don't talk a lot. (R)"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $E2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Find it difficult to approach others. (R)"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $E3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Know how to captivate people."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $E4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Make friends easily."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $E5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Take charge."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $N1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Get angry easily."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $N2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Get irritated easily."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $N3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Have frequent mood swings."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $N4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Often feel blue."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $N5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Panic easily."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $O1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Am full of ideas."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $O2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Avoid difficult reading material. (R)"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $O3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Carry the conversation to a higher level."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $O4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Spend time reflecting on things."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $O5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Will not probe deeply into a subject. (R)"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $gender</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Gender of the respondent"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $age</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Age of the respondent (years)"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="va">nmeOut</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># (2) as data frame (using lblDtF from above), or ...</span></span></span>
 <span class="r-in"><span><span class="fu">jmvReadWrite</span><span class="fu">::</span><span class="fu">label_vars_omv</span><span class="op">(</span>dtaInp <span class="op">=</span> <span class="va">dtaInp</span>, fleOut <span class="op">=</span> <span class="va">nmeOut</span>, varLbl <span class="op">=</span> <span class="va">lblDtF</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fu">jmvReadWrite</span><span class="fu">::</span><span class="fu"><a href="read_omv.html">read_omv</a></span><span class="op">(</span><span class="va">nmeOut</span><span class="op">)</span>, <span class="va">attr</span>, <span class="st">"jmv-desc"</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ID</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Respondent ID"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $A1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Am indifferent to the feelings of others. (R)"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $A2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Inquire about others' well-being."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $A3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Know how to comfort others."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $A4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Love children."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $A5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Make people feel at ease."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $C1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Am exacting in my work."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $C2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Continue until everything is perfect."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $C3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Do things according to a plan."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $C4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Do things in a half-way manner. (R)"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $C5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Waste my time. (R)"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $E1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Don't talk a lot. (R)"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $E2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Find it difficult to approach others. (R)"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $E3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Know how to captivate people."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $E4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Make friends easily."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $E5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Take charge."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $N1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Get angry easily."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $N2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Get irritated easily."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $N3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Have frequent mood swings."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $N4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Often feel blue."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $N5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Panic easily."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $O1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Am full of ideas."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $O2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Avoid difficult reading material. (R)"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $O3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Carry the conversation to a higher level."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $O4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Spend time reflecting on things."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $O5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Will not probe deeply into a subject. (R)"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $gender</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Gender of the respondent"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $age</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Age of the respondent (years)"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="va">nmeOut</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># (3) as character vector (with the same length as there are columns in the input data set)</span></span></span>
 <span class="r-in"><span><span class="va">lblChr</span> <span class="op">&lt;-</span> <span class="va">lblDtF</span><span class="op">[[</span><span class="fl">2</span><span class="op">]</span><span class="op">]</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">lblChr</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Respondent ID"                                </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2] "Am indifferent to the feelings of others. (R)"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3] "Inquire about others' well-being."            </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [4] "Know how to comfort others."                  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [5] "Love children."                               </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [6] "Make people feel at ease."                    </span>
 <span class="r-in"><span><span class="fu">jmvReadWrite</span><span class="fu">::</span><span class="fu">label_vars_omv</span><span class="op">(</span>dtaInp <span class="op">=</span> <span class="va">dtaInp</span>, fleOut <span class="op">=</span> <span class="va">nmeOut</span>, varLbl <span class="op">=</span> <span class="va">lblChr</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fu">jmvReadWrite</span><span class="fu">::</span><span class="fu"><a href="read_omv.html">read_omv</a></span><span class="op">(</span><span class="va">nmeOut</span><span class="op">)</span>, <span class="va">attr</span>, <span class="st">"jmv-desc"</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $ID</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Respondent ID"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $A1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Am indifferent to the feelings of others. (R)"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $A2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Inquire about others' well-being."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $A3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Know how to comfort others."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $A4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Love children."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $A5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Make people feel at ease."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $C1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Am exacting in my work."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $C2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Continue until everything is perfect."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $C3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Do things according to a plan."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $C4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Do things in a half-way manner. (R)"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $C5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Waste my time. (R)"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $E1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Don't talk a lot. (R)"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $E2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Find it difficult to approach others. (R)"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $E3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Know how to captivate people."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $E4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Make friends easily."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $E5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Take charge."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $N1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Get angry easily."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $N2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Get irritated easily."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $N3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Have frequent mood swings."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $N4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Often feel blue."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $N5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Panic easily."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $O1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Am full of ideas."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $O2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Avoid difficult reading material. (R)"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $O3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Carry the conversation to a higher level."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $O4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Spend time reflecting on things."</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $O5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Will not probe deeply into a subject. (R)"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $gender</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Gender of the respondent"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $age</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Age of the respondent (years)"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="va">nmeOut</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
+<span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

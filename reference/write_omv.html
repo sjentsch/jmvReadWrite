@@ -104,15 +104,76 @@ file.</p></li>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
-<span class="r-in"><span><span class="co"># use the data set "ToothGrowth" and, if it exists, write it as</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># use the data set "ToothGrowth" and, if it exists, write it as</span></span></span>
 <span class="r-in"><span><span class="co"># jamovi-file using write_omv()</span></span></span>
 <span class="r-in"><span><span class="fu">jmvReadWrite</span><span class="fu">::</span><span class="va"><a href="ToothGrowth.html">ToothGrowth</a></span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    ID supp supp2 dose dose2  len    logLen</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1   1   VC     1  0.5   0.5  4.2 0.6232493</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2   2   VC     1  0.5   0.5 11.5 1.0606978</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3   3   VC     1  0.5   0.5  7.3 0.8633229</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4   4   VC     1  0.5   0.5  5.8 0.7634280</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5   5   VC     1  0.5   0.5  6.4 0.8061800</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6   6   VC     1  0.5   0.5 10.0 1.0000000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7   7   VC     1  0.5   0.5 11.2 1.0492180</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8   8   VC     1  0.5   0.5 11.2 1.0492180</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9   9   VC     1  0.5   0.5  5.2 0.7160033</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10 10   VC     1  0.5   0.5  7.0 0.8450980</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11 11   VC     1  1.0   1.0 16.5 1.2174839</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12 12   VC     1  1.0   1.0 16.5 1.2174839</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 13 13   VC     1  1.0   1.0 15.2 1.1818436</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 14 14   VC     1  1.0   1.0 17.3 1.2380461</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 15 15   VC     1  1.0   1.0 22.5 1.3521825</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 16 16   VC     1  1.0   1.0 17.3 1.2380461</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 17 17   VC     1  1.0   1.0 13.6 1.1335389</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 18 18   VC     1  1.0   1.0 14.5 1.1613680</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 19 19   VC     1  1.0   1.0 18.8 1.2741578</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 20 20   VC     1  1.0   1.0 15.5 1.1903317</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 21 21   VC     1  2.0   2.0 23.6 1.3729120</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 22 22   VC     1  2.0   2.0 18.5 1.2671717</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 23 23   VC     1  2.0   2.0 33.9 1.5301997</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 24 24   VC     1  2.0   2.0 25.5 1.4065402</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 25 25   VC     1  2.0   2.0 26.4 1.4216039</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 26 26   VC     1  2.0   2.0 32.5 1.5118834</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 27 27   VC     1  2.0   2.0 26.7 1.4265113</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 28 28   VC     1  2.0   2.0 21.5 1.3324385</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 29 29   VC     1  2.0   2.0 23.3 1.3673559</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 30 30   VC     1  2.0   2.0 29.5 1.4698220</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 31 31   OJ     2  0.5   0.5 15.2 1.1818436</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 32 32   OJ     2  0.5   0.5 21.5 1.3324385</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 33 33   OJ     2  0.5   0.5 17.6 1.2455127</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 34 34   OJ     2  0.5   0.5  9.7 0.9867717</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 35 35   OJ     2  0.5   0.5 14.5 1.1613680</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 36 36   OJ     2  0.5   0.5 10.0 1.0000000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 37 37   OJ     2  0.5   0.5  8.2 0.9138139</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 38 38   OJ     2  0.5   0.5  9.4 0.9731279</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 39 39   OJ     2  0.5   0.5 16.5 1.2174839</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 40 40   OJ     2  0.5   0.5  9.7 0.9867717</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 41 41   OJ     2  1.0   1.0 19.7 1.2944662</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 42 42   OJ     2  1.0   1.0 23.3 1.3673559</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 43 43   OJ     2  1.0   1.0 23.6 1.3729120</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 44 44   OJ     2  1.0   1.0 26.4 1.4216039</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 45 45   OJ     2  1.0   1.0 20.0 1.3010300</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 46 46   OJ     2  1.0   1.0 25.2 1.4014005</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 47 47   OJ     2  1.0   1.0 25.8 1.4116197</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 48 48   OJ     2  1.0   1.0 21.2 1.3263359</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 49 49   OJ     2  1.0   1.0 14.5 1.1613680</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 50 50   OJ     2  1.0   1.0 27.3 1.4361626</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 51 51   OJ     2  2.0   2.0 25.5 1.4065402</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 52 52   OJ     2  2.0   2.0 26.4 1.4216039</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 53 53   OJ     2  2.0   2.0 22.4 1.3502480</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 54 54   OJ     2  2.0   2.0 24.5 1.3891661</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 55 55   OJ     2  2.0   2.0 24.8 1.3944517</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 56 56   OJ     2  2.0   2.0 30.9 1.4899585</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 57 57   OJ     2  2.0   2.0 26.4 1.4216039</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 58 58   OJ     2  2.0   2.0 27.3 1.4361626</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 59 59   OJ     2  2.0   2.0 29.4 1.4683473</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 60 60   OJ     2  2.0   2.0 23.0 1.3617278</span>
 <span class="r-in"><span><span class="va">nmeOut</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".omv"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># typically, one would use a "real" file name instead of tempfile(),</span></span></span>
 <span class="r-in"><span><span class="co"># e.g., "Data1.omv"</span></span></span>
 <span class="r-in"><span><span class="va">dtaDbg</span> <span class="op">=</span> <span class="fu">jmvReadWrite</span><span class="fu">::</span><span class="fu">write_omv</span><span class="op">(</span>dtaFrm <span class="op">=</span> <span class="va">ToothGrowth</span>, fleOut <span class="op">=</span> <span class="va">nmeOut</span>, retDbg <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">dtaDbg</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "mtaDta" "xtdDta" "dtaFrm"</span>
 <span class="r-in"><span><span class="co"># the print-function is only used to force devtools::run_examples()</span></span></span>
 <span class="r-in"><span><span class="co"># to show output</span></span></span>
 <span class="r-in"><span><span class="co"># -&gt; "mtaDta" "xtdDta" "dtaFrm"</span></span></span>
@@ -124,11 +185,13 @@ file.</p></li>
 <span class="r-in"><span><span class="co"># check whether the file was written to the disk, get the file informa-</span></span></span>
 <span class="r-in"><span><span class="co"># tion (size, etc.) and delete the file afterwards</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/basename.html" class="external-link">dirname</a></span><span class="op">(</span><span class="va">nmeOut</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/basename.html" class="external-link">basename</a></span><span class="op">(</span><span class="va">nmeOut</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "file24dc3ba4c91f.omv"</span>
 <span class="r-in"><span><span class="co"># -&gt; "file[...].omv" ([...] is a combination of random numbers / characters</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.info.html" class="external-link">file.info</a></span><span class="op">(</span><span class="va">nmeOut</span><span class="op">)</span><span class="op">$</span><span class="va">size</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 2617</span>
 <span class="r-in"><span><span class="co"># -&gt; approx. 2600 (size may differ on different OSes)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="va">nmeOut</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
+<span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

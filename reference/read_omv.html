@@ -85,9 +85,326 @@ R-package <code>foreign</code>)</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
-<span class="r-in"><span><span class="va">nmeInp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"ToothGrowth.omv"</span>, package <span class="op">=</span> <span class="st">"jmvReadWrite"</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">nmeInp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"ToothGrowth.omv"</span>, package <span class="op">=</span> <span class="st">"jmvReadWrite"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu">jmvReadWrite</span><span class="fu">::</span><span class="fu">read_omv</span><span class="op">(</span>fleInp <span class="op">=</span> <span class="va">nmeInp</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 'data.frame':	60 obs. of  16 variables:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Filter 1          : logi  TRUE TRUE TRUE TRUE TRUE TRUE ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "name")= chr "Filter 1"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "id")= int 18</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "columnType")= chr "Filter"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "dataType")= chr "Integer"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "measureType")= chr "Nominal"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "formula")= chr "logLen &lt; 1.5"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "formulaMessage")= chr ""</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "parentId")= int 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "width")= int 78</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "type")= chr "integer"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "importName")= chr ""</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "description")= chr ""</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "transform")= int 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "edits")= list()</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "missingValues")= list()</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "filterNo")= int 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "active")= logi FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ ID                : chr  "1" "2" "3" "4" ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "jmv-id")= logi TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "name")= chr "ID"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "id")= int 24</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "columnType")= chr "Data"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "dataType")= chr "Text"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "measureType")= chr "ID"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "formula")= chr ""</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "formulaMessage")= chr ""</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "parentId")= int 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "width")= int 100</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "type")= chr "string"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "importName")= chr ""</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "description")= chr ""</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "transform")= int 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "edits")= list()</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "missingValues")= list()</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ logLen            : num  0.623 1.061 0.863 0.763 0.806 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "jmv-desc")= chr "Trial with log10"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "name")= chr "logLen"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "id")= int 10</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "columnType")= chr "Computed"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "dataType")= chr "Decimal"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "measureType")= chr "Continuous"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "formula")= chr "LOG10(len)"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "formulaMessage")= chr ""</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "parentId")= int 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "width")= int 100</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "type")= chr "number"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "importName")= chr ""</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "description")= chr "Trial with log10"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "transform")= int 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "edits")= list()</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "missingValues")= list()</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ supp - Transform 1: Factor w/ 2 levels "1","2": 1 1 1 1 1 1 1 1 1 1 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "values")= int [1:2] 1 2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "name")= chr "supp - Transform 1"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "id")= int 12</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "columnType")= chr "Recoded"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "dataType")= chr "Integer"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "measureType")= chr "Nominal"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "formula")= chr "RECODE(`supp`, IFMISS($source, NA, 1), MATCH($source, 'VC', 'OJ'))"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "formulaMessage")= chr ""</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "parentId")= int 3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "width")= int 100</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "type")= chr "integer"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "importName")= chr ""</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "description")= chr ""</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "transform")= int 1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "edits")= list()</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "missingValues")= list()</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "trimLevels")= logi TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ len               : num  4.2 11.5 7.3 5.8 6.4 10 11.2 11.2 5.2 7 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "name")= chr "len"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "id")= int 2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "columnType")= chr "Data"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "dataType")= chr "Decimal"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "measureType")= chr "Continuous"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "formula")= chr ""</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "formulaMessage")= chr ""</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "parentId")= int 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "width")= int 100</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "type")= chr "number"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "importName")= chr "len"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "description")= chr ""</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "transform")= int 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "edits")= list()</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "missingValues")= list()</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ supp              : Factor w/ 2 levels "OJ","VC": 2 2 2 2 2 2 2 2 2 2 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "name")= chr "supp"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "id")= int 3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "columnType")= chr "Data"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "dataType")= chr "Text"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "measureType")= chr "Nominal"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "formula")= chr ""</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "formulaMessage")= chr ""</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "parentId")= int 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "width")= int 100</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "type")= chr "integer"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "importName")= chr "supp"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "description")= chr ""</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "transform")= int 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "edits")= list()</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "missingValues")= list()</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "trimLevels")= logi TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ dose              : num  0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "name")= chr "dose"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "id")= int 4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "columnType")= chr "Data"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "dataType")= chr "Decimal"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "measureType")= chr "Continuous"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "formula")= chr ""</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "formulaMessage")= chr ""</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "parentId")= int 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "width")= int 211</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "type")= chr "number"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "importName")= chr "dose"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "description")= chr ""</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "transform")= int 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "edits")= list()</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "missingValues")= list()</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ dose2             : Ord.factor w/ 3 levels "0.5"&lt;"1.0"&lt;"2.0": 1 1 1 1 1 1 1 1 1 1 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "name")= chr "dose2"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "id")= int 31</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "columnType")= chr "Data"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "dataType")= chr "Text"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "measureType")= chr "Ordinal"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "formula")= chr ""</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "formulaMessage")= chr ""</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "parentId")= int 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "width")= int 100</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "type")= chr "integer"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "importName")= chr ""</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "description")= chr ""</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "transform")= int 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "edits")= list()</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "missingValues")= list()</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "trimLevels")= logi TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ dose3             : Factor w/ 3 levels "500","1000","2000": 1 1 1 1 1 1 1 1 1 1 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "values")= int [1:3] 500 1000 2000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "name")= chr "dose3"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "id")= int 49</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "columnType")= chr "Data"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "dataType")= chr "Integer"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "measureType")= chr "Nominal"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "formula")= chr ""</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "formulaMessage")= chr ""</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "parentId")= int 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "width")= int 100</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "type")= chr "integer"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "importName")= chr ""</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "description")= chr ""</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "transform")= int 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "edits")= list()</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "missingValues")= list()</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "trimLevels")= logi TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Trial             : Factor w/ 17 levels "A","B","C","D",..: 1 2 2 3 3 3 4 4 4 4 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "jmv-desc")= chr "Trial"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "name")= chr "Trial"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "id")= int 5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "columnType")= chr "Data"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "dataType")= chr "Text"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "measureType")= chr "Nominal"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "formula")= chr ""</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "formulaMessage")= chr ""</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "parentId")= int 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "width")= int 100</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "type")= chr "integer"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "importName")= chr ""</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "description")= chr "Trial"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "transform")= int 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "edits")= list()</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "missingValues")= list()</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "trimLevels")= logi FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ Residuals         : num  -3.78 3.52 -0.68 -2.18 -1.58 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "jmv-desc")= chr "Residuals from ANOVA"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "name")= chr "Residuals"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "id")= int 32</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "columnType")= chr "Output"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "dataType")= chr "Decimal"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "measureType")= chr "Continuous"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "formula")= chr ""</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "formulaMessage")= chr ""</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "parentId")= int 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "width")= int 100</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "type")= chr "number"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "outputAnalysisId")= int 2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "outputOptionName")= chr "residsOV"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "outputName")= chr "1"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "outputDesiredColumnName")= chr "Residuals"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "outputAssignedColumnName")= chr "Residuals"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "importName")= chr ""</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "description")= chr "Residuals from ANOVA"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "transform")= int 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "edits")= list()</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "missingValues")= list()</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ J                 : num  0.25 0.25 0.25 0.25 0.25 0.25 0.25 0.25 0.25 0.25 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "name")= chr "J"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "id")= int 33</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "columnType")= chr "Computed"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "dataType")= chr "Decimal"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "measureType")= chr "Continuous"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "formula")= chr "dose ^ 2"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "formulaMessage")= chr ""</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "parentId")= int 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "width")= int 100</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "type")= chr "number"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "importName")= chr ""</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "description")= chr ""</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "transform")= int 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "edits")= list()</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "missingValues")= list()</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ K                 : num  -1.64 2.01 -0.09 -0.84 -0.54 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "name")= chr "K"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "id")= int 34</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "columnType")= chr "Computed"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "dataType")= chr "Decimal"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "measureType")= chr "Continuous"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "formula")= chr "MEAN(dose, Residuals)"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "formulaMessage")= chr ""</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "parentId")= int 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "width")= int 100</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "type")= chr "number"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "importName")= chr ""</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "description")= chr ""</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "transform")= int 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "edits")= list()</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "missingValues")= list()</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ L                 : int  1 2 3 4 5 6 7 8 9 10 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "name")= chr "L"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "id")= int 35</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "columnType")= chr "Data"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "dataType")= chr "Integer"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "measureType")= chr "Continuous"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "formula")= chr ""</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "formulaMessage")= chr ""</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "parentId")= int 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "width")= int 100</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "type")= chr "integer"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "importName")= chr ""</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "description")= chr ""</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "transform")= int 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "edits")= list()</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "missingValues")=List of 2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ : chr "== 99"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ : chr "== 88"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ M                 : logi  TRUE FALSE FALSE FALSE FALSE TRUE ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "name")= chr "M"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "id")= int 55</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "columnType")= chr "Data"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "dataType")= chr "Integer"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "measureType")= chr "Nominal"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "formula")= chr ""</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "formulaMessage")= chr ""</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "parentId")= int 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "width")= int 100</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "type")= chr "integer"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "importName")= chr ""</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "description")= chr ""</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "transform")= int 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "edits")= list()</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "missingValues")= list()</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "trimLevels")= logi TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ weights           : int  1 1 1 1 1 1 1 1 1 1 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "name")= chr "weights"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "id")= int 36</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "columnType")= chr "Data"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "dataType")= chr "Integer"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "measureType")= chr "Continuous"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "formula")= chr ""</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "formulaMessage")= chr ""</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "parentId")= int 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "width")= int 100</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "type")= chr "integer"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "importName")= chr ""</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "description")= chr ""</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "transform")= int 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "edits")= list()</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "missingValues")= list()</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  - attr(*, "fltLst")= chr "Filter 1"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  - attr(*, "removedRows")= list()</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  - attr(*, "addedRows")= list()</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  - attr(*, "transforms")=List of 1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ :List of 7</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ name          : chr "Transform 1"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ id            : int 1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ suffix        : chr ""</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ formula       :List of 1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ : chr "MATCH($source, 'VC', 'OJ')"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ formulaMessage:List of 1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .. .. ..$ : chr ""</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ measureType   : chr "None"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   .. ..$ description   : chr ""</span>
+<span class="r-in"><span><span class="co"># shows the data frame including all jamovi attributes:</span></span></span>
+<span class="r-in"><span><span class="co"># 'data.frame':  60 obs. of  16 variables:</span></span></span>
+<span class="r-in"><span><span class="co">#  $ Filter 1          : logi  TRUE TRUE TRUE TRUE TRUE TRUE ...</span></span></span>
+<span class="r-in"><span><span class="co">#   ..- attr(*, "name")= chr "Filter 1"</span></span></span>
+<span class="r-in"><span><span class="co">#   ..- attr(*, "id")= int 18</span></span></span>
+<span class="r-in"><span><span class="co">#   ..- attr(*, "columnType")= chr "Filter"</span></span></span>
+<span class="r-in"><span><span class="co">#   ..- attr(*, "dataType")= chr "Integer"</span></span></span>
+<span class="r-in"><span><span class="co">#   ..- attr(*, "measureType")= chr "Nominal"</span></span></span>
+<span class="r-in"><span><span class="co">#   ..- attr(*, "formula")= chr "logLen &lt; 1.5"</span></span></span>
+<span class="r-in"><span><span class="co">#   ..- attr(*, "formulaMessage")= chr ""</span></span></span>
+<span class="r-in"><span><span class="co">#   ..- attr(*, "parentId")= int 0</span></span></span>
+<span class="r-in"><span><span class="co">#   ..- attr(*, "width")= int 78</span></span></span>
+<span class="r-in"><span><span class="co">#   ..- attr(*, "type")= chr "integer"</span></span></span>
+<span class="r-in"><span><span class="co">#   ..- attr(*, "importName")= chr ""</span></span></span>
+<span class="r-in"><span><span class="co">#   ..- attr(*, "description")= chr ""</span></span></span>
+<span class="r-in"><span><span class="co">#   ..- attr(*, "transform")= int 0</span></span></span>
+<span class="r-in"><span><span class="co">#   ..- attr(*, "edits")= list()</span></span></span>
+<span class="r-in"><span><span class="co">#   ..- attr(*, "missingValues")= list()</span></span></span>
+<span class="r-in"><span><span class="co">#   ..- attr(*, "filterNo")= int 0</span></span></span>
+<span class="r-in"><span><span class="co">#   ..- attr(*, "active")= logi FALSE</span></span></span>
+<span class="r-in"><span><span class="co"># ... (continued)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
 <span class="r-in"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu">jmvReadWrite</span><span class="fu">::</span><span class="fu">read_omv</span><span class="op">(</span>fleInp <span class="op">=</span> <span class="va">nmeInp</span>, getSyn <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
 <span class="r-in"><span><span class="co"># if the syntax couldn't be extracted, an empty list - length = 0 - is returned,</span></span></span>
 <span class="r-in"><span><span class="co"># otherwise, the commands are shown and the first analysis is run, with the output</span></span></span>
 <span class="r-in"><span><span class="co"># from the second analysis being assigned to the variable result</span></span></span>
@@ -104,7 +421,6 @@ R-package <code>foreign</code>)</p>
 <span class="r-in"><span>        <span class="co"># (the names of the six output tables)</span></span></span>
 <span class="r-in"><span>    <span class="op">}</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
-<span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

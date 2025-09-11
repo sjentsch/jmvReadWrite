@@ -211,8 +211,7 @@ Stata-files, <code><a href="https://haven.tidyverse.org/reference/read_sas.html"
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
-<span class="r-in"><span><span class="co"># create matrices for the different types of distance measures: continuous</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># create matrices for the different types of distance measures: continuous</span></span></span>
 <span class="r-in"><span><span class="co"># (cntFrm), frequency counts (frqFrm) or binary (binFrm); all 20 R x 5 C</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">cntFrm</span> <span class="op">&lt;-</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/setNames.html" class="external-link">setNames</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">100</span>, sd <span class="op">=</span> <span class="fl">10</span><span class="op">)</span>,</span></span>
@@ -231,6 +230,12 @@ Stata-files, <code><a href="https://haven.tidyverse.org/reference/read_sas.html"
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="va">nmeOut</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># the resulting matrix (10 x 10) with the Euclidian distances</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">dtaFrm</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       C_01     C_02     C_03     C_04     C_05</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1  0.00000 61.34075 44.71434 65.20404 65.90022</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 61.34075  0.00000 59.09327 54.25283 56.95269</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 44.71434 59.09327  0.00000 51.37643 49.35176</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 65.20404 54.25283 51.37643  0.00000 68.46490</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5 65.90022 56.95269 49.35176 68.46490  0.00000</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># calculates the (Euclidean) distances between rows (clmDst = FALSE)</span></span></span>
 <span class="r-in"><span><span class="fu">jmvReadWrite</span><span class="fu">::</span><span class="fu">distances_omv</span><span class="op">(</span>dtaInp <span class="op">=</span> <span class="va">cntFrm</span>, fleOut <span class="op">=</span> <span class="va">nmeOut</span>, varDst <span class="op">=</span></span></span>
@@ -239,6 +244,69 @@ Stata-files, <code><a href="https://haven.tidyverse.org/reference/read_sas.html"
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="va">nmeOut</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># the resulting matrix (20 x 20) with the Euclidian distances</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">dtaFrm</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           1         2         3        4         5        6        7        8</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1   0.00000 26.131543 27.350739 45.23326 35.383875 26.44391 47.99352 30.64342</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  26.13154  0.000000 21.676641 35.01735 11.244887 14.79294 24.30533 29.53035</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  27.35074 21.676641  0.000000 42.33862 24.433205 17.19017 28.54954 27.69381</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4  45.23326 35.017352 42.338618  0.00000 38.781160 38.26722 38.31024 21.45148</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5  35.38388 11.244887 24.433205 38.78116  0.000000 16.48204 17.55941 35.13815</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6  26.44391 14.792935 17.190167 38.26722 16.482038  0.00000 27.16255 29.40360</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7  47.99352 24.305328 28.549545 38.31024 17.559410 27.16255  0.00000 38.10638</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8  30.64342 29.530354 27.693815 21.45148 35.138152 29.40360 38.10638  0.00000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9  30.55541 14.332681 19.731562 27.15150 15.659990 15.76215 21.57344 19.91058</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10 14.82706 25.909314 18.605862 41.61574 33.937495 26.36965 42.04666 23.44241</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11 29.65218 17.180385 32.023400 35.21951 24.293889 30.84166 33.35057 31.27000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12 38.87806 17.910528 22.818187 37.92538  9.537864 17.46241 14.78549 33.04212</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 13 25.95182 18.049475  5.264775 42.60625 20.427063 14.82885 27.14785 28.91468</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 14 41.39663 29.524358 28.493849 51.93825 26.774265 18.75533 32.30149 45.93174</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 15 53.75718 35.821951 32.305671 35.61084 32.200139 37.09996 19.02030 34.01429</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 16 35.27272 26.581168 17.477468 34.05918 30.671408 28.31329 27.58806 23.06398</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 17 32.76102 17.038073 30.549965 25.05542 22.000511 19.66510 28.59081 27.58129</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 18 31.55798 14.507930 31.236666 27.59670 16.974705 20.20535 28.53359 27.45392</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 19 29.17899 15.442762 31.566741 31.99236 24.559690 28.46439 32.39750 30.72126</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 20 32.35799  7.745134 27.520743 32.46818 12.489624 20.62853 22.23422 31.74860</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           9       10       11        12        13       14       15       16</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1  30.55541 14.82706 29.65218 38.878061 25.951817 41.39663 53.75718 35.27272</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  14.33268 25.90931 17.18039 17.910528 18.049475 29.52436 35.82195 26.58117</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  19.73156 18.60586 32.02340 22.818187  5.264775 28.49385 32.30567 17.47747</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4  27.15150 41.61574 35.21951 37.925376 42.606250 51.93825 35.61084 34.05918</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5  15.65999 33.93749 24.29389  9.537864 20.427063 26.77427 32.20014 30.67141</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6  15.76215 26.36965 30.84166 17.462409 14.828854 18.75533 37.09996 28.31329</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7  21.57344 42.04666 33.35057 14.785487 27.147849 32.30149 19.02030 27.58806</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8  19.91058 23.44241 31.27000 33.042120 28.914676 45.93174 34.01429 23.06398</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9   0.00000 25.79688 23.33919 13.683037 17.950287 32.08199 26.37753 21.96242</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10 25.79688  0.00000 28.20642 34.897196 19.051886 42.12985 43.65010 23.65112</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11 23.33919 28.20642  0.00000 29.806311 29.007094 46.63294 40.28531 30.52709</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12 13.68304 34.89720 29.80631  0.000000 19.793327 27.13234 26.04911 29.03732</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 13 17.95029 19.05189 29.00709 19.793327  0.000000 27.37625 33.18633 20.31720</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 14 32.08199 42.12985 46.63294 27.132339 27.376247  0.00000 45.12002 40.03875</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 15 26.37753 43.65010 40.28531 26.049113 33.186331 45.12002  0.00000 24.57344</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 16 21.96242 23.65112 30.52709 29.037323 20.317198 40.03875 24.57344  0.00000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 17 18.68052 33.95234 27.15950 25.599634 29.204786 31.11091 37.90084 30.69191</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 18 14.46393 33.04019 21.53910 20.429258 28.187645 35.32704 37.61112 34.08393</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 19 23.59061 29.08503 10.95177 30.921575 29.353719 42.61095 40.79366 28.74388</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 20 16.74755 31.84056 16.18782 19.647393 24.401274 33.22717 34.65123 28.48199</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          17       18       19        20</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1  32.76102 31.55798 29.17899 32.357991</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  17.03807 14.50793 15.44276  7.745134</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  30.54996 31.23667 31.56674 27.520743</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4  25.05542 27.59670 31.99236 32.468177</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5  22.00051 16.97470 24.55969 12.489624</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6  19.66510 20.20535 28.46439 20.628532</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7  28.59081 28.53359 32.39750 22.234216</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8  27.58129 27.45392 30.72126 31.748597</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9  18.68052 14.46393 23.59061 16.747548</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10 33.95234 33.04019 29.08503 31.840557</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11 27.15950 21.53910 10.95177 16.187822</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12 25.59963 20.42926 30.92158 19.647393</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 13 29.20479 28.18764 29.35372 24.401274</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 14 31.11091 35.32704 42.61095 33.227175</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 15 37.90084 37.61112 40.79366 34.651232</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 16 30.69191 34.08393 28.74388 28.481989</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 17  0.00000 14.77914 20.20579 15.595960</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 18 14.77914  0.00000 20.96006 14.086098</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 19 20.20579 20.96006  0.00000 12.910776</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 20 15.59596 14.08610 12.91078  0.000000</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># calculates the (Euclidean) distances between columns; the original data</span></span></span>
 <span class="r-in"><span><span class="co"># are z-standardized before calculating the distances (stdDst = "z")</span></span></span>
@@ -249,6 +317,12 @@ Stata-files, <code><a href="https://haven.tidyverse.org/reference/read_sas.html"
 <span class="r-in"><span><span class="co"># the resulting matrix (10 x 10) with the Euclidian distances using the</span></span></span>
 <span class="r-in"><span><span class="co"># z-standardized data</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">dtaFrm</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       C_01     C_02     C_03     C_04     C_05</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.000000 6.801907 5.166205 6.617378 7.217520</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 6.801907 0.000000 6.985124 5.589434 6.358651</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 5.166205 6.985124 0.000000 5.450948 5.723096</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 6.617378 5.589434 5.450948 0.000000 6.972127</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5 7.217520 6.358651 5.723096 6.972127 0.000000</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># calculates the correlations between columns</span></span></span>
 <span class="r-in"><span><span class="fu">jmvReadWrite</span><span class="fu">::</span><span class="fu">distances_omv</span><span class="op">(</span>dtaInp <span class="op">=</span> <span class="va">cntFrm</span>, fleOut <span class="op">=</span> <span class="va">nmeOut</span>, varDst <span class="op">=</span></span></span>
@@ -257,6 +331,12 @@ Stata-files, <code><a href="https://haven.tidyverse.org/reference/read_sas.html"
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="va">nmeOut</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># the resulting matrix (10 x 10) with the correlations</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">dtaFrm</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         C_01        C_02       C_03       C_04        C_05</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1  1.0000000 -0.21752487  0.2976402 -0.1523604 -0.37085773</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 -0.2175249  1.00000000 -0.2839989  0.1778480 -0.06401162</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  0.2976402 -0.28399885  1.0000000  0.2180834  0.13805728</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 -0.1523604  0.17784796  0.2180834  1.0000000 -0.27922504</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5 -0.3708577 -0.06401162  0.1380573 -0.2792250  1.00000000</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># calculates the chi-square dissimilarity (nmeDst = "chisq") between columns</span></span></span>
 <span class="r-in"><span><span class="fu">jmvReadWrite</span><span class="fu">::</span><span class="fu">distances_omv</span><span class="op">(</span>dtaInp <span class="op">=</span> <span class="va">frqFrm</span>, fleOut <span class="op">=</span> <span class="va">nmeOut</span>, varDst <span class="op">=</span></span></span>
@@ -265,6 +345,12 @@ Stata-files, <code><a href="https://haven.tidyverse.org/reference/read_sas.html"
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="va">nmeOut</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># the resulting matrix (10 x 10) with the chi-square dissimilarities</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">dtaFrm</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       F_01      F_02     F_03      F_04     F_05</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.000000  8.247183 5.142857  5.911111 8.990482</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 8.247183  0.000000 4.678393 10.148313 4.085714</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 5.142857  4.678393 0.000000  9.252381 6.890820</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 5.911111 10.148313 9.252381  0.000000 7.033762</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5 8.990482  4.085714 6.890820  7.033762 0.000000</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># calculates the Jaccard similarity (nmeDst = "jaccard") between columns</span></span></span>
 <span class="r-in"><span><span class="fu">jmvReadWrite</span><span class="fu">::</span><span class="fu">distances_omv</span><span class="op">(</span>dtaInp <span class="op">=</span> <span class="va">binFrm</span>, fleOut <span class="op">=</span> <span class="va">nmeOut</span>, varDst <span class="op">=</span></span></span>
@@ -273,8 +359,13 @@ Stata-files, <code><a href="https://haven.tidyverse.org/reference/read_sas.html"
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="va">nmeOut</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># the resulting matrix (10 x 10) with the Jaccard similarities</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">dtaFrm</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     B_01      B_02      B_03      B_04      B_05</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 1.0000 0.4375000 0.6000000 0.4000000 0.4000000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 0.4375 1.0000000 0.4705882 0.3750000 0.4666667</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 0.6000 0.4705882 1.0000000 0.2777778 0.3529412</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 0.4000 0.3750000 0.2777778 1.0000000 0.3333333</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5 0.4000 0.4666667 0.3529412 0.3333333 1.0000000</span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

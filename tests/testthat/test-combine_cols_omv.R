@@ -29,7 +29,7 @@ test_that("combine_cols_omv works", {
     class(dtaInp[, "A1_1"]) <- class(dtaInp[, "A1"])
     expect_false(any(is.na(dtaInp[selRow, "A1_1"])))
     expect_true(all(is.na(dtaInp[!selRow, "A1_1"])))
-    
+
     dtaFrm <- combine_cols_omv(dtaInp, varPrs = list(c("A1", "A1_1")), mdeCmb = "first")
     expect_s3_class(dtaFrm, "data.frame")
     expect_equal(dim(dtaFrm), c(250, 29))

@@ -1,6 +1,4 @@
 # compare the files in inst/extdata (write and read again)
-for (crrFle in list.files('R')) { source(file.path('R', crrFle)) }
-OR
 devtools::load_all()
 
 for (blnAtt in c(TRUE, FALSE)) {

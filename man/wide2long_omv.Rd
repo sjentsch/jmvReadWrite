@@ -34,8 +34,7 @@ returned instead}
 \item{varID}{Name(s) of one or more variables that (is created to) identify the same group / individual (if empty, "ID" is added with row numbers
 identifying cases; default: NULL)}
 
-\item{varTme}{Name of the variable that (is created to) differentiate multiple records from the same group / individual (default: "cond"; a counter is added
-for each time-varying part)}
+\item{varTme}{Name of the variable (or vector with variable names) that (is created to) differentiate multiple records from the same group / individual #'               (default: "cond"; if required, a counter is added for each time-varying part)}
 
 \item{varSep}{Character that separates the variables in varLst into a time-varying part and a part that forms the variable name in long format ("\emph{" in
 "VAR_1", "VAR_2", default: "}")}

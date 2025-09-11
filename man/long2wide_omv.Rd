@@ -79,7 +79,6 @@ use \code{haven}, you may need to install it using \code{install.packages("haven
 }
 }
 \examples{
-\dontrun{
 # generate a test dataframe with 100 (imaginary) participants / units of
 #  observation (ID), 8 measurement (measure) of one variable (X)
 dtaInp <- data.frame(ID = rep(as.character(seq(1, 100)), each = 8),
@@ -130,7 +129,7 @@ cat(str(jmvReadWrite::read_omv(nmeOut, sveAtt = FALSE)))
 
 unlink(nmeInp)
 unlink(nmeOut)
-}
+
 
 }
 \seealso{

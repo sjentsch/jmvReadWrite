@@ -58,7 +58,6 @@ and \code{read_xpt} (\code{haven}) / \code{read.xport} (\code{foreign}) for SAS-
 }
 }
 \examples{
-\dontrun{
 # generate skewed variables
 set.seed(335)
 dtaInp <- data.frame(MP = rnorm(1000) * 1e-1 + rexp(1000, 2) * (1 - 1e-1),
@@ -79,7 +78,6 @@ crrXfm <- list(mdrPos = c("MP"), mdrNeg = c("MN"), strPos = c("SP"), strNeg = c(
 dtaOut <- jmvReadWrite::transform_vars_omv(dtaInp = dtaInp, varXfm = crrXfm)
 jmv::descriptives(data = dtaOut, skew = TRUE, sw = TRUE)
 
-}
 
 }
 \seealso{

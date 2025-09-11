@@ -76,7 +76,6 @@ SAS-transport-files. If you would like to use \code{haven}, you may need to inst
 }
 }
 \examples{
-\dontrun{
 dtaInp <- jmvReadWrite::bfi_sample2
 # create a new column (A1_1) containing a subset of the values in the original variable
 # whereas those lines are replaced with NAs
@@ -106,7 +105,7 @@ head(cbind(dtaOut[, "A1"], dtaInp[, c("A1", "A1_1")]))
 # ("A1_1") take precedence if the values are unequal
 dtaOut <- combine_cols_omv(dtaInp, varPrs = list(c("A1", "A1_1")), mdeCmb = "second")
 head(cbind(dtaOut[, "A1"], dtaInp[, c("A1", "A1_1")]))
-}
+
 
 }
 \seealso{

@@ -42,7 +42,6 @@
 #'   SAS-data-files, and [haven::read_xpt()] or [foreign::read.xport()] for SAS-transport-files.
 #'
 #' @examples
-#' \dontrun{
 #' dtaFrm <- jmvReadWrite::ToothGrowth[, c("len", "supp", "dose")]
 #' nmeOut <- tempfile(fileext = ".omv")
 #'
@@ -85,7 +84,7 @@
 #' jmvReadWrite::describe_omv(dtaInp = dtaFrm, fleOut = nmeOut, dtaTtl = "ToothGrowth",
 #'   dtaDsc = chrDsc)
 #' unlink(nmeOut)
-#' }
+#'
 #'
 #' @export describe_omv
 #'

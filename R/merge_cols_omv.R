@@ -76,7 +76,6 @@
 #'   [foreign::read.xport()] for SAS-transport-files.
 #'
 #' @examples
-#' \dontrun{
 #' dtaInp <- jmvReadWrite::bfi_sample2
 #' nmeInp <- paste0(tempfile(), "_", 1:3, ".rds")
 #' nmeOut <- tempfile(fileext = ".omv")
@@ -107,7 +106,7 @@
 #'
 #' unlink(nmeInp)
 #' unlink(nmeOut)
-#' }
+#'
 #'
 #' @export merge_cols_omv
 #'

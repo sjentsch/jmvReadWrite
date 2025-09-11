@@ -107,7 +107,6 @@
 #'   [foreign::read.xport()] for SAS-transport-files.
 #'
 #' @examples
-#' \dontrun{
 #' # create matrices for the different types of distance measures: continuous
 #' # (cntFrm), frequency counts (frqFrm) or binary (binFrm); all 20 R x 5 C
 #' set.seed(1)
@@ -170,7 +169,6 @@
 #' # the resulting matrix (10 x 10) with the Jaccard similarities
 #' print(dtaFrm)
 #'
-#' }
 #'
 #' @export distances_omv
 #'

@@ -57,7 +57,6 @@ respective function under “See also”, you can get a more detailed overview o
 }
 }
 \examples{
-\dontrun{
 # the exact value 24 appears 13 times in age
 bfi_sample <- jmvReadWrite::bfi_sample
 jmvReadWrite::search_omv(bfi_sample, 24, whlTrm = TRUE)
@@ -74,7 +73,7 @@ bfi_sample["6", "gender"] # Males
 srcRes <- jmvReadWrite::search_omv(bfi_sample, "males", whlTrm = FALSE, ignCse = TRUE)
 bfi_sample[srcRes[[1]][1], names(srcRes[1])] # Females
 bfi_sample[srcRes[[1]][6], names(srcRes[1])] # Males
-}
+
 
 }
 \seealso{

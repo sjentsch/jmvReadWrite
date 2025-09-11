@@ -33,7 +33,6 @@
 #'   SAS-data-files, and [haven::read_xpt()] or [foreign::read.xport()] for SAS-transport-files.
 #'
 #' @examples
-#' \dontrun{
 #' # Example 1: Convert from RDS
 #' # (use ToothGrowth as example, save it as RDS)
 #' nmeInp <- tempfile(fileext = ".rds")
@@ -64,7 +63,7 @@
 #' # gives a overview of the dataframe (all columns and some attributes)
 #' unlink(nmeInp)
 #' unlink(nmeOut)
-#' }
+#'
 #'
 #' @export convert_to_omv
 #'

@@ -53,7 +53,6 @@ and \code{read_xpt} (\code{haven}) / \code{read.xport} (\code{foreign}) for SAS-
 }
 }
 \examples{
-\dontrun{
 # Example 1: Convert from RDS
 # (use ToothGrowth as example, save it as RDS)
 nmeInp <- tempfile(fileext = ".rds")
@@ -84,7 +83,7 @@ cat(str(jmvReadWrite::read_omv(nmeOut, sveAtt = FALSE)))
 # gives a overview of the dataframe (all columns and some attributes)
 unlink(nmeInp)
 unlink(nmeOut)
-}
+
 
 }
 \seealso{

@@ -31,7 +31,6 @@
 #'   SAS-data-files, and [haven::read_xpt()] or [foreign::read.xport()] for SAS-transport-files.
 #'
 #' @examples
-#' \dontrun{
 #' nmeInp <- system.file("extdata", "AlbumSales.omv", package = "jmvReadWrite")
 #' nmeOut <- tempfile(fileext = ".omv")
 #' jmvReadWrite::sort_omv(dtaInp = nmeInp, fleOut = nmeOut, varSrt = "Image")
@@ -52,7 +51,7 @@
 #' cat(is.unsorted(-dtaFrm$Image))
 #' # if the sign of the variable is changed, it returns FALSE (i.e., the variable is
 #' # NOT unsorted)
-#' }
+#'
 #'
 #' @export sort_omv
 #'

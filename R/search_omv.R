@@ -24,7 +24,6 @@
 #' @seealso `replace_omv` uses [jmvReadWrite::read_omv()] and [jmvReadWrite::write_omv()] for reading and writing jamovi-files.
 #'
 #' @examples
-#' \dontrun{
 #' # the exact value 24 appears 13 times in age
 #' bfi_sample <- jmvReadWrite::bfi_sample
 #' jmvReadWrite::search_omv(bfi_sample, 24, whlTrm = TRUE)
@@ -41,7 +40,7 @@
 #' srcRes <- jmvReadWrite::search_omv(bfi_sample, "males", whlTrm = FALSE, ignCse = TRUE)
 #' bfi_sample[srcRes[[1]][1], names(srcRes[1])] # Females
 #' bfi_sample[srcRes[[1]][6], names(srcRes[1])] # Males
-#' }
+#'
 #'
 #' @export search_omv
 #'

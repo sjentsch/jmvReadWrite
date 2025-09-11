@@ -43,7 +43,6 @@
 #'   [haven::read_sas()] for SAS-data-files, and [haven::read_xpt()] or [foreign::read.xport()] for SAS-transport-files.
 #'
 #' @examples
-#' \dontrun{
 #' dtaInp <- jmvReadWrite::bfi_sample2
 #' nmeInp <- paste0(tempfile(), "_", 1:3, ".rds")
 #' nmeOut <- tempfile(fileext = ".omv")
@@ -86,7 +85,7 @@
 #' # reduced by 3 (i.e., "A1", "A2", "A3")
 #'
 #' unlink(nmeInp)
-#' }
+#'
 #'
 #' @export merge_rows_omv
 #'

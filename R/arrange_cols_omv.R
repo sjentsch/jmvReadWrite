@@ -39,7 +39,6 @@
 #'   SAS-data-files, and [haven::read_xpt()] or [foreign::read.xport()] for SAS-transport-files.
 #'
 #' @examples
-#' \dontrun{
 #' nmeInp <- system.file("extdata", "AlbumSales.omv", package = "jmvReadWrite")
 #' nmeOut <- tempfile(fileext = ".omv")
 #' # the original file has the variables in the order: "Adverts", "Airplay", "Image", "Sales"
@@ -53,7 +52,7 @@
 #' jmvReadWrite::arrange_cols_omv(dtaInp = nmeInp, fleOut = nmeOut, varMve = list(Sales = -3))
 #' names(jmvReadWrite::read_omv(nmeOut))
 #' unlink(nmeOut)
-#' }
+#'
 #'
 #' @export arrange_cols_omv
 #'

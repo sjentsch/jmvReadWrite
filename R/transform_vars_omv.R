@@ -36,7 +36,6 @@
 #'   SAS-data-files, and [haven::read_xpt()] or [foreign::read.xport()] for SAS-transport-files.
 #'
 #' @examples
-#' \dontrun{
 #' # generate skewed variables
 #' set.seed(335)
 #' dtaInp <- data.frame(MP = rnorm(1000) * 1e-1 + rexp(1000, 2) * (1 - 1e-1),
@@ -57,7 +56,6 @@
 #' dtaOut <- jmvReadWrite::transform_vars_omv(dtaInp = dtaInp, varXfm = crrXfm)
 #' jmv::descriptives(data = dtaOut, skew = TRUE, sw = TRUE)
 #'
-#' }
 #'
 #' @export transform_vars_omv
 #'

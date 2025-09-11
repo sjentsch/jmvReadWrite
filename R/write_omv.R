@@ -30,7 +30,6 @@
 #'   file.
 #'
 #' @examples
-#' \dontrun{
 #' # use the data set "ToothGrowth" and, if it exists, write it as
 #' # jamovi-file using write_omv()
 #' jmvReadWrite::ToothGrowth
@@ -54,7 +53,7 @@
 #' print(file.info(nmeOut)$size)
 #' # -> approx. 2600 (size may differ on different OSes)
 #' unlink(nmeOut)
-#' }
+#'
 #'
 #' @export write_omv
 

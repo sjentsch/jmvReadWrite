@@ -101,7 +101,6 @@ it using \code{install.packages("haven", dep = TRUE)}.
 }
 }
 \examples{
-\dontrun{
 dtaInp <- jmvReadWrite::bfi_sample2
 nmeInp <- paste0(tempfile(), "_", 1:3, ".rds")
 nmeOut <- tempfile(fileext = ".omv")
@@ -132,7 +131,7 @@ cat(colMeans(dtaOut[2:11]))
 
 unlink(nmeInp)
 unlink(nmeOut)
-}
+
 
 }
 \seealso{

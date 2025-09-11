@@ -34,9 +34,34 @@ R-package \code{foreign})
 Read files created of the statistical spreadsheet 'jamovi' (\url{https://www.jamovi.org})
 }
 \examples{
-\dontrun{
 nmeInp <- system.file("extdata", "ToothGrowth.omv", package = "jmvReadWrite")
+data <- jmvReadWrite::read_omv(fleInp = nmeInp)
+str(data)
+# shows the data frame including all jamovi attributes:
+# 'data.frame':	60 obs. of  16 variables:
+#  $ Filter 1          : logi  TRUE TRUE TRUE TRUE TRUE TRUE ...
+#   ..- attr(*, "name")= chr "Filter 1"
+#   ..- attr(*, "id")= int 18
+#   ..- attr(*, "columnType")= chr "Filter"
+#   ..- attr(*, "dataType")= chr "Integer"
+#   ..- attr(*, "measureType")= chr "Nominal"
+#   ..- attr(*, "formula")= chr "logLen < 1.5"
+#   ..- attr(*, "formulaMessage")= chr ""
+#   ..- attr(*, "parentId")= int 0
+#   ..- attr(*, "width")= int 78
+#   ..- attr(*, "type")= chr "integer"
+#   ..- attr(*, "importName")= chr ""
+#   ..- attr(*, "description")= chr ""
+#   ..- attr(*, "transform")= int 0
+#   ..- attr(*, "edits")= list()
+#   ..- attr(*, "missingValues")= list()
+#   ..- attr(*, "filterNo")= int 0
+#   ..- attr(*, "active")= logi FALSE
+# ... (continued)
+
+\dontrun{
 data <- jmvReadWrite::read_omv(fleInp = nmeInp, getSyn = TRUE)
+}
 # if the syntax couldn't be extracted, an empty list - length = 0 - is returned,
 # otherwise, the commands are shown and the first analysis is run, with the output
 # from the second analysis being assigned to the variable result
@@ -52,7 +77,6 @@ if (length(attr(data, "syntax")) >= 1) {
         # -> "main"      "assump"    "contrasts" "postHoc"   "emm"       "residsOV"
         # (the names of the six output tables)
     }
-}
 }
 
 }

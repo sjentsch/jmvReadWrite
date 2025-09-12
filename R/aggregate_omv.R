@@ -202,7 +202,7 @@ aggregate_omv <- function(dtaInp = NULL, fleOut = "", varAgg = c(), grpAgg = c()
 
         for (i in which(clcSel)) {
             crrNme <- sprintf("%s_%s", crrVar, clcStr[i])
-            crrRes <- do.call(aggregate,
+            crrRes <- do.call(stats::aggregate,
                               c(list(x = frmInp[!grpNA, crrVar], by = frmInp[!grpNA, grpAgg, drop = FALSE], FUN = getFnc(clcStr[i], drpNA)),
                                 rep(list(na.rm = drpNA), !(clcStr[i] %in% c("N", "Mss", "Mde", "Rng", "IQR")))))
             names(crrRes)[ncol(crrRes)] <- crrNme

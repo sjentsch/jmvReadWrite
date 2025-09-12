@@ -190,6 +190,10 @@ other columns.
 `jmvReadWrite` contains a number of helper functions that assist you with data
 management tasks that are frequently required:
 
+* [`aggregate_omv`](https://sjentsch.github.io/jmvReadWrite/reference/aggregate_omv.html):
+  Aggregates data (calculating, e.g., mean, median, etc.) from data sets in long
+  format.
+
 * [`arrange_cols_omv`](https://sjentsch.github.io/jmvReadWrite/reference/arrange_cols_omv.html):
   Re-arranges the columns of your data file in a requested order.
 

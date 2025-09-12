@@ -1,3 +1,14 @@
+# jmvReadWrite 0.4.12
+
+## Enhancements:
+* added `aggregate_omv`
+* parameter `varTme` for `wide2long_omv` can now be a vector with variable names
+  (previously it could only be a prefix)
+* changes suggested by pkgcheck (remove dontrun from examples, etc.)
+* reducing cyclomatic complexity for `wide2long_omv`
+
+---
+
 # jmvReadWrite 0.4.11
 
 ## Enhancements:

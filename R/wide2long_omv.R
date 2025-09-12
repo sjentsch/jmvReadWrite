@@ -108,8 +108,9 @@
 #'
 #' @export wide2long_omv
 #'
-wide2long_omv <- function(dtaInp = NULL, fleOut = "", varLst = c(), varExc = c(), varID = NULL, varTme = "cond", varSep = "_", varOrd = TRUE, varSrt = c(),
-                          excLvl = NULL, usePkg = c("foreign", "haven"), selSet = "", ...) {
+wide2long_omv <- function(dtaInp = NULL, fleOut = "", varLst = c(), varExc = c(), varID = NULL,
+                          varTme = "cond", varSep = "_", varOrd = TRUE, varSrt = c(), excLvl = NULL,
+                          usePkg = c("foreign", "haven"), selSet = "", ...) {
 
     # check and import input data set (either as data frame or from a file)
     if (!is.null(list(...)[["fleInp"]])) stop("Please use the argument dtaInp instead of fleInp.")
@@ -179,23 +180,11 @@ wide2long_omv <- function(dtaInp = NULL, fleOut = "", varLst = c(), varExc = c()
         crrPos <- which(dffSpl == min(dffSpl, na.rm = TRUE))
         # crrTms is used as parameter in crrArg and the if-condition below
         crrTms <- unique(vapply(varSpl, "[[", character(1), crrPos))
-        # assemble the list for varying, if crrTms are the only elements of left in varLst, an output
-        # variable “measure” is used as target, otherwise crrVry is assembled as named list with the
-        # target as name and all former variables for that step of the hierarchy as entries
-        if (all(crrNmV %in% crrTms)) {
-            crrVry <- list(measure = crrNmV)
-        } else {
-            vldPos <- which(!is.na(dffSpl))
-            crrVry <- list()
-            for (i in seq_along(varSpl)) {
-                tmpTgt <- paste0(varSpl[[i]][setdiff(vldPos, crrPos)], collapse = varSep)
-                crrVry[[tmpTgt]] <- unique(c(crrVry[[tmpTgt]], paste0(varSpl[[i]][vldPos], collapse = varSep)))
-            }
-        }
-        # assemble the arguments to call reshape (limiting the variable arguments - ... - to those permitted)
-        # rmvTms also corrects labels (if available) and variable names
-        crrArg <- list(data = dtaFrm, direction = "long", idvar = varID, sep = varSep, varying = crrVry, v.names = names(crrVry),
-                       timevar = paste0(pfxTme, rep(sum(is.finite(dffSpl)), numSpl)), times = crrTms)
+        # assemble the list for varying
+        crrVry <- crtVry(crrNmV = crrNmV, crrTms = crrTms, varSpl = varSpl, vldPos = which(!is.na(dffSpl)), crrPos = crrPos, varSep = varSep)
+        crrArg <- list(data = dtaFrm, direction = "long", idvar = varID, sep = varSep, varying = crrVry,
+                       v.names = names(crrVry), timevar = paste0(pfxTme, rep(sum(is.finite(dffSpl)), numSpl)),
+                       times = crrTms)
         dtaFrm <- rmvTms(do.call(stats::reshape, adjArg("stats::reshape", crrArg, ...,
                                                         c("data", "direction", "idvar", "sep", "varying", "times", "timevar", "v.names"))), crrTms)
         dtaFrm[[crrArg$timevar]] <- as.factor(dtaFrm[[crrArg$timevar]])
@@ -233,13 +222,33 @@ wide2long_omv <- function(dtaInp = NULL, fleOut = "", varLst = c(), varExc = c()
     rtnDta(dtaFrm = dtaFrm, fleOut = fleOut, dtaTtl = jmvTtl("_long"), ...)
 }
 
+crtVry <- function(crrNmV = c(), crrTms = c(), varSpl = c(), vldPos = NA, crrPos = NA, varSep = "_") {
+    # assemble the list for varying, if crrTms are the only elements of left in varLst, an output
+    # variable “measure” is used as target, otherwise crrVry is assembled as named list with the
+    # target as name and all former variables for that step of the hierarchy as entries
+    # assemble the arguments to call reshape (limiting the variable arguments - ... - to those permitted)
+    # rmvTms also corrects labels (if available) and variable names
+
+    if (all(crrNmV %in% crrTms)) {
+        list(measure = crrNmV)
+    } else {
+        crrVry <- list()
+        for (i in seq_along(varSpl)) {
+            tmpTgt <- paste0(varSpl[[i]][setdiff(vldPos, crrPos)], collapse = varSep)
+            crrVry[[tmpTgt]] <- unique(c(crrVry[[tmpTgt]], paste0(varSpl[[i]][vldPos], collapse = varSep)))
+        }
+        crrVry
+    }
+}
+
 ordCol <- function(varNme = c(), dtaNmV = c(), varID = c(), varLst = c()) {
     posVrL <- range(which(dtaNmV %in% varLst))
     varOrd <- c(varID[1], setdiff(dtaNmV[rep(seq(1, posVrL[1] - 1), posVrL[1] > 1)], varID), sort(varID[-1]),
                 setdiff(varNme, c(varID, setdiff(dtaNmV, varLst))),
                 setdiff(dtaNmV[rep(seq(posVrL[2] + 1, length(dtaNmV)), posVrL[2] < length(dtaNmV))], varID))
     if (length(c(setdiff(varNme, varOrd), setdiff(varOrd, varNme))) != 0) {
-        stop(paste0("Mismatch between old and new variable order - old: ", paste0(varNme, collapse = ", "), "; new: ", paste0(varOrd, collapse = ", "), "."))
+        stop(sprintf("Mismatch between old and new variable order - old: (%s); new: (%s).",
+                     paste0(varNme, collapse = ", "), paste0(varOrd, collapse = ", ")))
     }
 
     varOrd

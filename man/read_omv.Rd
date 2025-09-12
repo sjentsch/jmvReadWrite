@@ -59,6 +59,7 @@ str(data)
 #   ..- attr(*, "active")= logi FALSE
 # ... (continued)
 
+# getSyn requires jmvcore and RProtoBuf, and is thus not run here
 \dontrun{
 data <- jmvReadWrite::read_omv(fleInp = nmeInp, getSyn = TRUE)
 }

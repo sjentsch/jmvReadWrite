@@ -1,5 +1,4 @@
-^add_docs
-^doc$
+^add_docs$
 ^docs$
 ^pkgdown$
 ^TrialSPSS

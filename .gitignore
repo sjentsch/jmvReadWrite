@@ -22,10 +22,9 @@
 .Rproj.user/
 *.Rproj
 
-# produced vignettes and manual
+# produced vignettes, manual, and pkgdown site
 vignettes/*.html
 vignettes/*.pdf
-doc/
 docs/
 pkgdown/
 
@@ -42,9 +41,6 @@ pkgdown/
 
 # R Environment Variables
 .Renviron
-
-# pkgdown site
-docs/
 
 # translation temp files
 po/*~
@@ -65,7 +61,4 @@ TrialSPSS
 TrialOMV
 TrialOther
 Meta/
-inst/doc
-/doc/
 /Meta/
-docs

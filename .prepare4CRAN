@@ -55,7 +55,7 @@ pkgdown::clean_site()
 pkgdown::build_site()
 pkgdown::build_reference(run_dont_run = TRUE, preview = FALSE)
 pkgdown::build_reference_index()
-devtools::build_manual(path = "doc")
+devtools::build_manual(path = "docs")
 # NB: build_manual uses LaTeX which needs to be installed using those steps (on Ubuntu):
 # (1) sudo apt install texlive-latex-base 
 # (2) tlmgr init-usertree

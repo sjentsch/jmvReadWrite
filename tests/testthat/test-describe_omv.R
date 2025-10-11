@@ -138,6 +138,14 @@ test_that("describe_omv works", {
     expect_error(describe_omv(dtaInp = jmvReadWrite::ToothGrowth[, c("len", "supp", "dose")], fleOut = nmeOut),
       regexp = "^Calling describe_omv requires either the parameter dtaTtl \\(character vector\\) or the parameter dtaDsc \\(character vector or named list\\)\\.")
     expect_error(describe_omv(fleInp = file.path("..", "ToothGrowth.omv"), fleOut = nmeOut, dtaTtl = "ToothGrowth"), regexp = "Please use the argument dtaInp instead of fleInp\\.")
+    expect_error(describe_omv(dtaInp = jmvReadWrite::ToothGrowth[, c("len", "supp")], fleOut = nmeOut, dtaTtl = "ToothGrowth", dtaDsc = lstDsc),
+      regexp = "^The variable description \\(in dtaDsc\\) should contain all variables in the data set and no variables not contained in it\\.")
+    expect_error(describe_omv(dtaInp = jmvReadWrite::ToothGrowth[, c("len", "supp", "supp2", "dose")], fleOut = nmeOut, dtaTtl = "ToothGrowth", dtaDsc = lstDsc),
+      regexp = "^The variable description \\(in dtaDsc\\) should contain all variables in the data set and no variables not contained in it\\.")
+    expect_equal(defHdr("EN"), c(description = "Description", variables = "Variables", references = "References"))
+    expect_equal(defHdr("DE"), c(description = "Beschreibung", variables = "Variablen", references = "Referenzen"))
+    expect_equal(defHdr("JP"), c(description = "説明", variables = "変数", references = "引用文献"))
+    expect_equal(defHdr("NB"), c(description = "Beskrivelse", variables = "Variabler", references = "Referanser"))
     if (packageVersion("jmvcore") >= "2.4.3") {
         expect_warning(df4Chk <- describe_omv(dtaInp = file.path("..", "ToothGrowth.omv"), dtaTtl = "ToothGrowth"),
           regexp = "^The data set contains analyses\\. Those will be overwritten\\.")

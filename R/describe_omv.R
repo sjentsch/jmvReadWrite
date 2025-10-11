@@ -7,6 +7,8 @@
 #' @param dtaTtl Character vector with a title to be added to the data set (see Details; default: "")
 #' @param dtaDsc Description of the data set, either as character vector (HTML-formatted) or as named list with the entries "description", "variables",
 #'               "references", and "license" (see Details; default: "")
+#' @param lngDsc Language of the description (localizes the description components ["Description", "Variables", "References", and "License"];
+#'               default: "EN")
 #' @param usePkg Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata and SAS files; "foreign" is the default (it comes with
 #'               base R), but "haven" is newer and more comprehensive
 #' @param selSet Name of the data set that is to be selected from the workspace (only applies when reading .RData-files)
@@ -88,7 +90,7 @@
 #'
 #' @export describe_omv
 #'
-describe_omv <- function(dtaInp = NULL, fleOut = "", dtaTtl = c(), dtaDsc = c(), usePkg = c("foreign", "haven"), selSet = "", ...) {
+describe_omv <- function(dtaInp = NULL, fleOut = "", dtaTtl = c(), dtaDsc = c(), lngDsc = "EN", usePkg = c("foreign", "haven"), selSet = "", ...) {
 
     # check the input parameters: either dtaTtl or dtaDsc need to be given (and in the correct format)
     dscPrm(dtaTtl, dtaDsc)
@@ -101,11 +103,22 @@ describe_omv <- function(dtaInp = NULL, fleOut = "", dtaTtl = c(), dtaDsc = c(),
         warning("jmvcore version 2.4.3 (or higher) is required for using describe_omv.\n\n")
         return(invisible(NULL))
     }
-    if (!jmvPtB()) stop("The R-packages RProtoBuf and jmvcore must be installed for using describe_omv (see warnings() for further details).")
+    if (!jmvPtB())
+        stop("The R-packages RProtoBuf and jmvcore must be installed for using describe_omv (see warnings() for further details).")
 
-    # check whether dtaDsc is a list, and if so, convert it to a HTML desription
+    # check whether dtaDsc is a list, and if so, convert it to a HTML desription;
+    # in addition: add a description if there doesn't exist one already
     if (is.list(dtaDsc)) {
-        dtaDsc <- crtHTM(dtaDsc)
+        if (length(setdiff(names(dtaDsc[["variables"]]), names(dtaFrm))) != 0 ||
+            length(setdiff(names(dtaFrm), names(dtaDsc[["variables"]]))) != 0)
+            stop("The variable description (in dtaDsc) should contain all variables in the data set and no variables not contained in it.")
+        for (crrClm in names(dtaDsc[["variables"]])) {
+            if (!any(c("jmv-desc", "description") %in% names(attributes(dtaFrm[, crrClm])))) {
+                attr(dtaFrm[, crrClm], "jmv-desc")    <- dtaDsc[["variables"]][[crrClm]]
+                attr(dtaFrm[, crrClm], "description") <- dtaDsc[["variables"]][[crrClm]]
+            }
+        }
+        dtaDsc <- crtHTM(dtaDsc, defHdr(lngDsc))
     }
 
     # check whether the data set contains analyses and, if so warn that they will be overwritten
@@ -171,22 +184,35 @@ clnHTM <- function(inpLne = c(), toHTM = FALSE) {
 }
 
 # create HTML from the list-version of dtaDsc
-crtHTM <- function(inpDsc = NULL) {
+crtHTM <- function(inpDsc = NULL, nmeHdr = NULL) {
     outDsc <- c()
-    outDsc <- paste0(outDsc, "<p><strong>Description:</strong></p>", clnHTM(inpDsc[["description"]]))
-    outDsc <- paste0(outDsc, "<p><br/><strong>Variables:</strong></p><ul>")
+    outDsc <- paste0(outDsc,      "<p><strong>", nmeHdr["description"], ":</strong></p>", clnHTM(inpDsc[["description"]]))
+    outDsc <- paste0(outDsc, "<p><br/><strong>", nmeHdr["variables"],   ":</strong></p><ul>")
     for (varNme in names(inpDsc[["variables"]])) {
          outDsc <- paste0(outDsc, clnHTM(paste0("<li><strong><em>", varNme, ":</em></strong> ", inpDsc[["variables"]][[varNme]], "</li>")))
     }
     outDsc <- paste0(outDsc, "</ul>")
     if (length(inpDsc[["references"]]) > 0 && all(nzchar(inpDsc[["references"]]))) {
-        outDsc <- paste0(outDsc, "<p><br/><strong>References:</strong></p>", clnHTM(inpDsc[["references"]]))
+        outDsc <- paste0(outDsc, "<p><br/><strong>", nmeHdr["references"], ":</strong></p>", clnHTM(inpDsc[["references"]]))
     }
     if (length(inpDsc[["license"]]) > 0    && all(nzchar(inpDsc[["license"]]))) {
         outDsc <- paste0(outDsc, "<p><br/>", clnHTM(paste0("<em>", inpDsc[["license"]], "</em>")))
     }
 
     return(outDsc)
+}
+
+# define headers for crtHTM
+defHdr <- function(lngDsc = "EN") {
+    if        (lngDsc == "DE") {
+        c(description = "Beschreibung", variables = "Variablen", references = "Referenzen")
+    } else if (lngDsc == "JP") {
+        c(description = "説明", variables = "変数", references = "引用文献")
+    } else if (lngDsc == "NB") {
+        c(description = "Beskrivelse", variables = "Variabler", references = "Referanser")
+    } else {  # defaults to English
+        c(description = "Description", variables = "Variables", references = "References")
+    }
 }
 
 # check input parameters

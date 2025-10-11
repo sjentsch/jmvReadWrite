@@ -157,8 +157,8 @@ cnvCol <- function(crrCol = NULL, tgtTyp = "character") {
     if (is.character(crrCol)) crrCol <- trimws(crrCol)
     if (is.numeric(crrCol) && tgtTyp ==  "integer") crrCol <- round(crrCol)
     # actual conversion; jamovi stores factors differently depending on whether they have the dataType Integer or Text
-    if (is.factor(crrCol) && tgtTyp == "integer") {
-        crrCol <- if (intFnC(crrCol)) as.integer(as.character(crrCol)) else as.integer(crrCol) - 1L
+    if (is.factor(crrCol) && tgtTyp %in% c("integer", "numeric")) {
+        crrCol <- if (intFnC(crrCol)) methods::as(as.character(crrCol), tgtTyp) else as.integer(crrCol) - 1L
     } else if (tgtTyp == "factor") {
         # tibble: conversion if the source is a column with the type dbl+lbl
         if ("labels" %in% names(crrAtt)) {

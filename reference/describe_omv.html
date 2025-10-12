@@ -100,20 +100,20 @@ base R), but "haven" is newer and more comprehensive</p></dd>
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
 
 <ul><li><p>The aim of this function is to add a title and a data set description to jamovi data files. Two typical use cases would be (1) to help creating data sets
-to be used in teaching (i.e., either creating or using data sets in R, and afterwards adding a description to those), and (2) to provide ”properly
-described“ data when publishing in a repository such as the OSF).</p></li>
+to be used in teaching (i.e., either creating or using data sets in R, and afterwards adding a description to those), and (2) to provide "properly
+described" data when publishing in a repository such as the OSF).</p></li>
 <li><p>NB: The data set should not contain any existing analyses. These will be overwritten (a  warning is issued informing you about that).</p></li>
-<li><p><code>dtaTtl</code> is a title for the dataset (at the top of the results output, i.e., that title which initially is “Results” when you create a new data set in
+<li><p><code>dtaTtl</code> is a title for the dataset (at the top of the results output, i.e., that title which initially is "Results" when you create a new data set in
 jamovi).</p></li>
 <li><p><code>dtaDsc</code> can either be a character vector (with length = 1) containing HTML-formatted text that describes the data set (see <code>chrDsc</code> in the examples for
-HTML tags that are currently implemented; putting “unformatted” text is not a problem, but then the result is just plain text without formatting).
+HTML tags that are currently implemented; putting "unformatted" text is not a problem, but then the result is just plain text without formatting).
 Alternatively, <code>dtaDcs</code> can be a named list with the entries <code>description</code>, <code>variables</code>, <code>references</code>, <code>license</code>. All entries except from <code>variables</code>
 contain character vectors (length = 1); <code>variables</code> shall be a named list with the variable name as name and a description what the variable contains as
 entry. <code>description</code> and <code>variables</code> must be given, <code>references</code> and <code>license</code> can be left blank (""; but the names must be present in the list). An
 example for both a named list with a description (<code>lstDsc</code>), as well as a character vector with all HTML tags that are implemented (<code>chrDsc</code>) can be found
 in the examples below.</p></li>
 <li><p>The ellipsis-parameter (<code>...</code>) can be used to submit arguments / parameters to the functions that are used for reading and writing the data. By clicking
-on the respective function under “See also”, you can get a more detailed overview over which parameters each of those functions take. The functions are:
+on the respective function under "See also", you can get a more detailed overview over which parameters each of those functions take. The functions are:
 <code>read_omv</code> and <code>write_omv</code> (for jamovi-files), <code>read.table</code> (for CSV / TSV files; using similar defaults as <code>read.csv</code> for CSV and <code>read.delim</code> for TSV
 which both are based upon <code>read.table</code>), <code>load</code> (for .RData-files), <code>readRDS</code> (for .rds-files), <code>read_sav</code> (needs the R-package <code>haven</code>) or <code>read.spss</code>
 (needs the R-package <code>foreign</code>) for SPSS-files, <code>read_dta</code> (<code>haven</code>) / <code>read.dta</code> (<code>foreign</code>) for Stata-files, <code>read_sas</code> (<code>haven</code>) for SAS-data-files,
@@ -154,7 +154,7 @@ SAS-data-files, and <code><a href="https://haven.tidyverse.org/reference/read_xp
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># the code underneath should cover all formatting options jamovi is able to use (paste0 is only</span></span></span>
 <span class="r-in"><span><span class="co"># for readability)</span></span></span>
-<span class="r-in"><span><span class="va">chrDsc</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"&lt;p&gt;&lt;strong&gt;Trial – all formattings:&lt;/strong&gt;&lt;br/&gt;&lt;strong&gt;bold&lt;/strong&gt;&lt;br/&gt;"</span>,</span></span>
+<span class="r-in"><span><span class="va">chrDsc</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"&lt;p&gt;&lt;strong&gt;Trial - all formattings:&lt;/strong&gt;&lt;br/&gt;&lt;strong&gt;bold&lt;/strong&gt;&lt;br/&gt;"</span>,</span></span>
 <span class="r-in"><span>                 <span class="st">"&lt;strong&gt;&lt;em&gt;bold, italics&lt;/em&gt;&lt;/strong&gt;&lt;br/&gt;&lt;em&gt;italics&lt;/em&gt;&lt;br/&gt;&lt;u&gt;underlined"</span>,</span></span>
 <span class="r-in"><span>                 <span class="st">"&lt;/u&gt;&lt;br/&gt;link:&lt;a href=\"https://jamovi.org﻿﻿﻿\" target=\"_blank\"&gt;https://"</span>,</span></span>
 <span class="r-in"><span>                 <span class="st">"jamovi.org﻿﻿﻿&lt;/a&gt;&lt;br/&gt;&lt;s&gt;strikethrough&lt;/s&gt;&lt;br/&gt;C&lt;sub&gt;2&lt;/sub&gt;H&lt;sub&gt;5&lt;/sub&gt;"</span>,</span></span>

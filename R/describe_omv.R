@@ -18,20 +18,20 @@
 #'
 #' @details
 #' * The aim of this function is to add a title and a data set description to jamovi data files. Two typical use cases would be (1) to help creating data sets
-#'   to be used in teaching (i.e., either creating or using data sets in R, and afterwards adding a description to those), and (2) to provide ”properly
-#'   described“ data when publishing in a repository such as the OSF).
+#'   to be used in teaching (i.e., either creating or using data sets in R, and afterwards adding a description to those), and (2) to provide "properly
+#'   described" data when publishing in a repository such as the OSF).
 #' * NB: The data set should not contain any existing analyses. These will be overwritten (a  warning is issued informing you about that).
-#' * `dtaTtl` is a title for the dataset (at the top of the results output, i.e., that title which initially is “Results” when you create a new data set in
+#' * `dtaTtl` is a title for the dataset (at the top of the results output, i.e., that title which initially is "Results" when you create a new data set in
 #'   jamovi).
 #' * `dtaDsc` can either be a character vector (with length = 1) containing HTML-formatted text that describes the data set (see `chrDsc` in the examples for
-#'   HTML tags that are currently implemented; putting “unformatted” text is not a problem, but then the result is just plain text without formatting).
+#'   HTML tags that are currently implemented; putting "unformatted" text is not a problem, but then the result is just plain text without formatting).
 #'   Alternatively, `dtaDcs` can be a named list with the entries `description`, `variables`, `references`, `license`. All entries except from `variables`
 #'   contain character vectors (length = 1); `variables` shall be a named list with the variable name as name and a description what the variable contains as
 #'   entry. `description` and `variables` must be given, `references` and `license` can be left blank (""; but the names must be present in the list). An
 #'   example for both a named list with a description (`lstDsc`), as well as a character vector with all HTML tags that are implemented (`chrDsc`) can be found
 #'   in the examples below.
 #' * The ellipsis-parameter (`...`) can be used to submit arguments / parameters to the functions that are used for reading and writing the data. By clicking
-#'   on the respective function under “See also”, you can get a more detailed overview over which parameters each of those functions take. The functions are:
+#'   on the respective function under "See also", you can get a more detailed overview over which parameters each of those functions take. The functions are:
 #'   `read_omv` and `write_omv` (for jamovi-files), `read.table` (for CSV / TSV files; using similar defaults as `read.csv` for CSV and `read.delim` for TSV
 #'   which both are based upon `read.table`), `load` (for .RData-files), `readRDS` (for .rds-files), `read_sav` (needs the R-package `haven`) or `read.spss`
 #'   (needs the R-package `foreign`) for SPSS-files, `read_dta` (`haven`) / `read.dta` (`foreign`) for Stata-files, `read_sas` (`haven`) for SAS-data-files,
@@ -68,7 +68,7 @@
 #'
 #' # the code underneath should cover all formatting options jamovi is able to use (paste0 is only
 #' # for readability)
-#' chrDsc <- paste0("<p><strong>Trial – all formattings:</strong><br/><strong>bold</strong><br/>",
+#' chrDsc <- paste0("<p><strong>Trial - all formattings:</strong><br/><strong>bold</strong><br/>",
 #'                  "<strong><em>bold, italics</em></strong><br/><em>italics</em><br/><u>underlined",
 #'                  "</u><br/>link:<a href=\"https://jamovi.org﻿﻿﻿\" target=\"_blank\">https://",
 #'                  "jamovi.org﻿﻿﻿</a><br/><s>strikethrough</s><br/>C<sub>2</sub>H<sub>5</sub>",
@@ -207,7 +207,8 @@ defHdr <- function(lngDsc = "EN") {
     if        (lngDsc == "DE") {
         c(description = "Beschreibung", variables = "Variablen", references = "Referenzen")
     } else if (lngDsc == "JP") {
-        c(description = "説明", variables = "変数", references = "引用文献")
+#       c(description = "説明", variables = "変数", references = "引用文献")
+        c(description = "\u8aac\u660e", variables = "\u5909\u6570", references = "\u5f15\u7528\u6587\u732e")
     } else if (lngDsc == "NB") {
         c(description = "Beskrivelse", variables = "Variabler", references = "Referanser")
     } else {  # defaults to English

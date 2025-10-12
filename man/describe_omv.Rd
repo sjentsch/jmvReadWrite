@@ -9,6 +9,7 @@ describe_omv(
   fleOut = "",
   dtaTtl = c(),
   dtaDsc = c(),
+  lngDsc = "EN",
   usePkg = c("foreign", "haven"),
   selSet = "",
   ...
@@ -25,6 +26,9 @@ returned instead}
 
 \item{dtaDsc}{Description of the data set, either as character vector (HTML-formatted) or as named list with the entries "description", "variables",
 "references", and "license" (see Details; default: "")}
+
+\item{lngDsc}{Language of the description (localizes the description components: "Description", "Variables", "References", and "License";
+default: "EN")}
 
 \item{usePkg}{Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata and SAS files; "foreign" is the default (it comes with
 base R), but "haven" is newer and more comprehensive}

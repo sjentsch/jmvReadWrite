@@ -7,7 +7,7 @@
 #' @param dtaTtl Character vector with a title to be added to the data set (see Details; default: "")
 #' @param dtaDsc Description of the data set, either as character vector (HTML-formatted) or as named list with the entries "description", "variables",
 #'               "references", and "license" (see Details; default: "")
-#' @param lngDsc Language of the description (localizes the description components ["Description", "Variables", "References", and "License"];
+#' @param lngDsc Language of the description (localizes the description components: "Description", "Variables", "References", and "License";
 #'               default: "EN")
 #' @param usePkg Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata and SAS files; "foreign" is the default (it comes with
 #'               base R), but "haven" is newer and more comprehensive

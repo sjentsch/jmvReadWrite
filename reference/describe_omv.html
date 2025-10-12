@@ -44,6 +44,7 @@
 <span>  fleOut <span class="op">=</span> <span class="st">""</span>,</span>
 <span>  dtaTtl <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  dtaDsc <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  lngDsc <span class="op">=</span> <span class="st">"EN"</span>,</span>
 <span>  usePkg <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"foreign"</span>, <span class="st">"haven"</span><span class="op">)</span>,</span>
 <span>  selSet <span class="op">=</span> <span class="st">""</span>,</span>
 <span>  <span class="va">...</span></span>
@@ -71,6 +72,11 @@ returned instead</p></dd>
 <dt id="arg-dtadsc">dtaDsc<a class="anchor" aria-label="anchor" href="#arg-dtadsc"></a></dt>
 <dd><p>Description of the data set, either as character vector (HTML-formatted) or as named list with the entries "description", "variables",
 "references", and "license" (see Details; default: "")</p></dd>
+
+
+<dt id="arg-lngdsc">lngDsc<a class="anchor" aria-label="anchor" href="#arg-lngdsc"></a></dt>
+<dd><p>Language of the description (localizes the description components: "Description", "Variables", "References", and "License";
+default: "EN")</p></dd>
 
 
 <dt id="arg-usepkg">usePkg<a class="anchor" aria-label="anchor" href="#arg-usepkg"></a></dt>

@@ -202,17 +202,204 @@ crtHTM <- function(inpDsc = NULL, nmeHdr = NULL) {
     return(outDsc)
 }
 
-# define headers for crtHTM
-defHdr <- function(lngDsc = "EN") {
-    if        (lngDsc == "DE") {
+# define headers for crtHTM (in different languages)
+defHdr <- function(crrLng = "EN") {
+    if        (crrLng == "DE") {
         c(description = "Beschreibung", variables = "Variablen", references = "Referenzen")
-    } else if (lngDsc == "JP") {
-#       c(description = "説明", variables = "変数", references = "引用文献")
+    } else if (crrLng == "JP") {
+#       c(description = "説明", variables = "変数", references = "引用文献") -> stringi::stri_escape_unicode()
         c(description = "\u8aac\u660e", variables = "\u5909\u6570", references = "\u5f15\u7528\u6587\u732e")
-    } else if (lngDsc == "NB") {
+    } else if (crrLng == "NB") {
         c(description = "Beskrivelse", variables = "Variabler", references = "Referanser")
     } else {  # defaults to English
         c(description = "Description", variables = "Variables", references = "References")
+    }
+}
+
+# define some common licenses and make them translateable
+defLic <- function(licNme = "", licHld = "", crrLng = "EN") {
+    if        (licNme == "CC0") {
+        if        (crrLng == "DE") {
+            paste("Dieser Datensatz ist uneingeschränkt zugänglich, und der Autor hat auf alle seine Rechte an dem",
+                  "Werk verzichtet. Sie können den Datensatz daher ohne vorherige Genehmigung kopieren, verändern,",
+                  "und verbreiten, auch für kommerzielle Zwecke. Wenn der Datensatz auf empirischen Daten basiert,",
+                  "sind die Autoren im Abschnitt 'Referenzen' des Datensatzes angegeben. Zitieren Sie in diesem Fall ",
+                  "bitte die entsprechenden Referenzen, wenn Sie den Datensatz verwenden.")
+        } else if (crrLng == "EN") {
+            paste("This data set is in the public domain, and the author has waived all of his or her rights to the",
+                  "work. You can therefore copy, modify and distribute the data set, even for commercial purposes,",
+                  "all without asking permission. If the data set is based upon empirical work, the authors are",
+                  "given in the 'References'-section of the data set. In such case, please cite the respective",
+                  "reference(s) when using the dataset.")
+        } else if (crrLng == "JP") {
+            stop("No translation available (yet) for %s.", crrLng)
+        } else if (crrLng == "NB") {
+            paste("Datasettet er offentlig tilgjengelig, og forfatteren har fraskrevet seg alle rettigheter til",
+                  "datasettet. Du kan derfor kopiere, endre og distribuere datasettet, også til kommersielle",
+                  "formål, uten å be om tillatelse. Hvis datasettet er empirisk, er forfatterne oppgitt under",
+                  "'Referanser', vennligst siter de aktuelle referansene hvis det er tilfellet.")
+        } else {
+            stop("No translation available (yet) for %s.", crrLng)
+        }
+    } else if (licNme == "DT_CC4-BY-NC-ND") {
+        if        (crrLng == "DE") {
+            paste("Dieser Datensatz enthält Daten einer wissenschaftlichen Studie, deren Urheberrecht bei den",
+                  "Autoren der Studie liegt. Ohne die ausdrückliche Zustimmung der Autoren",
+                  ifelse(licHld == "", "", paste0(" und von ", licHld)), "darf dieser Datensatz nicht zu",
+                  "kommerziellen Zwecken verbreitet, bearbeitet oder verwendet werden ohne die Quelle anzugeben",
+                  "(d. h. der Datensatz unterliegt den Bedingungen der CC BY-NC-ND-Lizenz).")
+        } else if (crrLng == "EN") {
+            paste("This data set contains data of a scientific study and the study authors therefore own the copyright.",
+                  "Without the study authors`", ifelse(licHld == "", "", paste0(" and ", licHld, "`s")), "explicit",
+                  "consent, this data set may not be distributed for commercial purposes, not be edited, and not be used",
+                  "without acknowledging its source (i.e., the terms of a CC BY-NC-ND license).")
+        } else if (crrLng == "JP") {
+            stop("No translation available (yet) for %s.", crrLng)
+        } else if (crrLng == "NB") {
+            paste("Dette datasettet inneholder data fra en vitenskapelig studie, og studieforfatterne eier derfor",
+                  "opphavsretten. Uten uttrykkelig samtykke fra studieforfatterne",
+                  ifelse(licHld == "", "", paste0(" og ", licHld)), "kan dette datasettet ikke distribueres for",
+                  "kommersielle formål, ikke redigeres og ikke brukes uten å oppgi kilden (dvs. vilkårene i en CC",
+                  "BY-NC-ND-lisens).")
+        } else {
+            stop("No translation available (yet) for %s.", crrLng)
+        }
+    } else if (licNme == "FC_CC4-BY-NC-ND") {
+        if        (licHld == "")
+            stop("When using this license, a license holder needs to be defined.")
+        if        (crrLng == "DE") {
+            paste0("Dieser Datensatz wurde von ", licHld, " erstellt, der somit das Urheberrecht daran besitzt.",
+                   "Ohne die ausdrückliche Zustimmung von ", licHld, " darf dieser Datensatz nicht für kommerzielle ",
+                   "Zwecke verbreitet, nicht bearbeitet und nicht ohne Angabe der Quelle verwendet werden (d. h. ",
+                   "der Datensatz unterliegt den Bedingungen der CC BY-NC-ND-Lizenz).")
+        } else if (crrLng == "EN") {
+            paste0("This data set was constructed by ", licHld, ", who therefore owns the copyright. Without the ",
+                   "explicit consent of ", licHld, ", this data set may not be distributed for commercial purposes, ",
+                   "not be edited, and not be used without acknowledging its source (i.e., the terms of the CC",
+                   "BY-NC-ND license).")
+        } else if (crrLng == "JP") {
+            stop("No translation available (yet) for %s.", crrLng)
+        } else if (crrLng == "NB") {
+            paste0("Datasettet er utarbeidet av ", licHld, ", som derfor eier opphavsretten. Uten uttrykkelig ",
+                   "samtykke fra ", licHld, " kan dette datasettet ikke distribueres for kommersielle formål, ",
+                   "redigeres eller brukes uten å oppgi kilden (dvs. vilkårene i CC BY-NC-ND-lisens).")
+        } else {
+            stop("No translation available (yet) for %s.", crrLng)
+        }
+    } else if (licNme == "RP_GPL2") {
+        if        (licHld == "")
+            stop("When using this license, the R-package where the data are originating from needs to be defined.")
+        if        (crrLng == "DE") {
+            paste0("Dieser Datensatz ist Teil des R-Pakets '", licHld, ", das unter den Bedingungen der GNU General ",
+                   "Public License 2.x veröffentlicht wurde. Sie können die Daten sowohl privat als auch kommerziell ",
+                   "nutzen, verbreiten oder verändern. Bei der Verwendung des Datensatzes müssen Sie die Quelle ",
+                   "angeben und alle Änderungen, die Sie vornehmen, unter derselben Lizenz veröffentlichen. Wenn der ",
+                   "Datensatz auf empirischer Forschung basiert, sind die Autoren im Abschnitt 'Referenzen' ",
+                   "angegeben. Zitieren Sie in diesem Fall die Studie, wenn Sie den Datensatz verwenden.")
+        } else if (crrLng == "EN") {
+            paste0("This data set was provided as part of the R-package '", licHld, "', which is published under ",
+                   "the terms of the GNU General Public License 2.x. You may use the data both privately and ",
+                   "commercially, distribute or modify them. When using the data set, you need to disclose the ",
+                   "source, and publish any modifications you may make under the same license. If the data set is ",
+                   "based on empirical data, the authors are given in the 'References'-section. In such case, please ",
+                   "cite them when using the dataset.")
+        } else if (crrLng == "JP") {
+            stop("No translation available (yet) for %s.", crrLng)
+        } else if (crrLng == "NB") {
+            paste0("Dette datasettet er en del av R-pakken '", licHld, "', som er publisert under vilkårene i GNU ",
+                   "General Public License 2.x. Du kan bruke dataene både privat og kommersielt, distribuere eller ",
+                   "endre dem. Når du bruker datasettet, må du oppgi kilden og publisere eventuelle endringer du ",
+                   "gjør under samme lisens. Hvis datasettet er basert på empiriske data, er forfatterne oppgitt ",
+                   "under 'Referanser'. Vennligst oppgi referansene i slike tilfeller når du bruker datasettet.")
+        } else {
+            stop("No translation available (yet) for %s.", crrLng)
+        }
+    } else if (licNme == "RP_GPL3") {
+        if        (licHld == "")
+            stop("When using this license, the R-package where the data are originating from needs to be defined.")
+        if        (crrLng == "DE") {
+            paste0("Dieser Datensatz ist Teil des R-Pakets '", licHld, ", das unter den Bedingungen der GNU General ",
+                   "Public License 3.0 veröffentlicht wurde. Sie können die Daten sowohl privat als auch kommerziell ",
+                   "nutzen, verbreiten oder verändern. Bei der Verwendung des Datensatzes müssen Sie die Quelle ",
+                   "angeben und alle Änderungen, die Sie vornehmen, unter derselben Lizenz veröffentlichen. Wenn der ",
+                   "Datensatz auf empirischer Forschung basiert, sind die Autoren im Abschnitt 'Referenzen' ",
+                   "angegeben. Zitieren Sie in diesem Fall die Studie, wenn Sie den Datensatz verwenden.")
+        } else if (crrLng == "EN") {
+            paste0("This data set was provided as part of the R-package '", licHld, "', which is published under ",
+                   "the terms of the GNU General Public License 3.0. You may use the data both privately and ",
+                   "commercially, distribute or modify them. When using the data set, you need to disclose the ",
+                   "source, and publish any modifications you may make under the same license. If the data set is ",
+                   "based on empirical data, the authors are given in the 'References'-section. In such case, please ",
+                   "cite them when using the dataset.")
+        } else if (crrLng == "JP") {
+            stop("No translation available (yet) for %s.", crrLng)
+        } else if (crrLng == "NB") {
+            paste0("Dette datasettet er en del av R-pakken '", licHld, "', som er publisert under vilkårene i GNU ",
+                   "General Public License 3.0. Du kan bruke dataene både privat og kommersielt, distribuere eller ",
+                   "endre dem. Når du bruker datasettet, må du oppgi kilden og publisere eventuelle endringer du ",
+                   "gjør under samme lisens. Hvis datasettet er basert på empiriske data, er forfatterne oppgitt ",
+                   "under 'Referanser'. Vennligst oppgi referansene i slike tilfeller når du bruker datasettet.")
+        } else {
+            stop("No translation available (yet) for %s.", crrLng)
+        }
+    } else if (licNme == "RP_AGPL3") {
+        if        (licHld == "")
+            stop("When using this license, the R-package where the data are originating from needs to be defined.")
+        if        (crrLng == "DE") {
+            paste0("Dieser Datensatz ist Teil des R-Pakets '", licHld, "', das unter den Bedingungen der GNU Affero ",
+                   "General Public License 3.0 veröffentlicht wurde. Sie können die Daten sowohl privat als auch ",
+                   "kommerziell nutzen, verbreiten oder verändern. Bei der Verwendung des Datensatzes müssen Sie die ",
+                   "Quelle angeben und alle Änderungen, die Sie vornehmen, unter derselben Lizenz veröffentlichen. ",
+                   "Wenn der Datensatz auf empirischer Forschung basiert, sind die Autoren im Abschnitt 'Referenzen' ",
+                   "angegeben. Zitieren Sie in diesem Fall die Studie, wenn Sie den Datensatz verwenden.")
+        } else if (crrLng == "EN") {
+            paste0("This data set was provided as part of the R-package '", licHld, "', which is published under ",
+                   "the terms of the GNU Affero Public License 3.0. You may use the data both privately and ",
+                   "commercially, distribute or modify them. When using the data set, you need to disclose the ",
+                   "source, and publish any modifications you may make under the same license. If the data set is ",
+                   "based on empirical data, the authors are given in the 'References'-section. In such case, please ",
+                   "cite them when using the dataset.")
+        } else if (crrLng == "JP") {
+            stop("No translation available (yet) for %s.", crrLng)
+        } else if (crrLng == "NB") {
+            paste0("Dette datasettet er en del av R-pakken '", licHld, "', som er publisert under vilkårene i GNU ",
+                   "Affero General Public License 3.0. Du kan bruke dataene både privat og kommersielt, distribuere ",
+                   "eller endre dem. Når du bruker datasettet, må du oppgi kilden og publisere eventuelle endringer ",
+                   "du gjør under samme lisens. Hvis datasettet er basert på empiriske data, er forfatterne oppgitt ",
+                   "under 'Referanser'. Vennligst oppgi referansene i slike tilfeller når du bruker datasettet.")
+        } else {
+            stop("No translation available (yet) for %s.", crrLng)
+        }
+    } else if (licNme == "RP_LGPL3") {
+        if        (licHld == "")
+            stop("When using this license, the R-package where the data are originating from needs to be defined.")
+        if        (crrLng == "DE") {
+            paste0("Dieser Datensatz ist Teil des R-Pakets '", licHld, "', das unter den Bedingungen der GNU Lesser ",
+                   "General Public License 3.0 veröffentlicht wurde. Sie können die Daten sowohl privat als auch ",
+                   "kommerziell nutzen, verbreiten oder verändern. Bei der Verwendung des Datensatzes müssen Sie die ",
+                   "Quelle angeben und alle Änderungen, die Sie vornehmen, unter derselben Lizenz veröffentlichen. ",
+                   "Wenn der Datensatz auf empirischer Forschung basiert, sind die Autoren im Abschnitt 'Referenzen' ",
+                   "angegeben. Zitieren Sie in diesem Fall die Studie, wenn Sie den Datensatz verwenden.")
+        } else if (crrLng == "EN") {
+            paste0("This data set was provided as part of the R-package '", licHld, "', which is published under ",
+                   "the terms of the GNU Lesser General Public License 3.0. You may use the data both privately and ",
+                   "commercially, distribute or modify them. When using the data set, you need to disclose the ",
+                   "source, and publish any modifications you may make under the same license. If the data set is ",
+                   "based on empirical data, the authors are given in the 'References'-section. In such case, please ",
+                   "cite them when using the dataset.")
+        } else if (crrLng == "JP") {
+            stop("No translation available (yet) for %s.", crrLng)
+        } else if (crrLng == "NB") {
+            paste0("Dette datasettet er en del av R-pakken '", licHld, "', som er publisert under vilkårene i GNU ",
+                   "Lesser General Public License 3.0. Du kan bruke dataene både privat og kommersielt, distribuere ",
+                   "eller endre dem. Når du bruker datasettet, må du oppgi kilden og publisere eventuelle endringer ",
+                   "du gjør under samme lisens. Hvis datasettet er basert på empiriske data, er forfatterne oppgitt ",
+                   "under 'Referanser'. Vennligst oppgi referansene i slike tilfeller når du bruker datasettet.")
+        } else {
+            stop("No translation available (yet) for %s.", crrLng)
+        }
+    } else {
+        c()
     }
 }
 

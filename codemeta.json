@@ -185,7 +185,7 @@
     },
     "SystemRequirements": null
   },
-  "fileSize": "1002.053KB",
+  "fileSize": "1017.282KB",
   "citation": [
     {
       "@type": "SoftwareSourceCode",
@@ -205,6 +205,7 @@
   ],
   "relatedLink": ["https://sjentsch.github.io/jmvReadWrite/", "https://CRAN.R-project.org/package=jmvReadWrite"],
   "releaseNotes": "https://github.com/sjentsch/jmvReadWrite/blob/master/NEWS.md",
+  "readme": "https://github.com/sjentsch/jmvReadWrite/blob/main/README.md",
   "contIntegration": ["https://github.com/sjentsch/jmvReadWrite/actions/workflows/rhub.yaml", "https://github.com/sjentsch/jmvReadWrite/actions/workflows/R-CMD-check.yaml", "https://github.com/sjentsch/jmvReadWrite/actions/workflows/CI.yml", "https://github.com/sjentsch/jmvReadWrite/actions?query=workflow%3Apkgcheck", "https://app.codecov.io/gh/sjentsch/jmvReadWrite?branch=main"],
   "developmentStatus": "https://www.repostatus.org/#active",
   "keywords": ["r", "jamovi", "cran"]

@@ -94,10 +94,9 @@ unlink(nmeOut)
 # for readability)
 chrDsc <- paste0("<p><strong>Trial - all formattings:</strong><br/><strong>bold</strong><br/>",
                  "<strong><em>bold, italics</em></strong><br/><em>italics</em><br/><u>underlined",
-                 "</u><br/>link:<a href=\"https://jamovi.org﻿﻿﻿\" target=\"_blank\">https://",
-                 "jamovi.org﻿﻿﻿</a><br/><s>strikethrough</s><br/>C<sub>2</sub>H<sub>5</sub>",
-                 "OH<br/>R<sup>2</sup><br/><span style=\"background-color:#e60000\">background ",
-                 "colour: red</span><br/><span style=\"color:#e60000\">foreground color: red",
+                 "</u><br/><s>strikethrough</s><br/>C<sub>2</sub>H<sub>5</sub>OH<br/>R<sup>2",
+                 "</sup><br/><span style=\"background-color:#e60000\">background colour: red",
+                 "</span><br/><span style=\"color:#e60000\">foreground color: red",
                  "</span></p><p class=\"ql-align-center\">centered</p><p class=\"ql-align-right\">",
                  "right</p><p class=\"ql-align-justify\">justify justify justify justify justify ",
                  "justify justify justify justify justify justify justify justify justify justify ",

@@ -61,8 +61,9 @@ test_that("label_vars_omv works", {
       regexp = "^Calling label_vars_omv requires the parameter varLbl, using the correct format \\(see Details in help\\)\\.")
     expect_false(file.exists(nmeOut))
     expect_error(label_vars_omv(dtaInp = nmeInp, fleOut = nmeOut, varLbl = lblDtF[, 2]),
-      regexp = paste0("^If the parameter varLbl is a character, it eiter needs to be the name of an \\(exisiting\\) file or a vector ",
-                      "with labels thathas the same length as the number of variables in the input data set \\(\\d+\\).$"))
+      regexp = paste0("^If the parameter varLbl is a character, it eiter needs to be the name of an \\(exisiting\\) ",
+                      "file or a vector with labels that has the same length as the number of variables in the input ",
+                      "data set \\(\\d+\\).$"))
     expect_false(file.exists(nmeOut))
     expect_error(label_vars_omv(dtaInp = nmeInp, fleOut = nmeOut, varLbl = data.frame(varNme = c("Dummy", lblDtF[-1, 1]), varLbl = lblDtF[2])),
       regexp = "^There must be exactly one column with the variable names \\(currently: 0\\)\\.\\nAll variable names in the label definition must be contained in the input data set\\.")

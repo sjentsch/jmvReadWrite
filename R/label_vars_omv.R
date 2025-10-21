@@ -69,7 +69,8 @@
 #'
 #' @export label_vars_omv
 #'
-label_vars_omv <- function(dtaInp = NULL, fleOut = "", varLbl = NULL, psvAnl = FALSE, usePkg = c("foreign", "haven"), selSet = "", ...) {
+label_vars_omv <- function(dtaInp = NULL, fleOut = "", varLbl = NULL, psvAnl = FALSE, usePkg = c("foreign", "haven"),
+                           selSet = "", ...) {
     # check the input parameter: varLbl needs to be given
     if (length(varLbl) < 1) {
         stop("Calling label_vars_omv requires the parameter varLbl, using the correct format (see Details in help).")
@@ -79,15 +80,17 @@ label_vars_omv <- function(dtaInp = NULL, fleOut = "", varLbl = NULL, psvAnl = F
     if (!is.null(list(...)[["fleInp"]])) stop("Please use the argument dtaInp instead of fleInp.")
     dtaFrm <- inp2DF(dtaInp = dtaInp, usePkg = usePkg, selSet = selSet, ...)
 
-    # if varLbl is a character (a file name) or a character vector (with labels), transform it into a data frame with two columns (variable names and labels)
+    # if varLbl is a character (a file name) or a character vector (with labels), transform it into a data frame with
+    # two columns (variable names and labels)
     if (is.character(varLbl)) {
         if (length(varLbl) == 1 && file.exists(varLbl)) {
             varLbl <- utils::read.csv(varLbl, header = FALSE)
         } else if (length(varLbl) == length(dtaFrm)) {
             varLbl <- data.frame(varNme = names(dtaFrm), varLbl = varLbl)
         } else {
-            stop(sprintf(paste0("If the parameter varLbl is a character, it eiter needs to be the name of an (exisiting) file or a vector with labels that",
-                                "has the same length as the number of variables in the input data set (%d)."), length(dtaFrm)))
+            stop(sprintf(paste0("If the parameter varLbl is a character, it eiter needs to be the name of an ",
+                                "(exisiting) file or a vector with labels that has the same length as the number of ",
+                                "variables in the input data set (%d)."), length(dtaFrm)))
         }
     }
 
@@ -106,13 +109,15 @@ label_vars_omv <- function(dtaInp = NULL, fleOut = "", varLbl = NULL, psvAnl = F
             }
         } else {
             stop(sprintf(paste0("There must be exactly one column with the variable names (currently: %d).\n",
-                                "All variable names in the label definition must be contained in the input data set.\n%s\n%s"),
-                                length(nmeClm), paste0(varLbl[[1]], collapse = ", "), paste0(names(dtaFrm), collapse = ", ")))
+                                "All variable names in the label definition must be contained in the input data ",
+                                "set.\n%s\n%s"),
+                         length(nmeClm), paste0(varLbl[[1]], collapse = ", "), paste0(names(dtaFrm), collapse = ", ")))
         }
     } else {
-        stop(sprintf("varLbl was either not a data frame or could not be converted into one.\n%s", utils::capture.output(utils::str(varLbl))))
+        stop(sprintf("varLbl was either not a data frame or could not be converted into one.\n%s",
+                     utils::capture.output(utils::str(varLbl))))
     }
 
-    # rtnDta in globals.R (unified function to either write the data frame, open it in a new jamovi session or return it)
+    # rtnDta in globals.R (unified function to either write a data frame, open it in a new jamovi session or return it)
     rtnDta(dtaFrm = dtaFrm, fleOut = fleOut, dtaTtl = jmvTtl("_label_vars"), psvAnl = psvAnl, dtaInp = dtaInp, ...)
 }

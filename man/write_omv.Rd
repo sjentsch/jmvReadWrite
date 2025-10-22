@@ -10,7 +10,8 @@ write_omv(
   fleOut = "",
   wrtPtB = FALSE,
   frcWrt = FALSE,
-  retDbg = FALSE
+  retDbg = FALSE,
+  vldExt = TRUE
 )
 }
 \arguments{
@@ -21,10 +22,14 @@ write_omv(
 
 \item{wrtPtB}{Whether to write protocol buffers (see Details; default: FALSE)}
 
-\item{frcWrt}{Whether to overwrite existing files with the same name (see Details; default: FALSE)}
+\item{frcWrt}{Whether to overwrite existing files with the same name (see
+Details; default: FALSE)}
 
 \item{retDbg}{Whether to return a list with debugging information (see
 Value; default: FALSE)}
+
+\item{vldExt}{Whether to validate that the file name has a correct extension
+(default: TRUE)}
 }
 \value{
 a list (if retDbg == TRUE), containing the meta data (mtaDta,

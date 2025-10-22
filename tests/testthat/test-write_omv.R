@@ -1,5 +1,6 @@
 test_that("write_omv works", {
-    # check whether writing the data is working (file existence, size, contents [.omv-files are ZIP archives and must contain files that include meta, metadata.json, data.bin])
+    # check whether writing the data is working (file existence, size, contents [.omv-files are ZIP archives and must
+    # contain files that include meta, metadata.json, data.bin])
     dtaOut <- jmvReadWrite::ToothGrowth
     rowOut <- dim(dtaOut)[1]
     nmeOut <- tempfile(fileext = ".omv")
@@ -12,11 +13,12 @@ test_that("write_omv works", {
     expect_true(chkFle(nmeOut, fleCnt = "data.bin"))
     unlink(nmeOut)
 
-    # check the debugging information: name and type of the three parts that are returned, content of the metadata, whether all entries in xtdDta are labels, and
-    # whether dtaFrm as a data frame with the correct sizes and attributes
+    # check the debugging information: name and type of the three parts that are returned, content of the metadata,
+    # whether all entries in xtdDta are labels, and whether dtaFrm as a data frame with the correct sizes and attributes
     expect_equal(names(dtaDbg),                       c("mtaDta", "xtdDta", "dtaFrm"))
     expect_equal(vapply(dtaDbg, class, character(1), USE.NAMES = FALSE), c("list",   "list",   "data.frame"))
-    expect_equal(names(dtaDbg$mtaDta), c("rowCount", "columnCount", "removedRows", "addedRows", "fields", "transforms", "weights"))
+    expect_equal(names(dtaDbg$mtaDta),
+                 c("rowCount", "columnCount", "removedRows", "addedRows", "fields", "transforms", "weights"))
     expect_true(all(grepl("labels", unlist(lapply(dtaDbg$xtdDta, attributes)))))
     expect_s3_class(dtaDbg$dtaFrm, "data.frame")
     expect_equal(dim(dtaDbg$dtaFrm), c(60, 7))

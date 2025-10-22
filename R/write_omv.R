@@ -5,7 +5,10 @@
 #' @param fleOut Name / position of the output file to be generated
 #'               ("FILENAME.omv"; default: "")
 #' @param wrtPtB Whether to write protocol buffers (see Details; default: FALSE)
-#' @param frcWrt Whether to overwrite existing files with the same name (see Details; default: FALSE)
+#' @param frcWrt Whether to overwrite existing files with the same name (see
+#'               Details; default: FALSE)
+#' @param vldExt Whether to validate that the file name has a correct extension
+#'               (default: TRUE)
 #' @param retDbg Whether to return a list with debugging information (see
 #'               Value; default: FALSE)
 #'
@@ -57,14 +60,14 @@
 #'
 #' @export write_omv
 
-write_omv <- function(dtaFrm = NULL, fleOut = "", wrtPtB = FALSE, frcWrt = FALSE, retDbg = FALSE) {
+write_omv <- function(dtaFrm = NULL, fleOut = "", wrtPtB = FALSE, frcWrt = FALSE, retDbg = FALSE, vldExt = TRUE) {
     if (is.null(dtaFrm)) stop("The data frame to be written needs to be given as parameter (dtaFrm = ...).")
     if (!nzchar(fleOut)) stop("Output file name needs to be given as parameter (fleOut = ...).")
 
     # check that the file name isn't empty, that the destination directory exists and that it ends in .omv
     fleOut <- nrmFle(fleOut)
     chkDir(fleOut)
-    chkExt(fleOut, c("omv", "omt"))
+    !vldExt || chkExt(fleOut, c("omv", "omt"))
     fleExs(fleOut, frcWrt)
 
     # [1] handle the attributes "variable.labels" and "value.labels" in the format provided by the R-package "foreign"

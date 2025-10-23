@@ -12,6 +12,7 @@ test_that("aggregate_omv works", {
     attr(dtaTmp[, "V2"], "jmv-desc") <- "Variable V2"
     saveRDS(dtaTmp, nmeInp)
 
+    # using a grouping variable (ID)
     expect_null(aggregate_omv(dtaInp = nmeInp, fleOut = nmeOut, varAgg = c("V1", "V2"), grpAgg = "ID",
                               clcN = TRUE, clcMss = TRUE, clcMn = TRUE, clcMdn = TRUE, clcMde = TRUE, clcSum = TRUE,
                               clcSD = TRUE, clcVar = TRUE, clcRng = TRUE, clcMin = TRUE, clcMax = TRUE, clcIQR = TRUE))
@@ -27,6 +28,25 @@ test_that("aggregate_omv works", {
                    10, 0,  2.9940,  2.9800, 2.9700,  29.9400,  0.6790,   0.4862,  2.0500, 1.9700,  4.0200,  0.5900),
                  tolerance = 1e-4)
     expect_equal(vapply(df4Chk[-1], attr, character(1), "jmv-desc", USE.NAMES = FALSE),
+                 sprintf("Variable %s (%s)", rep(c("V1", "V2"), each = 12), rep(clcDsc, 2)))
+    unlink(nmeOut)
+
+    # not using a grouping variable
+    expect_null(aggregate_omv(dtaInp = nmeInp, fleOut = nmeOut, varAgg = c("V1", "V2"),
+                              clcN = TRUE, clcMss = TRUE, clcMn = TRUE, clcMdn = TRUE, clcMde = TRUE, clcSum = TRUE,
+                              clcSD = TRUE, clcVar = TRUE, clcRng = TRUE, clcMin = TRUE, clcMax = TRUE, clcIQR = TRUE))
+    df4Chk <- read_omv(nmeOut)
+    expect_s3_class(df4Chk, "data.frame")
+    expect_equal(dim(df4Chk), c(1, 24))
+    expect_equal(vapply(df4Chk, typeof, character(1), USE.NAMES = FALSE),
+                 c(rep("integer", 2), rep("double", 10), rep("integer", 2), "double", rep("integer", 3), rep("double", 2),
+                   rep("integer", 4)))
+    expect_equal(names(df4Chk), paste0(rep(c("V1_", "V2_"), each = 12), rep(clcStr, 2)))
+    expect_equal(as.numeric(unname(df4Chk)),
+                 c(1000, 0, 50.7273, 51.0192, 0.0342, 50727.3463, 29.1208, 848.0223, 99.8961, 0.0342, 99.9303, 50.0280,
+                   1000, 0,  2.9940,  3.0000, 3.0000,  2994.0000,  0.6946,   0.4824,  4.0000, 1.0000,  4.0200,  0.5900),
+                 tolerance = 1e-4)
+    expect_equal(vapply(df4Chk, attr, character(1), "jmv-desc", USE.NAMES = FALSE),
                  sprintf("Variable %s (%s)", rep(c("V1", "V2"), each = 12), rep(clcDsc, 2)))
     unlink(nmeOut)
 
@@ -54,6 +74,24 @@ test_that("aggregate_omv works", {
                    10, 0, 99.6310, 99.3150, 88.6200, 996.3100, 15.1117, 239.1143, 47.6100, 76.1400, 123.7500, 18.2550),
                  tolerance = 1e-4)
     expect_equal(vapply(df4Chk[-1], attr, character(1), "jmv-desc", USE.NAMES = FALSE),
+                 sprintf("Variable %s (%s)", rep(c("V1", "V2"), each = 12), rep(clcDsc, 2)))
+    unlink(nmeOut)
+
+    expect_null(aggregate_omv(dtaInp = nmeInp, fleOut = nmeOut, varAgg = c("V1", "V2"),
+                              clcN = TRUE, clcMss = TRUE, clcMn = TRUE, clcMdn = TRUE, clcMde = TRUE, clcSum = TRUE,
+                              clcSD = TRUE, clcVar = TRUE, clcRng = TRUE, clcMin = TRUE, clcMax = TRUE, clcIQR = TRUE))
+    df4Chk <- read_omv(nmeOut)
+    expect_s3_class(df4Chk, "data.frame")
+    expect_equal(dim(df4Chk), c(1, 24))
+    expect_equal(vapply(df4Chk, typeof, character(1), USE.NAMES = FALSE),
+                 c(rep("integer", 2), rep("double", 10), rep("integer", 2), "double", rep("integer", 3), rep("double", 2),
+                   rep("integer", 4)))
+    expect_equal(names(df4Chk), paste0(rep(c("V1_", "V2_"), each = 12), rep(clcStr, 2)))
+    expect_equal(as.numeric(unname(df4Chk)),
+                 c(1000, 0, 49.9692, 48.3260,  0.1315, 49969.1673, 28.8387, 831.6708,  99.8616,  0.1315,  99.9931, 48.8804,
+                   1000, 0, 99.6310, 99.0000, 96.0000, 99631.0000, 15.5205, 240.8857, 104.0000, 51.0000, 155.0000, 22.0000),
+                 tolerance = 1e-4)
+    expect_equal(vapply(df4Chk, attr, character(1), "jmv-desc", USE.NAMES = FALSE),
                  sprintf("Variable %s (%s)", rep(c("V1", "V2"), each = 12), rep(clcDsc, 2)))
     unlink(nmeOut)
 
@@ -109,8 +147,8 @@ test_that("aggregate_omv works", {
                  regexp = "Please use the argument dtaInp instead of fleInp\\.")
 
     expect_error(aggregate_omv(dtaInp = nmeInp, varAgg = c("X", "Y"), grpAgg = "ID", clcMn = TRUE),
-                 regexp = paste("Calling aggregate_omv requires giving at least one \\(valid\\) variable to aggregate",
-                                "and one \\(valid\\) grouping variable\\."))
+                 regexp = paste("Calling aggregate_omv requires giving at least one \\(valid\\) variable to aggregate,",
+                                "and the grouping variable\\(s\\) needs to be empty or valid\\."))
     expect_error(aggregate_omv(dtaInp = nmeInp, varAgg = c("V1", "V2"), grpAgg = "ID"),
                  regexp = "At least one aggregation calculation \\(clc\\.\\.\\.\\) needs to be set to TRUE\\.")
 

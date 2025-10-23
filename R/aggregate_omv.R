@@ -10,7 +10,8 @@
 #' @param varAgg A character vector (default: c()) with the names of the variables which shall be
 #'               aggregated.
 #' @param grpAgg A character vector (default: c()) with the variables to group the aggregation
-#'               variable (`varAgg`) by. If several grouping variables are given, the aggregation
+#'               variable (`varAgg`) by. If no grouping variable is given, the aggregation happens
+#'               over the whole data set. If several grouping variables are given, the aggregation
 #'               happens for each step / possible combination of these variables. See Details for
 #'               more information.
 #' @param clcN   If TRUE, counts the number of valid values for each step / combination of values
@@ -177,14 +178,18 @@ aggregate_omv <- function(dtaInp = NULL, fleOut = "", varAgg = c(), grpAgg = c()
     frmInp <- inp2DF(dtaInp = dtaInp, usePkg = usePkg, selSet = selSet, ...)
 
     if (!all(nzchar(varAgg)) || length(intersect(varAgg, names(frmInp))) < 1 ||
-        !all(nzchar(grpAgg)) || length(intersect(grpAgg, names(frmInp))) < 1) {
+        !all(nzchar(grpAgg)) || length(intersect(grpAgg, names(frmInp))) < length(grpAgg)) {
         stop(paste("Calling aggregate_omv requires giving at least one (valid) variable to",
-                   "aggregate and one (valid) grouping variable."))
+                   "aggregate, and the grouping variable(s) needs to be empty or valid."))
     }
 
-    grpNA <- rowSums(is.na(frmInp[, grpAgg, drop = FALSE])) > 0
-    if (!drpNA && any(grpNA))
-        stop("The grouping variables must not contain empty or NA values (if drpNA is set to FALSE).")
+    if (length(grpAgg) >= 1) {
+        grpNA <- rowSums(is.na(frmInp[, grpAgg, drop = FALSE])) > 0
+        if (!drpNA && any(grpNA))
+            stop("The grouping variables must not contain empty or NA values (if drpNA is set to FALSE).")
+    } else {
+        grpNA <- rep(FALSE, nrow(frmInp))
+    }
 
     clcSel <- c(clcN, clcMss,  clcMn,  clcMdn,   clcMde, clcSum, clcSD, clcVar,     clcRng,  clcMin, clcMax, clcIQR)
     clcStr <- c("N",  "Mss",   "Mn",   "Mdn",    "Mde",  "Sum",  "SD",  "Var",      "Rng",   "Min",  "Max",  "IQR")

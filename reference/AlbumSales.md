@@ -1,0 +1,47 @@
+# Imagine that you worked for a record company and that your boss was interested in predicting album sales from advertising.
+
+The data set is fictional and was constructed by Andy Field who
+therefore owns the copyright. The data set is also publicly available on
+the website that accompanies Andy Field's book,
+https://edge.sagepub.com/field5e. Without Andy Field's explicit consent,
+this data set may not be distributed for commercial purposes, this data
+set may not be edited, and this data set may not be presented without
+acknowledging its source (i.e., the terms of a CC BY-NC-ND license).
+
+## Usage
+
+``` r
+AlbumSales
+```
+
+## Format
+
+A data frame with 60 rows, each one representing a different album, and
+5 variables:
+
+- `selSbj`:
+
+  Select the data in this row (1) or not (0)
+
+- `Adverts`:
+
+  Amount (in thousands of pounds) spent promoting the album before
+  release
+
+- `Airplay`:
+
+  How many times songs from the album were played on a prominent
+  national radio station in the week before release
+
+- `Image`:
+
+  How attractive people found the band's image (out of 10)
+
+- `Sales`:
+
+  Sales (in thousands) of each album in the week after release
+
+## Details
+
+Reference: Field, A. P. (2017). Discovering Statistics Using IBM SPSS
+Statistics (5th ed.). Sage.

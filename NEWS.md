@@ -1,3 +1,15 @@
+# jmvReadWrite 0.4.13
+
+## Enhancements:
+* corrected unit tests (for `read_omv`) for dealing with a change in how data frame attributes are arranged (changed with R 4.6)
+* `aggregate_omv`: permit to aggregate over the whole data set (without a grouping variable)
+* added converting Nominal / Ordinal into Numeric using the value labels (if numeric)
+* `describe_omv`: added option for creating descriptions in other languages than English, and added helper function
+  defining standard licenses for dtaDsc
+* fixing typos and small bugs, and improving unit tests (e.g., limit line length)
+
+---
+
 # jmvReadWrite 0.4.12
 
 ## Enhancements:

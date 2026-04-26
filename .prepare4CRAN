@@ -36,6 +36,8 @@ devtools::test_coverage()
 # once happy with the coverage, it can be uploaded using
 covr::codecov(token = "2f521d97-d1e2-4baf-b05b-0b569a7c6f0f")  # jmvReadWrite
 covr::codecov(token = "821f2b2f-e305-49b2-ab96-7f328530f6ed")  # jTransform
+covr::codecov(token = "e3369d7e-08cd-4bcf-ad37-3b5a65c6aadc")  # pwrss (sjentsch)
+covr::codecov(token = "...")  # pwrss (metinbulus)
 
 # some sed commands to correct common misformattings
 #sed -i -e's/[[:space:]]*$//' R/*.R && sed -i '${/^$/d}' R/*.R && sed -i 's/=/ = /g' R/*.h.R && sed -i 's/  =  / = /g' R/*.h.R && sed -i 's/ = = / == /g' R/*.h.R && sed -i 's/c(1,0,0)/c(1, 0, 0)/' R/*.h.R && sed -i "s/'auto'/\"auto\"/" R/*.h.R
@@ -50,7 +52,9 @@ system("gedit DESCRIPTION NEWS.md inst/CITATION") # jmvReadWrite
 # building / updating README, PDF manual, and the HTML documentation
 # add new functions to _pkgdown.yml and to vignettes/jmvReadWrite.Rmd if required
 #system("gedit _pkgdown.yml vignettes/jmvReadWrite.Rmd")  # jmvReadWrite
+#system("gedit _pkgdown.yml vignettes/examples.Rmd")  # pwrss
 devtools::build_readme()
+pkgdown::build_articles()
 pkgdown::clean_site()
 pkgdown::build_site()
 pkgdown::build_reference(run_dont_run = TRUE, preview = FALSE)
@@ -65,9 +69,11 @@ devtools::build_manual(path = "docs")
 # (4) tlmgr install inconsolata xkeyval times
 
 # the package itself (tar.gz) - build() also builds vignettes
-# ping-pong between build() and check() until all errors, warnings, notes are resolved 
+# ping-pong between build() and check() until all errors, warnings, notes are resolved
+# only jmvReadWrite is on CRAN, hence incoming should be FALSE for jTransform
 devtools::build()
-devtools::check(force_suggests = TRUE, incoming = TRUE, remote = TRUE, env_vars = c(NOT_CRAN = "FALSE"))
+devtools::check(force_suggests = TRUE, incoming = unname(desc::desc_get("Package")) == "jmvReadWrite",
+                remote = TRUE, env_vars = c(NOT_CRAN = "FALSE"))
 
 # check on win-builder (Rhub underneath may take a while, run check_win_devel first)
 devtools::check_win_devel()
@@ -75,8 +81,7 @@ devtools::check_win_devel()
 # the next stage of ping-pong, either build on the standard platforms
 # NB: ensure that everything is commited; rhub runs on the code on GitHub!
 # ------------------------------------------------------------------------
-#rhub::rc_submit(platforms=c("linux", "windows", "macos", "macos-arm64"))
-rhub::rhub_check(platforms=c("linux", "windows", "macos", "macos-arm64"))
+rhub::rhub_check(platforms=c("linux", "windows", "macos-arm64"))
 # running github actions requires a personal access token: https://github.com/settings/profile
 # → Developer options → Personal access token → Tokens (classic) → tick “repo”
 # the token is valid for a limited time period and can be regenerated; to update the

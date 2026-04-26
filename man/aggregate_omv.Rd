@@ -41,7 +41,8 @@ returned instead.}
 aggregated.}
 
 \item{grpAgg}{A character vector (default: c()) with the variables to group the aggregation
-variable (\code{varAgg}) by. If several grouping variables are given, the aggregation
+variable (\code{varAgg}) by. If no grouping variable is given, the aggregation happens
+over the whole data set. If several grouping variables are given, the aggregation
 happens for each step / possible combination of these variables. See Details for
 more information.}
 

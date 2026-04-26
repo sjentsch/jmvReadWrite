@@ -166,15 +166,19 @@ test_that("read_all works", {
         unlink(paste0(fleInp, ".sav"))
         save(tmpDta, file = paste0(fleInp, ".RData"))
         df4Chk <- read_all(paste0(fleInp, ".RData"))
-        expect_equal(attributes(df4Chk), list(row.names = seq(60), names = c("ID", "supp", "supp2", "dose", "dose2", "len", "logLen"), class = "data.frame"))
-        expect_equal(lapply(df4Chk, attributes), list(ID = NULL, supp = list(levels = c("OJ", "VC"), class = "factor"), supp2 = list(levels = c("1", "2"), class = "factor"),
-                                                      dose = NULL, dose2 = list(levels = c("0.5", "1.0", "2.0"), class = "factor"), len = NULL, logLen = NULL))
+        expect_equal(attributes(df4Chk)[c("names", "row.names", "class")],
+                     list(names = c("ID", "supp", "supp2", "dose", "dose2", "len", "logLen"), row.names = seq(60), class = "data.frame"))
+        expect_equal(lapply(df4Chk, attributes),
+                     list(ID = NULL, supp = list(levels = c("OJ", "VC"), class = "factor"), supp2 = list(levels = c("1", "2"), class = "factor"),
+                          dose = NULL, dose2 = list(levels = c("0.5", "1.0", "2.0"), class = "factor"), len = NULL, logLen = NULL))
         unlink(paste0(fleInp, ".RData"))
         saveRDS(tmpDta, file = paste0(fleInp, ".rds"))
         df4Chk <- read_all(paste0(fleInp, ".rds"))
-        expect_equal(attributes(df4Chk), list(row.names = seq(60), names = c("ID", "supp", "supp2", "dose", "dose2", "len", "logLen"), class = "data.frame"))
-        expect_equal(lapply(df4Chk, attributes), list(ID = NULL, supp = list(levels = c("OJ", "VC"), class = "factor"), supp2 = list(levels = c("1", "2"), class = "factor"),
-                                                      dose = NULL, dose2 = list(levels = c("0.5", "1.0", "2.0"), class = "factor"), len = NULL, logLen = NULL))
+        expect_equal(attributes(df4Chk)[c("names", "row.names", "class")],
+                     list(names = c("ID", "supp", "supp2", "dose", "dose2", "len", "logLen"), row.names = seq(60), class = "data.frame"))
+        expect_equal(lapply(df4Chk, attributes),
+                     list(ID = NULL, supp = list(levels = c("OJ", "VC"), class = "factor"), supp2 = list(levels = c("1", "2"), class = "factor"),
+                          dose = NULL, dose2 = list(levels = c("0.5", "1.0", "2.0"), class = "factor"), len = NULL, logLen = NULL))
         unlink(paste0(fleInp, ".rds"))
     }
 
@@ -218,9 +222,11 @@ test_that("read_all works", {
     if (requireNamespace("haven", quietly = TRUE)) {
         haven::write_sav(jmvReadWrite::ToothGrowth, fleInp)
         df4Chk <- read_all(fleInp, usePkg = "haven")
-        expect_equal(attributes(df4Chk), list(row.names = seq(60), names = c("ID", "supp", "supp2", "dose", "dose2", "len", "logLen"), class = "data.frame"))
-        expect_equal(lapply(df4Chk, attributes), list(ID = NULL, supp = list(levels = c("OJ", "VC"), class = "factor"), supp2 = list(levels = c("1", "2"), class = "factor"),
-                                                      dose = NULL, dose2 = list(levels = c("0.5", "1.0", "2.0"), class = "factor"), len = NULL, logLen = NULL))
+        expect_equal(attributes(df4Chk)[c("names", "row.names", "class")],
+                     list(names = c("ID", "supp", "supp2", "dose", "dose2", "len", "logLen"), row.names = seq(60), class = "data.frame"))
+        expect_equal(lapply(df4Chk, attributes),
+                     list(ID = NULL, supp = list(levels = c("OJ", "VC"), class = "factor"), supp2 = list(levels = c("1", "2"), class = "factor"),
+                          dose = NULL, dose2 = list(levels = c("0.5", "1.0", "2.0"), class = "factor"), len = NULL, logLen = NULL))
         unlink(fleInp)
     }
 
@@ -234,9 +240,11 @@ test_that("read_all works", {
     if (requireNamespace("haven", quietly = TRUE)) {
         haven::write_dta(jmvReadWrite::ToothGrowth, fleInp)
         df4Chk <- read_all(fleInp, usePkg = "haven")
-        expect_equal(attributes(df4Chk), list(row.names = seq(60), names = c("ID", "supp", "supp2", "dose", "dose2", "len", "logLen"), class = "data.frame"))
-        expect_equal(lapply(df4Chk, attributes), list(ID = NULL, supp = list(levels = c("OJ", "VC"), class = "factor"), supp2 = list(levels = c("1", "2"), class = "factor"),
-                                                      dose = NULL, dose2 = list(levels = c("0.5", "1.0", "2.0"), class = "factor"), len = NULL, logLen = NULL))
+        expect_equal(attributes(df4Chk)[c("names", "row.names", "class")],
+                     list(names = c("ID", "supp", "supp2", "dose", "dose2", "len", "logLen"), row.names = seq(60), class = "data.frame"))
+        expect_equal(lapply(df4Chk, attributes),
+                     list(ID = NULL, supp = list(levels = c("OJ", "VC"), class = "factor"), supp2 = list(levels = c("1", "2"), class = "factor"),
+                          dose = NULL, dose2 = list(levels = c("0.5", "1.0", "2.0"), class = "factor"), len = NULL, logLen = NULL))
         unlink(fleInp)
     }
 
@@ -248,8 +256,10 @@ test_that("read_all works", {
     if (requireNamespace("haven", quietly = TRUE)) {
         suppressWarnings(haven::write_sas(jmvReadWrite::ToothGrowth, fleInp))
         df4Chk <- read_all(fleInp, usePkg = "haven")
-        expect_equal(attributes(df4Chk), list(class = "data.frame", row.names = seq(60), names = c("ID", "supp", "supp2", "dose", "dose2", "len", "logLen")))
-        expect_equal(lapply(df4Chk, attributes), list(ID = NULL, supp = NULL, supp2 = NULL, dose = NULL, dose2 = NULL, len = NULL, logLen = NULL))
+        expect_equal(attributes(df4Chk)[c("names", "row.names", "class")],
+                     list(names = c("ID", "supp", "supp2", "dose", "dose2", "len", "logLen"), row.names = seq(60), class = "data.frame"))
+        expect_equal(lapply(df4Chk, attributes),
+                     list(ID = NULL, supp = NULL, supp2 = NULL, dose = NULL, dose2 = NULL, len = NULL, logLen = NULL))
         unlink(fleInp)
     }
 
@@ -263,8 +273,10 @@ test_that("read_all works", {
     if (requireNamespace("haven", quietly = TRUE)) {
         haven::write_xpt(jmvReadWrite::ToothGrowth, fleInp)
         df4Chk <- read_all(fleInp, usePkg = "haven")
-        expect_equal(attributes(df4Chk), list(class = "data.frame", row.names = seq(60), names = c("ID", "supp", "supp2", "dose", "dose2", "len", "logLen")))
-        expect_equal(lapply(df4Chk, attributes), list(ID = NULL, supp = NULL, supp2 = NULL, dose = NULL, dose2 = NULL, len = NULL, logLen = NULL))
+        expect_equal(attributes(df4Chk)[c("names", "row.names", "class")],
+                     list(names = c("ID", "supp", "supp2", "dose", "dose2", "len", "logLen"), row.names = seq(60), class = "data.frame"))
+        expect_equal(lapply(df4Chk, attributes),
+                     list(ID = NULL, supp = NULL, supp2 = NULL, dose = NULL, dose2 = NULL, len = NULL, logLen = NULL))
         unlink(fleInp)
     }
 
@@ -275,8 +287,10 @@ test_that("read_all works", {
     expect_equal(attributes(clnTbb(dtaTmp, jmvLbl = TRUE)[[6]]), list(`jmv-desc` = "Trial for label conversion"))
 
     set.seed(2)
-    dtaTmp <- structure(list(value = structure(sample(c(1, 2, 4), 200, replace = TRUE), format.sas = "LEVELS", class = c("haven_labelled", "vctrs_vctr", "double"),
-                             labels = c(`Level 1` = 1, `Level 2` = 2, `Level 3` = 4))), class = c("tbl_df", "tbl", "data.frame"), row.names = c(NA, -200L))
+    dtaTmp <- structure(list(value = structure(sample(c(1, 2, 4), 200, replace = TRUE), format.sas = "LEVELS",
+                             class = c("haven_labelled", "vctrs_vctr", "double"),
+                             labels = c(`Level 1` = 1, `Level 2` = 2, `Level 3` = 4))),
+                        class = c("tbl_df", "tbl", "data.frame"), row.names = c(NA, -200L))
     expect_s3_class(clnTbb(dtaTmp), "data.frame")
     expect_s3_class(clnTbb(dtaTmp)[, "value"], "factor")
     expect_equal(attributes(clnTbb(dtaTmp)), list(names = "value", row.names = seq(200), class = "data.frame"))
@@ -285,8 +299,9 @@ test_that("read_all works", {
     expect_equal(as.integer(table(clnTbb(dtaTmp)[, "value"])), c(71, 69, 60))
     expect_equal(names(table(clnTbb(dtaTmp)[, "value"])), sprintf("Level %d", seq(3)))
 
-    dtaTmp <- structure(list(value = structure(sample(c(1, 2, 4), 200, replace = TRUE), format.sas = "LEVELS", class = c("haven_labelled", "vctrs_vctr", "double"),
-                             labels = setNames(c(1, 2, 4), rep("", 3)))), class = c("tbl_df", "tbl", "data.frame"), row.names = c(NA, -200L))
+    dtaTmp <- structure(list(value = structure(sample(c(1, 2, 4), 200, replace = TRUE), format.sas = "LEVELS",
+                             class = c("haven_labelled", "vctrs_vctr", "double"), labels = setNames(c(1, 2, 4), rep("", 3)))),
+                        class = c("tbl_df", "tbl", "data.frame"), row.names = c(NA, -200L))
     expect_s3_class(clnTbb(dtaTmp), "data.frame")
     expect_type(clnTbb(dtaTmp)[, "value"], "integer")
     expect_equal(attributes(clnTbb(dtaTmp)), list(names = "value", row.names = seq(200), class = "data.frame"))
@@ -296,8 +311,9 @@ test_that("read_all works", {
     expect_equal(as.integer(table(clnTbb(dtaTmp)[, "value"])), c(66, 67, 67))
     expect_equal(names(table(clnTbb(dtaTmp)[, "value"])), sprintf("%d", c(1, 2, 4)))
 
-    dtaTmp <- structure(list(value = structure(sample(c(1, 2, 4), 200, replace = TRUE), format.sas = "LEVELS", class = c("haven_labelled", "vctrs_vctr", "double"),
-                             labels = setNames(c(1, 2, 4), rep("value label", 3)))), class = c("tbl_df", "tbl", "data.frame"), row.names = c(NA, -200L))
+    dtaTmp <- structure(list(value = structure(sample(c(1, 2, 4), 200, replace = TRUE), format.sas = "LEVELS",
+                             class = c("haven_labelled", "vctrs_vctr", "double"), labels = setNames(c(1, 2, 4), rep("value label", 3)))),
+                        class = c("tbl_df", "tbl", "data.frame"), row.names = c(NA, -200L))
     expect_s3_class(clnTbb(dtaTmp), "data.frame")
     expect_type(clnTbb(dtaTmp)[, "value"], "integer")
     expect_equal(attributes(clnTbb(dtaTmp)), list(names = "value", row.names = seq(200), class = "data.frame"))
@@ -307,8 +323,9 @@ test_that("read_all works", {
     expect_equal(as.integer(table(clnTbb(dtaTmp)[, "value"])), c(70, 72, 58))
     expect_equal(names(table(clnTbb(dtaTmp)[, "value"])), sprintf("%d", c(1, 2, 4)))
 
-    dtaTmp <- structure(list(value = structure(sample(seq(4), 200, replace = TRUE), format.sas = "LEVELS", class = c("haven_labelled", "vctrs_vctr", "double"),
-                             labels = setNames(seq(4), c("Smallest", "", "", "Largest")))), class = c("tbl_df", "tbl", "data.frame"), row.names = c(NA, -200L))
+    dtaTmp <- structure(list(value = structure(sample(seq(4), 200, replace = TRUE), format.sas = "LEVELS",
+                             class = c("haven_labelled", "vctrs_vctr", "double"), labels = setNames(seq(4), c("Smallest", "", "", "Largest")))),
+                        class = c("tbl_df", "tbl", "data.frame"), row.names = c(NA, -200L))
     expect_s3_class(clnTbb(dtaTmp), "data.frame")
     expect_s3_class(clnTbb(dtaTmp)[, "value"], "factor")
     expect_equal(attributes(clnTbb(dtaTmp)), list(names = "value", row.names = seq(200), class = "data.frame"))

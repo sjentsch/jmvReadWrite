@@ -198,7 +198,7 @@ list.files(".", "Trial.omv")
 #> [1] "Trial.omv"
 file.info("Trial.omv")[, c("size", "isdir", "mode")]
 #>           size isdir mode
-#> Trial.omv 2617 FALSE  644
+#> Trial.omv 2618 FALSE  644
 unlink("Trial.omv")
 ```
 

@@ -163,7 +163,7 @@ for (i in seq_along(nmeInp)) saveRDS(dtaInp[-i - 1], nmeInp[i])
 # each data set (for demonstration purposes, A1 in the first, A2 in the second, ...)
 jmvReadWrite::merge_rows_omv(dtaInp = nmeInp, fleOut = nmeOut, colInd = TRUE)
 cat(file.info(nmeOut)$size)
-#> 10935
+#> 10936
 # -> 10767 (size may differ on different OSes)
 dtaOut <- jmvReadWrite::read_omv(nmeOut, sveAtt = FALSE)
 unlink(nmeOut)

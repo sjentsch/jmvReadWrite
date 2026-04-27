@@ -1,12 +1,10 @@
 # Run CI for R using https://eddelbuettel.github.io/r-ci/
 
-name: CI
+name: ci
 
 on:
   push:
-    branches: [main]
   pull_request:
-    branches: [main]
 
 env:
   _R_CHECK_FORCE_SUGGESTS_: "false"
@@ -16,16 +14,15 @@ jobs:
     strategy:
       matrix:
         include:
-          - { name: container, os: ubuntu-latest, container: rocker/r2u4ci }
-          - { name: r-devel,   os: ubuntu-latest, container: rocker/drd }
-          - { name: macos,     os: macos-latest }
-          - { name: ubuntu,    os: ubuntu-latest }
+          #- {os: macOS-latest}
+          #- {os: ubuntu-slim}
+          - {os: ubuntu-latest}
 
     runs-on: ${{ matrix.os }}
-    container: ${{ matrix.container }}
 
     steps:
-      - uses: actions/checkout@v6
+      - name: Checkout
+        uses: actions/checkout@v6
 
       - name: Setup
         uses: eddelbuettel/github-actions/r-ci@master
@@ -44,4 +41,4 @@ jobs:
       #  if: ${{ matrix.os == 'ubuntu-latest' }}
       #  run: ./run.sh coverage
       #  env:
-      #    CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+      #    CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}  

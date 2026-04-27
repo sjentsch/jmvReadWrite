@@ -9,7 +9,6 @@ on:
     branches: [main]
 
 env:
-  USE_BSPM: "true"
   _R_CHECK_FORCE_SUGGESTS_: "false"
 
 jobs:
@@ -17,22 +16,32 @@ jobs:
     strategy:
       matrix:
         include:
-          - {os: macos-latest}
-          - {os: ubuntu-latest}
+          - { name: container, os: ubuntu-latest, container: rocker/r2u4ci }
+          - { name: r-devel,   os: ubuntu-latest, container: rocker/drd }
+          - { name: macos,     os: macos-latest }
+          - { name: ubuntu,    os: ubuntu-latest }
 
     runs-on: ${{ matrix.os }}
+    container: ${{ matrix.container }}
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v6
 
-      - name: Bootstrap
-        run: |
-          curl -OLs https://eddelbuettel.github.io/r-ci/run.sh
-          chmod 0755 run.sh
-          ./run.sh bootstrap
+      - name: Setup
+        uses: eddelbuettel/github-actions/r-ci@master
 
       - name: Dependencies
         run: ./run.sh install_all
 
       - name: Test
         run: ./run.sh run_tests
+
+      #- name: Logs
+      #  run: ./run.sh dump_logs
+      #  if: failure()
+        
+      #- name: Coverage
+      #  if: ${{ matrix.os == 'ubuntu-latest' }}
+      #  run: ./run.sh coverage
+      #  env:
+      #    CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

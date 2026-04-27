@@ -157,7 +157,7 @@ print(names(dtaDbg))
 # check whether the file was written to the disk, get the file informa-
 # tion (size, etc.) and delete the file afterwards
 print(list.files(dirname(nmeOut), basename(nmeOut)))
-#> [1] "file2acb422d91b4.omv"
+#> [1] "file293847a11c50.omv"
 # -> "file[...].omv" ([...] is a combination of random numbers / characters
 print(file.info(nmeOut)$size)
 #> [1] 2618

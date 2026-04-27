@@ -7,13 +7,13 @@
   "codeRepository": "https://github.com/sjentsch/jmvReadWrite",
   "issueTracker": "https://github.com/sjentsch/jmvReadWrite/issues",
   "license": "https://spdx.org/licenses/AGPL-3.0",
-  "version": "0.4.12",
+  "version": "0.4.13",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "R",
     "url": "https://r-project.org"
   },
-  "runtimePlatform": "R version 4.5.1 (2025-06-13)",
+  "runtimePlatform": "R version 4.5.3 (2026-03-11)",
   "provider": {
     "@id": "https://cran.r-project.org",
     "@type": "Organization",
@@ -185,11 +185,11 @@
     },
     "SystemRequirements": null
   },
-  "fileSize": "1027.162KB",
+  "fileSize": "3625.859KB",
   "citation": [
     {
       "@type": "SoftwareSourceCode",
-      "datePublished": "2025",
+      "datePublished": "2026",
       "author": [
         {
           "@type": "Person",
@@ -200,11 +200,11 @@
       ],
       "name": "jmvReadWrite: Read and Write jamovi Files",
       "url": "https://CRAN.R-project.org/package=jmvReadWrite",
-      "description": "R package version 0.4.12"
+      "description": "R package version 0.4.13"
     }
   ],
   "relatedLink": ["https://sjentsch.github.io/jmvReadWrite/", "https://CRAN.R-project.org/package=jmvReadWrite"],
-  "releaseNotes": "https://github.com/sjentsch/jmvReadWrite/blob/master/NEWS.md",
+  "releaseNotes": "https://github.com/sjentsch/jmvReadWrite/blob/main/NEWS.md",
   "readme": "https://github.com/sjentsch/jmvReadWrite/blob/main/README.md",
   "contIntegration": ["https://github.com/sjentsch/jmvReadWrite/actions/workflows/rhub.yaml", "https://github.com/sjentsch/jmvReadWrite/actions/workflows/R-CMD-check.yaml", "https://github.com/sjentsch/jmvReadWrite/actions/workflows/CI.yml", "https://github.com/sjentsch/jmvReadWrite/actions?query=workflow%3Apkgcheck", "https://app.codecov.io/gh/sjentsch/jmvReadWrite?branch=main"],
   "developmentStatus": "https://www.repostatus.org/#active",

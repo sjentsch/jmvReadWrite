@@ -95,7 +95,7 @@ system("gedit cran-comments.md NEWS.md")
 codemetar::write_codemeta()
 
 # now, we are ready to release the package onto CRAN
-devtools::release()
+usethis::use_release_issue()
 
 # on the shell (after the submission got accepted):
 V="v$(grep "^Version:" DESCRIPTION | cut -d: -f2 | sed -e 's/ //')"

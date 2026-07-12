@@ -1,34 +1,28 @@
 #' Sort data (using one or more variables) in .omv-files for the statistical spreadsheet 'jamovi' (<https://www.jamovi.org>)
 #'
-#' @param dtaInp Either a data frame or the name of a data file to be read (including the path, if required; "FILENAME.ext"; default: NULL); files can be of
-#'               any supported file type, see Details below
-#' @param fleOut Name of the data file to be written (including the path, if required; "FILE_OUT.omv"; default: ""); if empty, the resulting data frame is
-#'               returned instead
-#' @param varSrt Variable(s) that are used to sort the data frame (see Details; default: c())
-#' @param psvAnl Whether analyses that are contained in the input file shall be transferred to the output file (TRUE / FALSE; default: FALSE)
-#' @param usePkg Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata and SAS files; "foreign" is the default (it comes with
-#'               base R), but "haven" is newer and more comprehensive
-#' @param selSet Name of the data set that is to be selected from the workspace (only applies when reading .RData-files)
+#' @inheritParams aggregate_omv dtaInp fleOut usePkg selSet
+#' @param varSrt Variable(s) that are used to sort the data frame (see Details; default: NULL)
+#' @param psvAnl Whether analyses that are contained in the input file shall be transferred to the output file (TRUE /
+#'               FALSE; default: FALSE)
 #' @param ...    Additional arguments passed on to methods; see Details below
 #'
-#' @return a data frame (only returned if `fleOut` is empty) where the input data set is sorted (according to the variables in `varSrt`)
+#' @return a data frame (only returned if `fleOut` is empty) where the input data set is sorted (according to the
+#'         variables in `varSrt`)
 #'
 #' @details
-#' * `varSrt` can be either a character or a character vector (with one or more variables respectively). The sorting order for a particular variable can be
-#'   inverted with preceding the variable name with "-". Please note that this doesn't make sense and hence throws a warning for certain variable types (e.g.,
-#'   factors).
-#' * The ellipsis-parameter (`...`) can be used to submit arguments / parameters to the functions that are used for reading and writing the data. By clicking
-#'   on the respective function under “See also”, you can get a more detailed overview over which parameters each of those functions take. The functions are:
-#'   `read_omv` and `write_omv` (for jamovi-files), `read.table` (for CSV / TSV files; using similar defaults as `read.csv` for CSV and `read.delim` for TSV
-#'   which both are based upon `read.table`), `load` (for .RData-files), `readRDS` (for .rds-files), `read_sav` (needs the R-package `haven`) or `read.spss`
-#'   (needs the R-package `foreign`) for SPSS-files, `read_dta` (`haven`) / `read.dta` (`foreign`) for Stata-files, `read_sas` (`haven`) for SAS-data-files,
-#'   and `read_xpt` (`haven`) / `read.xport` (`foreign`) for SAS-transport-files. If you would like to use `haven`, you may need to install it using
-#'   `install.packages("haven", dep = TRUE)`.
+#' * `varSrt` can be either a character or a character vector (with one or more variables respectively). The sorting
+#'   order for a particular variable can be inverted with preceding the variable name with "-". Please note that this
+#'   doesn't make sense and hence throws a warning for certain variable types (e.g., factors).
+#' * The ellipsis-parameter (`...`) can be used to submit arguments / parameters to the functions that are used for
+#'   reading the data. By clicking on the respective function under “See also”, you can get a more detailed overview
+#'   over which parameters each of those functions take.
 #'
-#' @seealso `sort_omv` internally uses the following functions for reading and writing data files in different formats: [jmvReadWrite::read_omv()] and
-#'   [jmvReadWrite::write_omv()] for jamovi-files, [utils::read.table()] for CSV / TSV files, [load()] for reading .RData-files, [readRDS()] for .rds-files,
-#'   [haven::read_sav()] or [foreign::read.spss()] for SPSS-files, [haven::read_dta()] or [foreign::read.dta()] for Stata-files, [haven::read_sas()] for
-#'   SAS-data-files, and [haven::read_xpt()] or [foreign::read.xport()] for SAS-transport-files.
+#' @seealso
+#' `sort_omv` internally uses the following functions for reading and writing data files in different formats:
+#' [jmvReadWrite::read_omv()] and [jmvReadWrite::write_omv()] for jamovi-files, [utils::read.table()] for CSV / TSV
+#' files, [load()] for reading .RData-files, [readRDS()] for .rds-files, [haven::read_sav()] or [foreign::read.spss()]
+#' for SPSS-files, [haven::read_dta()] or [foreign::read.dta()] for Stata-files, [haven::read_sas()] for
+#' SAS-data-files, and [haven::read_xpt()] or [foreign::read.xport()] for SAS-transport-files.
 #'
 #' @examples
 #' nmeInp <- system.file("extdata", "AlbumSales.omv", package = "jmvReadWrite")
@@ -55,7 +49,9 @@
 #'
 #' @export sort_omv
 #'
-sort_omv <- function(dtaInp = NULL, fleOut = "", varSrt = c(), psvAnl = FALSE, usePkg = c("foreign", "haven"), selSet = "", ...) {
+sort_omv <- function(dtaInp = NULL, fleOut = "", varSrt = NULL, psvAnl = FALSE, usePkg = c("foreign", "haven"),
+                     selSet = "", ...) {
+
     if (length(varSrt) == 0 || !all(nzchar(varSrt))) {
         stop("Calling sort_omv requires giving at least one variable to sort after.")
     }
@@ -71,15 +67,14 @@ sort_omv <- function(dtaInp = NULL, fleOut = "", varSrt = c(), psvAnl = FALSE, u
     rtnDta(dtaFrm = dtaFrm, fleOut = fleOut, dtaTtl = jmvTtl("_sort"), psvAnl = psvAnl, dtaInp = dtaInp, ...)
 }
 
-srtFrm <- function(dtaFrm = NULL, varSrt = c()) {
+srtFrm <- function(dtaFrm = NULL, varSrt = NULL) {
     # if the sorting variable(s) are found, generate an order according to them and afterwards remove / reset the rownames
     if (chkVar(dtaFrm, gsub("^-", "", varSrt))) {
-#       srtOrd <- eval(parse(text = paste0("order(", paste0(gsub("dtaFrm[[\"-", "-dtaFrm[[\"", paste0("dtaFrm[[\"", varSrt, "\"]]"), fixed = TRUE), collapse = ", "), ")")))
-        srtOrd <- eval(parse(text = paste0("order(", paste0(vapply(varSrt, function(x) {
+        srtOrd <- eval(parse(text = paste0("order(", paste(vapply(varSrt, function(x) {
             s <- ifelse(grepl("^-", x), "-", "")
-            ifelse(!any(is.na(suppressWarnings(as.numeric(dtaFrm[[x]])))),
-                paste0(s, "as.numeric(dtaFrm[[\"", sub("^-", "", x), "\"]])"),
-                paste0(s, "dtaFrm[[\"", sub("^-", "", x), "\"]]"))
+            ifelse(anyNA(suppressWarnings(as.numeric(dtaFrm[[x]]))),
+                   paste0(s, "dtaFrm[[\"", sub("^-", "", x), "\"]]"),
+                   paste0(s, "as.numeric(dtaFrm[[\"", sub("^-", "", x), "\"]])"))
             }, character(1)), collapse = ", "), ")")))
         # sorting makes the data.frame lose it's attributes which are therefore stored and later restored
         attLst <- bckAtt(dtaFrm)

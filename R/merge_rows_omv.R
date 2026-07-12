@@ -1,46 +1,48 @@
-#' Merges two .omv-files for the statistical spreadsheet 'jamovi' (<https://www.jamovi.org>) by adding the content of the second, etc.  file(s) as rows to the
-#' first file
+#' Merges two .omv-files for the statistical spreadsheet 'jamovi' (<https://www.jamovi.org>) by adding the content of
+#' the second, etc. file(s) as rows to the first file
 #'
-#' @param dtaInp Either a data frame (with the attribute "fleInp" containing the files to merge) or vector with the names of the input files (including the
-#'               path, if required; "FILENAME.ext"; default: NULL); files can be of any supported file type, see Details below
-#' @param fleOut Name of the data file to be written (including the path, if required; "FILE_OUT.omv"; default: ""); if empty, the resulting data frame is
-#'               returned instead
-#' @param typMrg Type of merging operation: "all" (default) or  "common"; see also Details
-#' @param colInd Add a column with an indicator (the basename of the file minus the extension) marking from which input data set the respective rows are coming
-#'               (default: FALSE)
-#' @param rstRwN Reset row names (i.e., do not keep the row names of the original input data sets but number them consecutively - one to the row number of all
-#'               input data sets added up; default: TRUE)
-#' @param rmvDpl Remove duplicated rows (i.e., rows with the same content as a previous row in all columns; default: FALSE)
-#' @param varSrt Variable(s) that are used to sort the data frame (see Details; if empty, the order after merging is kept; default: c())
-#' @param usePkg Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata and SAS files; "foreign" is the default (it comes with
-#'               base R), but "haven" is newer and more comprehensive
-#' @param selSet Name of the data set that is to be selected from the workspace (only applies when reading .RData-files)
+#' @inheritParams aggregate_omv fleOut usePkg selSet
+#' @param dtaInp Either a data frame (with the attribute "fleInp" containing the files to merge) or vector with the
+#'               names of the input files (including the path, if required; "FILENAME.ext"; default: NULL); files can
+#'               be of any supported file type, see Details below.
+#' @param typMrg Type of merging operation: "all" (default) or "common"; see also Details.
+#' @param colInd Add a column with an indicator (the basename of the file minus the extension) marking from which input
+#'               data set the respective rows are coming (default: FALSE)
+#' @param rstRwN Reset row names (i.e., do not keep the row names of the original input data sets but number them
+#'               consecutively - one to the row number of all input data sets added up; default: TRUE)
+#' @param rmvDpl Remove duplicated rows (i.e., rows with the same content as a previous row in all columns; default:
+#'               FALSE)
+#' @param varSrt Variable(s) that are used to sort the data frame (see Details; if empty, the order after merging is
+#'               kept; default: NULL)
 #' @param ...    Additional arguments passed on to methods; see Details below
 #'
-#' @return a data frame (only returned if `fleOut` is empty) where the rows of all input data sets (given in the `dtaInp`-argument) are concatenated
+#' @return a data frame (only returned if `fleOut` is empty) where the rows of all input data sets (given in the
+#'         `dtaInp`-argument) are concatenated
 #'
 #' @details
-#' * Using data frames with the input parameter `dtaInp` is primarily thought to be used when calling `merge_cols_omv` from the jamovi-modules `jTransform` and
-#'   `Rj`. For the use in R, it is strongly recommended to use a character vector with the file names instead.
-#' * There are four different types of merging operations (defined via `typMrg`): "all" keeps all existing variables / columns that are contained in any of the
-#'   input data sets and fills them up with NA where the variable / column doesn't exist in an input data set. "common" only keeps the variables / columns that
-#'   are common to all input data sets (i.e., that are contained in all data sets).
-#' * `varSrt` can be either a character or a character vector (with one or more variables respectively). The sorting order for a particular variable can be
-#'   inverted with preceding the variable name with "-". Please note that this doesn't make sense and hence throws a warning for certain variable types (e.g.,
-#'   factors).
-#' * The ellipsis-parameter (`...`) can be used to submit arguments / parameters to the functions that are used for merging or reading the data. By clicking on
-#'   the respective function under “See also”, you can get a more detailed overview over which parameters each of those functions take.
-#' * Adding columns uses `rbind` (with some further operation, adding missing columns (filled with NAs), if `typMrg` is "all").
-#' * The functions for reading and writing the data are: `read_omv` and `write_omv` (for jamovi-files), `read.table` (for CSV / TSV files; using similar
-#'   defaults as `read.csv` for CSV and `read.delim` for TSV which both are based upon `read.table`), `load` (for .RData-files), `readRDS` (for .rds-files),
-#'   `read_sav` (needs R-package `haven`) or `read.spss` (needs R-package `foreign`) for SPSS-files, `read_dta` (`haven`) / `read.dta` (`foreign`) for
-#'   Stata-files, `read_sas` (`haven`) for SAS-data-files, and `read_xpt` (`haven`) / `read.xport` (`foreign`) for SAS-transport-files. If you would like to
-#'   use `haven`, you may need to install it using `install.packages("haven", dep = TRUE)`.
+#' * Using data frames with the input parameter `dtaInp` is primarily thought to be used when calling `merge_cols_omv`
+#'   from the jamovi-modules `jTransform` and `Rj`. For the use in R, it is strongly recommended to use a character
+#'   vector with the file names instead.
+#' * There are four different types of merging operations (defined via `typMrg`): "all" keeps all existing variables /
+#'   columns that are contained in any of the input data sets and fills them up with NA where the variable / column
+#'   doesn't exist in an input data set. "common" only keeps the variables / columns that are common to all input data
+#'   sets (i.e., that are contained in all data sets).
+#' * `varSrt` can be either a character or a character vector (with one or more variables respectively). The sorting
+#'   order for a particular variable can be inverted with preceding the variable name with "-". Please note that this
+#'   doesn't make sense and hence throws a warning for certain variable types (e.g., factors).
+#' * Adding columns uses `rbind` (with some further operation, adding missing columns (filled with NAs), if `typMrg` is
+#'   "all").
+#' * The ellipsis-parameter (`...`) can be used to submit arguments / parameters to the functions that are used for
+#'   reading or transforming the data. By clicking on the respective function under “See also”, you can get a more
+#'   detailed overview over which parameters each of those functions take.
 #'
-#' @seealso `merge_rows_omv` internally uses the following functions: Adding columns uses [rbind()]. For reading and writing data files in different formats:
-#'   [jmvReadWrite::read_omv()] and [jmvReadWrite::write_omv()] for jamovi-files, [utils::read.table()] for CSV / TSV files, [load()] for reading .RData-files,
-#'   [readRDS()] for .rds-files, [haven::read_sav()] or [foreign::read.spss()] for SPSS-files, [haven::read_dta()] or [foreign::read.dta()] for Stata-files,
-#'   [haven::read_sas()] for SAS-data-files, and [haven::read_xpt()] or [foreign::read.xport()] for SAS-transport-files.
+#' @seealso
+#' `merge_rows_omv` internally uses the following functions: Adding columns uses [rbind()]. For reading and writing
+#' data files in different formats: [jmvReadWrite::read_omv()] and [jmvReadWrite::write_omv()] for jamovi-files,
+#' [utils::read.table()] for CSV / TSV files, [load()] for reading .RData-files, [readRDS()] for .rds-files,
+#' [haven::read_sav()] or [foreign::read.spss()] for SPSS-files, [haven::read_dta()] or [foreign::read.dta()] for
+#' Stata-files, [haven::read_sas()] for SAS-data-files, and [haven::read_xpt()] or [foreign::read.xport()] for
+#' SAS-transport-files.
 #'
 #' @examples
 #' dtaInp <- jmvReadWrite::bfi_sample2
@@ -89,7 +91,8 @@
 #'
 #' @export merge_rows_omv
 #'
-merge_rows_omv <- function(dtaInp = NULL, fleOut = "", typMrg = c("all", "common"), colInd = FALSE, rstRwN = TRUE, rmvDpl = FALSE, varSrt = c(), usePkg = c("foreign", "haven"), selSet = "", ...) {
+merge_rows_omv <- function(dtaInp = NULL, fleOut = "", typMrg = c("all", "common"), colInd = FALSE, rstRwN = TRUE,
+                           rmvDpl = FALSE, varSrt = NULL, usePkg = c("foreign", "haven"), selSet = "", ...) {
 
     # check and import input data set (either as data frame or from a file)
     if (!is.null(list(...)[["fleInp"]])) stop("Please use the argument dtaInp instead of fleInp.")
@@ -99,7 +102,7 @@ merge_rows_omv <- function(dtaInp = NULL, fleOut = "", typMrg = c("all", "common
 
     # merge files - the additional arguments are the same in either case
     typMrg <- match.arg(typMrg)
-    crrArg <- adjArg(c("rbind", "data.frame"), list(), list(...), c())
+    crrArg <- adjArg(c("rbind", "data.frame"), list(), list(...), NULL)
     # keeping all existing variables, filling the void columns with NA
     if      (typMrg == "all") {
         # determine the variable names and types in all input data sets and remove
@@ -118,7 +121,10 @@ merge_rows_omv <- function(dtaInp = NULL, fleOut = "", typMrg = c("all", "common
                   rep(": ", sum(names(varTyp) == crrNme)), varTyp[names(varTyp) == crrNme]), collapse = "\n")))
             }
         }
-        if (length(varNme) != length(varTyp)) stop("Something went wrong when comparing the variable types of the input data files. Please send the data files to sebastian.jentschke@uib.no for debugging.")
+        if (length(varNme) != length(varTyp)) {
+            stop("Something went wrong when comparing the variable types of the input data files. Please send the data ",
+                 "files to sebastian.jentschke@uib.no for debugging.")
+        }
         tmpMrg <- addCol(dtaFrm[[1]], varNme, varTyp)
         for (i in setdiff(seq_along(dtaFrm), 1)) {
             crrInp <- addCol(dtaFrm[[i]], varNme, varTyp)
@@ -129,8 +135,9 @@ merge_rows_omv <- function(dtaInp = NULL, fleOut = "", typMrg = c("all", "common
     } else if (typMrg == "common") {
         varNme <- Reduce(intersect, lapply(dtaFrm, names))
         if (identical(varNme, character(0))) {
-            stop(paste("The data sets in the files that were given as dtaInp-argument do not contain variables that are overlapping (i.e., contained in all data sets).",
-                       "You can either reduce the number of data sets given to dtaInp or use \"outer\" as argument for \"typMrg\" (see Details in the help for this function)."))
+            stop("The data sets in the files that were given as dtaInp-argument do not contain variables that are ",
+                 "overlapping (i.e., contained in all data sets). You can either reduce the number of data sets given ",
+                 "to dtaInp or use \"outer\" as argument for \"typMrg\" (see Details in the help for this function).")
         }
         tmpMrg <- dtaFrm[[1]][, varNme]
         for (i in setdiff(seq_along(dtaFrm), 1)) {
@@ -140,14 +147,10 @@ merge_rows_omv <- function(dtaInp = NULL, fleOut = "", typMrg = c("all", "common
     }
 
     # remove row names
-    if (rstRwN == TRUE) {
-        rownames(dtaFrm) <- NULL
-    }
+    if (rstRwN) rownames(dtaFrm) <- NULL
 
     # remove duplicate rows
-    if (rmvDpl == TRUE) {
-        dtaFrm <- dtaFrm[!duplicated(dtaFrm[, setdiff(varNme, "fleInd")]), ]
-    }
+    if (rmvDpl) dtaFrm <- dtaFrm[!duplicated(dtaFrm[, setdiff(varNme, "fleInd")]), ]
 
     # sort data frame (if varSrt not empty)
     dtaFrm <- srtFrm(dtaFrm, varSrt)
@@ -156,7 +159,7 @@ merge_rows_omv <- function(dtaInp = NULL, fleOut = "", typMrg = c("all", "common
     rtnDta(dtaFrm = dtaFrm, fleOut = fleOut, dtaTtl = jmvTtl("_mrg_rows"), ...)
 }
 
-addCol <- function(dtaFrm = NULL, varNme = c(), varTyp = c()) {
+addCol <- function(dtaFrm = NULL, varNme = NULL, varTyp = NULL) {
     varDff <- setdiff(varNme, names(dtaFrm))
     for (i in seq_along(varDff)) {
         eval(parse(text = paste0("dtaFrm[varDff[i]] <- as.", varTyp[[varDff[i]]], "(NA)")))

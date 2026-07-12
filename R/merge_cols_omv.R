@@ -2,26 +2,18 @@
 #' input file and outputs them as files for the statistical spreadsheet 'jamovi'
 #' (<https://www.jamovi.org>)
 #'
-#' @param dtaInp Either a data frame (with the attribute "fleInp" containing the files to merge) or
-#'               vector with the names of the input files (including the path, if required;
-#'               "FILENAME.ext"; default: NULL); files can be of any supported file type, see
-#'               Details below
-#' @param fleOut Name of the data file to be written (including the path, if required;
-#'               "FILE_OUT.omv"; default: ""); if empty, the resulting data frame is returned
-#'               instead
+#' @inheritParams aggregate_omv fleOut usePkg selSet
+#' @param dtaInp Either a data frame (with the attribute "fleInp" containing the files to merge) or vector with the
+#'               names of the input files (including the path, if required; "FILENAME.ext"; default: NULL); files can
+#'               be of any supported file type, see Details below.
 #' @param typMrg Type of merging operation: "outer" (default), "inner", "left" or "right"; see
-#'               Details below
+#'               Details below.
 #' @param varBy  Name of the variable by which the data sets are matched, can either be a string,
 #'               a character or a list (see Details below; default: list())
 #' @param varSrt Variable(s) that are used to sort the data frame (see Details; if empty, the order
-#'               after merging is kept; default: c())
-#' @param psvAnl Whether analyses that are contained in the input file shall be transferred to the
-#'               output file (TRUE / FALSE; default: FALSE)
-#' @param usePkg Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata
-#'               and SAS files; "foreign" is the default (it comes with base R), but "haven" is
-#'               newer and more comprehensive
-#' @param selSet Name of the data set that is to be selected from the workspace (only applies when
-#'               reading .RData-files)
+#'               after merging is kept; default: NULL)
+#' @param psvAnl Whether analyses that are contained in the input file shall be transferred to the output file (TRUE /
+#'               FALSE; default: FALSE)
 #' @param ...    Additional arguments passed on to methods; see Details below
 #'
 #' @return a data frame (only returned if `fleOut` is empty) where the columns of all input data
@@ -51,21 +43,13 @@
 #'   respectively). The sorting order for a particular variable can be inverted with preceding the
 #'   variable name with "-". Please note that this doesn't make sense and hence throws a warning
 #'   for certain variable types (e.g., factors).
+#' * Adding columns uses `merge`. `typMrg` is implemented by setting `TRUE` or `FALSE` to `all.x`
+#'   and `all.y` in `merge`, `varBy` matches `by.x` and `by.y`. The help for `merge` can be
+#'   accessed by clicking on the link under “See also”.
 #' * The ellipsis-parameter (`...`) can be used to submit arguments / parameters to the functions
 #'   that are used for transforming or reading the data. By clicking on the respective function
 #'   under “See also”, you can get a more detailed overview over which parameters each of those
 #'   functions take.
-#' * Adding columns uses `merge`. `typMrg` is implemented by setting `TRUE` or `FALSE` to `all.x`
-#'   and `all.y` in `merge`, `varBy` matches `by.x` and `by.y`. The help for `merge` can be
-#'   accessed by clicking on the link under “See also”.
-#' * The functions for reading and writing the data are: `read_omv` and `write_omv` (for
-#'   jamovi-files), `read.table` (for CSV / TSV files; using similar defaults as `read.csv` for CSV
-#'   and `read.delim` for TSV which both are based upon `read.table`), `load` (for .RData-files),
-#'   `readRDS` (for .rds-files), `read_sav` (needs R-package `haven`) or `read.spss` (needs
-#'   R-package `foreign`) for SPSS-files, `read_dta` (`haven`) / `read.dta` (`foreign`) for
-#'   Stata-files, `read_sas` (`haven`) for SAS-data-files, and `read_xpt` (`haven`) / `read.xport`
-#'   (`foreign`) for SAS-transport-files. If you would like to use `haven`, you may need to install
-#'   it using `install.packages("haven", dep = TRUE)`.
 #'
 #' @seealso `merge_cols_omv` internally uses the following functions: Adding columns uses
 #'   [merge()]. For reading and writing data files in different formats: [jmvReadWrite::read_omv()]
@@ -111,7 +95,7 @@
 #' @export merge_cols_omv
 #'
 merge_cols_omv <- function(dtaInp = NULL, fleOut = "", typMrg = c("outer", "inner", "left", "right"), varBy = list(),
-                           varSrt = c(), psvAnl = FALSE, usePkg = c("foreign", "haven"), selSet = "", ...) {
+                           varSrt = NULL, psvAnl = FALSE, usePkg = c("foreign", "haven"), selSet = "", ...) {
 
     # check and import input data set (either as data frame or from a file)
     if (!is.null(list(...)[["fleInp"]])) stop("Please use the argument dtaInp instead of fleInp.")
@@ -125,8 +109,8 @@ merge_cols_omv <- function(dtaInp = NULL, fleOut = "", typMrg = c("outer", "inne
 
     # merge files ([1] determine arguments, [2] merge using a temporary variable which afterwards is written back)
     typMrg <- match.arg(typMrg)
-    crrArg <- list(x = NULL, y = NULL, by.x = "", by.y = "", all.x = ifelse(any(typMrg %in% c("outer", "left")), TRUE, FALSE),
-                   all.y = ifelse(any(typMrg %in% c("outer", "right")), TRUE, FALSE))
+    crrArg <- list(x = NULL, y = NULL, by.x = "", by.y = "", all.x = typMrg %in% c("outer", "left"),
+                   all.y = typMrg %in% c("outer", "right"))
     crrArg <- adjArg(c("merge", "data.frame"), crrArg, list(...), c("x", "y", "by.x", "by.y", "all.x", "all.y"))
     tmpMrg <- dtaFrm[[1]]
     for (i in setdiff(seq_along(dtaFrm), 1)) {
@@ -187,7 +171,7 @@ chkByV <- function(varBy = list(), dtaFrm = NULL) {
     for (i in seq_along(dtaFrm)) {
         if (any(vapply(varBy[[i]],
                        function(c) {
-                           any(is.na(dtaFrm[[i]][, c])) || any(is.null(dtaFrm[[i]][, c])) ||
+                           anyNA(dtaFrm[[i]][, c]) || any(is.null(dtaFrm[[i]][, c])) ||
                            (all(is.character(dtaFrm[[i]][, c])) && !all(nzchar(dtaFrm[[i]][, c])))
                        },
                        logical(length(varBy[[i]]))))) {

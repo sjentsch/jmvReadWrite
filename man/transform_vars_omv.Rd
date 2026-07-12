@@ -2,7 +2,8 @@
 % Please edit documentation in R/transform_vars_omv.R
 \name{transform_vars_omv}
 \alias{transform_vars_omv}
-\title{Transform skewed variables (aiming at they conform to a normal distribution) in .omv-files for the statistical spreadsheet 'jamovi' (\url{https://www.jamovi.org})}
+\title{Transform skewed variables (aiming at they conform to a normal distribution) in .omv-files for the statistical
+spreadsheet 'jamovi' (\url{https://www.jamovi.org})}
 \usage{
 transform_vars_omv(
   dtaInp = NULL,
@@ -15,46 +16,50 @@ transform_vars_omv(
 )
 }
 \arguments{
-\item{dtaInp}{Either a data frame or the name of a data file to be read (including the path, if required; "FILENAME.ext"; default: NULL); files can be of
-any supported file type, see Details below}
+\item{dtaInp}{Either a data frame or the name of a data file to be read (including the path, if required;
+"FILENAME.ext"; default: NULL); files can be of any supported file type, see Details below.}
 
-\item{fleOut}{Name of the data file to be written (including the path, if required; "FILE_OUT.omv"; default: ""); if empty, the resulting data frame is
-returned instead}
+\item{fleOut}{Name of the data set / file to be written (including the path, if required; "FILE_OUT.omv";
+default: ""); if empty, the resulting data frame is returned instead.}
 
-\item{varXfm}{Named list variable where the name indicates which transformation is to be carried out and where each list entry points to one or more
-variables to be transformed using this transformation. See Details for more information.}
+\item{varXfm}{Named list variable where the name indicates which transformation is to be carried out and where each
+list entry points to one or more variables to be transformed using this transformation. See Details
+for more information.}
 
-\item{psvAnl}{Whether analyses that are contained in the input file shall be transferred to the output file (default: FALSE)}
+\item{psvAnl}{Whether analyses that are contained in the input file shall be transferred to the output file (TRUE /
+FALSE; default: FALSE)}
 
-\item{usePkg}{Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata and SAS files; "foreign" is the default (it comes with
-base R), but "haven" is newer and more comprehensive}
+\item{usePkg}{Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata, and SAS files;
+"foreign" is the default (it is included in base R), but "haven" is newer and more comprehensive; you
+may have to install using \code{install.packages("haven", dep = TRUE)}.}
 
-\item{selSet}{Name of the data set that is to be selected from the workspace (only applies when reading .RData-files)}
+\item{selSet}{Name of the object / data set that is to be selected from the workspace (only relevant when reading
+.RData-files which can contain several objects / data sets)}
 
 \item{...}{Additional arguments passed on to methods; see Details below}
 }
 \value{
-a data frame (only returned if \code{fleOut} is empty) where the order of variables / columns of the input data set is re-arranged
+a data frame (only returned if \code{fleOut} is empty) where the order of variables / columns of the input data
+set is re-arranged
 }
 \description{
-Transform skewed variables (aiming at they conform to a normal distribution) in .omv-files for the statistical spreadsheet 'jamovi' (\url{https://www.jamovi.org})
+Transform skewed variables (aiming at they conform to a normal distribution) in .omv-files for the statistical
+spreadsheet 'jamovi' (\url{https://www.jamovi.org})
 }
 \details{
 \itemize{
-\item \code{varXfm} has to be a named list variable where the names can either indicate the type of transformation or the kind and degree of skewness that shall be
-corrected. For the type of transformation, the following names are valid: \code{posSqr}, \code{negSqr}, \code{posLog}, \code{negLog}, \code{posInv}, \code{negInv}; where the second
-part of the name indicates the transformation to be carried out: \code{...Sqr} - square root, \code{...Log} - logarithm to the basis 10, \code{...Inv} - inversion, i.e.,
-1 / original value), and where the first part of the name indicates whether the original value is used (\code{pos...}) or whether the original value is
-subtracted from the maximum value of that variable (\code{neg...}; a constant of 1 is added to the maximum value for \code{...Log} and \code{...Inv} transformations).
-For the degree and kind of skewness, the following names are valid: \code{mdrPos}, \code{strPos}, \code{svrPos}, \code{mdrNeg}, \code{strNeg}, \code{svrNeg} (degree: moderate, strong,
-severe; kind: positive or negative).
-\item The ellipsis-parameter (\code{...}) can be used to submit arguments / parameters to the functions that are used for reading and writing the data. By clicking
-on the respective function under “See also”, you can get a more detailed overview over which parameters each of those functions take. The functions are:
-\code{read_omv} and \code{write_omv} (for jamovi-files), \code{read.table} (for CSV / TSV files; using similar defaults as \code{read.csv} for CSV and \code{read.delim} for TSV
-which both are based upon \code{read.table}), \code{load} (for .RData-files), \code{readRDS} (for .rds-files), \code{read_sav} (needs the R-package \code{haven}) or \code{read.spss}
-(needs the R-package \code{foreign}) for SPSS-files, \code{read_dta} (\code{haven}) / \code{read.dta} (\code{foreign}) for Stata-files, \code{read_sas} (\code{haven}) for SAS-data-files,
-and \code{read_xpt} (\code{haven}) / \code{read.xport} (\code{foreign}) for SAS-transport-files. If you would like to use \code{haven}, you may need to install it using
-\code{install.packages("haven", dep = TRUE)}.
+\item \code{varXfm} has to be a named list variable where the names can either indicate the type of transformation or the
+kind and degree of skewness that shall be corrected. For the type of transformation, the following names are
+valid: \code{posSqr}, \code{negSqr}, \code{posLog}, \code{negLog}, \code{posInv}, \code{negInv}; where the second part of the name indicates the
+transformation to be carried out: \code{...Sqr} - square root, \code{...Log} - logarithm to the basis 10, \code{...Inv} -
+inversion, i.e., 1 / original value), and where the first part of the name indicates whether the original value is
+used (\code{pos...}) or whether the original value is subtracted from the maximum value of that variable (\code{neg...}; a
+constant of 1 is added to the maximum value for \code{...Log} and \code{...Inv} transformations). For the degree and kind of
+skewness, the following names are valid: \code{mdrPos}, \code{strPos}, \code{svrPos}, \code{mdrNeg}, \code{strNeg}, \code{svrNeg} (degree:
+moderate, strong, severe; kind: positive or negative).
+\item The ellipsis-parameter (\code{...}) can be used to submit arguments / parameters to the functions that are used for
+reading the data. By clicking on the respective function under “See also”, you can get a more detailed overview
+over which parameters each of those functions take.
 }
 }
 \examples{
@@ -81,8 +86,9 @@ jmv::descriptives(data = dtaOut, skew = TRUE, sw = TRUE)
 
 }
 \seealso{
-\code{transform_vars_omv} internally uses the following functions for reading and writing data files in different formats: \code{\link[=read_omv]{read_omv()}} and
-\code{\link[=write_omv]{write_omv()}} for jamovi-files, \code{\link[utils:read.table]{utils::read.table()}} for CSV / TSV files, \code{\link[=load]{load()}} for reading .RData-files, \code{\link[=readRDS]{readRDS()}} for .rds-files,
-\code{\link[haven:read_spss]{haven::read_sav()}} or \code{\link[foreign:read.spss]{foreign::read.spss()}} for SPSS-files, \code{\link[haven:read_dta]{haven::read_dta()}} or \code{\link[foreign:read.dta]{foreign::read.dta()}} for Stata-files, \code{\link[haven:read_sas]{haven::read_sas()}} for
-SAS-data-files, and \code{\link[haven:read_xpt]{haven::read_xpt()}} or \code{\link[foreign:read.xport]{foreign::read.xport()}} for SAS-transport-files.
+\code{transform_vars_omv} internally uses the following functions for reading and writing data files in different
+formats: \code{\link[=read_omv]{read_omv()}} and \code{\link[=write_omv]{write_omv()}} for jamovi-files, \code{\link[utils:read.table]{utils::read.table()}} for
+CSV / TSV files, \code{\link[=load]{load()}} for reading .RData-files, \code{\link[=readRDS]{readRDS()}} for .rds-files, \code{\link[haven:read_sav]{haven::read_sav()}} or
+\code{\link[foreign:read.spss]{foreign::read.spss()}} for SPSS-files, \code{\link[haven:read_dta]{haven::read_dta()}} or \code{\link[foreign:read.dta]{foreign::read.dta()}} for Stata-files,
+\code{\link[haven:read_sas]{haven::read_sas()}} for SAS-data-files, and \code{\link[haven:read_xpt]{haven::read_xpt()}} or \code{\link[foreign:read.xport]{foreign::read.xport()}} for SAS-transport-files.
 }

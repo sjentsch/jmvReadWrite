@@ -1,3 +1,11 @@
+# jmvReadWrite 0.4.14
+
+## Enhancements:
+* implementing suggestions made by the `goodpractice` R-package
+* fixing typos and small bugs, and improving unit tests (e.g., limit line length)
+
+---
+
 # jmvReadWrite 0.4.13
 
 ## Enhancements:

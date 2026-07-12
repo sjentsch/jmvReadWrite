@@ -1,8 +1,10 @@
 #' Search values in .omv-files for the statistical spreadsheet 'jamovi' (<https://www.jamovi.org>)
 #'
-#' @param dtaInp Either a data frame or the name of a jamovi data file to be read (including the path, if required; "FILENAME.omv"; default: NULL)
-#' @param srcTrm (Character or numeric) Vector (with length = 1) with a search term to be found in the data frame (default: c())
-#' @param whlTrm Whether the exact search term shall be found (TRUE) or whether a partial match is sufficient (FALSE; default: FALSE)
+#' @inheritParams aggregate_omv dtaInp usePkg selSet
+#' @param srcTrm (Character or numeric) Vector (with length = 1) with a search term to be found in the data frame
+#'               (default: NULL)
+#' @param whlTrm Whether the exact search term shall be found (TRUE) or whether a partial match is sufficient (FALSE;
+#'               default: FALSE)
 #' @param ignCse Whether to ignore the case of the search term (default: FALSE)
 #' @param incNum Whether to include continuous variables in the search (default: TRUE)
 #' @param incOrd Whether to include ordinal variables in the search (default: TRUE)
@@ -12,16 +14,21 @@
 #' @param incRcd Whether to include Recoded variables in the search (default: TRUE)
 #' @param ...    Additional arguments passed on to methods; see Details below
 #'
-#' @return a named list with the places where the search term was found: names in the list are the variables / columns, the entries the respective row names
-#'         within that variable / column (row names are used for being tolerant to filtered-out cases in jamovi, if a filter is used, row numbers would be
-#'         incorrect)
+#' @return a named list with the places where the search term was found: names in the list are the variables / columns,
+#'         the entries the respective row names within that variable / column (row names are used for being tolerant to
+#'         filtered-out cases in jamovi, if a filter is used, row numbers would be incorrect)
 #'
 #' @details
-#' * The ellipsis-parameter (`...`) can be used to submit arguments / parameters to the function that is used for reading and writing the data. Clicking on the
-#'   respective function under “See also”, you can get a more detailed overview over which parameters each of those functions take. The functions are:
-#'   `read_omv` and `write_omv` (for jamovi-files).
+#' * The ellipsis-parameter (`...`) can be used to submit arguments / parameters to the functions that are used for
+#'   reading the data. By clicking on the respective function under “See also”, you can get a more detailed overview
+#'   over which parameters each of those functions take.
 #'
-#' @seealso `replace_omv` uses [jmvReadWrite::read_omv()] and [jmvReadWrite::write_omv()] for reading and writing jamovi-files.
+#' @seealso
+#' `search_omv` internally uses the following functions for reading and writing data files in different formats:
+#' [jmvReadWrite::read_omv()] and [jmvReadWrite::write_omv()] for jamovi-files, [utils::read.table()] for CSV / TSV
+#' files, [load()] for reading .RData-files, [readRDS()] for .rds-files, [haven::read_sav()] or [foreign::read.spss()]
+#' for SPSS-files, [haven::read_dta()] or [foreign::read.dta()] for Stata-files, [haven::read_sas()] for
+#' SAS-data-files, and [haven::read_xpt()] or [foreign::read.xport()] for SAS-transport-files.
 #'
 #' @examples
 #' # the exact value 24 appears 13 times in age
@@ -44,7 +51,9 @@
 #'
 #' @export search_omv
 #'
-search_omv <- function(dtaInp = NULL, srcTrm = c(), whlTrm = FALSE, ignCse = FALSE, incNum = TRUE, incOrd = TRUE, incNom = TRUE, incID = TRUE, incCmp = TRUE, incRcd = TRUE, ...) {
+search_omv <- function(dtaInp = NULL, srcTrm = NULL, whlTrm = FALSE, ignCse = FALSE, incNum = TRUE, incOrd = TRUE,
+                       incNom = TRUE, incID = TRUE, incCmp = TRUE, incRcd = TRUE, usePkg = c("foreign", "haven"),
+                       selSet = "", ...) {
 
     # check the input parameter: the search term needs to be a non-empty character vector with length 1
     if (!is.character(srcTrm) && is.vector(srcTrm)) srcTrm <- as.character(srcTrm)
@@ -68,7 +77,8 @@ search_omv <- function(dtaInp = NULL, srcTrm = c(), whlTrm = FALSE, ignCse = FAL
     for (i in seq_along(srcRes)) {
         srcRes[[i]] <- nmeRow[srcClm(dtaFrm[[srcNme[i]]], srcTrm, whlTrm, ignCse)]
     }
-    return(srcRes[vapply(srcRes, length, integer(1)) > 0])
+
+    srcRes[vapply(srcRes, length, integer(1)) > 0]
 }
 
 srcClm <- function(inpClm = NULL, srcTrm = "", whlTrm = FALSE, ignCse = FALSE) {

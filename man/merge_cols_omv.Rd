@@ -11,7 +11,7 @@ merge_cols_omv(
   fleOut = "",
   typMrg = c("outer", "inner", "left", "right"),
   varBy = list(),
-  varSrt = c(),
+  varSrt = NULL,
   psvAnl = FALSE,
   usePkg = c("foreign", "haven"),
   selSet = "",
@@ -19,33 +19,31 @@ merge_cols_omv(
 )
 }
 \arguments{
-\item{dtaInp}{Either a data frame (with the attribute "fleInp" containing the files to merge) or
-vector with the names of the input files (including the path, if required;
-"FILENAME.ext"; default: NULL); files can be of any supported file type, see
-Details below}
+\item{dtaInp}{Either a data frame (with the attribute "fleInp" containing the files to merge) or vector with the
+names of the input files (including the path, if required; "FILENAME.ext"; default: NULL); files can
+be of any supported file type, see Details below.}
 
-\item{fleOut}{Name of the data file to be written (including the path, if required;
-"FILE_OUT.omv"; default: ""); if empty, the resulting data frame is returned
-instead}
+\item{fleOut}{Name of the data set / file to be written (including the path, if required; "FILE_OUT.omv";
+default: ""); if empty, the resulting data frame is returned instead.}
 
 \item{typMrg}{Type of merging operation: "outer" (default), "inner", "left" or "right"; see
-Details below}
+Details below.}
 
 \item{varBy}{Name of the variable by which the data sets are matched, can either be a string,
 a character or a list (see Details below; default: list())}
 
 \item{varSrt}{Variable(s) that are used to sort the data frame (see Details; if empty, the order
-after merging is kept; default: c())}
+after merging is kept; default: NULL)}
 
-\item{psvAnl}{Whether analyses that are contained in the input file shall be transferred to the
-output file (TRUE / FALSE; default: FALSE)}
+\item{psvAnl}{Whether analyses that are contained in the input file shall be transferred to the output file (TRUE /
+FALSE; default: FALSE)}
 
-\item{usePkg}{Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata
-and SAS files; "foreign" is the default (it comes with base R), but "haven" is
-newer and more comprehensive}
+\item{usePkg}{Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata, and SAS files;
+"foreign" is the default (it is included in base R), but "haven" is newer and more comprehensive; you
+may have to install using \code{install.packages("haven", dep = TRUE)}.}
 
-\item{selSet}{Name of the data set that is to be selected from the workspace (only applies when
-reading .RData-files)}
+\item{selSet}{Name of the object / data set that is to be selected from the workspace (only relevant when reading
+.RData-files which can contain several objects / data sets)}
 
 \item{...}{Additional arguments passed on to methods; see Details below}
 }
@@ -83,21 +81,13 @@ length as it is necessary to always use the same number of matching variables wh
 respectively). The sorting order for a particular variable can be inverted with preceding the
 variable name with "-". Please note that this doesn't make sense and hence throws a warning
 for certain variable types (e.g., factors).
+\item Adding columns uses \code{merge}. \code{typMrg} is implemented by setting \code{TRUE} or \code{FALSE} to \code{all.x}
+and \code{all.y} in \code{merge}, \code{varBy} matches \code{by.x} and \code{by.y}. The help for \code{merge} can be
+accessed by clicking on the link under “See also”.
 \item The ellipsis-parameter (\code{...}) can be used to submit arguments / parameters to the functions
 that are used for transforming or reading the data. By clicking on the respective function
 under “See also”, you can get a more detailed overview over which parameters each of those
 functions take.
-\item Adding columns uses \code{merge}. \code{typMrg} is implemented by setting \code{TRUE} or \code{FALSE} to \code{all.x}
-and \code{all.y} in \code{merge}, \code{varBy} matches \code{by.x} and \code{by.y}. The help for \code{merge} can be
-accessed by clicking on the link under “See also”.
-\item The functions for reading and writing the data are: \code{read_omv} and \code{write_omv} (for
-jamovi-files), \code{read.table} (for CSV / TSV files; using similar defaults as \code{read.csv} for CSV
-and \code{read.delim} for TSV which both are based upon \code{read.table}), \code{load} (for .RData-files),
-\code{readRDS} (for .rds-files), \code{read_sav} (needs R-package \code{haven}) or \code{read.spss} (needs
-R-package \code{foreign}) for SPSS-files, \code{read_dta} (\code{haven}) / \code{read.dta} (\code{foreign}) for
-Stata-files, \code{read_sas} (\code{haven}) for SAS-data-files, and \code{read_xpt} (\code{haven}) / \code{read.xport}
-(\code{foreign}) for SAS-transport-files. If you would like to use \code{haven}, you may need to install
-it using \code{install.packages("haven", dep = TRUE)}.
 }
 }
 \examples{
@@ -138,7 +128,7 @@ unlink(nmeOut)
 \code{merge_cols_omv} internally uses the following functions: Adding columns uses
 \code{\link[=merge]{merge()}}. For reading and writing data files in different formats: \code{\link[=read_omv]{read_omv()}}
 and \code{\link[=write_omv]{write_omv()}} for jamovi-files, \code{\link[utils:read.table]{utils::read.table()}} for CSV / TSV files,
-\code{\link[=load]{load()}} for reading .RData-files, \code{\link[=readRDS]{readRDS()}} for .rds-files, \code{\link[haven:read_spss]{haven::read_sav()}} or
+\code{\link[=load]{load()}} for reading .RData-files, \code{\link[=readRDS]{readRDS()}} for .rds-files, \code{\link[haven:read_sav]{haven::read_sav()}} or
 \code{\link[foreign:read.spss]{foreign::read.spss()}} for SPSS-files, \code{\link[haven:read_dta]{haven::read_dta()}} or \code{\link[foreign:read.dta]{foreign::read.dta()}} for
 Stata-files, \code{\link[haven:read_sas]{haven::read_sas()}} for SAS-data-files, and \code{\link[haven:read_xpt]{haven::read_xpt()}} or
 \code{\link[foreign:read.xport]{foreign::read.xport()}} for SAS-transport-files.

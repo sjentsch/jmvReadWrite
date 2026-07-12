@@ -1,64 +1,47 @@
 #' Aggregates data from a data set / frame (in long format) and returns them as a .omv-file for the
 #' statistical spreadsheet 'jamovi' (<https://www.jamovi.org>)
 #'
-#' @param dtaInp Either a data frame or the name of a data file to be read (including the path,
-#'               if required; "FILENAME.ext"; default: NULL); files can be of any supported file
-#'               type, see Details below.
-#' @param fleOut Name of the aggregated data set / file to be written (including the path, if
-#'               required; "FILE_OUT.omv"; default: ""); if empty, the resulting data frame is
-#'               returned instead.
-#' @param varAgg A character vector (default: c()) with the names of the variables which shall be
-#'               aggregated.
-#' @param grpAgg A character vector (default: c()) with the variables to group the aggregation
-#'               variable (`varAgg`) by. If no grouping variable is given, the aggregation happens
-#'               over the whole data set. If several grouping variables are given, the aggregation
-#'               happens for each step / possible combination of these variables. See Details for
-#'               more information.
-#' @param clcN   If TRUE, counts the number of valid values for each step / combination of values
-#'               in the grouping variable. The suffix appended `"_N"´ is appended to each variable
-#'               in the resulting data set.
-#' @param clcMss If TRUE, counts the number of missing values for each step / combination of values
-#'               in the grouping variable. The suffix appended `"_Mss"` is appended to each
-#'               variable in the resulting data set.
-#' @param clcMn  If TRUE, calculates the mean for each step / combination of values in the grouping
-#'               variable. The suffix appended `"_Mn"` is appended to each variable in the
-#'               resulting data set.
-#' @param clcMdn If TRUE, calculates the median for each step / combination of values in the
-#'               grouping variable. The suffix appended `"_Mdn"` is appended to each variable in
-#'               the resulting data set.
-#' @param clcMde If TRUE, calculates the mode for each step / combination of values in the grouping
-#'               variable. The suffix appended `"_Mde"` is appended to each variable in the
-#'               resulting data set.
-#' @param clcSum If TRUE, calculates the sum for each step / combination of values in the grouping
-#'               variable. The suffix appended `"_Sum"` is appended to each variable in the
-#'               resulting data set.
-#' @param clcSD  If TRUE, calculates the std. deviation for each step / combination of values in
-#'               the grouping variable. The suffix appended `"_SD"` is appended to each variable in
-#'               the resulting data set.
-#' @param clcVar If TRUE, calculates the variance for each step / combination of values in the
-#'               grouping variable. The suffix appended `"_Var"` is appended to each variable in
-#'               the resulting data set.
-#' @param clcRng If TRUE, calculates the range for each step / combination of values in the
-#'               grouping variable. The suffix appended `"_Rng"` is appended to each variable in
-#'               the resulting data set.
-#' @param clcMin If TRUE, determines the minimum at each step / combination of values in the
-#'               grouping variable. The suffix appended `"_Min"` is appended to each variable in
-#'               the resulting data set.
-#' @param clcMax If TRUE, determines the maximum at each step / combination of values in the
-#'               grouping variable. The suffix appended `"_Max"` is appended to each variable in
-#'               the resulting data set.
-#' @param clcIQR If TRUE, calculates the IQR for each step / combination of values in the grouping
-#'               variable. The suffix appended `"_IQR"` is appended to each variable in the
-#'               resulting data set.
-#' @param drpNA  If TRUE (default: TRUE), NA values are removed before the aggregation, and the
-#'               aggregation is calculated using the valid values. If FALSE, the result would be NA
-#'               for any step / combination of values in the grouping variable that contains a NA
-#'               value.
-#' @param usePkg Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata,
-#'               and SAS files; "foreign" is the default (it comes with base R), but "haven" is
-#'               newer and more comprehensive.
-#' @param selSet Name of the data set that is to be selected from the workspace (only applies when
-#'               reading .RData-files)
+#' @param dtaInp Either a data frame or the name of a data file to be read (including the path, if required;
+#'               "FILENAME.ext"; default: NULL); files can be of any supported file type, see Details below.
+#' @param fleOut Name of the data set / file to be written (including the path, if required; "FILE_OUT.omv";
+#'               default: ""); if empty, the resulting data frame is returned instead.
+#' @param varAgg A character vector (default: NULL) with the names of the variables which shall be aggregated.
+#' @param grpAgg A character vector (default: NULL) with the variables to group the aggregation variable (`varAgg`) by.
+#'               If no grouping variable is given, the aggregation happens over the whole data set. If several grouping
+#'               variables are given, the aggregation happens for each step / possible combination of these variables.
+#'               See Details for more information.
+#' @param clcN   If TRUE, counts the number of valid values for each step / combination of values in the grouping
+#'               variable. The suffix appended `"_N"´ is appended to each variable in the resulting data set.
+#' @param clcMss If TRUE, counts the number of missing values for each step / combination of values in the grouping
+#'               variable. The suffix `"_Mss"` is appended to each variable in the resulting data set.
+#' @param clcMn  If TRUE, calculates the mean for each step / combination of values in the grouping variable. The
+#'               suffix `"_Mn"` is appended to each variable in the resulting data set.
+#' @param clcMdn If TRUE, calculates the median for each step / combination of values in the grouping variable. The
+#'               suffix `"_Mdn"` is appended to each variable in the resulting data set.
+#' @param clcMde If TRUE, calculates the mode for each step / combination of values in the grouping variable. The
+#'               suffix `"_Mde"` is appended to each variable in the resulting data set.
+#' @param clcSum If TRUE, calculates the sum for each step / combination of values in the grouping variable. The suffix
+#'               `"_Sum"` is appended to each variable in the resulting data set.
+#' @param clcSD  If TRUE, calculates the std. deviation for each step / combination of values in the grouping variable.
+#'               The suffix `"_SD"` is appended to each variable in the resulting data set.
+#' @param clcVar If TRUE, calculates the variance for each step / combination of values in the grouping variable. The
+#'               suffix `"_Var"` is appended to each variable in the resulting data set.
+#' @param clcRng If TRUE, calculates the range for each step / combination of values in the grouping variable. The
+#'               suffix `"_Rng"` is appended to each variable in the resulting data set.
+#' @param clcMin If TRUE, determines the minimum at each step / combination of values in the grouping variable. The
+#'               suffix `"_Min"` is appended to each variable in the resulting data set.
+#' @param clcMax If TRUE, determines the maximum at each step / combination of values in the grouping variable. The
+#'               suffix `"_Max"` is appended to each variable in the resulting data set.
+#' @param clcIQR If TRUE, calculates the IQR for each step / combination of values in the grouping variable. The suffix
+#'               `"_IQR"` is appended to each variable in the resulting data set.
+#' @param drpNA  If TRUE (default: TRUE), NA values are removed before the aggregation, and the aggregation is
+#'               calculated using the valid values. If FALSE, the result would be NA for any step / combination of
+#'               values in the grouping variable that contains a NA value.
+#' @param usePkg Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata, and SAS files;
+#'               "foreign" is the default (it is included in base R), but "haven" is newer and more comprehensive; you
+#'               may have to install using `install.packages("haven", dep = TRUE)`.
+#' @param selSet Name of the object / data set that is to be selected from the workspace (only relevant when reading
+#'               .RData-files which can contain several objects / data sets)
 #' @param ...    Additional arguments passed on to methods; see Details below.
 #'
 #' @return a data frame containing a symmetric matrix (only returned if `fleOut` is empty)
@@ -66,44 +49,33 @@
 #'         (clmDst == FALSE)
 #'
 #' @details
-#' * `varAgg` must be a character vector containing the variables to be aggregated. From these
-#'   variables, a new data set is created where the values in the original data set are aggregated
-#'   for each possible combination of steps in the grouping variable(s) given in `grpAgg`. For
-#'   example, if one grouping variable were a participant ID, and another grouping variable were
-#'   measurement time points, the resulting new dataset would contain as many rows as the number of
-#'   participants multiplied by the number of measurement time points. For each variable in
-#'   `varAgg`, and each possible aggregation (`clcN`, `clcMn`, etc. if set to TRUE), a new column
-#'   would be generated in the resulting new data set.
-#' * `drpNA` determines whether NA should be dropped / removed before calculating an aggregation.
-#'   If set to FALSE, the result for a combination of steps in the grouping variable(s) where at
-#'   least one value is NA would be NA. If set to TRUE, only the values for any given combination
-#'   of steps in the grouping variable(s) that are not NA are considered for the calculation. For
-#'   `clcN` and `clcMss`, `drpNA` has no effect.
-#'   NB: If `drpNA` is set to TRUE, any row where any of the grouping variable(s) has the value NA
-#'   is excluded from the aggregation, if `drpNA` is set to FALSE and there is any row where any of
-#'   the group variables has the value NA, an error is thrown and no aggregation is carried out.
-#' * The ellipsis-parameter (`...`) can be used to submit arguments / parameters to the functions
-#'   that are used for reading and writing the data. By clicking on the respective function under
-#'   “See also”, you can get a more detailed overview over which parameters each of those functions
-#'   take. The functions are: `read_omv` and `write_omv` (for jamovi-files), `read.table` (for
-#'   CSV / TSV files; using similar defaults as `read.csv` for CSV and `read.delim` for TSV which
-#'   both are based upon `read.table`), `load` (for .RData-files), `readRDS` (for .rds-files),
-#'   `read_sav` (needs the R-package `haven`) or `read.spss` (needs the R-package `foreign`) for
-#'   SPSS-files, `read_dta` (`haven`) / `read.dta` (`foreign`) for Stata-files, `read_sas`
-#'   (`haven`) for SAS-data-files, and `read_xpt` (`haven`) / `read.xport` (`foreign`) for
-#'   SAS-transport-files. If you would like to use `haven`, you may need to install it using
-#'   `install.packages("haven", dep = TRUE)`.
+#' * `varAgg` must be a character vector containing the variables to be aggregated. From these variables, a new data
+#'   set is created where the values in the original data set are aggregated for each possible combination of steps in
+#'   the grouping variable(s) given in `grpAgg`. For example, if one grouping variable were a participant ID, and
+#'   another grouping variable were measurement time points, the resulting new dataset would contain as many rows as
+#'   the number of participants multiplied by the number of measurement time points. For each variable in `varAgg`, and
+#'   each possible aggregation (`clcN`, `clcMn`, etc. if set to TRUE), a new column would be generated in the resulting
+#'   new data set.
+#' * `drpNA` determines whether NA should be dropped / removed before calculating an aggregation. If set to FALSE, the
+#'   result for a combination of steps in the grouping variable(s) where at least one value is NA would be NA. If set
+#'   to TRUE, only the values for any given combination of steps in the grouping variable(s) that are not NA are
+#'   considered for the calculation. For `clcN` and `clcMss`, `drpNA` has no effect.
+#'   NB: If `drpNA` is set to TRUE, any row where any of the grouping variable(s) has the value NA is excluded from the
+#'   aggregation, if `drpNA` is set to FALSE and there is any row where any of the group variables has the value NA, an
+#'   error is thrown and no aggregation is carried out.
+#' * The ellipsis-parameter (`...`) can be used to submit arguments / parameters to the functions that are used for
+#'   reading or transforming the data. By clicking on the respective function under “See also”, you can get a more
+#'   detailed overview over which parameters each of those functions take.
 #'
-#' @seealso `aggregate_omv` internally uses [stats::aggregate()] as function for the aggregation,
-#'   and [base::is.na()], [base::mean()], [stats::median()], [base::sum()], [stats::sd()],
-#'   [stats::var()], [base::range()], [base::min()], [base::max()], and
-#'   [stats::quantile()] for calculation. It furthermore uses the following functions for reading
-#'   and writing data files in different formats: [jmvReadWrite::read_omv()] and
-#'   [jmvReadWrite::write_omv()] for jamovi-files, [utils::read.table()] for CSV / TSV files,
-#'   [load()] for reading .RData-files, [readRDS()] for .rds-files, [haven::read_sav()] or
-#'   [foreign::read.spss()] for SPSS-files, [haven::read_dta()] or [foreign::read.dta()] for
-#'   Stata-files, [haven::read_sas()] for SAS-data-files, and [haven::read_xpt()] or
-#'   [foreign::read.xport()] for SAS-transport-files.
+#' @seealso
+#' `aggregate_omv` internally uses [stats::aggregate()] as function for the aggregation, and [base::is.na()],
+#' [base::mean()], [stats::median()], [base::sum()], [stats::sd()], [stats::var()], [base::range()], [base::min()],
+#' [base::max()], and [stats::quantile()] for calculation. It furthermore uses the following functions for reading and
+#' writing data files in different formats: [jmvReadWrite::read_omv()] and [jmvReadWrite::write_omv()] for
+#' jamovi-files, [utils::read.table()] for CSV / TSV files, [load()] for reading .RData-files, [readRDS()] for
+#' .rds-files, [haven::read_sav()] or [foreign::read.spss()] for SPSS-files, [haven::read_dta()] or
+#' [foreign::read.dta()] for Stata-files, [haven::read_sas()] for SAS-data-files, and [haven::read_xpt()] or
+#' [foreign::read.xport()] for SAS-transport-files.
 #'
 #' @examples
 #' # generate a test dataframe with 100 (imaginary) participants / units of
@@ -167,7 +139,7 @@
 #'
 #' @export aggregate_omv
 #'
-aggregate_omv <- function(dtaInp = NULL, fleOut = "", varAgg = c(), grpAgg = c(), clcN = FALSE,
+aggregate_omv <- function(dtaInp = NULL, fleOut = "", varAgg = NULL, grpAgg = NULL, clcN = FALSE,
                           clcMss = FALSE, clcMn = FALSE, clcMdn = FALSE, clcMde = FALSE,
                           clcSum = FALSE, clcSD = FALSE, clcVar = FALSE, clcRng = FALSE,
                           clcMin = FALSE, clcMax = FALSE, clcIQR = FALSE, drpNA = TRUE,
@@ -179,8 +151,8 @@ aggregate_omv <- function(dtaInp = NULL, fleOut = "", varAgg = c(), grpAgg = c()
 
     if (!all(nzchar(varAgg)) || length(intersect(varAgg, names(frmInp))) < 1 ||
         !all(nzchar(grpAgg)) || length(intersect(grpAgg, names(frmInp))) < length(grpAgg)) {
-        stop(paste("Calling aggregate_omv requires giving at least one (valid) variable to",
-                   "aggregate, and the grouping variable(s) needs to be empty or valid."))
+        stop("Calling aggregate_omv requires giving at least one (valid) variable to aggregate, ",
+             "and the grouping variable(s) needs to be empty or valid.")
     }
 
     if (length(grpAgg) >= 1) {

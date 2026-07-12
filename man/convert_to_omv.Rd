@@ -7,7 +7,7 @@
 convert_to_omv(
   fleInp = "",
   fleOut = "",
-  varSrt = c(),
+  varSrt = NULL,
   usePkg = c("foreign", "haven"),
   selSet = "",
   ...
@@ -20,7 +20,7 @@ file types if "foreign" or "haven" are installed, see Details below}
 \item{fleOut}{Name (including the path, if required) of the data file to be written ("FILENAME.omv"; default: ""); if empty, the extension of fleInp is
 replaced with ".omv"}
 
-\item{varSrt}{Variable(s) that are used to sort the data frame (see Details; if empty, the row order of the input file is kept; default: c())}
+\item{varSrt}{Variable(s) that are used to sort the data frame (see Details; if empty, the row order of the input file is kept; default: NULL)}
 
 \item{usePkg}{Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata and SAS files; "foreign" is the default (it comes with base
 R), but "haven" is newer and more comprehensive}
@@ -89,6 +89,6 @@ unlink(nmeOut)
 \seealso{
 \code{convert_to_omv} internally uses the following functions for reading and writing data files in different formats: \code{\link[=read_omv]{read_omv()}} and
 \code{\link[=write_omv]{write_omv()}} for jamovi-files, \code{\link[utils:read.table]{utils::read.table()}} for CSV / TSV files, \code{\link[=load]{load()}} for reading .RData-files, \code{\link[=readRDS]{readRDS()}} for .rds-files,
-\code{\link[haven:read_spss]{haven::read_sav()}} or \code{\link[foreign:read.spss]{foreign::read.spss()}} for SPSS-files, \code{\link[haven:read_dta]{haven::read_dta()}} or \code{\link[foreign:read.dta]{foreign::read.dta()}} for Stata-files, \code{\link[haven:read_sas]{haven::read_sas()}} for
+\code{\link[haven:read_sav]{haven::read_sav()}} or \code{\link[foreign:read.spss]{foreign::read.spss()}} for SPSS-files, \code{\link[haven:read_dta]{haven::read_dta()}} or \code{\link[foreign:read.dta]{foreign::read.dta()}} for Stata-files, \code{\link[haven:read_sas]{haven::read_sas()}} for
 SAS-data-files, and \code{\link[haven:read_xpt]{haven::read_xpt()}} or \code{\link[foreign:read.xport]{foreign::read.xport()}} for SAS-transport-files.
 }

@@ -75,7 +75,7 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", wrtPtB = FALSE, frcWrt = FALSE
     # [2] clean tibble attributes, particularly convert haven_labelled to either factors or numeric / integer
     if (chkAtt(dtaFrm, "variable.labels"))
         dtaFrm <- clnFgn(dtaFrm)
-    if (methods::is(dtaFrm, "tbl_df") || any(vapply(dtaFrm, function(C) methods::is(C, "haven_labelled"), logical(1))))
+    if (methods::is(dtaFrm, "tbl_df") || any(vapply(dtaFrm, methods::is, logical(1), "haven_labelled")))
         dtaFrm <- clnTbb(dtaFrm, c("format.sas", "format.spss", "format.stata", "display_width"), jmvLbl = TRUE)
     if (chkAtt(dtaFrm, "label.table"))
         stop("R-foreign-style value labels need to be implemented. Please send the data file that caused this problem to sebastian.jentschke@uib.no")
@@ -139,7 +139,8 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", wrtPtB = FALSE, frcWrt = FALSE
         # and upon "dataType"
         mtaDta$fields[[i]][["type"]] <- ifelse(chkAtt(crrCol, "type"), attr(crrCol, "type"),
                                                gsub("decimal", "number",
-                                               gsub("text", ifelse(isID(crrCol), "string", "integer"), tolower(attr(crrCol, "dataType")))))
+                                               gsub("text", ifelse(isID(crrCol), "string", "integer"), tolower(attr(crrCol, "dataType")),
+                                                    fixed = TRUE), fixed = TRUE))
 
         # for debugging: check that dataType, and measureType are set accordingly to type (attribute and column in the data frame)
         #cat(do.call(sprintf, c(fmt = "%02d: %s - %s - %s - %s\n", c(i, mtaDta$fields[[i]][c("name", "type", "dataType", "measureType")]))))
@@ -300,12 +301,12 @@ xtdCol <- function(crrCol = NULL, crrNme = "") {
 
     # columns that have previously been logical or where all factor levels can be converted to integer
     if        (chkAtt(crrCol, "dataType", "Integer") && identical(crrLvl, c("FALSE", "TRUE"))) {
-        return(list(labels = lapply(c(TRUE, FALSE),    function(l) list(as.integer(l), as.character(l), as.character(l), FALSE))))
+        list(labels = lapply(c(TRUE, FALSE),    function(l) list(as.integer(l), as.character(l), as.character(l), FALSE)))
     } else if (chkAtt(crrCol, "dataType", "Integer") && intFnC(crrLvl)) {
-        return(list(labels = lapply(crrLvl,            function(l) list(as.integer(l),              l,               l,  FALSE))))
+        list(labels = lapply(crrLvl,            function(l) list(as.integer(l),              l,               l,  FALSE)))
     # columns that           or where not all factor levels can be converted to integer
     } else if (chkAtt(crrCol, "dataType", "Text")) {
-        return(list(labels = lapply(seq_along(crrLvl), function(l) list(l - 1,               crrLvl[l],       crrLvl[l], FALSE))))
+        list(labels = lapply(seq_along(crrLvl), function(l) list(l - 1,               crrLvl[l],       crrLvl[l], FALSE)))
     }
 }
 
@@ -316,7 +317,7 @@ rmvMta <- function(crrFld = NULL, dtaCol = NULL) {
     } else {
         # if the variable isn't a filter, trimLevels is only removed
         # if the original variable was a factor / logical
-        if (all(class(dtaCol) != c("logical", "factor"))) {
+        if (!inherits(dtaCol, c("logical", "factor"))) {
             crrFld[["trimLevels"]]           <- NULL
         }
         crrFld[["filterNo"]]                 <- NULL
@@ -349,14 +350,14 @@ cnvStr <- function(crrCol = NULL, strHdl = NULL, strPos = NA) {
 
 unqID <- function(mtaFld = NULL) {
     id_Lst <- unlist(lapply(seq_along(mtaFld), function(i) mtaFld[[i]][["id"]]))
-    if (any(is.na(id_Lst)) || any(duplicated(id_Lst))) {
+    if (anyNA(id_Lst) || anyDuplicated(id_Lst)) {
         for (i in seq_along(mtaFld)) mtaFld[[i]][["id"]] <- i
     }
 
     mtaFld
 }
 
-fleExs <- function(fleOut = c(), frcWrt = FALSE) {
+fleExs <- function(fleOut = NULL, frcWrt = FALSE) {
     if (file.exists(fleOut)) {
         if (frcWrt) {
             unlink(fleOut)
@@ -379,8 +380,9 @@ hasPtB <- function(dtaFrm = NULL) {
 
 # convert to JSON and do some beatifying (adding spaces for increased legibility)
 fmtJSON <- function(txtJSON = "") {
-    gsub("\"weights\": \\{\\}", "\"weights\": null", gsub("00: 00", "00:00", gsub("  ", " ", gsub(":", ": ", gsub(",", ", ",
-      jsonlite::toJSON(txtJSON, auto_unbox = TRUE))))))
+    gsub("\"weights\": \\{\\}", "\"weights\": null",
+      gsub("00: 00", "00:00", gsub("  ", " ", gsub(":", ": ", gsub(",", ", ",
+        jsonlite::toJSON(txtJSON, auto_unbox = TRUE), fixed = TRUE), fixed = TRUE), fixed = TRUE), fixed = TRUE))
 }
 
 # generates an “empty” index.html (i.e., an index.html not containing any results output)
@@ -453,18 +455,20 @@ mnfTxt <- function() {
 }
 
 # adds an input file to the .omv-file (which is a ZIP-archive)
-add2ZIP <- function(fleZIP = "", crrHdl = NULL, crrFle = c(), txtOut = "", ptbOut = NULL, incZIP = TRUE) {
+add2ZIP <- function(fleZIP = "", crrHdl = NULL, crrFle = NULL, txtOut = "", ptbOut = NULL, incZIP = TRUE) {
     if ((!is.character(fleZIP) || length(fleZIP) < 1 || !nzchar(fleZIP)) ||
         ((is.null(crrHdl) || length(crrHdl) < 1) && (!is.character(crrFle) || length(crrFle) < 1 || !all(nzchar(crrFle))))) {
         clsRmv()
-        stop("fleZIP (a character with a file name), and either crrHdl (with a connection) or crrFle (with a file name and [optionally] a writing mode) need to be given as arguments.")
+        stop("fleZIP (a character with a file name), and either crrHdl (with a connection) or crrFle (with a file ",
+             "name and [optionally] a writing mode) need to be given as arguments.")
     }
 
     # if a file handle is given, determine the file name, close the handle and remove it (from the calling environment)
     if (!is.null(crrHdl)) {
-        if (!all(class(crrHdl) == c("file", "connection"))) {
+        if (!inherits(crrHdl, c("file", "connection"))) {
             clsRmv()
-            stop(sprintf("Parameter isn\'t a file handle pointing to a file to be zipped:\n%s", trimws(utils::capture.output(utils::str(crrHdl)))))
+            stop(sprintf("Parameter isn\'t a file handle pointing to a file to be zipped:\n%s",
+                         trimws(utils::capture.output(utils::str(crrHdl)))))
         }
         crrFle <- rmvTmp(summary(crrHdl)[["description"]])
         close(crrHdl)
@@ -492,21 +496,21 @@ add2ZIP <- function(fleZIP = "", crrHdl = NULL, crrFle = c(), txtOut = "", ptbOu
     delTmp(crrFle)
     rm(crrFle, crrHdl)
 
-    return(TRUE)
+    TRUE
 }
 
-crtDir <- function(crrFle = c()) {
+crtDir <- function(crrFle = NULL) {
     if (dirname(crrFle[1]) != "." && !dir.exists(file.path(tempdir(), dirname(crrFle[1])))) dir.create(file.path(tempdir(), dirname(crrFle[1])))
 
-    return(invisible(NULL))
+    invisible(NULL)
 }
 
-delTmp <- function(crrFle = c()) {
+delTmp <- function(crrFle = NULL) {
     if (dirname(crrFle[1]) == ".") unlink(file.path(tempdir(), crrFle[1])) else unlink(file.path(tempdir(), dirname(crrFle[1])), recursive = TRUE)
 
-    return(invisible(NULL))
+    invisible(NULL)
 }
 
 rmvTmp <- function(fleNme = "") {
-    return(sub("^/|^\\\\", "", sub(tempdir(), "", fleNme, fixed = TRUE)))
+    sub("^/|^\\\\", "", sub(tempdir(), "", fleNme, fixed = TRUE))
 }

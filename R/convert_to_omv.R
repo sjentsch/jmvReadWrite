@@ -4,7 +4,7 @@
 #'               file types if "foreign" or "haven" are installed, see Details below
 #' @param fleOut Name (including the path, if required) of the data file to be written ("FILENAME.omv"; default: ""); if empty, the extension of fleInp is
 #'               replaced with ".omv"
-#' @param varSrt Variable(s) that are used to sort the data frame (see Details; if empty, the row order of the input file is kept; default: c())
+#' @param varSrt Variable(s) that are used to sort the data frame (see Details; if empty, the row order of the input file is kept; default: NULL)
 #' @param usePkg Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata and SAS files; "foreign" is the default (it comes with base
 #'               R), but "haven" is newer and more comprehensive
 #' @param selSet Name of the data set that is to be selected from the workspace (only applies when reading .RData-files)
@@ -67,7 +67,7 @@
 #'
 #' @export convert_to_omv
 #'
-convert_to_omv <- function(fleInp = "", fleOut = "", varSrt = c(), usePkg = c("foreign", "haven"), selSet = "", ...) {
+convert_to_omv <- function(fleInp = "", fleOut = "", varSrt = NULL, usePkg = c("foreign", "haven"), selSet = "", ...) {
 
     # check and format input and output files and handle / check further input arguments
     fleInp <- fmtFlI(fleInp, maxLng = 1)
@@ -80,5 +80,5 @@ convert_to_omv <- function(fleInp = "", fleOut = "", varSrt = c(), usePkg = c("f
     # write file
     write_omv(dtaFrm = dtaFrm, fleOut = fleOut, ...)
 
-    return(invisible(NULL))
+    invisible(NULL)
 }

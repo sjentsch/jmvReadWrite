@@ -19,8 +19,8 @@ test_that("label_vars_omv works", {
     expect_true(chkFle(nmeOut, fleCnt = "data.bin"))
     df4Chk <- read_omv(nmeOut, sveAtt = FALSE)
     expect_s3_class(df4Chk, "data.frame")
-    expect_equal(dim(df4Chk), c(250, 33))
-    expect_equal(as.character(lapply(df4Chk[, lblDtF[, 1]], attr, "jmv-desc")), lblDtF[, 2])
+    expect_identical(dim(df4Chk), c(250L, 33L))
+    expect_identical(as.character(lapply(df4Chk[, lblDtF[, 1]], attr, "jmv-desc")), lblDtF[, 2])
     unlink(nmeOut)
 
     # varLbl: (2) use data frame as parameter
@@ -33,8 +33,8 @@ test_that("label_vars_omv works", {
     expect_true(chkFle(nmeOut, fleCnt = "data.bin"))
     df4Chk <- read_omv(nmeOut, sveAtt = FALSE)
     expect_s3_class(df4Chk, "data.frame")
-    expect_equal(dim(df4Chk), c(250, 33))
-    expect_equal(as.character(lapply(df4Chk[, lblDtF[, 1]], attr, "jmv-desc")), lblDtF[, 2])
+    expect_identical(dim(df4Chk), c(250L, 33L))
+    expect_identical(as.character(lapply(df4Chk[, lblDtF[, 1]], attr, "jmv-desc")), lblDtF[, 2])
     unlink(nmeOut)
 
     # varLbl: (3) use character vector (with labels) as parameter, here we need to
@@ -48,8 +48,8 @@ test_that("label_vars_omv works", {
     expect_true(chkFle(nmeOut, fleCnt = "data.bin"))
     df4Chk <- read_omv(nmeOut, sveAtt = FALSE)
     expect_s3_class(df4Chk, "data.frame")
-    expect_equal(dim(df4Chk), c(250, 28))
-    expect_equal(as.character(lapply(df4Chk, attr, "jmv-desc")), lblDtF[, 2])
+    expect_identical(dim(df4Chk), c(250L, 28L))
+    expect_identical(as.character(lapply(df4Chk, attr, "jmv-desc")), lblDtF[, 2])
     unlink(nmeOut)
 
     # test cases for code coverage ============================================================================================================================
@@ -66,17 +66,21 @@ test_that("label_vars_omv works", {
                       "data set \\(\\d+\\).$"))
     expect_false(file.exists(nmeOut))
     expect_error(label_vars_omv(dtaInp = nmeInp, fleOut = nmeOut, varLbl = data.frame(varNme = c("Dummy", lblDtF[-1, 1]), varLbl = lblDtF[2])),
-      regexp = "^There must be exactly one column with the variable names \\(currently: 0\\)\\.\\nAll variable names in the label definition must be contained in the input data set\\.")
+                 paste("^There must be exactly one column with the variable names \\(currently: 0\\)\\.\\nAll variable",
+                       "names in the label definition must be contained in the input data set\\."))
     expect_false(file.exists(nmeOut))
     expect_error(label_vars_omv(dtaInp = nmeInp, fleOut = nmeOut, varLbl = numeric(1)),
       regexp = "^varLbl was either not a data frame or could not be converted into one.")
     expect_false(file.exists(nmeOut))
     unlink(nmeOut)
 
-    # test cases for the transfer of analyses =================================================================================================================
+    # test cases for the transfer of analyses =========================================================================
     nmeInp <- file.path("..", "ToothGrowth.omv")
-    lblDtF <- data.frame(varNme = c("ID", "len", "supp", "dose", "dose2", "dose3"), varLbl = c("Participant", "Tooth length", "Type of Nutrition Supplement",
-                "Dosage of the Nutrition Supplement (num.)", "Dosage of the Nutrition Supplement (ordered)", "Dosage of the Nutrition Supplement (factor)"))
+    lblDtF <- data.frame(varNme = c("ID", "len", "supp", "dose", "dose2", "dose3"),
+                         varLbl = c("Participant", "Tooth length", "Type of Nutrition Supplement",
+                                    "Dosage of the Nutrition Supplement (num.)",
+                                    "Dosage of the Nutrition Supplement (ordered)",
+                                    "Dosage of the Nutrition Supplement (factor)"))
     # check that the labels in the original file are not set (NULL)
     expect_true(all(vapply(read_omv(nmeInp)[, lblDtF[, 1]], function(c) is.null(attr(c, "jmv-desc")), logical(1))))
 
@@ -89,23 +93,31 @@ test_that("label_vars_omv works", {
     expect_true(chkFle(nmeOut, fleCnt = "data.bin"))
     df4Chk <- read_omv(nmeOut, getSyn = TRUE)
     expect_s3_class(df4Chk, "data.frame")
-    expect_equal(dim(df4Chk), c(60, 16))
-    expect_equal(names(df4Chk), c("Filter 1", "ID", "logLen", "supp - Transform 1", "len", "supp", "dose", "dose2", "dose3", "Trial", "Residuals", "J", "K", "L", "M", "weights"))
-    expect_equal(as.vector(vapply(df4Chk, typeof, character(1))),
-      c("logical", "character", "double", "integer", "double", "integer", "double", "integer", "integer", "integer", "double", "double", "double", "integer", "logical", "integer"))
-    expect_equal(as.character(lapply(df4Chk[, lblDtF[, 1]], attr, "jmv-desc")), lblDtF[, 2])
-    expect_equal(sort(zip::zip_list(nmeOut)$filename),
-      c("01 empty/analysis", "02 anova/analysis", "02 anova/resources/65167cb3bdaf8761.png", "02 anova/resources/99f9b5d34a92049b.png", "03 empty/analysis",
-        "04 ancova/analysis", "05 empty/analysis", "data.bin", "index.html", "meta", "metadata.json", "strings.bin", "xdata.json"))
-    expect_equal(attr(df4Chk, "syntax"),
-      c(paste("jmv::ANOVA(formula = len ~ supp + dose2 + supp:dose2, data = data, effectSize = \"partEta\", modelTest = TRUE, qq = TRUE,",
-              "contrasts = list(list(var=\"supp\", type=\"none\"), list(var=\"dose2\", type=\"polynomial\")), postHoc = ~ supp + dose2, emMeans = ~ dose2:supp)"),
-           "jmv::ancova(formula = len ~ supp + dose, data = data, effectSize = \"partEta\", modelTest = TRUE)"))
+    expect_identical(dim(df4Chk), c(60L, 16L))
+    expect_named(df4Chk, c("Filter 1", "ID", "logLen", "supp - Transform 1", "len", "supp", "dose", "dose2", "dose3",
+                           "Trial", "Residuals", "J", "K", "L", "M", "weights"))
+    expect_identical(as.vector(vapply(df4Chk, typeof, character(1))),
+                     c("logical", "character", "double", "integer", "double", "integer", "double", "integer", "integer",
+                       "integer", "double", "double", "double", "integer", "logical", "integer"))
+    expect_identical(as.character(lapply(df4Chk[, lblDtF[, 1]], attr, "jmv-desc")), lblDtF[, 2])
+    expect_identical(sort(zip::zip_list(nmeOut)$filename),
+                     c("01 empty/analysis", "02 anova/analysis", "02 anova/resources/65167cb3bdaf8761.png",
+                       "02 anova/resources/99f9b5d34a92049b.png", "03 empty/analysis", "04 ancova/analysis",
+                       "05 empty/analysis", "data.bin", "index.html", "meta", "metadata.json", "strings.bin",
+                       "xdata.json"))
+    expect_identical(attr(df4Chk, "syntax"),
+                     c(paste("jmv::ANOVA(formula = len ~ supp + dose2 + supp:dose2, data = data, effectSize =",
+                             "\"partEta\", modelTest = TRUE, qq = TRUE, contrasts = list(list(var=\"supp\",",
+                             "type=\"none\"), list(var=\"dose2\", type=\"polynomial\")), postHoc = ~ supp + dose2,",
+                             "emMeans = ~ dose2:supp)"),
+                       "jmv::ancova(formula = len ~ supp + dose, data = data, effectSize = \"partEta\", modelTest = TRUE)"))
     unlink(nmeOut)
-    expect_warning(label_vars_omv(dtaInp = jmvReadWrite::AlbumSales, fleOut = nmeOut, varLbl = c("Include participant?", "Sales", "Adverts", "Airplay", "Image"), psvAnl = TRUE),
-      regexp = "^psvAnl is only possible if dtaInp is a file name \\(analyses are not stored in data frames, only in the jamovi files\\)\\.")
-    expect_warning(label_vars_omv(dtaInp = jmvReadWrite::AlbumSales,                  varLbl = c("Include participant?", "Sales", "Adverts", "Airplay", "Image"), psvAnl = TRUE),
-      regexp = "^psvAnl is only possible if fleOut is a file name \\(analyses are not stored in data frames, only in the jamovi files\\)\\.")
+    expect_warning(label_vars_omv(dtaInp = jmvReadWrite::AlbumSales, fleOut = nmeOut,
+                                  varLbl = c("Include participant?", "Sales", "Adverts", "Airplay", "Image"), psvAnl = TRUE),
+                   "^psvAnl is only possible if dtaInp is a file name \\(analyses are not stored in data frames, only in the jamovi files\\)\\.")
+    expect_warning(label_vars_omv(dtaInp = jmvReadWrite::AlbumSales,
+                                  varLbl = c("Include participant?", "Sales", "Adverts", "Airplay", "Image"), psvAnl = TRUE),
+                   "^psvAnl is only possible if fleOut is a file name \\(analyses are not stored in data frames, only in the jamovi files\\)\\.")
     unlink(nmeOut)
     # do not unlink nmeInp, this isn't a generated file, but a link
 })

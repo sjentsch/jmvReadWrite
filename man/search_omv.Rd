@@ -6,7 +6,7 @@
 \usage{
 search_omv(
   dtaInp = NULL,
-  srcTrm = c(),
+  srcTrm = NULL,
   whlTrm = FALSE,
   ignCse = FALSE,
   incNum = TRUE,
@@ -15,15 +15,20 @@ search_omv(
   incID = TRUE,
   incCmp = TRUE,
   incRcd = TRUE,
+  usePkg = c("foreign", "haven"),
+  selSet = "",
   ...
 )
 }
 \arguments{
-\item{dtaInp}{Either a data frame or the name of a jamovi data file to be read (including the path, if required; "FILENAME.omv"; default: NULL)}
+\item{dtaInp}{Either a data frame or the name of a data file to be read (including the path, if required;
+"FILENAME.ext"; default: NULL); files can be of any supported file type, see Details below.}
 
-\item{srcTrm}{(Character or numeric) Vector (with length = 1) with a search term to be found in the data frame (default: c())}
+\item{srcTrm}{(Character or numeric) Vector (with length = 1) with a search term to be found in the data frame
+(default: NULL)}
 
-\item{whlTrm}{Whether the exact search term shall be found (TRUE) or whether a partial match is sufficient (FALSE; default: FALSE)}
+\item{whlTrm}{Whether the exact search term shall be found (TRUE) or whether a partial match is sufficient (FALSE;
+default: FALSE)}
 
 \item{ignCse}{Whether to ignore the case of the search term (default: FALSE)}
 
@@ -39,21 +44,28 @@ search_omv(
 
 \item{incRcd}{Whether to include Recoded variables in the search (default: TRUE)}
 
+\item{usePkg}{Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata, and SAS files;
+"foreign" is the default (it is included in base R), but "haven" is newer and more comprehensive; you
+may have to install using \code{install.packages("haven", dep = TRUE)}.}
+
+\item{selSet}{Name of the object / data set that is to be selected from the workspace (only relevant when reading
+.RData-files which can contain several objects / data sets)}
+
 \item{...}{Additional arguments passed on to methods; see Details below}
 }
 \value{
-a named list with the places where the search term was found: names in the list are the variables / columns, the entries the respective row names
-within that variable / column (row names are used for being tolerant to filtered-out cases in jamovi, if a filter is used, row numbers would be
-incorrect)
+a named list with the places where the search term was found: names in the list are the variables / columns,
+the entries the respective row names within that variable / column (row names are used for being tolerant to
+filtered-out cases in jamovi, if a filter is used, row numbers would be incorrect)
 }
 \description{
 Search values in .omv-files for the statistical spreadsheet 'jamovi' (\url{https://www.jamovi.org})
 }
 \details{
 \itemize{
-\item The ellipsis-parameter (\code{...}) can be used to submit arguments / parameters to the function that is used for reading and writing the data. Clicking on the
-respective function under “See also”, you can get a more detailed overview over which parameters each of those functions take. The functions are:
-\code{read_omv} and \code{write_omv} (for jamovi-files).
+\item The ellipsis-parameter (\code{...}) can be used to submit arguments / parameters to the functions that are used for
+reading the data. By clicking on the respective function under “See also”, you can get a more detailed overview
+over which parameters each of those functions take.
 }
 }
 \examples{
@@ -77,5 +89,9 @@ bfi_sample[srcRes[[1]][6], names(srcRes[1])] # Males
 
 }
 \seealso{
-\code{replace_omv} uses \code{\link[=read_omv]{read_omv()}} and \code{\link[=write_omv]{write_omv()}} for reading and writing jamovi-files.
+\code{search_omv} internally uses the following functions for reading and writing data files in different formats:
+\code{\link[=read_omv]{read_omv()}} and \code{\link[=write_omv]{write_omv()}} for jamovi-files, \code{\link[utils:read.table]{utils::read.table()}} for CSV / TSV
+files, \code{\link[=load]{load()}} for reading .RData-files, \code{\link[=readRDS]{readRDS()}} for .rds-files, \code{\link[haven:read_sav]{haven::read_sav()}} or \code{\link[foreign:read.spss]{foreign::read.spss()}}
+for SPSS-files, \code{\link[haven:read_dta]{haven::read_dta()}} or \code{\link[foreign:read.dta]{foreign::read.dta()}} for Stata-files, \code{\link[haven:read_sas]{haven::read_sas()}} for
+SAS-data-files, and \code{\link[haven:read_xpt]{haven::read_xpt()}} or \code{\link[foreign:read.xport]{foreign::read.xport()}} for SAS-transport-files.
 }

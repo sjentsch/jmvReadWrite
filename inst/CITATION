@@ -5,7 +5,7 @@ bibentry(
   title = "jmvReadWrite: Read and Write jamovi Files",
   author = person("Sebastian", "Jentschke", role = c("aut", "cre"), email = "sebastian.jentschke@uib.no"),
   year = 2026,
-  note = "R package version 0.4.13",
+  note = "R package version 0.4.14",
   url = "https://CRAN.R-project.org/package=jmvReadWrite",
   key = "jmvReadWrite"
 )

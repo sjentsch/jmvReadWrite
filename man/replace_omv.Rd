@@ -9,8 +9,8 @@ replace_omv(
   fleOut = "",
   rplLst = list(),
   whlTrm = TRUE,
-  varInc = c(),
-  varExc = c(),
+  varInc = NULL,
+  varExc = NULL,
   incNum = TRUE,
   incOrd = TRUE,
   incNom = TRUE,
@@ -18,23 +18,27 @@ replace_omv(
   incCmp = TRUE,
   incRcd = TRUE,
   psvAnl = FALSE,
+  usePkg = c("foreign", "haven"),
+  selSet = "",
   ...
 )
 }
 \arguments{
-\item{dtaInp}{Either a data frame or the name of a jamovi data file to be read (including the path, if required; "FILENAME.omv"; default: NULL)}
+\item{dtaInp}{Either a data frame or the name of a data file to be read (including the path, if required;
+"FILENAME.ext"; default: NULL); files can be of any supported file type, see Details below.}
 
-\item{fleOut}{Name of the data file to be written (including the path, if required; "FILE_OUT.omv"; default: ""); if empty, the resulting data frame is
-returned instead}
+\item{fleOut}{Name of the data set / file to be written (including the path, if required; "FILE_OUT.omv";
+default: ""); if empty, the resulting data frame is returned instead.}
 
-\item{rplLst}{A list where each entry is a vector (with length 2) containing the original value and the to-replace-value (default: list())}
+\item{rplLst}{A list where each entry is a vector (with length 2) containing the original value and the
+to-replace-value (default: list())}
 
-\item{whlTrm}{Whether the search term (first entry in the vectors) must be found exactly (TRUE) or whether a partial match is sufficient (FALSE; default:
-TRUE)}
+\item{whlTrm}{Whether the search term (first entry in the vectors) must be found exactly (TRUE) or whether a partial
+match is sufficient (FALSE; default: TRUE)}
 
-\item{varInc}{Names of variables (character vector) to be included in the replacement (default: c())}
+\item{varInc}{Names of variables (character vector) to be included in the replacement (default: NULL)}
 
-\item{varExc}{Names of variables (character vector) to be excluded from the replacement (default: c())}
+\item{varExc}{Names of variables (character vector) to be excluded from the replacement (default: NULL)}
 
 \item{incNum}{Whether to include continuous variables in the replacement (default: TRUE)}
 
@@ -48,7 +52,15 @@ TRUE)}
 
 \item{incRcd}{Whether to include Recoded variables in the replacement (default: TRUE)}
 
-\item{psvAnl}{Whether analyses that are contained in the input file shall be transferred to the output file (default: FALSE)}
+\item{psvAnl}{Whether analyses that are contained in the input file shall be transferred to the output file (TRUE /
+FALSE; default: FALSE)}
+
+\item{usePkg}{Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata, and SAS files;
+"foreign" is the default (it is included in base R), but "haven" is newer and more comprehensive; you
+may have to install using \code{install.packages("haven", dep = TRUE)}.}
+
+\item{selSet}{Name of the object / data set that is to be selected from the workspace (only relevant when reading
+.RData-files which can contain several objects / data sets)}
 
 \item{...}{Additional arguments passed on to methods; see Details below}
 }
@@ -60,16 +72,17 @@ Search values in .omv-files for the statistical spreadsheet 'jamovi' (\url{https
 }
 \details{
 \itemize{
-\item \code{rplLst} is a list. Each list entry contains a vector (with length 2), where the first entry is the original value, and the second entry is the value the
-original value is to be replaced with.
-\item \code{whlTrm} indicates whether partial matches of the original value(s) shall replaced (e.g., for original: 24 and replacement: 34, 241 will be changed into
-341).
-\item \code{varInc} and \code{varExc} determine which variables are included or excluded from the replacement. If both are given, a warning is issued and \code{varInc} takes
-precedence. \code{varInc} makes that only in these variables, the replacement requested by \code{rplLst} is carried out, if \code{varExc} is given, for all variables of
-the input data set, except those defined in \code{varExc}, the replacement is carried out.
-\item The ellipsis-parameter (\code{...}) can be used to submit arguments / parameters to the function that is used for reading and writing the data. Clicking on the
-respective function under “See also”, you can get a more detailed overview over which parameters each of those functions take. The functions are:
-\code{read_omv} and \code{write_omv} (for jamovi-files).
+\item \code{rplLst} is a list. Each list entry contains a vector (with length 2), where the first entry is the original
+value, and the second entry is the value the original value is to be replaced with.
+\item \code{whlTrm} indicates whether partial matches of the original value(s) shall replaced (e.g., for original: 24 and
+replacement: 34, 241 will be changed into 341).
+\item \code{varInc} and \code{varExc} determine which variables are included or excluded from the replacement. If both are given,
+a warning is issued and \code{varInc} takes precedence. \code{varInc} makes that only in these variables, the replacement
+requested by \code{rplLst} is carried out, if \code{varExc} is given, for all variables of the input data set, except those
+defined in \code{varExc}, the replacement is carried out.
+\item The ellipsis-parameter (\code{...}) can be used to submit arguments / parameters to the functions that are used for
+reading the data. By clicking on the respective function under “See also”, you can get a more detailed overview
+over which parameters each of those functions take.
 }
 }
 \examples{
@@ -97,5 +110,9 @@ table(rplDF$age)
 
 }
 \seealso{
-\code{replace_omv} uses \code{\link[=read_omv]{read_omv()}} and \code{\link[=write_omv]{write_omv()}} for reading and writing jamovi-files.
+\code{replace_omv} internally uses the following functions for reading and writing data files in different formats:
+\code{\link[=read_omv]{read_omv()}} and \code{\link[=write_omv]{write_omv()}} for jamovi-files, \code{\link[utils:read.table]{utils::read.table()}} for CSV / TSV
+files, \code{\link[=load]{load()}} for reading .RData-files, \code{\link[=readRDS]{readRDS()}} for .rds-files, \code{\link[haven:read_sav]{haven::read_sav()}} or \code{\link[foreign:read.spss]{foreign::read.spss()}}
+for SPSS-files, \code{\link[haven:read_dta]{haven::read_dta()}} or \code{\link[foreign:read.dta]{foreign::read.dta()}} for Stata-files, \code{\link[haven:read_sas]{haven::read_sas()}} for
+SAS-data-files, and \code{\link[haven:read_xpt]{haven::read_xpt()}} or \code{\link[foreign:read.xport]{foreign::read.xport()}} for SAS-transport-files.
 }

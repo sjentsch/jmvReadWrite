@@ -1,13 +1,8 @@
 #' Calculates distances (returning a symmetric matrix) from a raw data matrix in .omv-files for the
 #' statistical spreadsheet 'jamovi' (<https://www.jamovi.org>)
 #'
-#' @param dtaInp Either a data frame or the name of a data file to be read (including the path,
-#'               if required; "FILENAME.ext"; default: NULL); files can be of any supported file
-#'               type, see Details below.
-#' @param fleOut Name of the data file to be written (including the path, if required;
-#'               "FILE_OUT.omv"; default: ""); if empty, the resulting data frame is returned
-#'               instead.
-#' @param varDst Variable (default: c()) containing a character vector with the names of the
+#' @inheritParams aggregate_omv dtaInp fleOut usePkg selSet
+#' @param varDst Variable (default: NULL) containing a character vector with the names of the
 #'               variables for which distances are to be calculated. See Details for more
 #'               information.
 #' @param clmDst Whether the distances shall be calculated between columns (TRUE) or rows
@@ -21,11 +16,6 @@
 #'               triangular (default: FALSE)
 #' @param mtxDgn Whether the symmetric matrix to be returned should retain the values in the main
 #'               diagonal (default: TRUE)
-#' @param usePkg Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata,
-#'               and SAS files; "foreign" is the default (it comes with base R), but "haven" is
-#'               newer and more comprehensive.
-#' @param selSet Name of the data set that is to be selected from the workspace (only applies when
-#'               reading .RData-files)
 #' @param ...    Additional arguments passed on to methods; see Details below.
 #'
 #' @return a data frame containing a symmetric matrix (only returned if `fleOut` is empty)
@@ -85,26 +75,17 @@
 #'   This behaviour can be changed with setting `mtxTrL` and `mtxDgn`: If `mtxTrL` is set to
 #'   `TRUE`, the values from the upper triangular matrix are removed / replaced with NAs; if
 #'   `mtxDgn` is set to `FALSE`, the values from the main diagonal are removed / replaced with NAs.
-#' * The ellipsis-parameter (`...`) can be used to submit arguments / parameters to the functions
-#'   that are used for reading and writing the data. By clicking on the respective function under
-#'   “See also”, you can get a more detailed overview over which parameters each of those functions
-#'   take. The functions are: `read_omv` and `write_omv` (for jamovi-files), `read.table` (for CSV
-#'   / TSV files; using similar defaults as `read.csv` for CSV and `read.delim` for TSV which both
-#'   are based upon `read.table`), `load` (for .RData-files), `readRDS` (for .rds-files),
-#'   `read_sav` (needs the R-package `haven`) or `read.spss` (needs the R-package `foreign`) for
-#'   SPSS-files, `read_dta` (`haven`) / `read.dta` (`foreign`) for Stata-files, `read_sas`
-#'   (`haven`) for SAS-data-files, and `read_xpt` (`haven`) / `read.xport` (`foreign`) for
-#'   SAS-transport-files. If you would like to use `haven`, you may need to install it using
-#'   `install.packages("haven", dep = TRUE)`.
+#' * The ellipsis-parameter (`...`) can be used to submit arguments / parameters to the functions that are used for
+#'   reading or transforming the data. By clicking on the respective function under “See also”, you can get a more
+#'   detailed overview over which parameters each of those functions take.
 #'
-#' @seealso `distances_omv` internally uses the following function for calculating the distances
-#'   for interval data [stats::dist()]. It furthermore uses the following functions for reading
-#'   and writing data files in different formats: [jmvReadWrite::read_omv()] and
-#'   [jmvReadWrite::write_omv()] for jamovi-files, [utils::read.table()] for CSV / TSV files,
-#'   [load()] for reading .RData-files, [readRDS()] for .rds-files, [haven::read_sav()] or
-#'   [foreign::read.spss()] for SPSS-files, [haven::read_dta()] or [foreign::read.dta()] for
-#'   Stata-files, [haven::read_sas()] for SAS-data-files, and [haven::read_xpt()] or
-#'   [foreign::read.xport()] for SAS-transport-files.
+#' @seealso
+#' `distances_omv` internally uses the following function for calculating the distances for interval data
+#' [stats::dist()]. It furthermore uses the following functions for reading and writing data files in different
+#' formats: [jmvReadWrite::read_omv()] and [jmvReadWrite::write_omv()] for jamovi-files, [utils::read.table()] for
+#' CSV / TSV files, [load()] for reading .RData-files, [readRDS()] for .rds-files, [haven::read_sav()] or
+#' [foreign::read.spss()] for SPSS-files, [haven::read_dta()] or [foreign::read.dta()] for Stata-files,
+#' [haven::read_sas()] for SAS-data-files, and [haven::read_xpt()] or [foreign::read.xport()] for SAS-transport-files.
 #'
 #' @examples
 #' # create matrices for the different types of distance measures: continuous
@@ -172,7 +153,7 @@
 #'
 #' @export distances_omv
 #'
-distances_omv <- function(dtaInp = NULL, fleOut = "", varDst = c(), clmDst = TRUE, stdDst = "none",
+distances_omv <- function(dtaInp = NULL, fleOut = "", varDst = NULL, clmDst = TRUE, stdDst = "none",
                           nmeDst = "euclid", mtxSps = FALSE, mtxTrL = FALSE, mtxDgn = TRUE,
                           usePkg = c("foreign", "haven"), selSet = "", ...) {
 
@@ -198,7 +179,7 @@ distances_omv <- function(dtaInp = NULL, fleOut = "", varDst = c(), clmDst = TRU
     } else if (grepl("^max$",              stdDst)) {
         dtaMtx <- scale(dtaMtx, center = FALSE, scale =  apply(abs(dtaMtx), 2, max))
     } else if (grepl("^mean$",             stdDst)) {
-        dtaMtx <- scale(dtaMtx, center = FALSE, scale =  apply(dtaMtx, 2, mean))
+        dtaMtx <- scale(dtaMtx, center = FALSE, scale =  colMeans(dtaMtx))
     } else if (grepl("^rescale$",          stdDst)) {
         dtaMtx <- scale(dtaMtx, center = apply(dtaMtx, 2, min), scale = (apply(dtaMtx, 2, max) - apply(dtaMtx, 2, min)))
     } else {
@@ -259,7 +240,7 @@ clcBin <- function(m = NULL, t = "jaccard") {
     # transform data matrix into a logical matrix
     m <- mkeBin(m, getP(t), getNP(t))
     # extract transformation name
-    t <- strsplit(t, "_")[[1]][1]
+    t <- strsplit(t, "_", fixed = TRUE)[[1]][1]
     n <- ncol(m)
     # create a result matrix
     r <- matrix(NA, n, n, dimnames = rep(dimnames(m)[2], 2))
@@ -312,26 +293,26 @@ clcFrq <- function(m = NULL, t = "chisq") {
 }
 
 # helper functions: get P (power / present), NP (not present), and R (root)
-getP  <- function(s) stats::na.omit(c(strsplit(s, "_")[[1]][2], "1"))[1]
-getNP <- function(s) stats::na.omit(c(strsplit(s, "_")[[1]][3], "0"))[1]
-getPw <- function(s) as.numeric(strsplit(s, "_")[[1]][2])
-getRt <- function(s) as.numeric(strsplit(s, "_")[[1]][3])
+getP  <- function(s) stats::na.omit(c(strsplit(s, "_", fixed = TRUE)[[1]][2], "1"))[1]
+getNP <- function(s) stats::na.omit(c(strsplit(s, "_", fixed = TRUE)[[1]][3], "0"))[1]
+getPw <- function(s) as.numeric(strsplit(s, "_", fixed = TRUE)[[1]][2])
+getRt <- function(s) as.numeric(strsplit(s, "_", fixed = TRUE)[[1]][3])
 
 # binary measures: transform the data matrix from numeric into logical
 mkeBin <- function(m = NULL, p = 1, np = 0) {
     if (all(apply(m, 2, is.logical))) return(m)
 
     if        (all(apply(m, 2, function(c) is.numeric(c)   &&   all(as.numeric(c(p, np)) %in% unique(c))))) {
-        r <- matrix(as.logical(NA), nrow = nrow(m), ncol = ncol(m), dimnames = dimnames(m))
+        r <- matrix(NA, nrow = nrow(m), ncol = ncol(m), dimnames = dimnames(m))
         r[m == as.numeric(p)]  <- TRUE
         r[m == as.numeric(np)] <- FALSE
     } else if (all(apply(m, 2, function(c) is.character(c) && all(as.character(c(p, np)) %in% unique(c))))) {
-        r <- matrix(as.logical(NA), nrow = nrow(m), ncol = ncol(m), dimnames = dimnames(m))
+        r <- matrix(NA, nrow = nrow(m), ncol = ncol(m), dimnames = dimnames(m))
         r[m == as.character(p)]  <- TRUE
         r[m == as.character(np)] <- FALSE
     } else {
-        stop(paste("The input matrix for binary data either needs to be logical (then it will be kept as it is),",
-                   "numeric or character (for the latter two, p and np are used to derive TRUE and FALSE)."))
+        stop("The input matrix for binary data either needs to be logical (then it will be kept as it is), ",
+             "numeric or character (for the latter two, p and np are used to derive TRUE and FALSE).")
     }
 
     r
@@ -345,73 +326,102 @@ mtcBin <- function(x, y, t = "") {
     o <- c(sum(x & y, na.rm = TRUE), sum(x & !y, na.rm = TRUE), sum(!x & y, na.rm = TRUE), sum(!x & !y, na.rm = TRUE))
 
     # binary - dissimilarity - Euclidian distance: binEuc - BEUCLID
-    if      (t == "beuclid")  return(sqrt(sum(o[2:3])))
+    if      (t == "beuclid") {
+        sqrt(sum(o[2:3]))
     # binary - dissimilarity - Lance and Williams: BLWMN
-    else if (t == "blwmn")    return(sum(o[2], o[3]) / sum(o[-4], o[1]))
+    } else if (t == "blwmn") {
+        sum(o[2], o[3]) / sum(o[-4], o[1])
     # binary - dissimilarity - Squared Euclidian distance: BSEUCLID
-    else if (t == "bseuclid") return(sum(o[2], o[3]))
+    } else if (t == "bseuclid") {
+        sum(o[2], o[3])
     # binary - dissimilarity - Shape: BSHAPE
-    else if (t == "bshape")   return((sum(o) * sum(o[2], o[3]) - sum(o[2], -o[3]) ^ 2) / sum(o) ^ 2)
+    } else if (t == "bshape") {
+        (sum(o) * sum(o[2], o[3]) - sum(o[2], -o[3]) ^ 2) / sum(o) ^ 2
     # binary - similarity - Anderberg's D: D
-    else if (t == "d")        return((t1_Bin(o) - t2_Bin(o)) / (2 * sum(o)))
+    } else if (t == "d") {
+        (t1_Bin(o) - t2_Bin(o)) / (2 * sum(o))
     # binary - similarity - Dice: DICE
-    else if (t == "dice")     return((o[1] * 2) / sum(o[1], o[-4]))
+    } else if (t == "dice") {
+        (o[1] * 2) / sum(o[1], o[-4])
     # binary - similarity - Dispersion: DISPER
-    else if (t == "disper")   return((o[1] * o[4] - o[2] * o[3]) / (sum(o) ^ 2))
+    } else if (t == "disper") {
+        (o[1] * o[4] - o[2] * o[3]) / (sum(o) ^ 2)
     # binary - similarity - Hamann: HAMANN
-    else if (t == "hamann")   return(sum(o[1], -o[2], -o[3], o[4]) / sum(o))
+    } else if (t == "hamann") {
+        sum(o[1], -o[2], -o[3], o[4]) / sum(o)
     # binary - similarity - Jaccard: JACCARD
-    else if (t == "jaccard")  return(o[1] / sum(o[-4]))
-    # binary - similarity - Jaccard
-    else if (t == "jaccards") return(o[1] / sum(o[-4]))
+    } else if (t %in% c("jaccard", "jaccards")) {
+        o[1] / sum(o[-4])
     # binary - distance - Jaccard (as in R - stats::dist - "binary")
-    else if (t == "jaccardd") return(sum(o[2], o[3]) / sum(o[-4]))
+    } else if (t == "jaccardd") {
+        sum(o[2], o[3]) / sum(o[-4])
     # binary - similarity - Kulczynski 1: K1
-    else if (t == "k1")       return(min(o[1] / sum(o[2], o[3]), 9999.999))
+    } else if (t == "k1") {
+        min(o[1] / sum(o[2], o[3]), 9999.999)
     # binary - similarity - Kulczynski 2: K2
-    else if (t == "k2")       return(sum(o[1] / sum(o[1], o[2]), o[1] / sum(o[1], o[3])) / 2)
+    } else if (t == "k2") {
+        sum(o[1] / sum(o[1], o[2]), o[1] / sum(o[1], o[3])) / 2
     # binary - similarity - Lambda: LAMBDA
-    else if (t == "lambda")   return((t1_Bin(o) - t2_Bin(o)) / (2 * sum(o) - t2_Bin(o)))
+    } else if (t == "lambda") {
+        (t1_Bin(o) - t2_Bin(o)) / (2 * sum(o) - t2_Bin(o))
     # binary - similarity - Ochiai: OCHIAI
-    else if (t == "ochiai")   return(sqrt((o[1] / sum(o[1], o[2])) * (o[1] / sum(o[1], o[3]))))
+    } else if (t == "ochiai") {
+        sqrt((o[1] / sum(o[1], o[2])) * (o[1] / sum(o[1], o[3])))
     # binary - similarity - Phi 4-point correlation: PHI
-    else if (t == "phi")      return(((o[1] * o[4]) - (o[2] * o[3])) / sqrt(sum(o[1], o[2]) * sum(o[1], o[3]) * sum(o[2], o[4]) * sum(o[3], o[4])))
+    } else if (t == "phi") {
+        ((o[1] * o[4]) - (o[2] * o[3])) / sqrt(sum(o[1], o[2]) * sum(o[1], o[3]) * sum(o[2], o[4]) * sum(o[3], o[4]))
     # binary - dissimilarity - Pattern difference: PATTERN
-    else if (t == "pattern")  return((o[2] * o[3]) / (sum(o) ^ 2))
+    } else if (t == "pattern") {
+        (o[2] * o[3]) / (sum(o) ^ 2)
     # binary - similarity - Yule's Q: Q
-    else if (t == "q")        return((o[1] * o[4] - o[2] * o[3]) / sum(o[1] * o[4], o[2] * o[3]))
+    } else if (t == "q") {
+        (o[1] * o[4] - o[2] * o[3]) / sum(o[1] * o[4], o[2] * o[3])
     # binary - similarity - Russel and Rao: RR
-    else if (t == "rr")       return(o[1] / sum(o))
+    } else if (t == "rr") {
+        o[1] / sum(o)
     # binary - similarity - Rogers and Tanimoto: RT
-    else if (t == "rt")       return(sum(o[1], o[4]) / sum(o, o[2], o[3]))
+    } else if (t == "rt") {
+        sum(o[1], o[4]) / sum(o, o[2], o[3])
     # binary - dissimilarity - Size difference: SIZE
-    else if (t == "size")     return(((o[2] - o[3]) ^ 2) / (sum(o) ^ 2))
+    } else if (t == "size") {
+        ((o[2] - o[3]) ^ 2) / (sum(o) ^ 2)
     # binary - similarity - Simple matching: SM
-    else if (t == "sm")       return(sum(o[1], o[4]) / sum(o))
+    } else if (t == "sm") {
+        sum(o[1], o[4]) / sum(o)
     # binary - similarity - Sokal and Sneath 1: SS1
-    else if (t == "ss1")      return(2 * sum(o[1], o[4]) / sum(o, o[1], o[4]))
+    } else if (t == "ss1") {
+        2 * sum(o[1], o[4]) / sum(o, o[1], o[4])
     # binary - similarity - Sokal and Sneath 2: SS2
-    else if (t == "ss2")      return(o[1] / sum(o[-4], o[2], o[3]))
+    } else if (t == "ss2") {
+        o[1] / sum(o[-4], o[2], o[3])
     # binary - similarity - Sokal and Sneath 3: SS3
-    else if (t == "ss3")      return(min(sum(o[1], o[4]) / sum(o[2], o[3]), 9999.999))
+    } else if (t == "ss3") {
+        min(sum(o[1], o[4]) / sum(o[2], o[3]), 9999.999)
     # binary - similarity - Sokal and Sneath 4: SS4
-    else if (t == "ss4")      return(sum(o[1] / sum(o[1], o[2]), o[1] / sum(o[1], o[3]), o[4] / sum(o[2], o[4]), o[4] / sum(o[3], o[4])) / 4)
+    } else if (t == "ss4") {
+        sum(o[1] / sum(o[1], o[2]), o[1] / sum(o[1], o[3]), o[4] / sum(o[2], o[4]), o[4] / sum(o[3], o[4])) / 4
     # binary - similarity - Sokal and Sneath 5: SS5
-    else if (t == "ss5")      return((o[1] * o[4]) / sqrt(sum(o[1], o[2]) * sum(o[1], o[3]) * sum(o[2], o[4]) * sum(o[3], o[4])))
+    } else if (t == "ss5") {
+        (o[1] * o[4]) / sqrt(sum(o[1], o[2]) * sum(o[1], o[3]) * sum(o[2], o[4]) * sum(o[3], o[4]))
     # binary - dissimilarity - Variance: VARIANCE
-    else if (t == "variance") return(sum(o[2], o[3]) / (4 * sum(o)))
+    } else if (t == "variance") {
+        sum(o[2], o[3]) / (4 * sum(o))
     # binary - similarity - Yule's Y: binYlY - Y
-    else if (t == "y")        return((sqrt(o[1] * o[4]) - sqrt(o[2] * o[3])) / sum(sqrt(o[1] * o[4]), sqrt(o[2] * o[3])))
+    } else if (t == "y") {
+        (sqrt(o[1] * o[4]) - sqrt(o[2] * o[3])) / sum(sqrt(o[1] * o[4]), sqrt(o[2] * o[3]))
 #   PLACEHOLDER FOR FUTURE IMPLEMENTATIONS
-#   else if (t == "")         return()
-    stop(sprintf("mtcBin: Method %s is not implemented.", t))
+#   } else if (t == "") {
+#       ...
+    } else {
+        stop(sprintf("mtcBin: Method %s is not implemented.", t))
+    }
 }
 
-t1_Bin <- function(o = c()) {
+t1_Bin <- function(o = NULL) {
     sum(max(o[1], o[2], na.rm = TRUE), max(o[3], o[4], na.rm = TRUE), max(o[1], o[3], na.rm = TRUE), max(o[2], o[4], na.rm = TRUE))
 }
 
-t2_Bin <- function(o = c()) {
+t2_Bin <- function(o = NULL) {
     sum(max(sum(o[1], o[3], na.rm = TRUE), sum(o[2], o[4], na.rm = TRUE), na.rm = TRUE),
         max(sum(o[1], o[2], na.rm = TRUE), sum(o[3], o[4], na.rm = TRUE), na.rm = TRUE))
 }

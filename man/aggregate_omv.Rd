@@ -8,8 +8,8 @@ statistical spreadsheet 'jamovi' (\url{https://www.jamovi.org})}
 aggregate_omv(
   dtaInp = NULL,
   fleOut = "",
-  varAgg = c(),
-  grpAgg = c(),
+  varAgg = NULL,
+  grpAgg = NULL,
   clcN = FALSE,
   clcMss = FALSE,
   clcMn = FALSE,
@@ -29,82 +29,65 @@ aggregate_omv(
 )
 }
 \arguments{
-\item{dtaInp}{Either a data frame or the name of a data file to be read (including the path,
-if required; "FILENAME.ext"; default: NULL); files can be of any supported file
-type, see Details below.}
+\item{dtaInp}{Either a data frame or the name of a data file to be read (including the path, if required;
+"FILENAME.ext"; default: NULL); files can be of any supported file type, see Details below.}
 
-\item{fleOut}{Name of the aggregated data set / file to be written (including the path, if
-required; "FILE_OUT.omv"; default: ""); if empty, the resulting data frame is
-returned instead.}
+\item{fleOut}{Name of the data set / file to be written (including the path, if required; "FILE_OUT.omv";
+default: ""); if empty, the resulting data frame is returned instead.}
 
-\item{varAgg}{A character vector (default: c()) with the names of the variables which shall be
-aggregated.}
+\item{varAgg}{A character vector (default: NULL) with the names of the variables which shall be aggregated.}
 
-\item{grpAgg}{A character vector (default: c()) with the variables to group the aggregation
-variable (\code{varAgg}) by. If no grouping variable is given, the aggregation happens
-over the whole data set. If several grouping variables are given, the aggregation
-happens for each step / possible combination of these variables. See Details for
-more information.}
+\item{grpAgg}{A character vector (default: NULL) with the variables to group the aggregation variable (\code{varAgg}) by.
+If no grouping variable is given, the aggregation happens over the whole data set. If several grouping
+variables are given, the aggregation happens for each step / possible combination of these variables.
+See Details for more information.}
 
-\item{clcN}{If TRUE, counts the number of valid values for each step / combination of values
-in the grouping variable. The suffix appended `"_N"´ is appended to each variable
-in the resulting data set.}
+\item{clcN}{If TRUE, counts the number of valid values for each step / combination of values in the grouping
+variable. The suffix appended `"_N"´ is appended to each variable in the resulting data set.}
 
-\item{clcMss}{If TRUE, counts the number of missing values for each step / combination of values
-in the grouping variable. The suffix appended \code{"_Mss"} is appended to each
-variable in the resulting data set.}
+\item{clcMss}{If TRUE, counts the number of missing values for each step / combination of values in the grouping
+variable. The suffix \code{"_Mss"} is appended to each variable in the resulting data set.}
 
-\item{clcMn}{If TRUE, calculates the mean for each step / combination of values in the grouping
-variable. The suffix appended \code{"_Mn"} is appended to each variable in the
-resulting data set.}
+\item{clcMn}{If TRUE, calculates the mean for each step / combination of values in the grouping variable. The
+suffix \code{"_Mn"} is appended to each variable in the resulting data set.}
 
-\item{clcMdn}{If TRUE, calculates the median for each step / combination of values in the
-grouping variable. The suffix appended \code{"_Mdn"} is appended to each variable in
-the resulting data set.}
+\item{clcMdn}{If TRUE, calculates the median for each step / combination of values in the grouping variable. The
+suffix \code{"_Mdn"} is appended to each variable in the resulting data set.}
 
-\item{clcMde}{If TRUE, calculates the mode for each step / combination of values in the grouping
-variable. The suffix appended \code{"_Mde"} is appended to each variable in the
-resulting data set.}
+\item{clcMde}{If TRUE, calculates the mode for each step / combination of values in the grouping variable. The
+suffix \code{"_Mde"} is appended to each variable in the resulting data set.}
 
-\item{clcSum}{If TRUE, calculates the sum for each step / combination of values in the grouping
-variable. The suffix appended \code{"_Sum"} is appended to each variable in the
-resulting data set.}
+\item{clcSum}{If TRUE, calculates the sum for each step / combination of values in the grouping variable. The suffix
+\code{"_Sum"} is appended to each variable in the resulting data set.}
 
-\item{clcSD}{If TRUE, calculates the std. deviation for each step / combination of values in
-the grouping variable. The suffix appended \code{"_SD"} is appended to each variable in
-the resulting data set.}
+\item{clcSD}{If TRUE, calculates the std. deviation for each step / combination of values in the grouping variable.
+The suffix \code{"_SD"} is appended to each variable in the resulting data set.}
 
-\item{clcVar}{If TRUE, calculates the variance for each step / combination of values in the
-grouping variable. The suffix appended \code{"_Var"} is appended to each variable in
-the resulting data set.}
+\item{clcVar}{If TRUE, calculates the variance for each step / combination of values in the grouping variable. The
+suffix \code{"_Var"} is appended to each variable in the resulting data set.}
 
-\item{clcRng}{If TRUE, calculates the range for each step / combination of values in the
-grouping variable. The suffix appended \code{"_Rng"} is appended to each variable in
-the resulting data set.}
+\item{clcRng}{If TRUE, calculates the range for each step / combination of values in the grouping variable. The
+suffix \code{"_Rng"} is appended to each variable in the resulting data set.}
 
-\item{clcMin}{If TRUE, determines the minimum at each step / combination of values in the
-grouping variable. The suffix appended \code{"_Min"} is appended to each variable in
-the resulting data set.}
+\item{clcMin}{If TRUE, determines the minimum at each step / combination of values in the grouping variable. The
+suffix \code{"_Min"} is appended to each variable in the resulting data set.}
 
-\item{clcMax}{If TRUE, determines the maximum at each step / combination of values in the
-grouping variable. The suffix appended \code{"_Max"} is appended to each variable in
-the resulting data set.}
+\item{clcMax}{If TRUE, determines the maximum at each step / combination of values in the grouping variable. The
+suffix \code{"_Max"} is appended to each variable in the resulting data set.}
 
-\item{clcIQR}{If TRUE, calculates the IQR for each step / combination of values in the grouping
-variable. The suffix appended \code{"_IQR"} is appended to each variable in the
-resulting data set.}
+\item{clcIQR}{If TRUE, calculates the IQR for each step / combination of values in the grouping variable. The suffix
+\code{"_IQR"} is appended to each variable in the resulting data set.}
 
-\item{drpNA}{If TRUE (default: TRUE), NA values are removed before the aggregation, and the
-aggregation is calculated using the valid values. If FALSE, the result would be NA
-for any step / combination of values in the grouping variable that contains a NA
-value.}
+\item{drpNA}{If TRUE (default: TRUE), NA values are removed before the aggregation, and the aggregation is
+calculated using the valid values. If FALSE, the result would be NA for any step / combination of
+values in the grouping variable that contains a NA value.}
 
-\item{usePkg}{Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata,
-and SAS files; "foreign" is the default (it comes with base R), but "haven" is
-newer and more comprehensive.}
+\item{usePkg}{Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata, and SAS files;
+"foreign" is the default (it is included in base R), but "haven" is newer and more comprehensive; you
+may have to install using \code{install.packages("haven", dep = TRUE)}.}
 
-\item{selSet}{Name of the data set that is to be selected from the workspace (only applies when
-reading .RData-files)}
+\item{selSet}{Name of the object / data set that is to be selected from the workspace (only relevant when reading
+.RData-files which can contain several objects / data sets)}
 
 \item{...}{Additional arguments passed on to methods; see Details below.}
 }
@@ -119,33 +102,23 @@ statistical spreadsheet 'jamovi' (\url{https://www.jamovi.org})
 }
 \details{
 \itemize{
-\item \code{varAgg} must be a character vector containing the variables to be aggregated. From these
-variables, a new data set is created where the values in the original data set are aggregated
-for each possible combination of steps in the grouping variable(s) given in \code{grpAgg}. For
-example, if one grouping variable were a participant ID, and another grouping variable were
-measurement time points, the resulting new dataset would contain as many rows as the number of
-participants multiplied by the number of measurement time points. For each variable in
-\code{varAgg}, and each possible aggregation (\code{clcN}, \code{clcMn}, etc. if set to TRUE), a new column
-would be generated in the resulting new data set.
-\item \code{drpNA} determines whether NA should be dropped / removed before calculating an aggregation.
-If set to FALSE, the result for a combination of steps in the grouping variable(s) where at
-least one value is NA would be NA. If set to TRUE, only the values for any given combination
-of steps in the grouping variable(s) that are not NA are considered for the calculation. For
-\code{clcN} and \code{clcMss}, \code{drpNA} has no effect.
-NB: If \code{drpNA} is set to TRUE, any row where any of the grouping variable(s) has the value NA
-is excluded from the aggregation, if \code{drpNA} is set to FALSE and there is any row where any of
-the group variables has the value NA, an error is thrown and no aggregation is carried out.
-\item The ellipsis-parameter (\code{...}) can be used to submit arguments / parameters to the functions
-that are used for reading and writing the data. By clicking on the respective function under
-“See also”, you can get a more detailed overview over which parameters each of those functions
-take. The functions are: \code{read_omv} and \code{write_omv} (for jamovi-files), \code{read.table} (for
-CSV / TSV files; using similar defaults as \code{read.csv} for CSV and \code{read.delim} for TSV which
-both are based upon \code{read.table}), \code{load} (for .RData-files), \code{readRDS} (for .rds-files),
-\code{read_sav} (needs the R-package \code{haven}) or \code{read.spss} (needs the R-package \code{foreign}) for
-SPSS-files, \code{read_dta} (\code{haven}) / \code{read.dta} (\code{foreign}) for Stata-files, \code{read_sas}
-(\code{haven}) for SAS-data-files, and \code{read_xpt} (\code{haven}) / \code{read.xport} (\code{foreign}) for
-SAS-transport-files. If you would like to use \code{haven}, you may need to install it using
-\code{install.packages("haven", dep = TRUE)}.
+\item \code{varAgg} must be a character vector containing the variables to be aggregated. From these variables, a new data
+set is created where the values in the original data set are aggregated for each possible combination of steps in
+the grouping variable(s) given in \code{grpAgg}. For example, if one grouping variable were a participant ID, and
+another grouping variable were measurement time points, the resulting new dataset would contain as many rows as
+the number of participants multiplied by the number of measurement time points. For each variable in \code{varAgg}, and
+each possible aggregation (\code{clcN}, \code{clcMn}, etc. if set to TRUE), a new column would be generated in the resulting
+new data set.
+\item \code{drpNA} determines whether NA should be dropped / removed before calculating an aggregation. If set to FALSE, the
+result for a combination of steps in the grouping variable(s) where at least one value is NA would be NA. If set
+to TRUE, only the values for any given combination of steps in the grouping variable(s) that are not NA are
+considered for the calculation. For \code{clcN} and \code{clcMss}, \code{drpNA} has no effect.
+NB: If \code{drpNA} is set to TRUE, any row where any of the grouping variable(s) has the value NA is excluded from the
+aggregation, if \code{drpNA} is set to FALSE and there is any row where any of the group variables has the value NA, an
+error is thrown and no aggregation is carried out.
+\item The ellipsis-parameter (\code{...}) can be used to submit arguments / parameters to the functions that are used for
+reading or transforming the data. By clicking on the respective function under “See also”, you can get a more
+detailed overview over which parameters each of those functions take.
 }
 }
 \examples{
@@ -210,14 +183,12 @@ unlink(nmeOut)
 
 }
 \seealso{
-\code{aggregate_omv} internally uses \code{\link[stats:aggregate]{stats::aggregate()}} as function for the aggregation,
-and \code{\link[base:NA]{base::is.na()}}, \code{\link[base:mean]{base::mean()}}, \code{\link[stats:median]{stats::median()}}, \code{\link[base:sum]{base::sum()}}, \code{\link[stats:sd]{stats::sd()}},
-\code{\link[stats:cor]{stats::var()}}, \code{\link[base:range]{base::range()}}, \code{\link[base:Extremes]{base::min()}}, \code{\link[base:Extremes]{base::max()}}, and
-\code{\link[stats:quantile]{stats::quantile()}} for calculation. It furthermore uses the following functions for reading
-and writing data files in different formats: \code{\link[=read_omv]{read_omv()}} and
-\code{\link[=write_omv]{write_omv()}} for jamovi-files, \code{\link[utils:read.table]{utils::read.table()}} for CSV / TSV files,
-\code{\link[=load]{load()}} for reading .RData-files, \code{\link[=readRDS]{readRDS()}} for .rds-files, \code{\link[haven:read_spss]{haven::read_sav()}} or
-\code{\link[foreign:read.spss]{foreign::read.spss()}} for SPSS-files, \code{\link[haven:read_dta]{haven::read_dta()}} or \code{\link[foreign:read.dta]{foreign::read.dta()}} for
-Stata-files, \code{\link[haven:read_sas]{haven::read_sas()}} for SAS-data-files, and \code{\link[haven:read_xpt]{haven::read_xpt()}} or
+\code{aggregate_omv} internally uses \code{\link[stats:aggregate]{stats::aggregate()}} as function for the aggregation, and \code{\link[base:is.na]{base::is.na()}},
+\code{\link[base:mean]{base::mean()}}, \code{\link[stats:median]{stats::median()}}, \code{\link[base:sum]{base::sum()}}, \code{\link[stats:sd]{stats::sd()}}, \code{\link[stats:var]{stats::var()}}, \code{\link[base:range]{base::range()}}, \code{\link[base:min]{base::min()}},
+\code{\link[base:max]{base::max()}}, and \code{\link[stats:quantile]{stats::quantile()}} for calculation. It furthermore uses the following functions for reading and
+writing data files in different formats: \code{\link[=read_omv]{read_omv()}} and \code{\link[=write_omv]{write_omv()}} for
+jamovi-files, \code{\link[utils:read.table]{utils::read.table()}} for CSV / TSV files, \code{\link[=load]{load()}} for reading .RData-files, \code{\link[=readRDS]{readRDS()}} for
+.rds-files, \code{\link[haven:read_sav]{haven::read_sav()}} or \code{\link[foreign:read.spss]{foreign::read.spss()}} for SPSS-files, \code{\link[haven:read_dta]{haven::read_dta()}} or
+\code{\link[foreign:read.dta]{foreign::read.dta()}} for Stata-files, \code{\link[haven:read_sas]{haven::read_sas()}} for SAS-data-files, and \code{\link[haven:read_xpt]{haven::read_xpt()}} or
 \code{\link[foreign:read.xport]{foreign::read.xport()}} for SAS-transport-files.
 }

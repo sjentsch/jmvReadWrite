@@ -5,7 +5,8 @@ test_that("globals work", {
                                     list(fleInp = "Trial_varArg.omv", sveAtt = FALSE, getSyn = FALSE, getHTM = FALSE),
                                     fxdArg = c("fleInp", "getSyn")),
                  list(fleInp = "Trial_dflArg.omv", getSyn = TRUE, sveAtt = FALSE, getHTM = FALSE))
-    expect_identical(fcnArg(c("merge", "data.frame")), c("x", "y", "by", "by.x", "by.y", "all", "all.x", "all.y", "sort", "suffixes", "no.dups", "incomparables", "..."))
+    expect_identical(fcnArg(c("merge", "data.frame")),
+                     c("x", "y", "by", "by.x", "by.y", "all", "all.x", "all.y", "sort", "suffixes", "no.dups", "incomparables", "..."))
     expect_true(chkDir(nmeOMV))
     if (.Platform$OS.type == "unix" && Sys.getenv("NO_CHKDIR") != "true") {
         # permissions on *nix-systems
@@ -20,36 +21,46 @@ test_that("globals work", {
     expect_true(chkFle(nmeOMV, isZIP = TRUE))
     expect_true(chkFle(nmeOMV, fleCnt = "meta"))
     expect_true(chkVar(jmvReadWrite::ToothGrowth, c("len", "dose", "supp")))
-    expect_error(chkDir(file.path(tempdir(), "not", "file")), regexp = "^Directory \\(.*?\\) doesn't exist\\.")
+    expect_error(chkDir(file.path(tempdir(), "not", "file")), "^Directory \\(.*?\\) doesn't exist\\.")
     expect_error(chkFle(NA),            regexp = "^chkFle: Unsupported input parameter type\\.")
     expect_error(chkFle("", isZIP = 1), regexp = "^chkFle: Unsupported input parameter type\\.")
     expect_error(chkFle(tempfile()), regexp = "^File \".*?\" not found\\.")
-    expect_error(chkDtF(data.frame(A = runif(n = 100)), minSze = 2), regexp = "^The \\w+ dimension of the input data frame has not the required size")
+    expect_error(chkDtF(data.frame(A = runif(n = 100)), minSze = 2),
+                 "^The \\w+ dimension of the input data frame has not the required size")
     expect_true(chkExt(tempfile(), ""))
     expect_true(chkExt(tempfile(), "omv"))
     expect_true(chkExt(tempfile(fileext = ".omv"), "omv"))
-    expect_error(chkExt(tempfile(fileext = ".omv"), "chk"), regexp = "^File name \\(.*?\\) contains an unsupported file extension \\(.*?\\)\\.")
+    expect_error(chkExt(tempfile(fileext = ".omv"), "chk"),
+                 "^File name \\(.*?\\) contains an unsupported file extension \\(.*?\\)\\.")
     expect_error(chkFle("no_file"), regexp = "^File \".*?\" not found.")
-    expect_error(chkFle(nmeOMV, fleCnt = "no_file"), regexp = "^chkFle: File \".*?\" doesn't contain the file \".*?\"\\.")
-    expect_error(chkVar(dtaFrm = data.frame(A = runif(100)), varNme = c("A", "B")), regexp = "^The variable\\(s\\) \\w+ are not contained in the current data set\\.")
+    expect_error(chkFle(nmeOMV, fleCnt = "no_file"), "^chkFle: File \".*?\" doesn't contain the file \".*?\"\\.")
+    expect_error(chkVar(dtaFrm = data.frame(A = runif(100)), varNme = c("A", "B")),
+                 "^The variable\\(s\\) \\w+ are not contained in the current data set\\.")
 
     set.seed(1)
-    tmpDF <- setAtt("value.labels", list(value.labels = setNames(seq(4), sprintf("Level %d", seq(4)))), data.frame(tmpCol = sample(seq(4), 200, replace = TRUE)))
+    tmpDF <- setAtt("value.labels",
+                    list(value.labels = setNames(seq(4), sprintf("Level %d", seq(4)))),
+                    data.frame(tmpCol = sample(seq(4), 200, replace = TRUE)))
     tmpDF[, 1] <- cnvCol(tmpDF[, 1], "factor")
     expect_s3_class(tmpDF[, 1], "factor")
     expect_identical(levels(tmpDF[, 1]), sprintf("Level %d", seq(4)))
     expect_identical(as.integer(table(tmpDF[, 1])), c(51L, 54L, 51L, 44L))
 
-    expect_error(fmtFlI(fleInp = tempfile(), minLng = 2), regexp = "^The fleInp-argument is supposed to be a character vector with a minimal length of \\d+ and a maximal length of")
+    expect_error(fmtFlI(fleInp = tempfile(), minLng = 2),
+                 "^The fleInp-argument is supposed to be a character vector with a minimal length of \\d+ and a maximal length of")
     expect_error(fmtFlI(fleInp = c(tempfile(), tempfile()), maxLng = 1),
-      regexp = "^The fleInp-argument is supposed to be a character vector with a minimal length of \\d+ and a maximal length of")
+                 "^The fleInp-argument is supposed to be a character vector with a minimal length of \\d+ and a maximal length of")
     expect_error(fmtFlO(fleOut = ""),
-      regexp = "^fleOut needs to be a valid non-empty file name \\(character\\), and the file extension for output file needs to be \\.omv\\ or \\.omt\\.")
+                 paste("^fleOut needs to be a valid non-empty file name \\(character\\), and the file extension for",
+                       "output file needs to be \\.omv\\ or \\.omt\\."))
     expect_error(fmtFlO(fleOut = "Trial"),
-      regexp = "^fleOut needs to be a valid non-empty file name \\(character\\), and the file extension for output file needs to be \\.omv\\ or \\.omt\\.")
+                 paste("^fleOut needs to be a valid non-empty file name \\(character\\), and the file extension for",
+                       "output file needs to be \\.omv\\ or \\.omt\\."))
     expect_error(fmtFlO(fleOut = "Trial.rds"),
-      regexp = "^fleOut needs to be a valid non-empty file name \\(character\\), and the file extension for output file needs to be \\.omv\\ or \\.omt\\.")
-    expect_error(fcnArg(c("stats::sd", "stats::mean", "C")), regexp = "^The argument to fcnArg must be a character \\(vector\\) with 1 or 2 elements.")
+                 paste("^fleOut needs to be a valid non-empty file name \\(character\\), and the file extension for",
+                       "output file needs to be \\.omv\\ or \\.omt\\."))
+    expect_error(fcnArg(c("stats::sd", "stats::mean", "C")),
+                 "^The argument to fcnArg must be a character \\(vector\\) with 1 or 2 elements.")
     expect_true(jmvPtB())
     tmpPB <- var2PB(inpVar = list(list(A = NULL, B = TRUE, C = 1, D = 0.01, E = "Trial", F = c(TRUE, FALSE, TRUE),
                                        G = c(1, 2, 3), H = c(0.01, 0.02, 0.03), I = c("A", "B"))))
@@ -72,7 +83,7 @@ test_that("globals work", {
                             "      hasNames: true\n      names: \"A\"\n      names: \"B\"\n      names: \"C\"\n      ",
                             "names: \"D\"\n      names: \"E\"\n      names: \"F\"\n      names: \"G\"\n      names: ",
                             "\"H\"\n      names: \"I\"\n    }\n  }\n}\n"))
-    expect_error(var2PB(inpVar = as.complex(pi)), regexp = "^Element not implemented for conversion to protocol buffer.")
+    expect_error(var2PB(inpVar = as.complex(pi)), "^Element not implemented for conversion to protocol buffer.")
     expect_error(setAtt(attLst = "Trial", inpObj = list(),       outObj = list()),
       regexp = "^Error when storing or accessing meta-data information\\. Please send the file")
     expect_error(setAtt(attLst = "Trial", inpObj = data.frame(), outObj = data.frame()),
@@ -159,52 +170,58 @@ test_that("globals work", {
     expect_named(df4Chk, row.names(df4Chk))
     expect_named(df4Chk, sprintf("V%d", seq(10)))
     expect_false(anyNA(df4Chk))
-    expect_equal(unname(colMeans(df4Chk)),
-                 c(0.128183893, 0.096625131, 0.070568445, 0.115919003, 0.139886614, 0.058323693, 0.092441925,
-                   0.106711615, 0.168887776, 0.10403618))
+    expect_identical(unname(colMeans(df4Chk)),
+                     c(0.128183893, 0.096625131, 0.070568445, 0.115919003, 0.139886614, 0.058323693, 0.092441925,
+                       0.106711615, 0.168887776, 0.10403618),
+                     tolerance = 1e-6)
 
     df4Chk <- mtxF2S(tmpDF, rmvTrU = TRUE)
     expect_identical(dim(df4Chk), c(10L, 10L))
     expect_named(df4Chk, row.names(df4Chk))
     expect_named(df4Chk, sprintf("V%d", seq(10)))
     expect_identical(as.integer(colSums(is.na(df4Chk))), seq(0, 9))
-    expect_equal(unname(colMeans(df4Chk, na.rm = TRUE)),
-                 c(0.12818389, 0.10747174, 0.09210481, 0.16532417, 0.17717275, 0.18858648, 0.25467175, 0.34689183,
-                   0.59969889, 1))
+    expect_identical(unname(colMeans(df4Chk, na.rm = TRUE)),
+                     c(0.12818389, 0.10747174, 0.09210481, 0.16532417, 0.17717275, 0.18858648, 0.25467175, 0.34689183,
+                       0.59969889, 1),
+                     tolerance = 1e-6)
 
     df4Chk <- mtxF2S(tmpDF, rmvDgn = TRUE)
     expect_identical(dim(df4Chk), c(10L, 10L))
     expect_named(df4Chk, row.names(df4Chk))
     expect_named(df4Chk, sprintf("V%d", seq(10)))
     expect_identical(unname(colSums(is.na(df4Chk))), rep(1, 10))
-    expect_equal(unname(colMeans(df4Chk, na.rm = TRUE)),
-                 c(0.031315436, -0.003749854, -0.032701727, 0.017687781, 0.044318459, -0.046307008, -0.008397862,
-                   0.007457349, 0.076541973, 0.004484645))
+    expect_identical(unname(colMeans(df4Chk, na.rm = TRUE)),
+                     c(0.031315436, -0.003749854, -0.032701727, 0.017687781, 0.044318459, -0.046307008, -0.008397862,
+                       0.007457349, 0.076541973, 0.004484645),
+                     tolerance = 1e-6)
 
     df4Chk <- mtxF2S(tmpDF, rmvTrU = TRUE, mtxXps = TRUE)
     expect_identical(dim(df4Chk), c(10L, 10L))
     expect_named(df4Chk, row.names(df4Chk))
     expect_named(df4Chk, sprintf("V%d", seq(10)))
     expect_identical(as.integer(colSums(is.na(df4Chk))), seq(9, 0))
-    expect_equal(unname(colMeans(df4Chk, na.rm = TRUE)),
-                 c(1, 0.49950284, 0.322948658, 0.250480203, 0.26716593, 0.106717426, 0.129390323, 0.128305082,
-                   0.165497776, 0.10403618))
+    expect_identical(unname(colMeans(df4Chk, na.rm = TRUE)),
+                     c(1, 0.49950284, 0.322948658, 0.250480203, 0.26716593, 0.106717426, 0.129390323, 0.128305082,
+                       0.165497776, 0.10403618),
+                     tolerance = 1e-6)
 
     df4Chk <- mtxF2S(tmpDF, rmvTrU = TRUE, rmvDgn = TRUE, mtxXps = TRUE)
     expect_identical(dim(df4Chk), c(10L, 10L))
     expect_named(df4Chk, row.names(df4Chk))
     expect_named(df4Chk, sprintf("V%d", seq(10)))
     expect_identical(as.integer(colSums(is.na(df4Chk))), seq(10, 1))
-    expect_equal(unname(colMeans(df4Chk, na.rm = TRUE)),
-                 c(NA, -0.0009943199, -0.0155770134, 0.0006402703, 0.0839574127, -0.0719390890, -0.0157112896,
-                   0.0037772361, 0.0611849980, 0.0044846446))
+    expect_identical(unname(colMeans(df4Chk, na.rm = TRUE)),
+                     c(NA, -0.0009943199, -0.0155770134, 0.0006402703, 0.0839574127, -0.0719390890, -0.0157112896,
+                       0.0037772361, 0.0611849980, 0.0044846446),
+                     tolerance = 1e-6)
 
     df4Chk <- mtxF2S(tmpDF, mtxSps = TRUE)
     expect_identical(dim(df4Chk), c(9L, 10L))
     expect_named(df4Chk, c("Variable", sprintf("V%d", seq(1, 9))))
     expect_identical(row.names(df4Chk), sprintf("V%d", seq(2, 10)))
     expect_identical(unname(colSums(is.na(df4Chk))), c(0, seq(0, 8)))
-    expect_equal(unname(colMeans(df4Chk[, -1], na.rm = TRUE)),
-                 c(0.031315436, -0.004094296, -0.037594503,  0.026211536, 0.012607297, -0.014266906, 0.006228995,
-                   0.020337746, 0.199397772))
+    expect_identical(unname(colMeans(df4Chk[, -1], na.rm = TRUE)),
+                     c(0.031315436, -0.004094296, -0.037594503,  0.026211536, 0.012607297, -0.014266906, 0.006228995,
+                       0.020337746, 0.199397772),
+                     tolerance = 1e-6)
 })

@@ -304,6 +304,6 @@ test_that("write_omv works", {
 
     tmpCol <- rnorm(100)
     attr(tmpCol, "Trial") <- "Check whether attribute is preserved"
-    expect_equal(cnvCol(tmpCol, tgtTyp = "integer"), round(tmpCol))
+    expect_identical(cnvCol(tmpCol, tgtTyp = "integer"), round(tmpCol), tolerance = 1e-6)
     expect_identical(attr(cnvCol(tmpCol, tgtTyp = "integer"), "Trial"), "Check whether attribute is preserved")
 })

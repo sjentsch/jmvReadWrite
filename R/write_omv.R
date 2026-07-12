@@ -200,7 +200,8 @@ write_omv <- function(dtaFrm = NULL, fleOut = "", wrtPtB = FALSE, frcWrt = FALSE
         add2ZIP(fleOut, crrFle = c(names(attr(dtaFrm, "protobuf")[1]), "wb"), ptbOut = attr(dtaFrm, "protobuf")[[1]])
     } else if (wrtPtB && !hasPtB(dtaFrm)) {
         unlink(fleOut)
-        stop("The data frame (dtaFrm) must contain the attribute \"protobuf\", there has to be at least one of them, and it has to be of the correct type (a RProtoBuf).")
+        stop("The data frame (dtaFrm) must contain the attribute \"protobuf\", there has to be at least one of them, ",
+             "and it has to be of the correct type (a RProtoBuf).")
     }
 
     # handle weights

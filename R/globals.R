@@ -419,11 +419,11 @@ rstAtt <- function(dtaFrm = NULL, attLst = NULL) {
 
 chkAtt <- function(attObj = NULL, attNme = "", attVal = NULL) {
    ((attNme %in% names(attributes(attObj))) && length(attr(attObj, attNme)) > 0 &&
-     ifelse(!is.null(attVal), grepl(attVal, attr(attObj, attNme)), TRUE))
+    (is.null(attVal) || grepl(attVal, attr(attObj, attNme))))
 }
 
 chkFld <- function(fldObj = NULL, fldNme = "", fldVal = NULL) {
-   ((fldNme %in% names(fldObj)) && length(fldObj[[fldNme]]) > 0 && ifelse(!is.null(fldVal), grepl(fldVal, fldObj[[fldNme]]), TRUE))
+   ((fldNme %in% names(fldObj)) && length(fldObj[[fldNme]]) > 0 && (is.null(fldVal) || grepl(fldVal, fldObj[[fldNme]])))
 }
 
 # =================================================================================================

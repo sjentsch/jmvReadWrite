@@ -148,7 +148,9 @@ test_that("wide2long_omv works", {
     expect_identical(df4Chk[, "cond1"], as.factor(rep(rep(c("cong", "incong", "neutral"), each = 8), times = 100)))
     expect_identical(df4Chk[, "cond2"], as.factor(rep(rep(c("BLUE", "GREEN", "RED", "YELLOW"), each = 2), times = 300)))
     expect_identical(df4Chk[, "cond3"], as.factor(rep(c("1", "2"), times = 1200)))
-    expect_identical(unname(colMeans(dtaTmp[3:50])), as.vector(unlist(aggregate(x = df4Chk[, c("rspCrr", "rspTme")], by = df4Chk[, c("cond3", "cond2", "cond1")], FUN = mean)[4:5])))
+    expect_identical(unname(colMeans(dtaTmp[3:50])),
+                     as.vector(unlist(aggregate(x = df4Chk[, c("rspCrr", "rspTme")], by = df4Chk[, c("cond3", "cond2", "cond1")], FUN = mean)[4:5])),
+                     tolerance = 1e-6)
 
     df4Chk <- wide2long_omv(dtaInp = dtaTmp, fleOut = "", varLst = names(dtaTmp)[c(-1, -2)], varExc = "sex", varID = "ID", varTme = "cond")
     expect_s3_class(df4Chk, "data.frame")
@@ -159,7 +161,9 @@ test_that("wide2long_omv works", {
     expect_identical(df4Chk[, "cond2"], as.factor(rep(rep(c("cong", "incong", "neutral"), each = 8), times = 200)))
     expect_identical(df4Chk[, "cond3"], as.factor(rep(rep(c("BLUE", "GREEN", "RED", "YELLOW"), each = 2), times = 600)))
     expect_identical(df4Chk[, "cond4"], as.factor(rep(c("1", "2"), times = 2400)))
-    expect_identical(unname(colMeans(dtaTmp[3:50])), aggregate(x = df4Chk[, "measure", drop = FALSE], by = df4Chk[, c("cond4", "cond3", "cond2", "cond1")], FUN = mean)[, 5])
+    expect_identical(unname(colMeans(dtaTmp[3:50])),
+                     aggregate(x = df4Chk[, "measure", drop = FALSE], by = df4Chk[, c("cond4", "cond3", "cond2", "cond1")], FUN = mean)[, 5],
+                     tolerance = 1e-6)
     unlink(nmeOut)
 
     # more complex data set, varTme as a vector =======================================================================

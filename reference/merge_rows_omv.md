@@ -14,7 +14,7 @@ merge_rows_omv(
   colInd = FALSE,
   rstRwN = TRUE,
   rmvDpl = FALSE,
-  varSrt = c(),
+  varSrt = NULL,
   usePkg = c("foreign", "haven"),
   selSet = "",
   ...
@@ -28,18 +28,18 @@ merge_rows_omv(
   Either a data frame (with the attribute "fleInp" containing the files
   to merge) or vector with the names of the input files (including the
   path, if required; "FILENAME.ext"; default: NULL); files can be of any
-  supported file type, see Details below
+  supported file type, see Details below.
 
 - fleOut:
 
-  Name of the data file to be written (including the path, if required;
-  "FILE_OUT.omv"; default: ""); if empty, the resulting data frame is
-  returned instead
+  Name of the data set / file to be written (including the path, if
+  required; "FILE_OUT.omv"; default: ""); if empty, the resulting data
+  frame is returned instead.
 
 - typMrg:
 
   Type of merging operation: "all" (default) or "common"; see also
-  Details
+  Details.
 
 - colInd:
 
@@ -61,18 +61,20 @@ merge_rows_omv(
 - varSrt:
 
   Variable(s) that are used to sort the data frame (see Details; if
-  empty, the order after merging is kept; default: c())
+  empty, the order after merging is kept; default: NULL)
 
 - usePkg:
 
   Name of the package: "foreign" or "haven" that shall be used to read
-  SPSS, Stata and SAS files; "foreign" is the default (it comes with
-  base R), but "haven" is newer and more comprehensive
+  SPSS, Stata, and SAS files; "foreign" is the default (it is included
+  in base R), but "haven" is newer and more comprehensive; you may have
+  to install using `install.packages("haven", dep = TRUE)`.
 
 - selSet:
 
-  Name of the data set that is to be selected from the workspace (only
-  applies when reading .RData-files)
+  Name of the object / data set that is to be selected from the
+  workspace (only relevant when reading .RData-files which can contain
+  several objects / data sets)
 
 - ...:
 
@@ -103,26 +105,14 @@ input data sets (given in the `dtaInp`-argument) are concatenated
   Please note that this doesn't make sense and hence throws a warning
   for certain variable types (e.g., factors).
 
-- The ellipsis-parameter (`...`) can be used to submit arguments /
-  parameters to the functions that are used for merging or reading the
-  data. By clicking on the respective function under “See also”, you can
-  get a more detailed overview over which parameters each of those
-  functions take.
-
 - Adding columns uses `rbind` (with some further operation, adding
   missing columns (filled with NAs), if `typMrg` is "all").
 
-- The functions for reading and writing the data are: `read_omv` and
-  `write_omv` (for jamovi-files), `read.table` (for CSV / TSV files;
-  using similar defaults as `read.csv` for CSV and `read.delim` for TSV
-  which both are based upon `read.table`), `load` (for .RData-files),
-  `readRDS` (for .rds-files), `read_sav` (needs R-package `haven`) or
-  `read.spss` (needs R-package `foreign`) for SPSS-files, `read_dta`
-  (`haven`) / `read.dta` (`foreign`) for Stata-files, `read_sas`
-  (`haven`) for SAS-data-files, and `read_xpt` (`haven`) / `read.xport`
-  (`foreign`) for SAS-transport-files. If you would like to use `haven`,
-  you may need to install it using
-  `install.packages("haven", dep = TRUE)`.
+- The ellipsis-parameter (`...`) can be used to submit arguments /
+  parameters to the functions that are used for reading or transforming
+  the data. By clicking on the respective function under “See also”, you
+  can get a more detailed overview over which parameters each of those
+  functions take.
 
 ## See also
 
@@ -163,7 +153,7 @@ for (i in seq_along(nmeInp)) saveRDS(dtaInp[-i - 1], nmeInp[i])
 # each data set (for demonstration purposes, A1 in the first, A2 in the second, ...)
 jmvReadWrite::merge_rows_omv(dtaInp = nmeInp, fleOut = nmeOut, colInd = TRUE)
 cat(file.info(nmeOut)$size)
-#> 10936
+#> 10932
 # -> 10767 (size may differ on different OSes)
 dtaOut <- jmvReadWrite::read_omv(nmeOut, sveAtt = FALSE)
 unlink(nmeOut)

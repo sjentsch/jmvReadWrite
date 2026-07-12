@@ -18,6 +18,7 @@ available on [CRAN](https://cran.r-project.org/package=jmvReadWrite)
 using the following command:
 
 ``` r
+
 install.packages("jmvReadWrite")
 ```
 
@@ -25,6 +26,7 @@ or you can install the development version of the `jmvReadWrite` package
 from [GitHub](https://github.com/sjentsch/jmvReadWrite/):
 
 ``` r
+
 if (!require(devtools)) install.packages("devtools")
 devtools::install_github("sjentsch/jmvReadWrite")
 ```
@@ -57,14 +59,15 @@ Afterwards, the syntax is shown at the top of the analysis and can be
 copied from there.
 
 ``` r
+
 fleOMV <- system.file("extdata", "ToothGrowth.omv", package = "jmvReadWrite")
 data <- jmvReadWrite::read_omv(fleOMV)
 # if the "jmv"-package is installed, we can run a test analysis with the data
-if ("jmv" %in% rownames(installed.packages())) {
+if (nzchar(system.file(package = "jmv"))) {
     jmv::ANOVA(
         formula = len ~ supp + dose + supp:dose,
         data = data,
-        effectSize = c("omega"),
+        effectSize = "omega",
         modelTest = TRUE,
         homo = TRUE,
         norm = TRUE)
@@ -113,6 +116,7 @@ in the attribute `syntax`. They can be used as shown in the following
 examples:
 
 ``` r
+
 fleOMV <- system.file("extdata", "ToothGrowth.omv", package = "jmvReadWrite")
 data <- jmvReadWrite::read_omv(fleOMV, getSyn = TRUE)
 # shows the syntax of the analyses from the .omv-file
@@ -124,7 +128,7 @@ data <- jmvReadWrite::read_omv(fleOMV, getSyn = TRUE)
 if (length(attr(data, "syntax")) >= 2) {
     attr(data, "syntax")
     # if the "jmv"-package is installed, we can run the analyses in "syntax"
-    if ("jmv" %in% rownames(installed.packages())) {
+    if (nzchar(system.file(package = "jmv"))) {
         eval(parse(text = attr(data, "syntax")[[1]]))
         eval(parse(text = paste0("result = ", attr(data, "syntax")[[2]])))
         names(result)
@@ -148,6 +152,7 @@ process (summarize, filter, etc.) in R in order to later analyse them in
 in jamovi afterwards.
 
 ``` r
+
 # use the data set "ToothGrowth" and, if it exists, write it as jamovi-file
 # using write_omv()
 data("ToothGrowth", package = "jmvReadWrite")
@@ -167,7 +172,7 @@ list.files(".", "Trial.omv")
 #> [1] "Trial.omv"
 file.info("Trial.omv")[, c("size", "isdir", "mode")]
 #>           size isdir mode
-#> Trial.omv 2618 FALSE  644
+#> Trial.omv 2617 FALSE  644
 unlink("Trial.omv")
 ```
 
@@ -180,6 +185,7 @@ modifications), it is recommended to leave the `sveAtt`-attribute set to
 `TRUE` (which is the default).
 
 ``` r
+
 # reading and writing a file with the "sveAtt"-parameter permits you to keep
 # essential meta-data to ensure that the written file looks and works like the
 # original file (plus you modifications)

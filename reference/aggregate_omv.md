@@ -10,8 +10,8 @@ them as a .omv-file for the statistical spreadsheet 'jamovi'
 aggregate_omv(
   dtaInp = NULL,
   fleOut = "",
-  varAgg = c(),
-  grpAgg = c(),
+  varAgg = NULL,
+  grpAgg = NULL,
   clcN = FALSE,
   clcMss = FALSE,
   clcMn = FALSE,
@@ -41,18 +41,18 @@ aggregate_omv(
 
 - fleOut:
 
-  Name of the aggregated data set / file to be written (including the
-  path, if required; "FILE_OUT.omv"; default: ""); if empty, the
-  resulting data frame is returned instead.
+  Name of the data set / file to be written (including the path, if
+  required; "FILE_OUT.omv"; default: ""); if empty, the resulting data
+  frame is returned instead.
 
 - varAgg:
 
-  A character vector (default: c()) with the names of the variables
+  A character vector (default: NULL) with the names of the variables
   which shall be aggregated.
 
 - grpAgg:
 
-  A character vector (default: c()) with the variables to group the
+  A character vector (default: NULL) with the variables to group the
   aggregation variable (`varAgg`) by. If no grouping variable is given,
   the aggregation happens over the whole data set. If several grouping
   variables are given, the aggregation happens for each step / possible
@@ -67,68 +67,68 @@ aggregate_omv(
 - clcMss:
 
   If TRUE, counts the number of missing values for each step /
-  combination of values in the grouping variable. The suffix appended
-  `"_Mss"` is appended to each variable in the resulting data set.
+  combination of values in the grouping variable. The suffix `"_Mss"` is
+  appended to each variable in the resulting data set.
 
 - clcMn:
 
   If TRUE, calculates the mean for each step / combination of values in
-  the grouping variable. The suffix appended `"_Mn"` is appended to each
-  variable in the resulting data set.
+  the grouping variable. The suffix `"_Mn"` is appended to each variable
+  in the resulting data set.
 
 - clcMdn:
 
   If TRUE, calculates the median for each step / combination of values
-  in the grouping variable. The suffix appended `"_Mdn"` is appended to
-  each variable in the resulting data set.
+  in the grouping variable. The suffix `"_Mdn"` is appended to each
+  variable in the resulting data set.
 
 - clcMde:
 
   If TRUE, calculates the mode for each step / combination of values in
-  the grouping variable. The suffix appended `"_Mde"` is appended to
-  each variable in the resulting data set.
+  the grouping variable. The suffix `"_Mde"` is appended to each
+  variable in the resulting data set.
 
 - clcSum:
 
   If TRUE, calculates the sum for each step / combination of values in
-  the grouping variable. The suffix appended `"_Sum"` is appended to
-  each variable in the resulting data set.
+  the grouping variable. The suffix `"_Sum"` is appended to each
+  variable in the resulting data set.
 
 - clcSD:
 
   If TRUE, calculates the std. deviation for each step / combination of
-  values in the grouping variable. The suffix appended `"_SD"` is
-  appended to each variable in the resulting data set.
+  values in the grouping variable. The suffix `"_SD"` is appended to
+  each variable in the resulting data set.
 
 - clcVar:
 
   If TRUE, calculates the variance for each step / combination of values
-  in the grouping variable. The suffix appended `"_Var"` is appended to
-  each variable in the resulting data set.
+  in the grouping variable. The suffix `"_Var"` is appended to each
+  variable in the resulting data set.
 
 - clcRng:
 
   If TRUE, calculates the range for each step / combination of values in
-  the grouping variable. The suffix appended `"_Rng"` is appended to
-  each variable in the resulting data set.
+  the grouping variable. The suffix `"_Rng"` is appended to each
+  variable in the resulting data set.
 
 - clcMin:
 
   If TRUE, determines the minimum at each step / combination of values
-  in the grouping variable. The suffix appended `"_Min"` is appended to
-  each variable in the resulting data set.
+  in the grouping variable. The suffix `"_Min"` is appended to each
+  variable in the resulting data set.
 
 - clcMax:
 
   If TRUE, determines the maximum at each step / combination of values
-  in the grouping variable. The suffix appended `"_Max"` is appended to
-  each variable in the resulting data set.
+  in the grouping variable. The suffix `"_Max"` is appended to each
+  variable in the resulting data set.
 
 - clcIQR:
 
   If TRUE, calculates the IQR for each step / combination of values in
-  the grouping variable. The suffix appended `"_IQR"` is appended to
-  each variable in the resulting data set.
+  the grouping variable. The suffix `"_IQR"` is appended to each
+  variable in the resulting data set.
 
 - drpNA:
 
@@ -140,13 +140,15 @@ aggregate_omv(
 - usePkg:
 
   Name of the package: "foreign" or "haven" that shall be used to read
-  SPSS, Stata, and SAS files; "foreign" is the default (it comes with
-  base R), but "haven" is newer and more comprehensive.
+  SPSS, Stata, and SAS files; "foreign" is the default (it is included
+  in base R), but "haven" is newer and more comprehensive; you may have
+  to install using `install.packages("haven", dep = TRUE)`.
 
 - selSet:
 
-  Name of the data set that is to be selected from the workspace (only
-  applies when reading .RData-files)
+  Name of the object / data set that is to be selected from the
+  workspace (only relevant when reading .RData-files which can contain
+  several objects / data sets)
 
 - ...:
 
@@ -185,19 +187,10 @@ empty) containing the distances between the variables / columns (clmDst
   aggregation is carried out.
 
 - The ellipsis-parameter (`...`) can be used to submit arguments /
-  parameters to the functions that are used for reading and writing the
-  data. By clicking on the respective function under “See also”, you can
-  get a more detailed overview over which parameters each of those
-  functions take. The functions are: `read_omv` and `write_omv` (for
-  jamovi-files), `read.table` (for CSV / TSV files; using similar
-  defaults as `read.csv` for CSV and `read.delim` for TSV which both are
-  based upon `read.table`), `load` (for .RData-files), `readRDS` (for
-  .rds-files), `read_sav` (needs the R-package `haven`) or `read.spss`
-  (needs the R-package `foreign`) for SPSS-files, `read_dta` (`haven`) /
-  `read.dta` (`foreign`) for Stata-files, `read_sas` (`haven`) for
-  SAS-data-files, and `read_xpt` (`haven`) / `read.xport` (`foreign`)
-  for SAS-transport-files. If you would like to use `haven`, you may
-  need to install it using `install.packages("haven", dep = TRUE)`.
+  parameters to the functions that are used for reading or transforming
+  the data. By clicking on the respective function under “See also”, you
+  can get a more detailed overview over which parameters each of those
+  functions take.
 
 ## See also
 
@@ -271,10 +264,10 @@ jmvReadWrite::aggregate_omv(dtaInp = nmeInp, fleOut = nmeOut, varAgg = c("V1", "
 # SD, IQR, etc.) to be calculated
 # check whether the file was created and its size
 cat(list.files(dirname(nmeOut), basename(nmeOut)))
-#> file290375df210c.omv
+#> file29d16bffcd53.omv
 # -> "file[...].omv" ([...] contains a random combination of numbers / characters
 cat(file.info(nmeOut)$size)
-#> 4434
+#> 4433
 # -> 4898 (approximate size; size may differ in every run [in dependence of
 #          how well the generated random data can be compressed])
 cat(str(jmvReadWrite::read_omv(nmeOut, sveAtt = FALSE)))

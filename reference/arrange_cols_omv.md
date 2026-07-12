@@ -9,7 +9,7 @@ spreadsheet 'jamovi' (<https://www.jamovi.org>)
 arrange_cols_omv(
   dtaInp = NULL,
   fleOut = "",
-  varOrd = c(),
+  varOrd = NULL,
   varMve = list(),
   psvAnl = FALSE,
   usePkg = c("foreign", "haven"),
@@ -24,40 +24,42 @@ arrange_cols_omv(
 
   Either a data frame or the name of a data file to be read (including
   the path, if required; "FILENAME.ext"; default: NULL); files can be of
-  any supported file type, see Details below
+  any supported file type, see Details below.
 
 - fleOut:
 
-  Name of the data file to be written (including the path, if required;
-  "FILE_OUT.omv"; default: ""); if empty, the resulting data frame is
-  returned instead
+  Name of the data set / file to be written (including the path, if
+  required; "FILE_OUT.omv"; default: ""); if empty, the resulting data
+  frame is returned instead.
 
 - varOrd:
 
   Character vector with the desired order of variable(s) in the data
-  frame (see Details; default: c())
+  frame (see Details; default: NULL)
 
 - varMve:
 
   Named list defining to how much a particular variable (name of a list
   entry) should be moved up (neg. value of a list entry) or down (pos.
-  value) in the data frame (see Details; default: c())
+  value) in the data frame (see Details; default: NULL)
 
 - psvAnl:
 
   Whether analyses that are contained in the input file shall be
-  transferred to the output file (default: FALSE)
+  transferred to the output file (TRUE / FALSE; default: FALSE)
 
 - usePkg:
 
   Name of the package: "foreign" or "haven" that shall be used to read
-  SPSS, Stata and SAS files; "foreign" is the default (it comes with
-  base R), but "haven" is newer and more comprehensive
+  SPSS, Stata, and SAS files; "foreign" is the default (it is included
+  in base R), but "haven" is newer and more comprehensive; you may have
+  to install using `install.packages("haven", dep = TRUE)`.
 
 - selSet:
 
-  Name of the data set that is to be selected from the workspace (only
-  applies when reading .RData-files)
+  Name of the object / data set that is to be selected from the
+  workspace (only relevant when reading .RData-files which can contain
+  several objects / data sets)
 
 - ...:
 
@@ -92,19 +94,10 @@ variables / columns of the input data set is re-arranged
   precedence.
 
 - The ellipsis-parameter (`...`) can be used to submit arguments /
-  parameters to the functions that are used for reading and writing the
-  data. By clicking on the respective function under “See also”, you can
-  get a more detailed overview over which parameters each of those
-  functions take. The functions are: `read_omv` and `write_omv` (for
-  jamovi-files), `read.table` (for CSV / TSV files; using similar
-  defaults as `read.csv` for CSV and `read.delim` for TSV which both are
-  based upon `read.table`), `load` (for .RData-files), `readRDS` (for
-  .rds-files), `read_sav` (needs the R-package `haven`) or `read.spss`
-  (needs the R-package `foreign`) for SPSS-files, `read_dta` (`haven`) /
-  `read.dta` (`foreign`) for Stata-files, `read_sas` (`haven`) for
-  SAS-data-files, and `read_xpt` (`haven`) / `read.xport` (`foreign`)
-  for SAS-transport-files. If you would like to use `haven`, you may
-  need to install it using `install.packages("haven", dep = TRUE)`.
+  parameters to the functions that are used for reading the data. By
+  clicking on the respective function under “See also”, you can get a
+  more detailed overview over which parameters each of those functions
+  take.
 
 ## See also
 

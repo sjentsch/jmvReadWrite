@@ -8,7 +8,7 @@ Search values in .omv-files for the statistical spreadsheet 'jamovi'
 ``` r
 search_omv(
   dtaInp = NULL,
-  srcTrm = c(),
+  srcTrm = NULL,
   whlTrm = FALSE,
   ignCse = FALSE,
   incNum = TRUE,
@@ -17,6 +17,8 @@ search_omv(
   incID = TRUE,
   incCmp = TRUE,
   incRcd = TRUE,
+  usePkg = c("foreign", "haven"),
+  selSet = "",
   ...
 )
 ```
@@ -25,13 +27,14 @@ search_omv(
 
 - dtaInp:
 
-  Either a data frame or the name of a jamovi data file to be read
-  (including the path, if required; "FILENAME.omv"; default: NULL)
+  Either a data frame or the name of a data file to be read (including
+  the path, if required; "FILENAME.ext"; default: NULL); files can be of
+  any supported file type, see Details below.
 
 - srcTrm:
 
   (Character or numeric) Vector (with length = 1) with a search term to
-  be found in the data frame (default: c())
+  be found in the data frame (default: NULL)
 
 - whlTrm:
 
@@ -66,6 +69,19 @@ search_omv(
 
   Whether to include Recoded variables in the search (default: TRUE)
 
+- usePkg:
+
+  Name of the package: "foreign" or "haven" that shall be used to read
+  SPSS, Stata, and SAS files; "foreign" is the default (it is included
+  in base R), but "haven" is newer and more comprehensive; you may have
+  to install using `install.packages("haven", dep = TRUE)`.
+
+- selSet:
+
+  Name of the object / data set that is to be selected from the
+  workspace (only relevant when reading .RData-files which can contain
+  several objects / data sets)
+
 - ...:
 
   Additional arguments passed on to methods; see Details below
@@ -81,19 +97,37 @@ numbers would be incorrect)
 ## Details
 
 - The ellipsis-parameter (`...`) can be used to submit arguments /
-  parameters to the function that is used for reading and writing the
-  data. Clicking on the respective function under “See also”, you can
-  get a more detailed overview over which parameters each of those
-  functions take. The functions are: `read_omv` and `write_omv` (for
-  jamovi-files).
+  parameters to the functions that are used for reading the data. By
+  clicking on the respective function under “See also”, you can get a
+  more detailed overview over which parameters each of those functions
+  take.
 
 ## See also
 
-`replace_omv` uses
+`search_omv` internally uses the following functions for reading and
+writing data files in different formats:
 [`read_omv()`](https://sjentsch.github.io/jmvReadWrite/reference/read_omv.md)
 and
 [`write_omv()`](https://sjentsch.github.io/jmvReadWrite/reference/write_omv.md)
-for reading and writing jamovi-files.
+for jamovi-files,
+[`utils::read.table()`](https://rdrr.io/r/utils/read.table.html) for CSV
+/ TSV files, [`load()`](https://rdrr.io/r/base/load.html) for reading
+.RData-files, [`readRDS()`](https://rdrr.io/r/base/readRDS.html) for
+.rds-files,
+[`haven::read_sav()`](https://haven.tidyverse.org/reference/read_spss.html)
+or
+[`foreign::read.spss()`](https://rdrr.io/pkg/foreign/man/read.spss.html)
+for SPSS-files,
+[`haven::read_dta()`](https://haven.tidyverse.org/reference/read_dta.html)
+or
+[`foreign::read.dta()`](https://rdrr.io/pkg/foreign/man/read.dta.html)
+for Stata-files,
+[`haven::read_sas()`](https://haven.tidyverse.org/reference/read_sas.html)
+for SAS-data-files, and
+[`haven::read_xpt()`](https://haven.tidyverse.org/reference/read_xpt.html)
+or
+[`foreign::read.xport()`](https://rdrr.io/pkg/foreign/man/read.xport.html)
+for SAS-transport-files.
 
 ## Examples
 

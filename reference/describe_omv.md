@@ -9,8 +9,8 @@ the statistical spreadsheet 'jamovi' (<https://www.jamovi.org>)
 describe_omv(
   dtaInp = NULL,
   fleOut = "",
-  dtaTtl = c(),
-  dtaDsc = c(),
+  dtaTtl = NULL,
+  dtaDsc = NULL,
   lngDsc = "EN",
   usePkg = c("foreign", "haven"),
   selSet = "",
@@ -24,13 +24,13 @@ describe_omv(
 
   Either a data frame or the name of a data file to be read (including
   the path, if required; "FILENAME.ext"; default: NULL); files can be of
-  any supported file type, see Details below
+  any supported file type, see Details below.
 
 - fleOut:
 
-  Name of the data file to be written (including the path, if required;
-  "FILE_OUT.omv"; default: ""); if empty, the resulting data frame is
-  returned instead
+  Name of the data set / file to be written (including the path, if
+  required; "FILE_OUT.omv"; default: ""); if empty, the resulting data
+  frame is returned instead.
 
 - dtaTtl:
 
@@ -52,13 +52,15 @@ describe_omv(
 - usePkg:
 
   Name of the package: "foreign" or "haven" that shall be used to read
-  SPSS, Stata and SAS files; "foreign" is the default (it comes with
-  base R), but "haven" is newer and more comprehensive
+  SPSS, Stata, and SAS files; "foreign" is the default (it is included
+  in base R), but "haven" is newer and more comprehensive; you may have
+  to install using `install.packages("haven", dep = TRUE)`.
 
 - selSet:
 
-  Name of the data set that is to be selected from the workspace (only
-  applies when reading .RData-files)
+  Name of the object / data set that is to be selected from the
+  workspace (only relevant when reading .RData-files which can contain
+  several objects / data sets)
 
 - ...:
 
@@ -76,7 +78,7 @@ and a title are added to the input data
   creating data sets to be used in teaching (i.e., either creating or
   using data sets in R, and afterwards adding a description to those),
   and (2) to provide "properly described" data when publishing in a
-  repository such as the OSF).
+  repository, e.g., the OSF).
 
 - NB: The data set should not contain any existing analyses. These will
   be overwritten (a warning is issued informing you about that).
@@ -101,19 +103,10 @@ and a title are added to the input data
   can be found in the examples below.
 
 - The ellipsis-parameter (`...`) can be used to submit arguments /
-  parameters to the functions that are used for reading and writing the
-  data. By clicking on the respective function under "See also", you can
-  get a more detailed overview over which parameters each of those
-  functions take. The functions are: `read_omv` and `write_omv` (for
-  jamovi-files), `read.table` (for CSV / TSV files; using similar
-  defaults as `read.csv` for CSV and `read.delim` for TSV which both are
-  based upon `read.table`), `load` (for .RData-files), `readRDS` (for
-  .rds-files), `read_sav` (needs the R-package `haven`) or `read.spss`
-  (needs the R-package `foreign`) for SPSS-files, `read_dta` (`haven`) /
-  `read.dta` (`foreign`) for Stata-files, `read_sas` (`haven`) for
-  SAS-data-files, and `read_xpt` (`haven`) / `read.xport` (`foreign`)
-  for SAS-transport-files. If you would like to use `haven`, you may
-  need to install it using `install.packages("haven", dep = TRUE)`.
+  parameters to the functions that are used for reading the data. By
+  clicking on the respective function under “See also”, you can get a
+  more detailed overview over which parameters each of those functions
+  take.
 
 ## See also
 
@@ -162,8 +155,7 @@ lstDsc <- list(description = paste("The response is the length of odontoblasts (
                                   "pig. <em>The Journal of Nutrition, 33</em>(5), 491-504.",
                                   "https://doi.org/10.1093/jn/33.5.491"),
                license = "")
-jmvReadWrite::describe_omv(dtaInp = dtaFrm, fleOut = nmeOut, dtaTtl = "ToothGrowth",
-  dtaDsc = lstDsc)
+jmvReadWrite::describe_omv(dtaInp = dtaFrm, fleOut = nmeOut, dtaTtl = "ToothGrowth", dtaDsc = lstDsc)
 # don't include the unlink, if you copy the code and want to look at the resulting output file
 unlink(nmeOut)
 
@@ -183,8 +175,8 @@ chrDsc <- paste0("<p><strong>Trial - all formattings:</strong><br/><strong>bold<
                  "indented once</p><p class=\"ql-indent-2\">indented twice</p><p ",
                  "class=\"ql-indent-1\">indented once</p><p>Formula: <span class=\"ql-formula\">",
                  "e=mc^2</span></p><pre>Preformatted</pre><p>normal again</p><h2>Heading</h2>")
-jmvReadWrite::describe_omv(dtaInp = dtaFrm, fleOut = nmeOut, dtaTtl = "ToothGrowth",
-  dtaDsc = chrDsc)
+jmvReadWrite::describe_omv(dtaInp = dtaFrm, fleOut = nmeOut, dtaTtl = "ToothGrowth", dtaDsc = chrDsc)
+# don't include the unlink, if you copy the code and want to look at the resulting output file
 unlink(nmeOut)
 
 ```

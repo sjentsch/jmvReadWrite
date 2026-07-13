@@ -28,9 +28,9 @@ combine_cols_omv(
 
 - fleOut:
 
-  Name of the data set / file to be written (including the path, if
-  required; "FILE_OUT.omv"; default: ""); if empty, the resulting data
-  frame is returned instead.
+  Name of the data file to be written (including the path, if required;
+  "FILE_OUT.omv"; default: ""); if empty, the resulting data frame is
+  returned instead.
 
 - varPrs:
 
@@ -51,15 +51,13 @@ combine_cols_omv(
 - usePkg:
 
   Name of the package: "foreign" or "haven" that shall be used to read
-  SPSS, Stata, and SAS files; "foreign" is the default (it is included
-  in base R), but "haven" is newer and more comprehensive; you may have
-  to install using `install.packages("haven", dep = TRUE)`.
+  SPSS, Stata, and SAS files; "foreign" is the default (it comes with
+  base R), but "haven" is newer and more comprehensive.
 
 - selSet:
 
-  Name of the object / data set that is to be selected from the
-  workspace (only relevant when reading .RData-files which can contain
-  several objects / data sets)
+  Name of the data set that is to be selected from the workspace (only
+  applies when reading .RData-files)
 
 - ...:
 
@@ -73,7 +71,7 @@ the original columns removed
 ## Details
 
 - The need to combine two columns into one is quite common after merging
-  columns or rows (using, e.g., `merge_cols_omv` or `merge_rows_omv`).
+  columns or rows (using, e.g., merge_cols_omv or merge_rows_omv).
   `varPrs` defines the variable pairs to be combined. It is a list
   containing the pairs of variables to be combined, either as list or as
   character vector; e.g., list(c("A", "B"), c("C", "D")) or
@@ -86,10 +84,19 @@ the original columns removed
   case of conflicts.
 
 - The ellipsis-parameter (`...`) can be used to submit arguments /
-  parameters to the functions that are used for reading the data. By
-  clicking on the respective function under “See also”, you can get a
-  more detailed overview over which parameters each of those functions
-  take.
+  parameters to the functions that are used for reading and writing the
+  data. By clicking on the respective function under “See also”, you can
+  get a more detailed overview over which parameters each of those
+  functions take. The functions are: `read_omv` and `write_omv` (for
+  jamovi-files), `read.table` (for CSV / TSV files; using similar
+  defaults as `read.csv` for CSV and `read.delim` for TSV which both are
+  based upon `read.table`), `load` (for .RData-files), `readRDS` (for
+  .rds-files), `read_sav` (needs the R-package `haven`) or `read.spss`
+  (needs the R-package `foreign`) for SPSS-files, `read_dta` (`haven`) /
+  `read.dta` (`foreign`) for Stata-files, `read_sas` (`haven`) for
+  SAS-data-files, and `read_xpt` (`haven`) / `read.xport` (`foreign`)
+  for SAS-transport-files. If you would like to use `haven`, you may
+  need to install it using `install.packages("haven", dep = TRUE)`.
 
 ## See also
 

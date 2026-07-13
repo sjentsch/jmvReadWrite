@@ -9,14 +9,14 @@ Converts .omv-files for the statistical spreadsheet 'jamovi'
 long2wide_omv(
   dtaInp = NULL,
   fleOut = "",
-  varTgt = NULL,
-  varExc = NULL,
+  varTgt = c(),
+  varExc = c(),
   varID = "ID",
-  varTme = NULL,
+  varTme = c(),
   varSep = "_",
   varOrd = c("times", "vars"),
   varAgg = c("mean", "first"),
-  varSrt = NULL,
+  varSrt = c(),
   usePkg = c("foreign", "haven"),
   selSet = "",
   ...
@@ -29,34 +29,34 @@ long2wide_omv(
 
   Either a data frame or the name of a data file to be read (including
   the path, if required; "FILENAME.ext"; default: NULL); files can be of
-  any supported file type, see Details below.
+  any supported file type, see Details below
 
 - fleOut:
 
-  Name of the data set / file to be written (including the path, if
-  required; "FILE_OUT.omv"; default: ""); if empty, the resulting data
-  frame is returned instead.
+  Name of the data file to be written (including the path, if required;
+  "FILE_OUT.omv"; default: ""); if empty, the resulting data frame is
+  returned instead
 
 - varTgt:
 
   Names of one or more variables to be transformed / reshaped (other
-  variables are excluded, if empty (NULL) all variables except `varTme`,
-  `varID` and `varExc` are included; default: NULL)
+  variables are excluded, if empty(c()) all variables except `varTme`,
+  `varID` and `varExc` are included; default: c())
 
 - varExc:
 
   Name of the variable(s) should be excluded from the transformation,
-  typically this will be between-subject-variable(s) (default: NULL)
+  typically this will be between-subject-variable(s) (default: c())
 
 - varID:
 
   Names of one or more variables that identify the same group /
-  individual (default: NULL)
+  individual (default: c())
 
 - varTme:
 
   Name of the variable(s) that differentiates multiple records from the
-  same group / individual (default: NULL)
+  same group / individual (default: c())
 
 - varSep:
 
@@ -67,31 +67,29 @@ long2wide_omv(
 
   How variables / columns are organized: for "times" (default) the steps
   of the time varying variable are adjacent, for "vars" the steps of the
-  original columns in the long dataset.
+  original columns in the long dataset
 
 - varAgg:
 
   How multiple occurrences of particular combinations of time varying
   variables are aggregated: either "mean" (calculate the mean over
-  occurrences), or "first" (take the first occurrence).
+  occurrences), or "first" (take the first occurrence)
 
 - varSrt:
 
   Variable(s) that are used to sort the data frame (see Details; if
-  empty, the order returned from reshape is kept; default: NULL)
+  empty, the order returned from reshape is kept; default: c())
 
 - usePkg:
 
   Name of the package: "foreign" or "haven" that shall be used to read
-  SPSS, Stata, and SAS files; "foreign" is the default (it is included
-  in base R), but "haven" is newer and more comprehensive; you may have
-  to install using `install.packages("haven", dep = TRUE)`.
+  SPSS, Stata and SAS files; "foreign" is the default (it comes with
+  base R), but "haven" is newer and more comprehensive
 
 - selSet:
 
-  Name of the object / data set that is to be selected from the
-  workspace (only relevant when reading .RData-files which can contain
-  several objects / data sets)
+  Name of the data set that is to be selected from the workspace (only
+  applies when reading .RData-files)
 
 - ...:
 
@@ -118,17 +116,29 @@ set is converted from long to wide format
   Please note that this doesn't make sense and hence throws a warning
   for certain variable types (e.g., factors).
 
+- The ellipsis-parameter (`...`) can be used to submit arguments /
+  parameters to the functions that are used for transforming, reading or
+  writing the data. By clicking on the respective function under “See
+  also”, you can get a more detailed overview over which parameters each
+  of those functions take.
+
 - The transformation from long to wide uses `reshape`. `varTgt` matches
   (~) `v.names` in `reshape`, `varID` ~ `idvar`, `varTme` ~ `timevar`,
   and `varSep` ~ `sep`. The help for `reshape` is very explanatory,
   click on the link under “See also” to access it, particularly what is
   explained under “Details”.
 
-- The ellipsis-parameter (`...`) can be used to submit arguments /
-  parameters to the functions that are used for reading or transforming
-  the data. By clicking on the respective function under “See also”, you
-  can get a more detailed overview over which parameters each of those
-  functions take.
+- The functions for reading and writing the data are: `read_omv` and
+  `write_omv` (for jamovi-files), `read.table` (for CSV / TSV files;
+  using similar defaults as `read.csv` for CSV and `read.delim` for TSV
+  which both are based upon `read.table`), `load` (for .RData-files),
+  `readRDS` (for .rds-files), `read_sav` (needs R-package `haven`) or
+  `read.spss` (needs R-package `foreign`) for SPSS-files, `read_dta`
+  (`haven`) / `read.dta` (`foreign`) for Stata-files, `read_sas`
+  (`haven`) for SAS-data-files, and `read_xpt` (`haven`) / `read.xport`
+  (`foreign`) for SAS-transport-files. If you would like to use `haven`,
+  you may need to install it using
+  `install.packages("haven", dep = TRUE)`.
 
 ## See also
 
@@ -186,10 +196,10 @@ jmvReadWrite::long2wide_omv(dtaInp = nmeInp, fleOut = nmeOut, varTgt = "X", varI
 # it is required to give at least the arguments dtaInp, varID and varTme
 # check whether the file was created and its size
 cat(list.files(dirname(nmeOut), basename(nmeOut)))
-#> file2726170c3ed2.omv
+#> file27c77b3e0de3.omv
 # -> "file[...].omv" ([...] contains a random combination of numbers / characters
 cat(file.info(nmeOut)$size)
-#> 6620
+#> 6621
 # -> 6851 (approximate size; size may differ in every run [in dependence of
 #          how well the generated random data can be compressed])
 cat(str(jmvReadWrite::read_omv(nmeOut, sveAtt = FALSE)))

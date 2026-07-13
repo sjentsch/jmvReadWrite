@@ -12,7 +12,7 @@ merge_cols_omv(
   fleOut = "",
   typMrg = c("outer", "inner", "left", "right"),
   varBy = list(),
-  varSrt = NULL,
+  varSrt = c(),
   psvAnl = FALSE,
   usePkg = c("foreign", "haven"),
   selSet = "",
@@ -27,18 +27,18 @@ merge_cols_omv(
   Either a data frame (with the attribute "fleInp" containing the files
   to merge) or vector with the names of the input files (including the
   path, if required; "FILENAME.ext"; default: NULL); files can be of any
-  supported file type, see Details below.
+  supported file type, see Details below
 
 - fleOut:
 
-  Name of the data set / file to be written (including the path, if
-  required; "FILE_OUT.omv"; default: ""); if empty, the resulting data
-  frame is returned instead.
+  Name of the data file to be written (including the path, if required;
+  "FILE_OUT.omv"; default: ""); if empty, the resulting data frame is
+  returned instead
 
 - typMrg:
 
   Type of merging operation: "outer" (default), "inner", "left" or
-  "right"; see Details below.
+  "right"; see Details below
 
 - varBy:
 
@@ -48,7 +48,7 @@ merge_cols_omv(
 - varSrt:
 
   Variable(s) that are used to sort the data frame (see Details; if
-  empty, the order after merging is kept; default: NULL)
+  empty, the order after merging is kept; default: c())
 
 - psvAnl:
 
@@ -58,15 +58,13 @@ merge_cols_omv(
 - usePkg:
 
   Name of the package: "foreign" or "haven" that shall be used to read
-  SPSS, Stata, and SAS files; "foreign" is the default (it is included
-  in base R), but "haven" is newer and more comprehensive; you may have
-  to install using `install.packages("haven", dep = TRUE)`.
+  SPSS, Stata and SAS files; "foreign" is the default (it comes with
+  base R), but "haven" is newer and more comprehensive
 
 - selSet:
 
-  Name of the object / data set that is to be selected from the
-  workspace (only relevant when reading .RData-files which can contain
-  several objects / data sets)
+  Name of the data set that is to be selected from the workspace (only
+  applies when reading .RData-files)
 
 - ...:
 
@@ -114,16 +112,28 @@ all input data sets (given in the `dtaInp`-argument) are concatenated
   Please note that this doesn't make sense and hence throws a warning
   for certain variable types (e.g., factors).
 
-- Adding columns uses `merge`. `typMrg` is implemented by setting `TRUE`
-  or `FALSE` to `all.x` and `all.y` in `merge`, `varBy` matches `by.x`
-  and `by.y`. The help for `merge` can be accessed by clicking on the
-  link under “See also”.
-
 - The ellipsis-parameter (`...`) can be used to submit arguments /
   parameters to the functions that are used for transforming or reading
   the data. By clicking on the respective function under “See also”, you
   can get a more detailed overview over which parameters each of those
   functions take.
+
+- Adding columns uses `merge`. `typMrg` is implemented by setting `TRUE`
+  or `FALSE` to `all.x` and `all.y` in `merge`, `varBy` matches `by.x`
+  and `by.y`. The help for `merge` can be accessed by clicking on the
+  link under “See also”.
+
+- The functions for reading and writing the data are: `read_omv` and
+  `write_omv` (for jamovi-files), `read.table` (for CSV / TSV files;
+  using similar defaults as `read.csv` for CSV and `read.delim` for TSV
+  which both are based upon `read.table`), `load` (for .RData-files),
+  `readRDS` (for .rds-files), `read_sav` (needs R-package `haven`) or
+  `read.spss` (needs R-package `foreign`) for SPSS-files, `read_dta`
+  (`haven`) / `read.dta` (`foreign`) for Stata-files, `read_sas`
+  (`haven`) for SAS-data-files, and `read_xpt` (`haven`) / `read.xport`
+  (`foreign`) for SAS-transport-files. If you would like to use `haven`,
+  you may need to install it using
+  `install.packages("haven", dep = TRUE)`.
 
 ## See also
 
@@ -166,7 +176,7 @@ for (i in seq_along(nmeInp)) {
 # to the data variables (A1 ... O5, gender, age → A1_1, ...)
 jmvReadWrite::merge_cols_omv(dtaInp = nmeInp, fleOut = nmeOut, varBy = "ID")
 cat(file.info(nmeOut)$size)
-#> 16375
+#> 16376
 # -> 17731 (size may differ on different OSes)
 dtaOut <- jmvReadWrite::read_omv(nmeOut, sveAtt = FALSE)
 # read the data set where the three original datasets were added as columns and show

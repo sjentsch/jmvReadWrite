@@ -9,7 +9,7 @@ statistical spreadsheet 'jamovi' (https://www.jamovi.org)"><meta property="og:im
 
     <a class="navbar-brand me-2" href="../index.html">jmvReadWrite</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.14</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.13</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -45,8 +45,8 @@ statistical spreadsheet 'jamovi' (<a href="https://www.jamovi.org" class="extern
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">aggregate_omv</span><span class="op">(</span></span>
 <span>  dtaInp <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  fleOut <span class="op">=</span> <span class="st">""</span>,</span>
-<span>  varAgg <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  grpAgg <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  varAgg <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  grpAgg <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  clcN <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  clcMss <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  clcMn <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -71,101 +71,118 @@ statistical spreadsheet 'jamovi' (<a href="https://www.jamovi.org" class="extern
 
 
 <dl><dt id="arg-dtainp">dtaInp<a class="anchor" aria-label="anchor" href="#arg-dtainp"></a></dt>
-<dd><p>Either a data frame or the name of a data file to be read (including the path, if required;
-"FILENAME.ext"; default: NULL); files can be of any supported file type, see Details below.</p></dd>
+<dd><p>Either a data frame or the name of a data file to be read (including the path,
+if required; "FILENAME.ext"; default: NULL); files can be of any supported file
+type, see Details below.</p></dd>
 
 
 <dt id="arg-fleout">fleOut<a class="anchor" aria-label="anchor" href="#arg-fleout"></a></dt>
-<dd><p>Name of the data set / file to be written (including the path, if required; "FILE_OUT.omv";
-default: ""); if empty, the resulting data frame is returned instead.</p></dd>
+<dd><p>Name of the aggregated data set / file to be written (including the path, if
+required; "FILE_OUT.omv"; default: ""); if empty, the resulting data frame is
+returned instead.</p></dd>
 
 
 <dt id="arg-varagg">varAgg<a class="anchor" aria-label="anchor" href="#arg-varagg"></a></dt>
-<dd><p>A character vector (default: NULL) with the names of the variables which shall be aggregated.</p></dd>
+<dd><p>A character vector (default: c()) with the names of the variables which shall be
+aggregated.</p></dd>
 
 
 <dt id="arg-grpagg">grpAgg<a class="anchor" aria-label="anchor" href="#arg-grpagg"></a></dt>
-<dd><p>A character vector (default: NULL) with the variables to group the aggregation variable (<code>varAgg</code>) by.
-If no grouping variable is given, the aggregation happens over the whole data set. If several grouping
-variables are given, the aggregation happens for each step / possible combination of these variables.
-See Details for more information.</p></dd>
+<dd><p>A character vector (default: c()) with the variables to group the aggregation
+variable (<code>varAgg</code>) by. If no grouping variable is given, the aggregation happens
+over the whole data set. If several grouping variables are given, the aggregation
+happens for each step / possible combination of these variables. See Details for
+more information.</p></dd>
 
 
 <dt id="arg-clcn">clcN<a class="anchor" aria-label="anchor" href="#arg-clcn"></a></dt>
-<dd><p>If TRUE, counts the number of valid values for each step / combination of values in the grouping
-variable. The suffix appended `"_N"´ is appended to each variable in the resulting data set.</p></dd>
+<dd><p>If TRUE, counts the number of valid values for each step / combination of values
+in the grouping variable. The suffix appended `"_N"´ is appended to each variable
+in the resulting data set.</p></dd>
 
 
 <dt id="arg-clcmss">clcMss<a class="anchor" aria-label="anchor" href="#arg-clcmss"></a></dt>
-<dd><p>If TRUE, counts the number of missing values for each step / combination of values in the grouping
-variable. The suffix <code>"_Mss"</code> is appended to each variable in the resulting data set.</p></dd>
+<dd><p>If TRUE, counts the number of missing values for each step / combination of values
+in the grouping variable. The suffix appended <code>"_Mss"</code> is appended to each
+variable in the resulting data set.</p></dd>
 
 
 <dt id="arg-clcmn">clcMn<a class="anchor" aria-label="anchor" href="#arg-clcmn"></a></dt>
-<dd><p>If TRUE, calculates the mean for each step / combination of values in the grouping variable. The
-suffix <code>"_Mn"</code> is appended to each variable in the resulting data set.</p></dd>
+<dd><p>If TRUE, calculates the mean for each step / combination of values in the grouping
+variable. The suffix appended <code>"_Mn"</code> is appended to each variable in the
+resulting data set.</p></dd>
 
 
 <dt id="arg-clcmdn">clcMdn<a class="anchor" aria-label="anchor" href="#arg-clcmdn"></a></dt>
-<dd><p>If TRUE, calculates the median for each step / combination of values in the grouping variable. The
-suffix <code>"_Mdn"</code> is appended to each variable in the resulting data set.</p></dd>
+<dd><p>If TRUE, calculates the median for each step / combination of values in the
+grouping variable. The suffix appended <code>"_Mdn"</code> is appended to each variable in
+the resulting data set.</p></dd>
 
 
 <dt id="arg-clcmde">clcMde<a class="anchor" aria-label="anchor" href="#arg-clcmde"></a></dt>
-<dd><p>If TRUE, calculates the mode for each step / combination of values in the grouping variable. The
-suffix <code>"_Mde"</code> is appended to each variable in the resulting data set.</p></dd>
+<dd><p>If TRUE, calculates the mode for each step / combination of values in the grouping
+variable. The suffix appended <code>"_Mde"</code> is appended to each variable in the
+resulting data set.</p></dd>
 
 
 <dt id="arg-clcsum">clcSum<a class="anchor" aria-label="anchor" href="#arg-clcsum"></a></dt>
-<dd><p>If TRUE, calculates the sum for each step / combination of values in the grouping variable. The suffix
-<code>"_Sum"</code> is appended to each variable in the resulting data set.</p></dd>
+<dd><p>If TRUE, calculates the sum for each step / combination of values in the grouping
+variable. The suffix appended <code>"_Sum"</code> is appended to each variable in the
+resulting data set.</p></dd>
 
 
 <dt id="arg-clcsd">clcSD<a class="anchor" aria-label="anchor" href="#arg-clcsd"></a></dt>
-<dd><p>If TRUE, calculates the std. deviation for each step / combination of values in the grouping variable.
-The suffix <code>"_SD"</code> is appended to each variable in the resulting data set.</p></dd>
+<dd><p>If TRUE, calculates the std. deviation for each step / combination of values in
+the grouping variable. The suffix appended <code>"_SD"</code> is appended to each variable in
+the resulting data set.</p></dd>
 
 
 <dt id="arg-clcvar">clcVar<a class="anchor" aria-label="anchor" href="#arg-clcvar"></a></dt>
-<dd><p>If TRUE, calculates the variance for each step / combination of values in the grouping variable. The
-suffix <code>"_Var"</code> is appended to each variable in the resulting data set.</p></dd>
+<dd><p>If TRUE, calculates the variance for each step / combination of values in the
+grouping variable. The suffix appended <code>"_Var"</code> is appended to each variable in
+the resulting data set.</p></dd>
 
 
 <dt id="arg-clcrng">clcRng<a class="anchor" aria-label="anchor" href="#arg-clcrng"></a></dt>
-<dd><p>If TRUE, calculates the range for each step / combination of values in the grouping variable. The
-suffix <code>"_Rng"</code> is appended to each variable in the resulting data set.</p></dd>
+<dd><p>If TRUE, calculates the range for each step / combination of values in the
+grouping variable. The suffix appended <code>"_Rng"</code> is appended to each variable in
+the resulting data set.</p></dd>
 
 
 <dt id="arg-clcmin">clcMin<a class="anchor" aria-label="anchor" href="#arg-clcmin"></a></dt>
-<dd><p>If TRUE, determines the minimum at each step / combination of values in the grouping variable. The
-suffix <code>"_Min"</code> is appended to each variable in the resulting data set.</p></dd>
+<dd><p>If TRUE, determines the minimum at each step / combination of values in the
+grouping variable. The suffix appended <code>"_Min"</code> is appended to each variable in
+the resulting data set.</p></dd>
 
 
 <dt id="arg-clcmax">clcMax<a class="anchor" aria-label="anchor" href="#arg-clcmax"></a></dt>
-<dd><p>If TRUE, determines the maximum at each step / combination of values in the grouping variable. The
-suffix <code>"_Max"</code> is appended to each variable in the resulting data set.</p></dd>
+<dd><p>If TRUE, determines the maximum at each step / combination of values in the
+grouping variable. The suffix appended <code>"_Max"</code> is appended to each variable in
+the resulting data set.</p></dd>
 
 
 <dt id="arg-clciqr">clcIQR<a class="anchor" aria-label="anchor" href="#arg-clciqr"></a></dt>
-<dd><p>If TRUE, calculates the IQR for each step / combination of values in the grouping variable. The suffix
-<code>"_IQR"</code> is appended to each variable in the resulting data set.</p></dd>
+<dd><p>If TRUE, calculates the IQR for each step / combination of values in the grouping
+variable. The suffix appended <code>"_IQR"</code> is appended to each variable in the
+resulting data set.</p></dd>
 
 
 <dt id="arg-drpna">drpNA<a class="anchor" aria-label="anchor" href="#arg-drpna"></a></dt>
-<dd><p>If TRUE (default: TRUE), NA values are removed before the aggregation, and the aggregation is
-calculated using the valid values. If FALSE, the result would be NA for any step / combination of
-values in the grouping variable that contains a NA value.</p></dd>
+<dd><p>If TRUE (default: TRUE), NA values are removed before the aggregation, and the
+aggregation is calculated using the valid values. If FALSE, the result would be NA
+for any step / combination of values in the grouping variable that contains a NA
+value.</p></dd>
 
 
 <dt id="arg-usepkg">usePkg<a class="anchor" aria-label="anchor" href="#arg-usepkg"></a></dt>
-<dd><p>Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata, and SAS files;
-"foreign" is the default (it is included in base R), but "haven" is newer and more comprehensive; you
-may have to install using <code>install.packages("haven", dep = TRUE)</code>.</p></dd>
+<dd><p>Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata,
+and SAS files; "foreign" is the default (it comes with base R), but "haven" is
+newer and more comprehensive.</p></dd>
 
 
 <dt id="arg-selset">selSet<a class="anchor" aria-label="anchor" href="#arg-selset"></a></dt>
-<dd><p>Name of the object / data set that is to be selected from the workspace (only relevant when reading
-.RData-files which can contain several objects / data sets)</p></dd>
+<dd><p>Name of the data set that is to be selected from the workspace (only applies when
+reading .RData-files)</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
@@ -181,33 +198,45 @@ containing the distances between the variables / columns (clmDst == TRUE) or row
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
 
-<ul><li><p><code>varAgg</code> must be a character vector containing the variables to be aggregated. From these variables, a new data
-set is created where the values in the original data set are aggregated for each possible combination of steps in
-the grouping variable(s) given in <code>grpAgg</code>. For example, if one grouping variable were a participant ID, and
-another grouping variable were measurement time points, the resulting new dataset would contain as many rows as
-the number of participants multiplied by the number of measurement time points. For each variable in <code>varAgg</code>, and
-each possible aggregation (<code>clcN</code>, <code>clcMn</code>, etc. if set to TRUE), a new column would be generated in the resulting
-new data set.</p></li>
-<li><p><code>drpNA</code> determines whether NA should be dropped / removed before calculating an aggregation. If set to FALSE, the
-result for a combination of steps in the grouping variable(s) where at least one value is NA would be NA. If set
-to TRUE, only the values for any given combination of steps in the grouping variable(s) that are not NA are
-considered for the calculation. For <code>clcN</code> and <code>clcMss</code>, <code>drpNA</code> has no effect.
-NB: If <code>drpNA</code> is set to TRUE, any row where any of the grouping variable(s) has the value NA is excluded from the
-aggregation, if <code>drpNA</code> is set to FALSE and there is any row where any of the group variables has the value NA, an
-error is thrown and no aggregation is carried out.</p></li>
-<li><p>The ellipsis-parameter (<code>...</code>) can be used to submit arguments / parameters to the functions that are used for
-reading or transforming the data. By clicking on the respective function under “See also”, you can get a more
-detailed overview over which parameters each of those functions take.</p></li>
+<ul><li><p><code>varAgg</code> must be a character vector containing the variables to be aggregated. From these
+variables, a new data set is created where the values in the original data set are aggregated
+for each possible combination of steps in the grouping variable(s) given in <code>grpAgg</code>. For
+example, if one grouping variable were a participant ID, and another grouping variable were
+measurement time points, the resulting new dataset would contain as many rows as the number of
+participants multiplied by the number of measurement time points. For each variable in
+<code>varAgg</code>, and each possible aggregation (<code>clcN</code>, <code>clcMn</code>, etc. if set to TRUE), a new column
+would be generated in the resulting new data set.</p></li>
+<li><p><code>drpNA</code> determines whether NA should be dropped / removed before calculating an aggregation.
+If set to FALSE, the result for a combination of steps in the grouping variable(s) where at
+least one value is NA would be NA. If set to TRUE, only the values for any given combination
+of steps in the grouping variable(s) that are not NA are considered for the calculation. For
+<code>clcN</code> and <code>clcMss</code>, <code>drpNA</code> has no effect.
+NB: If <code>drpNA</code> is set to TRUE, any row where any of the grouping variable(s) has the value NA
+is excluded from the aggregation, if <code>drpNA</code> is set to FALSE and there is any row where any of
+the group variables has the value NA, an error is thrown and no aggregation is carried out.</p></li>
+<li><p>The ellipsis-parameter (<code>...</code>) can be used to submit arguments / parameters to the functions
+that are used for reading and writing the data. By clicking on the respective function under
+“See also”, you can get a more detailed overview over which parameters each of those functions
+take. The functions are: <code>read_omv</code> and <code>write_omv</code> (for jamovi-files), <code>read.table</code> (for
+CSV / TSV files; using similar defaults as <code>read.csv</code> for CSV and <code>read.delim</code> for TSV which
+both are based upon <code>read.table</code>), <code>load</code> (for .RData-files), <code>readRDS</code> (for .rds-files),
+<code>read_sav</code> (needs the R-package <code>haven</code>) or <code>read.spss</code> (needs the R-package <code>foreign</code>) for
+SPSS-files, <code>read_dta</code> (<code>haven</code>) / <code>read.dta</code> (<code>foreign</code>) for Stata-files, <code>read_sas</code>
+(<code>haven</code>) for SAS-data-files, and <code>read_xpt</code> (<code>haven</code>) / <code>read.xport</code> (<code>foreign</code>) for
+SAS-transport-files. If you would like to use <code>haven</code>, you may need to install it using
+<code>install.packages("haven", dep = TRUE)</code>.</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p><code>aggregate_omv</code> internally uses <code><a href="https://rdrr.io/r/stats/aggregate.html" class="external-link">stats::aggregate()</a></code> as function for the aggregation, and <code><a href="https://rdrr.io/r/base/NA.html" class="external-link">base::is.na()</a></code>,
-<code><a href="https://rdrr.io/r/base/mean.html" class="external-link">base::mean()</a></code>, <code><a href="https://rdrr.io/r/stats/median.html" class="external-link">stats::median()</a></code>, <code><a href="https://rdrr.io/r/base/sum.html" class="external-link">base::sum()</a></code>, <code><a href="https://rdrr.io/r/stats/sd.html" class="external-link">stats::sd()</a></code>, <code><a href="https://rdrr.io/r/stats/cor.html" class="external-link">stats::var()</a></code>, <code><a href="https://rdrr.io/r/base/range.html" class="external-link">base::range()</a></code>, <code><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">base::min()</a></code>,
-<code><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">base::max()</a></code>, and <code><a href="https://rdrr.io/r/stats/quantile.html" class="external-link">stats::quantile()</a></code> for calculation. It furthermore uses the following functions for reading and
-writing data files in different formats: <code><a href="read_omv.html">read_omv()</a></code> and <code><a href="write_omv.html">write_omv()</a></code> for
-jamovi-files, <code><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">utils::read.table()</a></code> for CSV / TSV files, <code><a href="https://rdrr.io/r/base/load.html" class="external-link">load()</a></code> for reading .RData-files, <code><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS()</a></code> for
-.rds-files, <code><a href="https://haven.tidyverse.org/reference/read_spss.html" class="external-link">haven::read_sav()</a></code> or <code><a href="https://rdrr.io/pkg/foreign/man/read.spss.html" class="external-link">foreign::read.spss()</a></code> for SPSS-files, <code><a href="https://haven.tidyverse.org/reference/read_dta.html" class="external-link">haven::read_dta()</a></code> or
-<code><a href="https://rdrr.io/pkg/foreign/man/read.dta.html" class="external-link">foreign::read.dta()</a></code> for Stata-files, <code><a href="https://haven.tidyverse.org/reference/read_sas.html" class="external-link">haven::read_sas()</a></code> for SAS-data-files, and <code><a href="https://haven.tidyverse.org/reference/read_xpt.html" class="external-link">haven::read_xpt()</a></code> or
+    <div class="dont-index"><p><code>aggregate_omv</code> internally uses <code><a href="https://rdrr.io/r/stats/aggregate.html" class="external-link">stats::aggregate()</a></code> as function for the aggregation,
+and <code><a href="https://rdrr.io/r/base/NA.html" class="external-link">base::is.na()</a></code>, <code><a href="https://rdrr.io/r/base/mean.html" class="external-link">base::mean()</a></code>, <code><a href="https://rdrr.io/r/stats/median.html" class="external-link">stats::median()</a></code>, <code><a href="https://rdrr.io/r/base/sum.html" class="external-link">base::sum()</a></code>, <code><a href="https://rdrr.io/r/stats/sd.html" class="external-link">stats::sd()</a></code>,
+<code><a href="https://rdrr.io/r/stats/cor.html" class="external-link">stats::var()</a></code>, <code><a href="https://rdrr.io/r/base/range.html" class="external-link">base::range()</a></code>, <code><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">base::min()</a></code>, <code><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">base::max()</a></code>, and
+<code><a href="https://rdrr.io/r/stats/quantile.html" class="external-link">stats::quantile()</a></code> for calculation. It furthermore uses the following functions for reading
+and writing data files in different formats: <code><a href="read_omv.html">read_omv()</a></code> and
+<code><a href="write_omv.html">write_omv()</a></code> for jamovi-files, <code><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">utils::read.table()</a></code> for CSV / TSV files,
+<code><a href="https://rdrr.io/r/base/load.html" class="external-link">load()</a></code> for reading .RData-files, <code><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS()</a></code> for .rds-files, <code><a href="https://haven.tidyverse.org/reference/read_spss.html" class="external-link">haven::read_sav()</a></code> or
+<code><a href="https://rdrr.io/pkg/foreign/man/read.spss.html" class="external-link">foreign::read.spss()</a></code> for SPSS-files, <code><a href="https://haven.tidyverse.org/reference/read_dta.html" class="external-link">haven::read_dta()</a></code> or <code><a href="https://rdrr.io/pkg/foreign/man/read.dta.html" class="external-link">foreign::read.dta()</a></code> for
+Stata-files, <code><a href="https://haven.tidyverse.org/reference/read_sas.html" class="external-link">haven::read_sas()</a></code> for SAS-data-files, and <code><a href="https://haven.tidyverse.org/reference/read_xpt.html" class="external-link">haven::read_xpt()</a></code> or
 <code><a href="https://rdrr.io/pkg/foreign/man/read.xport.html" class="external-link">foreign::read.xport()</a></code> for SAS-transport-files.</p></div>
     </div>
 
@@ -242,10 +271,10 @@ jamovi-files, <code><a href="https://rdrr.io/r/utils/read.table.html" class="ext
 <span class="r-in"><span><span class="co"># SD, IQR, etc.) to be calculated</span></span></span>
 <span class="r-in"><span><span class="co"># check whether the file was created and its size</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/basename.html" class="external-link">dirname</a></span><span class="op">(</span><span class="va">nmeOut</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/basename.html" class="external-link">basename</a></span><span class="op">(</span><span class="va">nmeOut</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> file27267bf26450.omv</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> file27c75a027bdd.omv</span>
 <span class="r-in"><span><span class="co"># -&gt; "file[...].omv" ([...] contains a random combination of numbers / characters</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.info.html" class="external-link">file.info</a></span><span class="op">(</span><span class="va">nmeOut</span><span class="op">)</span><span class="op">$</span><span class="va">size</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4433</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4434</span>
 <span class="r-in"><span><span class="co"># -&gt; 4898 (approximate size; size may differ in every run [in dependence of</span></span></span>
 <span class="r-in"><span><span class="co">#          how well the generated random data can be compressed])</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="fu">jmvReadWrite</span><span class="fu">::</span><span class="fu"><a href="read_omv.html">read_omv</a></span><span class="op">(</span><span class="va">nmeOut</span>, sveAtt <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>

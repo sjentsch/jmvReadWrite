@@ -11,8 +11,8 @@ replace_omv(
   fleOut = "",
   rplLst = list(),
   whlTrm = TRUE,
-  varInc = NULL,
-  varExc = NULL,
+  varInc = c(),
+  varExc = c(),
   incNum = TRUE,
   incOrd = TRUE,
   incNom = TRUE,
@@ -20,8 +20,6 @@ replace_omv(
   incCmp = TRUE,
   incRcd = TRUE,
   psvAnl = FALSE,
-  usePkg = c("foreign", "haven"),
-  selSet = "",
   ...
 )
 ```
@@ -30,15 +28,14 @@ replace_omv(
 
 - dtaInp:
 
-  Either a data frame or the name of a data file to be read (including
-  the path, if required; "FILENAME.ext"; default: NULL); files can be of
-  any supported file type, see Details below.
+  Either a data frame or the name of a jamovi data file to be read
+  (including the path, if required; "FILENAME.omv"; default: NULL)
 
 - fleOut:
 
-  Name of the data set / file to be written (including the path, if
-  required; "FILE_OUT.omv"; default: ""); if empty, the resulting data
-  frame is returned instead.
+  Name of the data file to be written (including the path, if required;
+  "FILE_OUT.omv"; default: ""); if empty, the resulting data frame is
+  returned instead
 
 - rplLst:
 
@@ -54,12 +51,12 @@ replace_omv(
 - varInc:
 
   Names of variables (character vector) to be included in the
-  replacement (default: NULL)
+  replacement (default: c())
 
 - varExc:
 
   Names of variables (character vector) to be excluded from the
-  replacement (default: NULL)
+  replacement (default: c())
 
 - incNum:
 
@@ -93,20 +90,7 @@ replace_omv(
 - psvAnl:
 
   Whether analyses that are contained in the input file shall be
-  transferred to the output file (TRUE / FALSE; default: FALSE)
-
-- usePkg:
-
-  Name of the package: "foreign" or "haven" that shall be used to read
-  SPSS, Stata, and SAS files; "foreign" is the default (it is included
-  in base R), but "haven" is newer and more comprehensive; you may have
-  to install using `install.packages("haven", dep = TRUE)`.
-
-- selSet:
-
-  Name of the object / data set that is to be selected from the
-  workspace (only relevant when reading .RData-files which can contain
-  several objects / data sets)
+  transferred to the output file (default: FALSE)
 
 - ...:
 
@@ -135,37 +119,19 @@ values
   those defined in `varExc`, the replacement is carried out.
 
 - The ellipsis-parameter (`...`) can be used to submit arguments /
-  parameters to the functions that are used for reading the data. By
-  clicking on the respective function under “See also”, you can get a
-  more detailed overview over which parameters each of those functions
-  take.
+  parameters to the function that is used for reading and writing the
+  data. Clicking on the respective function under “See also”, you can
+  get a more detailed overview over which parameters each of those
+  functions take. The functions are: `read_omv` and `write_omv` (for
+  jamovi-files).
 
 ## See also
 
-`replace_omv` internally uses the following functions for reading and
-writing data files in different formats:
+`replace_omv` uses
 [`read_omv()`](https://sjentsch.github.io/jmvReadWrite/reference/read_omv.md)
 and
 [`write_omv()`](https://sjentsch.github.io/jmvReadWrite/reference/write_omv.md)
-for jamovi-files,
-[`utils::read.table()`](https://rdrr.io/r/utils/read.table.html) for CSV
-/ TSV files, [`load()`](https://rdrr.io/r/base/load.html) for reading
-.RData-files, [`readRDS()`](https://rdrr.io/r/base/readRDS.html) for
-.rds-files,
-[`haven::read_sav()`](https://haven.tidyverse.org/reference/read_spss.html)
-or
-[`foreign::read.spss()`](https://rdrr.io/pkg/foreign/man/read.spss.html)
-for SPSS-files,
-[`haven::read_dta()`](https://haven.tidyverse.org/reference/read_dta.html)
-or
-[`foreign::read.dta()`](https://rdrr.io/pkg/foreign/man/read.dta.html)
-for Stata-files,
-[`haven::read_sas()`](https://haven.tidyverse.org/reference/read_sas.html)
-for SAS-data-files, and
-[`haven::read_xpt()`](https://haven.tidyverse.org/reference/read_xpt.html)
-or
-[`foreign::read.xport()`](https://rdrr.io/pkg/foreign/man/read.xport.html)
-for SAS-transport-files.
+for reading and writing jamovi-files.
 
 ## Examples
 

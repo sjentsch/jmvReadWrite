@@ -9,7 +9,7 @@ for the statistical spreadsheet 'jamovi' (<https://www.jamovi.org>)
 convert_to_omv(
   fleInp = "",
   fleOut = "",
-  varSrt = NULL,
+  varSrt = c(),
   usePkg = c("foreign", "haven"),
   selSet = "",
   ...
@@ -34,7 +34,7 @@ convert_to_omv(
 - varSrt:
 
   Variable(s) that are used to sort the data frame (see Details; if
-  empty, the row order of the input file is kept; default: NULL)
+  empty, the row order of the input file is kept; default: c())
 
 - usePkg:
 
@@ -122,10 +122,10 @@ nmeOut <- tempfile(fileext = ".omv")
 saveRDS(jmvReadWrite::ToothGrowth, nmeInp)
 jmvReadWrite::convert_to_omv(fleInp = nmeInp, fleOut = nmeOut)
 cat(list.files(dirname(nmeOut), basename(nmeOut)))
-#> file27263edd1217.omv
+#> file27c77f68798d.omv
 # -> "file[...].omv" ([...] contains a random combination of numbers / characters
 cat(file.info(nmeOut)$size)
-#> 2617
+#> 2618
 # -> 2448 (size may differ on different OSes)
 cat(str(jmvReadWrite::read_omv(nmeOut, sveAtt = FALSE)))
 #> 'data.frame':    60 obs. of  7 variables:
@@ -159,9 +159,9 @@ nmeOut <- tempfile(fileext = ".omv")
 write.csv(jmvReadWrite::ToothGrowth, nmeInp)
 jmvReadWrite::convert_to_omv(fleInp = nmeInp, fleOut = nmeOut)
 cat(list.files(dirname(nmeOut), basename(nmeOut)))
-#> file27261930d383.omv
+#> file27c7b74a700.omv
 cat(file.info(nmeOut)$size)
-#> 2273
+#> 2274
 # -> 2104 (size may differ acc. to OS; the size is smaller than for the RDS-file
 # because CSV can store fewer attributes, e.g., labels)
 cat(str(jmvReadWrite::read_omv(nmeOut, sveAtt = FALSE)))

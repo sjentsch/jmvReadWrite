@@ -63,11 +63,11 @@ copied from there.
 fleOMV <- system.file("extdata", "ToothGrowth.omv", package = "jmvReadWrite")
 data <- jmvReadWrite::read_omv(fleOMV)
 # if the "jmv"-package is installed, we can run a test analysis with the data
-if (nzchar(system.file(package = "jmv"))) {
+if ("jmv" %in% rownames(installed.packages())) {
     jmv::ANOVA(
         formula = len ~ supp + dose + supp:dose,
         data = data,
-        effectSize = "omega",
+        effectSize = c("omega"),
         modelTest = TRUE,
         homo = TRUE,
         norm = TRUE)
@@ -128,7 +128,7 @@ data <- jmvReadWrite::read_omv(fleOMV, getSyn = TRUE)
 if (length(attr(data, "syntax")) >= 2) {
     attr(data, "syntax")
     # if the "jmv"-package is installed, we can run the analyses in "syntax"
-    if (nzchar(system.file(package = "jmv"))) {
+    if ("jmv" %in% rownames(installed.packages())) {
         eval(parse(text = attr(data, "syntax")[[1]]))
         eval(parse(text = paste0("result = ", attr(data, "syntax")[[2]])))
         names(result)
@@ -172,7 +172,7 @@ list.files(".", "Trial.omv")
 #> [1] "Trial.omv"
 file.info("Trial.omv")[, c("size", "isdir", "mode")]
 #>           size isdir mode
-#> Trial.omv 2617 FALSE  644
+#> Trial.omv 2618 FALSE  644
 unlink("Trial.omv")
 ```
 

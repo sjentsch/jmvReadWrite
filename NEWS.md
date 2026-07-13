@@ -2,6 +2,7 @@
 
 ## Enhancements:
 * implementing suggestions made by the `goodpractice` R-package
+* `describe_omv`: added creating a license string based upon keywords of standard licenses (e.g., `"RP_GPL2"`)
 * fixing typos and small bugs, and improving unit tests (e.g., limit line length)
 
 ---

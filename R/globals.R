@@ -380,13 +380,6 @@ setAtt <- function(attLst = NULL, inpObj = NULL, outObj = NULL) {
     outObj
 }
 
-rmvMsV <- function(dtaFrm = NULL) {
-    for (N in names(dtaFrm))
-        attr(dtaFrm[, N], "missingValues") <- NULL
-
-    dtaFrm
-}
-
 rmvAtt <- function(attObj = NULL, att2Rm = NULL) {
     if (is.null(att2Rm))
         att2Rm <- setdiff(names(attributes(attObj)),

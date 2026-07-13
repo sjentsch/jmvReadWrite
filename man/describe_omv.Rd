@@ -59,21 +59,30 @@ informing you about that).
 set (see \code{chrDsc} in the examples for HTML tags that are currently implemented; putting "unformatted" text is not
 a problem, but then the result is just plain text without formatting). Alternatively, \code{dtaDcs} can be a named list
 with the entries \code{description}, \code{variables}, \code{references}, \code{license}. All entries except from \code{variables} contain
-character vectors (length = 1); \code{variables} shall be a named list with the variable name as name and a description
-what the variable contains as entry. \code{description} and \code{variables} must be given, \code{references} and \code{license} can
-be left blank (""; but the names must be present in the list). An example for both a named list with a description
-(\code{lstDsc}), as well as a character vector with all HTML tags that are implemented (\code{chrDsc}) can be found in the
-examples below.
+character vectors (typically with the length = 1); \code{variables} shall be a named list with the variable name as
+name and a description what the variable contains as entry. \code{description} and \code{variables} must be given,
+\code{references} and \code{license} can be left blank (""; but the names must be present in the list). \code{license} can also
+a character vector containing one of the following keywords, producing a license text fitting the respective
+license: "CC0" (Creative Commons, CC0), "DT_CC4-BY-NC-ND" and "FC_CC4-BY-NC-ND" (Creative Commons, CC BY-NC-ND
+4.0, for data from scientific studies "DT_" or generated / simulated data sets "FC_"; both need the license holder
+to be given as the second element of the character vector for the list entry \code{license}, e.g., \code{list(..., list = c("DT_CC4-BY-NC-ND", "John Doe"))}, "RP_GPL2", "RP_GPL3", "RP_AGPL3", and "RP_LGPL3" are for data sets that were
+originally part of R-packages under different versions of the GNU General Public License (respectively, GNU
+General Public License 2.x, GNU General Public License 3.0, GNU Affero General Public License 3.0, and GNU Lesser
+General Public License 3.0; these need the name of the R-package to be given as the second element of the
+character vector for the list entry \code{license}, e.g., \verb{list(..., list = c("RP_GPL2", "jmv")}. Examples for both
+named lists with a description (\code{lstDsc}), as well as a character vector with all HTML tags that are implemented
+(\code{chrDsc}) can be found in the examples below.
 \item The ellipsis-parameter (\code{...}) can be used to submit arguments / parameters to the functions that are used for
 reading the data. By clicking on the respective function under “See also”, you can get a more detailed overview
 over which parameters each of those functions take.
 }
 }
 \examples{
-dtaFrm <- jmvReadWrite::ToothGrowth[, c("len", "supp", "dose")]
 nmeOut <- tempfile(fileext = ".omv")
 
 # the paste's underneath are only for readability (without them, the vignettes are misformatted)
+# example for a data set without a license
+dtaFrm <- jmvReadWrite::ToothGrowth[, c("len", "supp", "dose")]
 lstDsc <- list(description = paste("The response is the length of odontoblasts (cells",
                                    "responsible for tooth growth) in 60 guinea pigs. Each",
                                    "animal received one of three dose levels of vitamin C",
@@ -82,7 +91,7 @@ lstDsc <- list(description = paste("The response is the length of odontoblasts (
                                    "coded as VC)."),
                variables = list(len  = "Tooth length",
                                 supp = "Supplement type (VC or OJ)",
-                                dose = "Dose (in milligrams / day"),
+                                dose = "Dose (in milligrams / day)"),
                references = paste("Crampton, E. W. (1947). The growth of the odontoblast of",
                                   "the incisor teeth as a criterion of vitamin C intake of",
                                   "the guinea pig. <em>The Journal of Nutrition, 33</em>(5),",
@@ -93,8 +102,34 @@ jmvReadWrite::describe_omv(dtaInp = dtaFrm, fleOut = nmeOut, dtaTtl = "ToothGrow
 # don't include the unlink, if you copy the code and want to look at the resulting output file
 unlink(nmeOut)
 
+# example for a data set which is part of the R-package `datasets` under the GPL2
+dtaFrm <- datasets::penguins
+lstDsc <- list(description = paste("Data on adult penguins covering three species found on",
+                                   "three islands in the Palmer Archipelago, Antarctica,",
+                                   "including their size (flipper length, body mass, bill",
+                                   "dimensions), and sex."),
+               variables = list(species     = "Species (Adelie, Chinstrap, and Gentoo)",
+                                island      = "Island (Biscoe, Dream, and Torgersen)",
+                                bill_len    = "Bill length (in mm)",
+                                bill_dep    = "Bill depth (in mm)",
+                                flipper_len = "Flipper length (in mm)", 
+                                body_mass   = "Body mass (in g)",
+                                sex         = "Sex (female and male)",
+                                year        = "Study year: 2007, 2008, or 2009"),
+               references = paste("Gorman, K. B., Williams, T. D., & Fraser, W. R. (2014).",
+                                  "Ecological sexual dimorphism and environmental variability",
+                                  "within a community of antarctic penguins (Genus pygoscelis).",
+                                  "<em>PLoS ONE, 9</em>(3), e90081.",
+                                  "https://doi.org/10.1371/journal.pone.0090081"),
+               license = c("RP_GPL2", "datasets"))
+jmvReadWrite::describe_omv(dtaInp = dtaFrm, fleOut = nmeOut, dtaTtl = "Penguins",
+                           dtaDsc = lstDsc)
+# don't include the unlink, if you copy the code and want to look at the resulting output file
+unlink(nmeOut)
+
 # the code underneath should cover all formatting options jamovi is able to use (paste0 is only
 # for readability)
+dtaFrm <- jmvReadWrite::ToothGrowth[, c("len", "supp", "dose")]
 chrDsc <- paste0("<p><strong>Trial - all formattings:</strong><br/>",
                  "<strong>bold</strong><br/><strong><em>bold, italics</em></strong><br/>",
                  "<em>italics</em><br/><u>underlined</u><br/><s>strikethrough</s><br/>",

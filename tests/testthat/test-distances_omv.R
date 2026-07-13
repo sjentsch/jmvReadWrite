@@ -1,4 +1,12 @@
 test_that("distances_omv works", {
+    # helper function
+    rmvMsV <- function(dtaFrm = NULL) {
+        for (N in names(dtaFrm))
+            attr(dtaFrm[, N], "missingValues") <- NULL
+
+        dtaFrm
+    }
+
     set.seed(1)
     cntFrm <- stats::setNames(as.data.frame(matrix(rnorm(1000, sd = 10),                         nrow = 50)), sprintf("C_%02d", seq(20)))
     frqFrm <- stats::setNames(as.data.frame(matrix(sample(seq(10),        1000, replace = TRUE), nrow = 50)), sprintf("C_%02d", seq(20)))

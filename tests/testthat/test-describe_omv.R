@@ -147,112 +147,116 @@ test_that("describe_omv works", {
 
     # code coverage
     expect_error(describe_omv(dtaInp = jmvReadWrite::ToothGrowth[, c("len", "supp", "dose")], fleOut = nmeOut),
-      regexp = "^Calling describe_omv requires either the parameter dtaTtl \\(character vector\\) or the parameter dtaDsc \\(character vector or named list\\)\\.")
-    expect_error(describe_omv(fleInp = file.path("..", "ToothGrowth.omv"), fleOut = nmeOut, dtaTtl = "ToothGrowth"), regexp = "Please use the argument dtaInp instead of fleInp\\.")
+                 paste("^Calling describe_omv requires either the parameter dtaTtl \\(character vector\\) or the",
+                       "parameter dtaDsc \\(character vector or named list\\)\\."))
+    expect_error(describe_omv(fleInp = file.path("..", "ToothGrowth.omv"), fleOut = nmeOut, dtaTtl = "ToothGrowth"),
+                 "Please use the argument dtaInp instead of fleInp\\.")
     expect_error(describe_omv(dtaInp = jmvReadWrite::ToothGrowth[, c("len", "supp")], fleOut = nmeOut, dtaTtl = "ToothGrowth", dtaDsc = lstDsc),
-      regexp = "^The variable description \\(in dtaDsc\\) should contain all variables in the data set and no variables not contained in it\\.")
-    expect_error(describe_omv(dtaInp = jmvReadWrite::ToothGrowth[, c("len", "supp", "supp2", "dose")], fleOut = nmeOut, dtaTtl = "ToothGrowth", dtaDsc = lstDsc),
-      regexp = "^The variable description \\(in dtaDsc\\) should contain all variables in the data set and no variables not contained in it\\.")
+                              paste("^The variable description \\(in dtaDsc\\) should contain all variables in the",
+                                    "data set and no variables not contained in it\\."))
+    expect_error(describe_omv(dtaInp = jmvReadWrite::ToothGrowth[, c("len", "supp", "supp2", "dose")], fleOut = nmeOut,
+                              dtaTtl = "ToothGrowth", dtaDsc = lstDsc),
+                 "^The variable description \\(in dtaDsc\\) should contain all variables in the data set and no variables not contained in it\\.")
     expect_identical(defHdr("EN"), c(description = "Description", variables = "Variables", references = "References"))
     expect_identical(defHdr("DE"), c(description = "Beschreibung", variables = "Variablen", references = "Referenzen"))
     expect_identical(defHdr("JP"), c(description = "説明", variables = "変数", references = "引用文献"))
     expect_identical(defHdr("NB"), c(description = "Beskrivelse", variables = "Variabler", references = "Referanser"))
     expect_identical(defLic("CC0"),
-                 paste("This data set is in the public domain, and the author has waived all of his or her rights to",
-                       "the work. You can therefore copy, modify and distribute the data set, even for commercial",
-                       "purposes, all without asking permission. If the data set is based upon empirical work, the",
-                       "authors are given in the 'References'-section of the data set. In such case, please cite the",
-                       "respective reference(s) when using the dataset."))
+                     paste("This data set is in the public domain, and the author has waived all of his or her rights to",
+                           "the work. You can therefore copy, modify and distribute the data set, even for commercial",
+                           "purposes, all without asking permission. If the data set is based upon empirical work, the",
+                           "authors are given in the 'References'-section of the data set. In such case, please cite the",
+                           "respective reference(s) when using the dataset."))
     expect_identical(defLic("CC0", crrLng = "DE"),
-                 paste("Dieser Datensatz ist uneingeschränkt zugänglich, und der Autor hat auf alle seine Rechte an",
-                       "dem Werk verzichtet. Sie können den Datensatz daher ohne vorherige Genehmigung kopieren,",
-                       "verändern, und verbreiten, auch für kommerzielle Zwecke. Wenn der Datensatz auf empirischen",
-                       "Daten basiert, sind die Autoren im Abschnitt 'Referenzen' des Datensatzes angegeben. Zitieren",
-                       "Sie in diesem Fall bitte die entsprechenden Referenzen, wenn Sie den Datensatz verwenden."))
+                     paste("Dieser Datensatz ist uneingeschränkt zugänglich, und der Autor hat auf alle seine Rechte an",
+                           "dem Werk verzichtet. Sie können den Datensatz daher ohne vorherige Genehmigung kopieren,",
+                           "verändern, und verbreiten, auch für kommerzielle Zwecke. Wenn der Datensatz auf empirischen",
+                           "Daten basiert, sind die Autoren im Abschnitt 'Referenzen' des Datensatzes angegeben. Zitieren",
+                           "Sie in diesem Fall bitte die entsprechenden Referenzen, wenn Sie den Datensatz verwenden."))
     expect_identical(defLic("CC0", crrLng = "EN"),
-                 paste("This data set is in the public domain, and the author has waived all of his or her rights to",
-                       "the work. You can therefore copy, modify and distribute the data set, even for commercial",
-                       "purposes, all without asking permission. If the data set is based upon empirical work, the",
-                       "authors are given in the 'References'-section of the data set. In such case, please cite the",
-                       "respective reference(s) when using the dataset."))
+                     paste("This data set is in the public domain, and the author has waived all of his or her rights to",
+                           "the work. You can therefore copy, modify and distribute the data set, even for commercial",
+                           "purposes, all without asking permission. If the data set is based upon empirical work, the",
+                           "authors are given in the 'References'-section of the data set. In such case, please cite the",
+                           "respective reference(s) when using the dataset."))
     expect_error(defLic("CC0", crrLng = "JP"), "No translation available \\(yet\\) for JP\\.")
     expect_identical(defLic("CC0", crrLng = "NB"),
-                 paste("Datasettet er offentlig tilgjengelig, og forfatteren har fraskrevet seg alle rettigheter til",
-                       "datasettet. Du kan derfor kopiere, endre og distribuere datasettet, også til kommersielle",
-                       "formål, uten å be om tillatelse. Hvis datasettet er empirisk, er forfatterne oppgitt under",
-                       "'Referanser', vennligst siter de aktuelle referansene hvis det er tilfellet."))
+                     paste("Datasettet er offentlig tilgjengelig, og forfatteren har fraskrevet seg alle rettigheter til",
+                           "datasettet. Du kan derfor kopiere, endre og distribuere datasettet, også til kommersielle",
+                           "formål, uten å be om tillatelse. Hvis datasettet er empirisk, er forfatterne oppgitt under",
+                           "'Referanser', vennligst siter de aktuelle referansene hvis det er tilfellet."))
     expect_error(defLic("CC0", crrLng = "XX"), "No translation available \\(yet\\) for XX\\.")
     expect_identical(defLic("DT_CC4-BY-NC-ND"),
-                 paste("This data set contains data of a scientific study and the study authors therefore own the",
-                       "copyright. Without the study authors` explicit consent, this data set may not be distributed",
-                       "for commercial purposes, not be edited, and not be used without acknowledging its source",
-                       "(i.e., the terms of a CC BY-NC-ND license)."))
+                     paste("This data set contains data of a scientific study and the study authors therefore own the",
+                           "copyright. Without the study authors` explicit consent, this data set may not be distributed",
+                           "for commercial purposes, not be edited, and not be used without acknowledging its source",
+                           "(i.e., the terms of a CC BY-NC-ND license)."))
     expect_identical(defLic("DT_CC4-BY-NC-ND", crrLng = "DE"),
-                 paste("Dieser Datensatz enthält Daten einer wissenschaftlichen Studie, deren Urheberrecht bei den",
-                       "Autoren der Studie liegt. Ohne die ausdrückliche Zustimmung der Autoren darf dieser Datensatz",
-                       "nicht zu kommerziellen Zwecken verbreitet, bearbeitet oder verwendet werden ohne die Quelle",
-                       "anzugeben (d. h. der Datensatz unterliegt den Bedingungen der CC BY-NC-ND-Lizenz)."))
+                     paste("Dieser Datensatz enthält Daten einer wissenschaftlichen Studie, deren Urheberrecht bei den",
+                           "Autoren der Studie liegt. Ohne die ausdrückliche Zustimmung der Autoren darf dieser Datensatz",
+                           "nicht zu kommerziellen Zwecken verbreitet, bearbeitet oder verwendet werden ohne die Quelle",
+                           "anzugeben (d. h. der Datensatz unterliegt den Bedingungen der CC BY-NC-ND-Lizenz)."))
     expect_identical(defLic("DT_CC4-BY-NC-ND", crrLng = "EN"),
-                 paste("This data set contains data of a scientific study and the study authors therefore own the",
-                       "copyright. Without the study authors` explicit consent, this data set may not be distributed",
-                       "for commercial purposes, not be edited, and not be used without acknowledging its source",
-                       "(i.e., the terms of a CC BY-NC-ND license)."))
+                     paste("This data set contains data of a scientific study and the study authors therefore own the",
+                           "copyright. Without the study authors` explicit consent, this data set may not be distributed",
+                           "for commercial purposes, not be edited, and not be used without acknowledging its source",
+                           "(i.e., the terms of a CC BY-NC-ND license)."))
     expect_error(defLic("DT_CC4-BY-NC-ND", crrLng = "JP"), "No translation available \\(yet\\) for JP\\.")
     expect_identical(defLic("DT_CC4-BY-NC-ND", crrLng = "NB"),
-                 paste("Dette datasettet inneholder data fra en vitenskapelig studie, og studieforfatterne eier",
-                       "derfor opphavsretten. Uten uttrykkelig samtykke fra studieforfatterne kan dette datasettet",
-                       "ikke distribueres for kommersielle formål, ikke redigeres og ikke brukes uten å oppgi kilden",
-                       "(dvs. vilkårene i en CC BY-NC-ND-lisens)."))
+                     paste("Dette datasettet inneholder data fra en vitenskapelig studie, og studieforfatterne eier",
+                           "derfor opphavsretten. Uten uttrykkelig samtykke fra studieforfatterne kan dette datasettet",
+                           "ikke distribueres for kommersielle formål, ikke redigeres og ikke brukes uten å oppgi kilden",
+                           "(dvs. vilkårene i en CC BY-NC-ND-lisens)."))
     expect_error(defLic("DT_CC4-BY-NC-ND", crrLng = "XX"), "No translation available \\(yet\\) for XX\\.")
     expect_identical(defLic("DT_CC4-BY-NC-ND", licHld = "John Doe"),
-                 paste("This data set contains data of a scientific study and the study authors therefore own the",
-                       "copyright. Without the study authors` and John Doe`s explicit consent, this data set may not",
-                       "be distributed for commercial purposes, not be edited, and not be used without acknowledging",
-                       "its source (i.e., the terms of a CC BY-NC-ND license)."))
+                     paste("This data set contains data of a scientific study and the study authors therefore own the",
+                           "copyright. Without the study authors` and John Doe`s explicit consent, this data set may not",
+                           "be distributed for commercial purposes, not be edited, and not be used without acknowledging",
+                           "its source (i.e., the terms of a CC BY-NC-ND license)."))
     expect_identical(defLic("DT_CC4-BY-NC-ND", crrLng = "DE", licHld = "Max Mustermann"),
-                 paste("Dieser Datensatz enthält Daten einer wissenschaftlichen Studie, deren Urheberrecht bei den",
-                       "Autoren der Studie liegt. Ohne die ausdrückliche Zustimmung der Autoren und von Max",
-                       "Mustermann darf dieser Datensatz nicht zu kommerziellen Zwecken verbreitet, bearbeitet oder",
-                       "verwendet werden ohne die Quelle anzugeben (d. h. der Datensatz unterliegt den Bedingungen",
-                       "der CC BY-NC-ND-Lizenz)."))
+                     paste("Dieser Datensatz enthält Daten einer wissenschaftlichen Studie, deren Urheberrecht bei den",
+                           "Autoren der Studie liegt. Ohne die ausdrückliche Zustimmung der Autoren und von Max",
+                           "Mustermann darf dieser Datensatz nicht zu kommerziellen Zwecken verbreitet, bearbeitet oder",
+                           "verwendet werden ohne die Quelle anzugeben (d. h. der Datensatz unterliegt den Bedingungen",
+                           "der CC BY-NC-ND-Lizenz)."))
     expect_identical(defLic("DT_CC4-BY-NC-ND", crrLng = "EN", licHld = "John Doe"),
-                 paste("This data set contains data of a scientific study and the study authors therefore own the",
-                       "copyright. Without the study authors` and John Doe`s explicit consent, this data set may not",
-                       "be distributed for commercial purposes, not be edited, and not be used without acknowledging",
-                       "its source (i.e., the terms of a CC BY-NC-ND license)."))
+                     paste("This data set contains data of a scientific study and the study authors therefore own the",
+                           "copyright. Without the study authors` and John Doe`s explicit consent, this data set may not",
+                           "be distributed for commercial purposes, not be edited, and not be used without acknowledging",
+                           "its source (i.e., the terms of a CC BY-NC-ND license)."))
     expect_error(defLic("DT_CC4-BY-NC-ND", crrLng = "JP", licHld = "\\u5c71\\u7530\\u592a\\u90ce"),
                  "No translation available \\(yet\\) for JP\\.")
     expect_identical(defLic("DT_CC4-BY-NC-ND", crrLng = "NB", licHld = "Kari Normann"),
-                 paste("Dette datasettet inneholder data fra en vitenskapelig studie, og studieforfatterne eier",
-                       "derfor opphavsretten. Uten uttrykkelig samtykke fra studieforfatterne og Kari Normann kan",
-                       "dette datasettet ikke distribueres for kommersielle formål, ikke redigeres og ikke brukes",
-                       "uten å oppgi kilden (dvs. vilkårene i en CC BY-NC-ND-lisens)."))
+                     paste("Dette datasettet inneholder data fra en vitenskapelig studie, og studieforfatterne eier",
+                           "derfor opphavsretten. Uten uttrykkelig samtykke fra studieforfatterne og Kari Normann kan",
+                           "dette datasettet ikke distribueres for kommersielle formål, ikke redigeres og ikke brukes",
+                           "uten å oppgi kilden (dvs. vilkårene i en CC BY-NC-ND-lisens)."))
     expect_error(defLic("DT_CC4-BY-NC-ND", crrLng = "XX", licHld = "John Doe"),
                  "No translation available \\(yet\\) for XX\\.")
     expect_error(defLic("FC_CC4-BY-NC-ND"), "When using this license, a license holder needs to be defined\\.")
     expect_error(defLic("FC_CC4-BY-NC-ND", crrLng = "DE"),
                  "When using this license, a license holder needs to be defined\\.")
     expect_identical(defLic("FC_CC4-BY-NC-ND", licHld = "John Doe"),
-                 paste("This data set was constructed by John Doe, who therefore owns the copyright. Without the",
-                       "explicit consent of John Doe, this data set may not be distributed for commercial purposes,",
-                       "not be edited, and not be used without acknowledging its source (i.e., the terms of the CC",
-                       "BY-NC-ND license)."))
+                     paste("This data set was constructed by John Doe, who therefore owns the copyright. Without the",
+                           "explicit consent of John Doe, this data set may not be distributed for commercial purposes,",
+                           "not be edited, and not be used without acknowledging its source (i.e., the terms of the CC",
+                           "BY-NC-ND license)."))
     expect_identical(defLic("FC_CC4-BY-NC-ND", crrLng = "DE", licHld = "Max Mustermann"),
-                 paste("Dieser Datensatz wurde von Max Mustermann erstellt, der somit das Urheberrecht daran besitzt.",
-                       "Ohne die ausdrückliche Zustimmung von Max Mustermann darf dieser Datensatz nicht für",
-                       "kommerzielle Zwecke verbreitet, nicht bearbeitet und nicht ohne Angabe der Quelle verwendet",
-                       "werden (d. h. der Datensatz unterliegt den Bedingungen der CC BY-NC-ND-Lizenz)."))
+                     paste("Dieser Datensatz wurde von Max Mustermann erstellt, der somit das Urheberrecht daran besitzt.",
+                           "Ohne die ausdrückliche Zustimmung von Max Mustermann darf dieser Datensatz nicht für",
+                           "kommerzielle Zwecke verbreitet, nicht bearbeitet und nicht ohne Angabe der Quelle verwendet",
+                           "werden (d. h. der Datensatz unterliegt den Bedingungen der CC BY-NC-ND-Lizenz)."))
     expect_identical(defLic("FC_CC4-BY-NC-ND", crrLng = "EN", licHld = "John Doe"),
-                 paste("This data set was constructed by John Doe, who therefore owns the copyright. Without the",
-                       "explicit consent of John Doe, this data set may not be distributed for commercial purposes,",
-                       "not be edited, and not be used without acknowledging its source (i.e., the terms of the CC",
-                       "BY-NC-ND license)."))
+                     paste("This data set was constructed by John Doe, who therefore owns the copyright. Without the",
+                           "explicit consent of John Doe, this data set may not be distributed for commercial purposes,",
+                           "not be edited, and not be used without acknowledging its source (i.e., the terms of the CC",
+                           "BY-NC-ND license)."))
     expect_error(defLic("FC_CC4-BY-NC-ND", crrLng = "JP", licHld = "\\u5c71\\u7530\\u592a\\u90ce"),
                  "No translation available \\(yet\\) for JP\\.")
     expect_identical(defLic("FC_CC4-BY-NC-ND", crrLng = "NB", licHld = "Kari Normann"),
-                 paste("Datasettet er utarbeidet av Kari Normann, som derfor eier opphavsretten. Uten uttrykkelig",
-                       "samtykke fra Kari Normann kan dette datasettet ikke distribueres for kommersielle formål,",
-                       "redigeres eller brukes uten å oppgi kilden (dvs. vilkårene i CC BY-NC-ND-lisens)."))
+                     paste("Datasettet er utarbeidet av Kari Normann, som derfor eier opphavsretten. Uten uttrykkelig",
+                           "samtykke fra Kari Normann kan dette datasettet ikke distribueres for kommersielle formål,",
+                           "redigeres eller brukes uten å oppgi kilden (dvs. vilkårene i CC BY-NC-ND-lisens)."))
     expect_error(defLic("FC_CC4-BY-NC-ND", crrLng = "XX", licHld = "John Doe"),
                  "No translation available \\(yet\\) for XX\\.")
     expect_error(defLic("RP_GPL2"),
@@ -260,68 +264,68 @@ test_that("describe_omv works", {
     expect_error(defLic("RP_GPL2", crrLng = "DE"),
                  "When using this license, the R-package where the data are originating from needs to be defined\\.")
     expect_identical(defLic("RP_GPL2", licHld = "RPKG"),
-                 paste("This data set was provided as part of the R-package 'RPKG', which is published under the",
-                       "terms of the GNU General Public License 2.x. You may use the data both privately and",
-                       "commercially, distribute or modify them. When using the data set, you need to disclose the",
-                       "source, and publish any modifications you may make under the same license. If the data set",
-                       "is based on empirical data, the authors are given in the 'References'-section. In such case,",
-                       "please  cite them when using the dataset."))
+                     paste("This data set was provided as part of the R-package 'RPKG', which is published under the",
+                           "terms of the GNU General Public License 2.x. You may use the data both privately and",
+                           "commercially, distribute or modify them. When using the data set, you need to disclose the",
+                           "source, and publish any modifications you may make under the same license. If the data set",
+                           "is based on empirical data, the authors are given in the 'References'-section. In such case,",
+                           "please  cite them when using the dataset."))
     expect_identical(defLic("RP_GPL2", crrLng = "DE", licHld = "RPKG"),
-                 paste("Dieser Datensatz ist Teil des R-Pakets 'RPKG, das unter den Bedingungen der GNU General",
-                       "Public License 2.x veröffentlicht wurde. Sie können die Daten sowohl privat als auch",
-                       "kommerziell nutzen, verbreiten oder verändern. Bei der Verwendung des Datensatzes müssen",
-                       "Sie die  Quelle angeben und alle änderungen, die Sie vornehmen, unter derselben Lizenz",
-                       "veröffentlichen. Wenn der Datensatz auf empirischer Forschung basiert, sind die Autoren",
-                       "im Abschnitt 'Referenzen' angegeben. Zitieren Sie in diesem Fall die Studie, wenn Sie",
-                       "den Datensatz verwenden."))
+                     paste("Dieser Datensatz ist Teil des R-Pakets 'RPKG, das unter den Bedingungen der GNU General",
+                           "Public License 2.x veröffentlicht wurde. Sie können die Daten sowohl privat als auch",
+                           "kommerziell nutzen, verbreiten oder verändern. Bei der Verwendung des Datensatzes müssen",
+                           "Sie die  Quelle angeben und alle änderungen, die Sie vornehmen, unter derselben Lizenz",
+                           "veröffentlichen. Wenn der Datensatz auf empirischer Forschung basiert, sind die Autoren",
+                           "im Abschnitt 'Referenzen' angegeben. Zitieren Sie in diesem Fall die Studie, wenn Sie",
+                           "den Datensatz verwenden."))
     expect_identical(defLic("RP_GPL2", crrLng = "EN", licHld = "RPKG"),
-                 paste("This data set was provided as part of the R-package 'RPKG', which is published under the",
-                       "terms of the GNU General Public License 2.x. You may use the data both privately and",
-                       "commercially, distribute or modify them. When using the data set, you need to disclose the",
-                       "source, and publish any modifications you may make under the same license. If the data set",
-                       "is based on empirical data, the authors are given in the 'References'-section. In such case,",
-                       "please  cite them when using the dataset."))
+                     paste("This data set was provided as part of the R-package 'RPKG', which is published under the",
+                           "terms of the GNU General Public License 2.x. You may use the data both privately and",
+                           "commercially, distribute or modify them. When using the data set, you need to disclose the",
+                           "source, and publish any modifications you may make under the same license. If the data set",
+                           "is based on empirical data, the authors are given in the 'References'-section. In such",
+                           "case, please  cite them when using the dataset."))
     expect_error(defLic("RP_GPL2", crrLng = "JP", licHld = "RPKG"),
                  "No translation available \\(yet\\) for JP\\.")
     expect_identical(defLic("RP_GPL2", crrLng = "NB", licHld = "RPKG"),
-                 paste("Dette datasettet er en del av R-pakken 'RPKG', som er publisert under vilkårene i GNU General",
-                       "Public License 2.x. Du kan bruke dataene både privat og kommersielt, distribuere eller endre",
-                       "dem. Når du bruker datasettet, må du oppgi kilden og publisere eventuelle endringer du gjør",
-                       "under samme lisens. Hvis datasettet er basert på empiriske data, er forfatterne oppgitt under",
-                       "'Referanser'. Vennligst oppgi referansene i slike tilfeller når du bruker datasettet."))
+                     paste("Dette datasettet er en del av R-pakken 'RPKG', som er publisert under vilkårene i GNU General",
+                           "Public License 2.x. Du kan bruke dataene både privat og kommersielt, distribuere eller endre",
+                           "dem. Når du bruker datasettet, må du oppgi kilden og publisere eventuelle endringer du gjør",
+                           "under samme lisens. Hvis datasettet er basert på empiriske data, er forfatterne oppgitt under",
+                           "'Referanser'. Vennligst oppgi referansene i slike tilfeller når du bruker datasettet."))
     expect_error(defLic("RP_GPL2", crrLng = "XX", licHld = "RPKG"),
                  "No translation available \\(yet\\) for XX\\.")
     expect_error(defLic("RP_GPL3"),
                  "When using this license, the R-package where the data are originating from needs to be defined\\.")
     expect_identical(defLic("RP_GPL3", licHld = "RPKG"),
-                 paste("This data set was provided as part of the R-package 'RPKG', which is published under the",
-                       "terms of the GNU General Public License 3.0. You may use the data both privately and",
-                       "commercially, distribute or modify them. When using the data set, you need to disclose the",
-                       "source, and publish any modifications you may make under the same license. If the data set",
-                       "is based on empirical data, the authors are given in the 'References'-section. In such case,",
-                       "please  cite them when using the dataset."))
+                     paste("This data set was provided as part of the R-package 'RPKG', which is published under the",
+                           "terms of the GNU General Public License 3.0. You may use the data both privately and",
+                           "commercially, distribute or modify them. When using the data set, you need to disclose the",
+                           "source, and publish any modifications you may make under the same license. If the data set",
+                           "is based on empirical data, the authors are given in the 'References'-section. In such case,",
+                           "please  cite them when using the dataset."))
     expect_error(defLic("RP_GPL3", crrLng = "XX", licHld = "RPKG"),
                  "No translation available \\(yet\\) for XX\\.")
     expect_error(defLic("RP_AGPL3"),
                  "When using this license, the R-package where the data are originating from needs to be defined\\.")
     expect_identical(defLic("RP_AGPL3", licHld = "RPKG"),
-                 paste("This data set was provided as part of the R-package 'RPKG', which is published under the",
-                       "terms of the GNU Affero General Public License 3.0. You may use the data both privately and",
-                       "commercially, distribute or modify them. When using the data set, you need to disclose the",
-                       "source, and publish any modifications you may make under the same license. If the data set",
-                       "is based on empirical data, the authors are given in the 'References'-section. In such case,",
-                       "please  cite them when using the dataset."))
+                     paste("This data set was provided as part of the R-package 'RPKG', which is published under the",
+                           "terms of the GNU Affero General Public License 3.0. You may use the data both privately and",
+                           "commercially, distribute or modify them. When using the data set, you need to disclose the",
+                           "source, and publish any modifications you may make under the same license. If the data set",
+                           "is based on empirical data, the authors are given in the 'References'-section. In such case,",
+                           "please  cite them when using the dataset."))
     expect_error(defLic("RP_AGPL3", crrLng = "XX", licHld = "RPKG"),
                  "No translation available \\(yet\\) for XX\\.")
     expect_error(defLic("RP_LGPL3"),
                  "When using this license, the R-package where the data are originating from needs to be defined\\.")
     expect_identical(defLic("RP_LGPL3", licHld = "RPKG"),
-                 paste("This data set was provided as part of the R-package 'RPKG', which is published under the",
-                       "terms of the GNU Lesser General Public License 3.0. You may use the data both privately and",
-                       "commercially, distribute or modify them. When using the data set, you need to disclose the",
-                       "source, and publish any modifications you may make under the same license. If the data set",
-                       "is based on empirical data, the authors are given in the 'References'-section. In such case,",
-                       "please  cite them when using the dataset."))
+                     paste("This data set was provided as part of the R-package 'RPKG', which is published under the",
+                           "terms of the GNU Lesser General Public License 3.0. You may use the data both privately and",
+                           "commercially, distribute or modify them. When using the data set, you need to disclose the",
+                           "source, and publish any modifications you may make under the same license. If the data set",
+                           "is based on empirical data, the authors are given in the 'References'-section. In such case,",
+                           "please  cite them when using the dataset."))
     expect_error(defLic("RP_LGPL3", crrLng = "XX", licHld = "RPKG"),
                  "No translation available \\(yet\\) for XX\\.")
     expect_null(defLic())

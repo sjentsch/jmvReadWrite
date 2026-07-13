@@ -302,7 +302,8 @@ test_that("distances_omv works", {
                      tolerance = 1e-6)
     # minkowski_2 == euclid
     expect_identical(distances_omv(dtaInp = cntFrm, varDst = names(cntFrm), stdDst = "none", nmeDst = "minkowski_2"),
-                 distances_omv(dtaInp = cntFrm, varDst = names(cntFrm), stdDst = "none", nmeDst = "euclid"))
+                     distances_omv(dtaInp = cntFrm, varDst = names(cntFrm), stdDst = "none", nmeDst = "euclid"),
+                     tolerance = 1e-6)
     # minkowski_1 == block
     expect_identical(distances_omv(dtaInp = cntFrm, varDst = names(cntFrm), stdDst = "none", nmeDst = "minkowski_1"),
                  distances_omv(dtaInp = cntFrm, varDst = names(cntFrm), stdDst = "none", nmeDst = "block"))

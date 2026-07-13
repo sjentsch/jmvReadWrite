@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">jmvReadWrite</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.13</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.14</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -42,14 +42,14 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">long2wide_omv</span><span class="op">(</span></span>
 <span>  dtaInp <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  fleOut <span class="op">=</span> <span class="st">""</span>,</span>
-<span>  varTgt <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">)</span>,</span>
-<span>  varExc <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  varTgt <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  varExc <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  varID <span class="op">=</span> <span class="st">"ID"</span>,</span>
-<span>  varTme <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  varTme <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  varSep <span class="op">=</span> <span class="st">"_"</span>,</span>
 <span>  varOrd <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"times"</span>, <span class="st">"vars"</span><span class="op">)</span>,</span>
 <span>  varAgg <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mean"</span>, <span class="st">"first"</span><span class="op">)</span>,</span>
-<span>  varSrt <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  varSrt <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  usePkg <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"foreign"</span>, <span class="st">"haven"</span><span class="op">)</span>,</span>
 <span>  selSet <span class="op">=</span> <span class="st">""</span>,</span>
 <span>  <span class="va">...</span></span>
@@ -61,57 +61,63 @@
 
 
 <dl><dt id="arg-dtainp">dtaInp<a class="anchor" aria-label="anchor" href="#arg-dtainp"></a></dt>
-<dd><p>Either a data frame or the name of a data file to be read (including the path, if required; "FILENAME.ext"; default: NULL); files can be of
-any supported file type, see Details below</p></dd>
+<dd><p>Either a data frame or the name of a data file to be read (including the path, if required;
+"FILENAME.ext"; default: NULL); files can be of any supported file type, see Details below.</p></dd>
 
 
 <dt id="arg-fleout">fleOut<a class="anchor" aria-label="anchor" href="#arg-fleout"></a></dt>
-<dd><p>Name of the data file to be written (including the path, if required; "FILE_OUT.omv"; default: ""); if empty, the resulting data frame is
-returned instead</p></dd>
+<dd><p>Name of the data set / file to be written (including the path, if required; "FILE_OUT.omv";
+default: ""); if empty, the resulting data frame is returned instead.</p></dd>
 
 
 <dt id="arg-vartgt">varTgt<a class="anchor" aria-label="anchor" href="#arg-vartgt"></a></dt>
-<dd><p>Names of one or more variables to be transformed / reshaped (other variables are excluded, if empty(c()) all variables except <code>varTme</code>,
-<code>varID</code> and <code>varExc</code> are included; default: c())</p></dd>
+<dd><p>Names of one or more variables to be transformed / reshaped (other variables are excluded, if empty
+(NULL) all variables except <code>varTme</code>, <code>varID</code> and <code>varExc</code> are included; default: NULL)</p></dd>
 
 
 <dt id="arg-varexc">varExc<a class="anchor" aria-label="anchor" href="#arg-varexc"></a></dt>
-<dd><p>Name of the variable(s) should be excluded from the transformation, typically this will be between-subject-variable(s) (default: c())</p></dd>
+<dd><p>Name of the variable(s) should be excluded from the transformation, typically this will be
+between-subject-variable(s) (default: NULL)</p></dd>
 
 
 <dt id="arg-varid">varID<a class="anchor" aria-label="anchor" href="#arg-varid"></a></dt>
-<dd><p>Names of one or more variables that identify the same group / individual (default: c())</p></dd>
+<dd><p>Names of one or more variables that identify the same group / individual (default: NULL)</p></dd>
 
 
 <dt id="arg-vartme">varTme<a class="anchor" aria-label="anchor" href="#arg-vartme"></a></dt>
-<dd><p>Name of the variable(s) that differentiates multiple records from the same group / individual (default: c())</p></dd>
+<dd><p>Name of the variable(s) that differentiates multiple records from the same group / individual
+(default: NULL)</p></dd>
 
 
 <dt id="arg-varsep">varSep<a class="anchor" aria-label="anchor" href="#arg-varsep"></a></dt>
-<dd><p>Separator character when concatenating the fixed and time-varying part of the variable name ("VAR1_1", "VAR1_2"; default: "_")</p></dd>
+<dd><p>Separator character when concatenating the fixed and time-varying part of the variable name ("VAR1_1",
+"VAR1_2"; default: "_")</p></dd>
 
 
 <dt id="arg-varord">varOrd<a class="anchor" aria-label="anchor" href="#arg-varord"></a></dt>
-<dd><p>How variables / columns are organized: for "times" (default) the steps of the time varying variable are adjacent, for "vars" the steps of
-the original columns in the long dataset</p></dd>
+<dd><p>How variables / columns are organized: for "times" (default) the steps of the time varying variable
+are adjacent, for "vars" the steps of the original columns in the long dataset.</p></dd>
 
 
 <dt id="arg-varagg">varAgg<a class="anchor" aria-label="anchor" href="#arg-varagg"></a></dt>
-<dd><p>How multiple occurrences of particular combinations of time varying variables are aggregated: either "mean" (calculate the mean over
-occurrences), or "first" (take the first occurrence)</p></dd>
+<dd><p>How multiple occurrences of particular combinations of time varying variables are aggregated: either
+"mean" (calculate the mean over occurrences), or "first" (take the first occurrence).</p></dd>
 
 
 <dt id="arg-varsrt">varSrt<a class="anchor" aria-label="anchor" href="#arg-varsrt"></a></dt>
-<dd><p>Variable(s) that are used to sort the data frame (see Details; if empty, the order returned from reshape is kept; default: c())</p></dd>
+<dd><p>Variable(s) that are used to sort the data frame (see Details; if empty, the order returned from
+reshape is kept; default: NULL)</p></dd>
 
 
 <dt id="arg-usepkg">usePkg<a class="anchor" aria-label="anchor" href="#arg-usepkg"></a></dt>
-<dd><p>Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata and SAS files; "foreign" is the default (it comes with
-base R), but "haven" is newer and more comprehensive</p></dd>
+<dd><p>Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata, and SAS files;
+"foreign" is the default (it is included in base R), but "haven" is newer and more comprehensive; you
+may have to install using <code>install.packages("haven", dep = TRUE)</code>.</p></dd>
 
 
 <dt id="arg-selset">selSet<a class="anchor" aria-label="anchor" href="#arg-selset"></a></dt>
-<dd><p>Name of the data set that is to be selected from the workspace (only applies when reading .RData-files)</p></dd>
+<dd><p>Name of the object / data set that is to be selected from the workspace (only relevant when reading
+.RData-files which can contain several objects / data sets)</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
@@ -120,33 +126,34 @@ base R), but "haven" is newer and more comprehensive</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>a data frame (only returned if <code>fleOut</code> is empty) where the input data set is converted from long to wide format</p>
+    <p>a data frame (only returned if <code>fleOut</code> is empty) where the input data set is converted from long to wide
+format</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
 
-<ul><li><p>If <code>varTgt</code> is empty, it is tried to generate it using all variables in the data frame except those defined by <code>varID</code>, <code>varTme</code> and <code>varExc</code>. The
-variable(s) in <code>varID</code> need to be unique identifiers (in the original dataset), those in <code>varExc</code> don't have this requirement. It is generally recommended
-that the variable names in <code>varExc</code> and <code>varID</code> should not contain the variable separator (defined in <code>varSep</code>; default: "_").</p></li>
-<li><p><code>varSrt</code> can be either a character or a character vector (with one or more variables respectively). The sorting order for a particular variable can be
-inverted with preceding the variable name with "-". Please note that this doesn't make sense and hence throws a warning for certain variable types (e.g.,
-factors).</p></li>
-<li><p>The ellipsis-parameter (<code>...</code>) can be used to submit arguments / parameters to the functions that are used for transforming, reading or writing the data.
-By clicking on the respective function under “See also”, you can get a more detailed overview over which parameters each of those functions take.</p></li>
-<li><p>The transformation from long to wide uses <code>reshape</code>. <code>varTgt</code> matches (~) <code>v.names</code> in <code>reshape</code>, <code>varID</code> ~ <code>idvar</code>, <code>varTme</code> ~ <code>timevar</code>, and <code>varSep</code> ~
-<code>sep</code>. The help for <code>reshape</code> is very explanatory, click on the link under “See also” to access it, particularly what is explained under “Details”.</p></li>
-<li><p>The functions for reading and writing the data are: <code>read_omv</code> and <code>write_omv</code> (for jamovi-files), <code>read.table</code> (for CSV / TSV files; using similar
-defaults as <code>read.csv</code> for CSV and <code>read.delim</code> for TSV which both are based upon <code>read.table</code>), <code>load</code> (for .RData-files), <code>readRDS</code> (for .rds-files),
-<code>read_sav</code> (needs R-package <code>haven</code>) or <code>read.spss</code> (needs R-package <code>foreign</code>) for SPSS-files, <code>read_dta</code> (<code>haven</code>) / <code>read.dta</code> (<code>foreign</code>) for
-Stata-files, <code>read_sas</code> (<code>haven</code>) for SAS-data-files, and <code>read_xpt</code> (<code>haven</code>) / <code>read.xport</code> (<code>foreign</code>) for SAS-transport-files. If you would like to
-use <code>haven</code>, you may need to install it using <code>install.packages("haven", dep = TRUE)</code>.</p></li>
+<ul><li><p>If <code>varTgt</code> is empty, it is tried to generate it using all variables in the data frame except those defined by
+<code>varID</code>, <code>varTme</code> and <code>varExc</code>. The variable(s) in <code>varID</code> need to be unique identifiers (in the original
+dataset), those in <code>varExc</code> don't have this requirement. It is generally recommended that the variable names in
+<code>varExc</code> and <code>varID</code> should not contain the variable separator (defined in <code>varSep</code>; default: "_").</p></li>
+<li><p><code>varSrt</code> can be either a character or a character vector (with one or more variables respectively). The sorting
+order for a particular variable can be inverted with preceding the variable name with "-". Please note that this
+doesn't make sense and hence throws a warning for certain variable types (e.g., factors).</p></li>
+<li><p>The transformation from long to wide uses <code>reshape</code>. <code>varTgt</code> matches (~) <code>v.names</code> in <code>reshape</code>, <code>varID</code> ~
+<code>idvar</code>, <code>varTme</code> ~ <code>timevar</code>, and <code>varSep</code> ~ <code>sep</code>. The help for <code>reshape</code> is very explanatory, click on the link
+under “See also” to access it, particularly what is explained under “Details”.</p></li>
+<li><p>The ellipsis-parameter (<code>...</code>) can be used to submit arguments / parameters to the functions that are used for
+reading or transforming the data. By clicking on the respective function under “See also”, you can get a more
+detailed overview over which parameters each of those functions take.</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p><code>long2wide_omv</code> internally uses the following functions: The transformation from long to wide uses <code><a href="https://rdrr.io/r/stats/reshape.html" class="external-link">stats::reshape()</a></code>. For reading and writing data
-files in different formats: <code><a href="read_omv.html">read_omv()</a></code> and <code><a href="write_omv.html">write_omv()</a></code> for jamovi-files, <code><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">utils::read.table()</a></code> for CSV / TSV files,
-<code><a href="https://rdrr.io/r/base/load.html" class="external-link">load()</a></code> for reading .RData-files, <code><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS()</a></code> for .rds-files, <code><a href="https://haven.tidyverse.org/reference/read_spss.html" class="external-link">haven::read_sav()</a></code> or <code><a href="https://rdrr.io/pkg/foreign/man/read.spss.html" class="external-link">foreign::read.spss()</a></code> for SPSS-files, <code><a href="https://haven.tidyverse.org/reference/read_dta.html" class="external-link">haven::read_dta()</a></code> or
-<code><a href="https://rdrr.io/pkg/foreign/man/read.dta.html" class="external-link">foreign::read.dta()</a></code> for Stata-files, <code><a href="https://haven.tidyverse.org/reference/read_sas.html" class="external-link">haven::read_sas()</a></code> for SAS-data-files, and <code><a href="https://haven.tidyverse.org/reference/read_xpt.html" class="external-link">haven::read_xpt()</a></code> or <code><a href="https://rdrr.io/pkg/foreign/man/read.xport.html" class="external-link">foreign::read.xport()</a></code> for SAS-transport-files.</p></div>
+    <div class="dont-index"><p><code>long2wide_omv</code> internally uses the following functions: The transformation from long to wide uses
+<code><a href="https://rdrr.io/r/stats/reshape.html" class="external-link">stats::reshape()</a></code>. For reading and writing data files in different formats: <code><a href="read_omv.html">read_omv()</a></code> and
+<code><a href="write_omv.html">write_omv()</a></code> for jamovi-files, <code><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">utils::read.table()</a></code> for CSV / TSV files, <code><a href="https://rdrr.io/r/base/load.html" class="external-link">load()</a></code> for reading
+.RData-files, <code><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS()</a></code> for .rds-files, <code><a href="https://haven.tidyverse.org/reference/read_spss.html" class="external-link">haven::read_sav()</a></code> or <code><a href="https://rdrr.io/pkg/foreign/man/read.spss.html" class="external-link">foreign::read.spss()</a></code> for SPSS-files,
+<code><a href="https://haven.tidyverse.org/reference/read_dta.html" class="external-link">haven::read_dta()</a></code> or <code><a href="https://rdrr.io/pkg/foreign/man/read.dta.html" class="external-link">foreign::read.dta()</a></code> for Stata-files, <code><a href="https://haven.tidyverse.org/reference/read_sas.html" class="external-link">haven::read_sas()</a></code> for SAS-data-files, and
+<code><a href="https://haven.tidyverse.org/reference/read_xpt.html" class="external-link">haven::read_xpt()</a></code> or <code><a href="https://rdrr.io/pkg/foreign/man/read.xport.html" class="external-link">foreign::read.xport()</a></code> for SAS-transport-files.</p></div>
     </div>
 
     <div class="section level2">
@@ -175,10 +182,10 @@ files in different formats: <code><a href="read_omv.html">read_omv()</a></code> 
 <span class="r-in"><span><span class="co"># it is required to give at least the arguments dtaInp, varID and varTme</span></span></span>
 <span class="r-in"><span><span class="co"># check whether the file was created and its size</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/basename.html" class="external-link">dirname</a></span><span class="op">(</span><span class="va">nmeOut</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/basename.html" class="external-link">basename</a></span><span class="op">(</span><span class="va">nmeOut</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> file27c77b3e0de3.omv</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> file27ddb976af5.omv</span>
 <span class="r-in"><span><span class="co"># -&gt; "file[...].omv" ([...] contains a random combination of numbers / characters</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.info.html" class="external-link">file.info</a></span><span class="op">(</span><span class="va">nmeOut</span><span class="op">)</span><span class="op">$</span><span class="va">size</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6621</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6620</span>
 <span class="r-in"><span><span class="co"># -&gt; 6851 (approximate size; size may differ in every run [in dependence of</span></span></span>
 <span class="r-in"><span><span class="co">#          how well the generated random data can be compressed])</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="fu">jmvReadWrite</span><span class="fu">::</span><span class="fu"><a href="read_omv.html">read_omv</a></span><span class="op">(</span><span class="va">nmeOut</span>, sveAtt <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>

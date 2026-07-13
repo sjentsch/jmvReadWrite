@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">jmvReadWrite</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.13</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.14</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -42,7 +42,7 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">sort_omv</span><span class="op">(</span></span>
 <span>  dtaInp <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  fleOut <span class="op">=</span> <span class="st">""</span>,</span>
-<span>  varSrt <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  varSrt <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  psvAnl <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  usePkg <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"foreign"</span>, <span class="st">"haven"</span><span class="op">)</span>,</span>
 <span>  selSet <span class="op">=</span> <span class="st">""</span>,</span>
@@ -55,30 +55,33 @@
 
 
 <dl><dt id="arg-dtainp">dtaInp<a class="anchor" aria-label="anchor" href="#arg-dtainp"></a></dt>
-<dd><p>Either a data frame or the name of a data file to be read (including the path, if required; "FILENAME.ext"; default: NULL); files can be of
-any supported file type, see Details below</p></dd>
+<dd><p>Either a data frame or the name of a data file to be read (including the path, if required;
+"FILENAME.ext"; default: NULL); files can be of any supported file type, see Details below.</p></dd>
 
 
 <dt id="arg-fleout">fleOut<a class="anchor" aria-label="anchor" href="#arg-fleout"></a></dt>
-<dd><p>Name of the data file to be written (including the path, if required; "FILE_OUT.omv"; default: ""); if empty, the resulting data frame is
-returned instead</p></dd>
+<dd><p>Name of the data set / file to be written (including the path, if required; "FILE_OUT.omv";
+default: ""); if empty, the resulting data frame is returned instead.</p></dd>
 
 
 <dt id="arg-varsrt">varSrt<a class="anchor" aria-label="anchor" href="#arg-varsrt"></a></dt>
-<dd><p>Variable(s) that are used to sort the data frame (see Details; default: c())</p></dd>
+<dd><p>Variable(s) that are used to sort the data frame (see Details; default: NULL)</p></dd>
 
 
 <dt id="arg-psvanl">psvAnl<a class="anchor" aria-label="anchor" href="#arg-psvanl"></a></dt>
-<dd><p>Whether analyses that are contained in the input file shall be transferred to the output file (TRUE / FALSE; default: FALSE)</p></dd>
+<dd><p>Whether analyses that are contained in the input file shall be transferred to the output file (TRUE /
+FALSE; default: FALSE)</p></dd>
 
 
 <dt id="arg-usepkg">usePkg<a class="anchor" aria-label="anchor" href="#arg-usepkg"></a></dt>
-<dd><p>Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata and SAS files; "foreign" is the default (it comes with
-base R), but "haven" is newer and more comprehensive</p></dd>
+<dd><p>Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata, and SAS files;
+"foreign" is the default (it is included in base R), but "haven" is newer and more comprehensive; you
+may have to install using <code>install.packages("haven", dep = TRUE)</code>.</p></dd>
 
 
 <dt id="arg-selset">selSet<a class="anchor" aria-label="anchor" href="#arg-selset"></a></dt>
-<dd><p>Name of the data set that is to be selected from the workspace (only applies when reading .RData-files)</p></dd>
+<dd><p>Name of the object / data set that is to be selected from the workspace (only relevant when reading
+.RData-files which can contain several objects / data sets)</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
@@ -87,27 +90,25 @@ base R), but "haven" is newer and more comprehensive</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>a data frame (only returned if <code>fleOut</code> is empty) where the input data set is sorted (according to the variables in <code>varSrt</code>)</p>
+    <p>a data frame (only returned if <code>fleOut</code> is empty) where the input data set is sorted (according to the
+variables in <code>varSrt</code>)</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
 
-<ul><li><p><code>varSrt</code> can be either a character or a character vector (with one or more variables respectively). The sorting order for a particular variable can be
-inverted with preceding the variable name with "-". Please note that this doesn't make sense and hence throws a warning for certain variable types (e.g.,
-factors).</p></li>
-<li><p>The ellipsis-parameter (<code>...</code>) can be used to submit arguments / parameters to the functions that are used for reading and writing the data. By clicking
-on the respective function under “See also”, you can get a more detailed overview over which parameters each of those functions take. The functions are:
-<code>read_omv</code> and <code>write_omv</code> (for jamovi-files), <code>read.table</code> (for CSV / TSV files; using similar defaults as <code>read.csv</code> for CSV and <code>read.delim</code> for TSV
-which both are based upon <code>read.table</code>), <code>load</code> (for .RData-files), <code>readRDS</code> (for .rds-files), <code>read_sav</code> (needs the R-package <code>haven</code>) or <code>read.spss</code>
-(needs the R-package <code>foreign</code>) for SPSS-files, <code>read_dta</code> (<code>haven</code>) / <code>read.dta</code> (<code>foreign</code>) for Stata-files, <code>read_sas</code> (<code>haven</code>) for SAS-data-files,
-and <code>read_xpt</code> (<code>haven</code>) / <code>read.xport</code> (<code>foreign</code>) for SAS-transport-files. If you would like to use <code>haven</code>, you may need to install it using
-<code>install.packages("haven", dep = TRUE)</code>.</p></li>
+<ul><li><p><code>varSrt</code> can be either a character or a character vector (with one or more variables respectively). The sorting
+order for a particular variable can be inverted with preceding the variable name with "-". Please note that this
+doesn't make sense and hence throws a warning for certain variable types (e.g., factors).</p></li>
+<li><p>The ellipsis-parameter (<code>...</code>) can be used to submit arguments / parameters to the functions that are used for
+reading the data. By clicking on the respective function under “See also”, you can get a more detailed overview
+over which parameters each of those functions take.</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p><code>sort_omv</code> internally uses the following functions for reading and writing data files in different formats: <code><a href="read_omv.html">read_omv()</a></code> and
-<code><a href="write_omv.html">write_omv()</a></code> for jamovi-files, <code><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">utils::read.table()</a></code> for CSV / TSV files, <code><a href="https://rdrr.io/r/base/load.html" class="external-link">load()</a></code> for reading .RData-files, <code><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS()</a></code> for .rds-files,
-<code><a href="https://haven.tidyverse.org/reference/read_spss.html" class="external-link">haven::read_sav()</a></code> or <code><a href="https://rdrr.io/pkg/foreign/man/read.spss.html" class="external-link">foreign::read.spss()</a></code> for SPSS-files, <code><a href="https://haven.tidyverse.org/reference/read_dta.html" class="external-link">haven::read_dta()</a></code> or <code><a href="https://rdrr.io/pkg/foreign/man/read.dta.html" class="external-link">foreign::read.dta()</a></code> for Stata-files, <code><a href="https://haven.tidyverse.org/reference/read_sas.html" class="external-link">haven::read_sas()</a></code> for
+    <div class="dont-index"><p><code>sort_omv</code> internally uses the following functions for reading and writing data files in different formats:
+<code><a href="read_omv.html">read_omv()</a></code> and <code><a href="write_omv.html">write_omv()</a></code> for jamovi-files, <code><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">utils::read.table()</a></code> for CSV / TSV
+files, <code><a href="https://rdrr.io/r/base/load.html" class="external-link">load()</a></code> for reading .RData-files, <code><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS()</a></code> for .rds-files, <code><a href="https://haven.tidyverse.org/reference/read_spss.html" class="external-link">haven::read_sav()</a></code> or <code><a href="https://rdrr.io/pkg/foreign/man/read.spss.html" class="external-link">foreign::read.spss()</a></code>
+for SPSS-files, <code><a href="https://haven.tidyverse.org/reference/read_dta.html" class="external-link">haven::read_dta()</a></code> or <code><a href="https://rdrr.io/pkg/foreign/man/read.dta.html" class="external-link">foreign::read.dta()</a></code> for Stata-files, <code><a href="https://haven.tidyverse.org/reference/read_sas.html" class="external-link">haven::read_sas()</a></code> for
 SAS-data-files, and <code><a href="https://haven.tidyverse.org/reference/read_xpt.html" class="external-link">haven::read_xpt()</a></code> or <code><a href="https://rdrr.io/pkg/foreign/man/read.xport.html" class="external-link">foreign::read.xport()</a></code> for SAS-transport-files.</p></div>
     </div>
 

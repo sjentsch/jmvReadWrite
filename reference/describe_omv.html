@@ -113,19 +113,11 @@ informing you about that).</p></li>
 set (see <code>chrDsc</code> in the examples for HTML tags that are currently implemented; putting "unformatted" text is not
 a problem, but then the result is just plain text without formatting). Alternatively, <code>dtaDcs</code> can be a named list
 with the entries <code>description</code>, <code>variables</code>, <code>references</code>, <code>license</code>. All entries except from <code>variables</code> contain
-character vectors (typically with the length = 1); <code>variables</code> shall be a named list with the variable name as
-name and a description what the variable contains as entry. <code>description</code> and <code>variables</code> must be given,
-<code>references</code> and <code>license</code> can be left blank (""; but the names must be present in the list). <code>license</code> can also
-a character vector containing one of the following keywords, producing a license text fitting the respective
-license: "CC0" (Creative Commons, CC0), "DT_CC4-BY-NC-ND" and "FC_CC4-BY-NC-ND" (Creative Commons, CC BY-NC-ND
-4.0, for data from scientific studies "DT_" or generated / simulated data sets "FC_"; both need the license holder
-to be given as the second element of the character vector for the list entry <code>license</code>, e.g., <code>list(..., list = c("DT_CC4-BY-NC-ND", "John Doe"))</code>, "RP_GPL2", "RP_GPL3", "RP_AGPL3", and "RP_LGPL3" are for data sets that were
-originally part of R-packages under different versions of the GNU General Public License (respectively, GNU
-General Public License 2.x, GNU General Public License 3.0, GNU Affero General Public License 3.0, and GNU Lesser
-General Public License 3.0; these need the name of the R-package to be given as the second element of the
-character vector for the list entry <code>license</code>, e.g., <code>list(..., list = c("RP_GPL2", "jmv")</code>. Examples for both
-named lists with a description (<code>lstDsc</code>), as well as a character vector with all HTML tags that are implemented
-(<code>chrDsc</code>) can be found in the examples below.</p></li>
+character vectors (length = 1); <code>variables</code> shall be a named list with the variable name as name and a description
+what the variable contains as entry. <code>description</code> and <code>variables</code> must be given, <code>references</code> and <code>license</code> can
+be left blank (""; but the names must be present in the list). An example for both a named list with a description
+(<code>lstDsc</code>), as well as a character vector with all HTML tags that are implemented (<code>chrDsc</code>) can be found in the
+examples below.</p></li>
 <li><p>The ellipsis-parameter (<code>...</code>) can be used to submit arguments / parameters to the functions that are used for
 reading the data. By clicking on the respective function under “See also”, you can get a more detailed overview
 over which parameters each of those functions take.</p></li>
@@ -141,11 +133,10 @@ SAS-data-files, and <code><a href="https://haven.tidyverse.org/reference/read_xp
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">nmeOut</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".omv"</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">dtaFrm</span> <span class="op">&lt;-</span> <span class="fu">jmvReadWrite</span><span class="fu">::</span><span class="va"><a href="ToothGrowth.html">ToothGrowth</a></span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"len"</span>, <span class="st">"supp"</span>, <span class="st">"dose"</span><span class="op">)</span><span class="op">]</span></span></span>
+<span class="r-in"><span><span class="va">nmeOut</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".omv"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># the paste's underneath are only for readability (without them, the vignettes are misformatted)</span></span></span>
-<span class="r-in"><span><span class="co"># example for a data set without a license</span></span></span>
-<span class="r-in"><span><span class="va">dtaFrm</span> <span class="op">&lt;-</span> <span class="fu">jmvReadWrite</span><span class="fu">::</span><span class="va"><a href="ToothGrowth.html">ToothGrowth</a></span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"len"</span>, <span class="st">"supp"</span>, <span class="st">"dose"</span><span class="op">)</span><span class="op">]</span></span></span>
 <span class="r-in"><span><span class="va">lstDsc</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>description <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"The response is the length of odontoblasts (cells"</span>,</span></span>
 <span class="r-in"><span>                                   <span class="st">"responsible for tooth growth) in 60 guinea pigs. Each"</span>,</span></span>
 <span class="r-in"><span>                                   <span class="st">"animal received one of three dose levels of vitamin C"</span>,</span></span>
@@ -154,7 +145,7 @@ SAS-data-files, and <code><a href="https://haven.tidyverse.org/reference/read_xp
 <span class="r-in"><span>                                   <span class="st">"coded as VC)."</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>               variables <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>len  <span class="op">=</span> <span class="st">"Tooth length"</span>,</span></span>
 <span class="r-in"><span>                                supp <span class="op">=</span> <span class="st">"Supplement type (VC or OJ)"</span>,</span></span>
-<span class="r-in"><span>                                dose <span class="op">=</span> <span class="st">"Dose (in milligrams / day)"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                                dose <span class="op">=</span> <span class="st">"Dose (in milligrams / day"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>               references <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"Crampton, E. W. (1947). The growth of the odontoblast of"</span>,</span></span>
 <span class="r-in"><span>                                  <span class="st">"the incisor teeth as a criterion of vitamin C intake of"</span>,</span></span>
 <span class="r-in"><span>                                  <span class="st">"the guinea pig. &lt;em&gt;The Journal of Nutrition, 33&lt;/em&gt;(5),"</span>,</span></span>
@@ -165,34 +156,8 @@ SAS-data-files, and <code><a href="https://haven.tidyverse.org/reference/read_xp
 <span class="r-in"><span><span class="co"># don't include the unlink, if you copy the code and want to look at the resulting output file</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="va">nmeOut</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># example for a data set which is part of the R-package `datasets` under the GPL2</span></span></span>
-<span class="r-in"><span><span class="va">dtaFrm</span> <span class="op">&lt;-</span> <span class="fu">datasets</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/r/datasets/penguins.html" class="external-link">penguins</a></span></span></span>
-<span class="r-in"><span><span class="va">lstDsc</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>description <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"Data on adult penguins covering three species found on"</span>,</span></span>
-<span class="r-in"><span>                                   <span class="st">"three islands in the Palmer Archipelago, Antarctica,"</span>,</span></span>
-<span class="r-in"><span>                                   <span class="st">"including their size (flipper length, body mass, bill"</span>,</span></span>
-<span class="r-in"><span>                                   <span class="st">"dimensions), and sex."</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>               variables <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>species     <span class="op">=</span> <span class="st">"Species (Adelie, Chinstrap, and Gentoo)"</span>,</span></span>
-<span class="r-in"><span>                                island      <span class="op">=</span> <span class="st">"Island (Biscoe, Dream, and Torgersen)"</span>,</span></span>
-<span class="r-in"><span>                                bill_len    <span class="op">=</span> <span class="st">"Bill length (in mm)"</span>,</span></span>
-<span class="r-in"><span>                                bill_dep    <span class="op">=</span> <span class="st">"Bill depth (in mm)"</span>,</span></span>
-<span class="r-in"><span>                                flipper_len <span class="op">=</span> <span class="st">"Flipper length (in mm)"</span>, </span></span>
-<span class="r-in"><span>                                body_mass   <span class="op">=</span> <span class="st">"Body mass (in g)"</span>,</span></span>
-<span class="r-in"><span>                                sex         <span class="op">=</span> <span class="st">"Sex (female and male)"</span>,</span></span>
-<span class="r-in"><span>                                year        <span class="op">=</span> <span class="st">"Study year: 2007, 2008, or 2009"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>               references <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"Gorman, K. B., Williams, T. D., &amp; Fraser, W. R. (2014)."</span>,</span></span>
-<span class="r-in"><span>                                  <span class="st">"Ecological sexual dimorphism and environmental variability"</span>,</span></span>
-<span class="r-in"><span>                                  <span class="st">"within a community of antarctic penguins (Genus pygoscelis)."</span>,</span></span>
-<span class="r-in"><span>                                  <span class="st">"&lt;em&gt;PLoS ONE, 9&lt;/em&gt;(3), e90081."</span>,</span></span>
-<span class="r-in"><span>                                  <span class="st">"https://doi.org/10.1371/journal.pone.0090081"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>               license <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"RP_GPL2"</span>, <span class="st">"datasets"</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">jmvReadWrite</span><span class="fu">::</span><span class="fu">describe_omv</span><span class="op">(</span>dtaInp <span class="op">=</span> <span class="va">dtaFrm</span>, fleOut <span class="op">=</span> <span class="va">nmeOut</span>, dtaTtl <span class="op">=</span> <span class="st">"Penguins"</span>,</span></span>
-<span class="r-in"><span>                           dtaDsc <span class="op">=</span> <span class="va">lstDsc</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="co"># don't include the unlink, if you copy the code and want to look at the resulting output file</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="va">nmeOut</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># the code underneath should cover all formatting options jamovi is able to use (paste0 is only</span></span></span>
 <span class="r-in"><span><span class="co"># for readability)</span></span></span>
-<span class="r-in"><span><span class="va">dtaFrm</span> <span class="op">&lt;-</span> <span class="fu">jmvReadWrite</span><span class="fu">::</span><span class="va"><a href="ToothGrowth.html">ToothGrowth</a></span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"len"</span>, <span class="st">"supp"</span>, <span class="st">"dose"</span><span class="op">)</span><span class="op">]</span></span></span>
 <span class="r-in"><span><span class="va">chrDsc</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"&lt;p&gt;&lt;strong&gt;Trial - all formattings:&lt;/strong&gt;&lt;br/&gt;"</span>,</span></span>
 <span class="r-in"><span>                 <span class="st">"&lt;strong&gt;bold&lt;/strong&gt;&lt;br/&gt;&lt;strong&gt;&lt;em&gt;bold, italics&lt;/em&gt;&lt;/strong&gt;&lt;br/&gt;"</span>,</span></span>
 <span class="r-in"><span>                 <span class="st">"&lt;em&gt;italics&lt;/em&gt;&lt;br/&gt;&lt;u&gt;underlined&lt;/u&gt;&lt;br/&gt;&lt;s&gt;strikethrough&lt;/s&gt;&lt;br/&gt;"</span>,</span></span>

@@ -264,10 +264,10 @@ jmvReadWrite::aggregate_omv(dtaInp = nmeInp, fleOut = nmeOut, varAgg = c("V1", "
 # SD, IQR, etc.) to be calculated
 # check whether the file was created and its size
 cat(list.files(dirname(nmeOut), basename(nmeOut)))
-#> file27bc5d702753.omv
+#> file291638d33660.omv
 # -> "file[...].omv" ([...] contains a random combination of numbers / characters
 cat(file.info(nmeOut)$size)
-#> 4433
+#> 4337
 # -> 4898 (approximate size; size may differ in every run [in dependence of
 #          how well the generated random data can be compressed])
 cat(str(jmvReadWrite::read_omv(nmeOut, sveAtt = FALSE)))

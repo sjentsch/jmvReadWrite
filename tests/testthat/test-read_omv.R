@@ -91,29 +91,30 @@ test_that("read_omv works", {
 
     # test cases for code coverage ====================================================================================
     # fleInp is not given or empty
-    expect_error(read_omv(),   regexp = "^File name to the input data file needs to be given as parameter \\(fleInp = \\.\\.\\.\\)\\.")
-    expect_error(read_omv(""), regexp = "^File name to the input data file needs to be given as parameter \\(fleInp = \\.\\.\\.\\)\\.")
+    expect_error(read_omv(),   "^File name to the input data file needs to be given as parameter \\(fleInp = \\.\\.\\.\\)\\.")
+    expect_error(read_omv(""), "^File name to the input data file needs to be given as parameter \\(fleInp = \\.\\.\\.\\)\\.")
     # fleInp is not a jamovi-file (.omv)
     expect_error(read_omv("Trial.rds"),
-      regexp = "^read_omv only reads jamovi files \\(\\.omv\\ / \\.omt\\), use convert_to_omv first, if you want to read other files types\\.")
+                 "^read_omv only reads jamovi files \\(\\.omv\\ / \\.omt\\), use convert_to_omv first, if you want to read other files types\\.")
     # the manifest must have a file name as second parameter and
     # the file has to be a valid manifest file (which is not the
     # case for "index.html" [exists, but isn't a manifest])
-    expect_error(chkMnf(nmeInp, NULL), regexp = "^File \".*?\" has not the correct file format \\(is missing the jamovi-file-manifest\\)\\.")
+    expect_error(chkMnf(nmeInp, NULL), "^File \".*?\" has not the correct file format \\(is missing the jamovi-file-manifest\\)\\.")
     expect_error(chkMnf(nmeInp, "index.html"),
-      regexp = "^The file you are trying to read \\(ToothGrowth\\.omv\\) has an improper manifest file \\(meta\\) and is likely corrupted\\.")
+                 "^The file you are trying to read \\(\"ToothGrowth\\.omv\"\\) has an improper manifest file \\(meta\\) and is likely corrupted\\.")
 
     # .omv-file isn't a ZIP
     nmeTmp <- tempfile(fileext = ".omv")
     writeBin("", con = nmeTmp)
-    expect_error(chkFle(nmeTmp, isZIP = TRUE), regexp = "^chkFle: File \".*\" has not the correct file format \\(is not a ZIP archive\\)\\.")
+    expect_error(chkFle(nmeTmp, isZIP = TRUE),
+                 "^chkFle: File \".*\" has not the correct file format \\(is not a ZIP archive\\)\\.")
     unlink(nmeTmp)
 
     # invalid manifest (wrong version number)
     nmeTmp <- tempfile(fileext = ".omv")
     add2ZIP(nmeTmp, crrFle = c("meta", "wb"), txtOut = gsub("jamovi-Archive-Version: 11.0", "jamovi-Archive-Version: 99.0", mnfTxt()))
-    suppressMessages(expect_warning(expect_error(read_omv(nmeTmp), regexp = "^'con' is not a connection"),
-      regexp = "^The file that you are trying to read \\(.*\\) was written with a version of jamovi that currently is not implemented"))
+    expect_warning(suppressMessages(expect_error(read_omv(nmeTmp), "^'con' is not a connection")),
+                   "^The file that you are trying to read ")
     suppressMessages(expect_null(getHdl(fleOMV = nmeTmp, crrFle = "MANIFEST.MF")))
     unlink(nmeTmp)
 
@@ -127,7 +128,7 @@ test_that("read_omv works", {
 
     # unimplemented columnType when assigning value labels
     expect_error(valLbl(mtaCol = list(name = "Trial", columnType = "Trial", dataType = "Trial"), xtdDta = list(Trial = NULL)),
-      regexp = "Error when reading value label - likely the column type is not implemented \\(yet\\): Trial - Trial - Trial")
+                 "Error when reading value label - likely the column type is not implemented \\(yet\\): Trial - Trial - Trial")
 })
 
 test_that("read_all works", {
@@ -167,8 +168,8 @@ test_that("read_all works", {
 
     # test cases for code coverage ====================================================================================
     # empty file name
-    expect_error(read_all(),   regexp = "^File name to the input data file needs to be given as parameter \\(fleInp = \\.\\.\\.\\)\\.")
-    expect_error(read_all(""), regexp = "^File name to the input data file needs to be given as parameter \\(fleInp = \\.\\.\\.\\)\\.")
+    expect_error(read_all(),   "^File name to the input data file needs to be given as parameter \\(fleInp = \\.\\.\\.\\)\\.")
+    expect_error(read_all(""), "^File name to the input data file needs to be given as parameter \\(fleInp = \\.\\.\\.\\)\\.")
 
     # more than one object when using Rdata
     D1 <- data.frame(A = runif(n = 100))
@@ -236,14 +237,14 @@ test_that("read_all works", {
     nmeInp <- tempfile(fileext = ".csv")
     writeBin("X1,X2\n1.2,2.2\n7.1,3.2", nmeInp)
     expect_message(expect_null(read_all(nmeInp)),
-      regexp = "^Warnings were issued when reading the file \".*\"\\.\nThe warning was: line 3 appears to contain embedded nulls")
+                   "^Warnings were issued when reading the file \".*\"\\.\nThe warning was: line 3 appears to contain embedded nulls")
     unlink(nmeInp)
 
     fleInp <- tempfile(fileext = ".sav")
     writeBin("$FL2@(#) IBM SPSS STATISTICS 64-bit Linux 25.0.0.0              \002", con = fleInp)
     expect_message(expect_null(read_all(fleInp, usePkg = "haven")),
-      regexp = "^File \".*\" couldn't be read\\.\nThe error message was: Failed to parse .*: Unable to read from file\\.")
-    expect_message(expect_null(read_all(fleInp, usePkg = "foreign")), regexp = "^File \".*\" couldn't be read\\.")
+                   "^File \".*\" couldn't be read\\.\nThe error message was: Failed to parse .*: Unable to read from file\\.")
+    expect_message(expect_null(read_all(fleInp, usePkg = "foreign")), "^File \".*\" couldn't be read\\.")
     unlink(fleInp)
     if (requireNamespace("haven", quietly = TRUE)) {
         haven::write_sav(jmvReadWrite::ToothGrowth, fleInp)
@@ -259,9 +260,9 @@ test_that("read_all works", {
     fleInp <- tempfile(fileext = ".dta")
     writeBin("<stata_dta><header><release>117</release><byteorder>LSF</byteorder><K>\x8f", con = fleInp)
     suppressWarnings(expect_message(expect_null(read_all(fleInp, usePkg = "haven")),
-      regexp = "File \".*\" couldn't be read\\.\nThe error message was: Failed to parse .*: Unable to read from file\\."))
+                                    "File \".*\" couldn't be read\\.\nThe error message was: Failed to parse .*: Unable to read from file\\."))
     suppressWarnings(expect_message(expect_null(read_all(fleInp, usePkg = "foreign")),
-      regexp = "File \".*\" couldn't be read\\.\nThe error message was: not a Stata version 5-12 .dta file"))
+                                    "File \".*\" couldn't be read\\.\nThe error message was: not a Stata version 5-12 .dta file"))
     unlink(fleInp)
     if (requireNamespace("haven", quietly = TRUE)) {
         haven::write_dta(jmvReadWrite::ToothGrowth, fleInp)
@@ -292,9 +293,9 @@ test_that("read_all works", {
     fleInp <- tempfile(fileext = ".xpt")
     writeBin("HEADER RECORD*******LIBRARY HEADER RECORD!!!!!!!", con = fleInp)
     expect_message(expect_null(read_all(fleInp, usePkg = "haven")),
-      regexp = "^File \".*\" couldn't be read\\.\nThe error message was: Failed to parse .*: Unable to read from file\\.")
+                   "^File \".*\" couldn't be read\\.\nThe error message was: Failed to parse .*: Unable to read from file\\.")
     expect_message(expect_null(read_all(fleInp, usePkg = "foreign")),
-      regexp = "^File \".*\" couldn't be read\\.\nThe error message was: file not in SAS transfer format")
+                   "^File \".*\" couldn't be read\\.\nThe error message was: file not in SAS transfer format")
     unlink(fleInp)
     if (requireNamespace("haven", quietly = TRUE)) {
         haven::write_xpt(jmvReadWrite::ToothGrowth, fleInp)

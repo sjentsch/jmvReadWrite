@@ -81,12 +81,14 @@ convert_to_omv <- function(fleInp = "", fleOut = "", varSrt = NULL, usePkg = c("
     fleInp <- fmtFlI(fleInp, maxLng = 1)
     fleOut <- ifelse(nzchar(fleOut), fmtFlO(fleOut), fmtFlO(sub(paste0("\\.", tools::file_ext(fleInp)), ".omv", fleInp)))
 
-    # read file and sort it (if varSrt is not empty)
+    # read the file
     dtaFrm <- read_all(fleInp = fleInp, usePkg = usePkg, selSet = selSet, ...)
-    dtaFrm <- srtFrm(dtaFrm, varSrt)
-
-    # write file
-    write_omv(dtaFrm = dtaFrm, fleOut = fleOut, ...)
+    # if it is not empty (i.e., if no error occurred during reading)
+    if (!is.null(dtaFrm)) {
+        # sort the data set (if varSrt is not empty) and write it to the output file
+        dtaFrm <- srtFrm(dtaFrm, varSrt)
+        write_omv(dtaFrm = dtaFrm, fleOut = fleOut, ...)
+    }
 
     invisible(NULL)
 }

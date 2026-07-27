@@ -539,7 +539,7 @@ test_that("describe_omv works", {
                             "when using the dataset.</em></p>"))
     expect_error(crtHTM(list(description = "", variables = list(A = "A"), license = c("RP_GPL3", "RPKG")), lngDsc = "XX"),
                  "No translation available \\(yet\\) for XX\\.")
-    expect_error(crtHTM(list(description = "", variables = list(A = "A"), license = c("RP_AGPL3"))),
+    expect_error(crtHTM(list(description = "", variables = list(A = "A"), license = "RP_AGPL3")),
                  "When using this license, the R-package where the data are originating from needs to be defined\\.")
     expect_identical(crtHTM(list(description = "", variables = list(A = "A"), license = c("RP_AGPL3", "RPKG"))),
                      paste0("<p><strong>Description:</strong></p><p></p><p><br/><strong>Variables:</strong></p><ul>",

@@ -181,8 +181,8 @@ describe_omv <- function(dtaInp = NULL, fleOut = "", dtaTtl = NULL, dtaDsc = NUL
         results = RProtoBuf::new(jamovi.coms.ResultsElement, title = "Results", status = 3, group = RProtoBuf::new(jamovi.coms.ResultsGroup)),
         status = 3, index = 1, title = "Results", hasTitle = TRUE)
 
-    # rtnDta in globals.R (unified function to either write the data frame, open it in a new jamovi session or return it)
-    rtnDta(dtaFrm = dtaFrm, fleOut = fleOut, dtaTtl = jmvTtl("_desc"), wrtPtB = TRUE, ...)
+    # rtnDta in globals.R (unified function to either write the data frame or return it)
+    rtnDta(dtaFrm = dtaFrm, fleOut = fleOut, wrtPtB = TRUE, ...)
 }
 
 # =================================================================================================
@@ -238,8 +238,8 @@ crtHTM <- function(inpDsc = NULL, lngDsc = "EN") {
     }
     if (length(inpDsc[["license"]]) > 0    && all(nzchar(inpDsc[["license"]]))) {
         if (grepl("^CC0|^DT_CC4-BY-NC-ND|^FC_CC4-BY-NC-ND|^RP_GPL2|^RP_GPL3|^RP_AGPL3|^RP_LGPL3", inpDsc[["license"]][1])) {
-            licDsc <- defLic(inpDsc[["license"]][1], lngDsc, inpDsc[["license"]][2])
-            outDsc <- paste0(outDsc, "<p><br/>", defLic(paste0("<em>", licDsc,                 "</em>")))
+            licDsc <- defLic(inpDsc[["license"]][1], lngDsc, ifelse(length(inpDsc[["license"]]) > 1, inpDsc[["license"]][2], ""))
+            outDsc <- paste0(outDsc, "<p><br/>", clnHTM(paste0("<em>", licDsc,                 "</em>")))
         } else {
             outDsc <- paste0(outDsc, "<p><br/>", clnHTM(paste0("<em>", inpDsc[["license"]][1], "</em>")))
         }
@@ -280,7 +280,7 @@ defLic <- function(licNme = "", crrLng = "EN", licHld = "") {
         } else if (crrLng == "JP") {
             stop(sprintf("No translation available (yet) for %s.", crrLng))
         } else if (crrLng == "NB") {
-            paste("Datasettet er offentlig tilgjengelig, og forfatteren har fraskrevet seg alle rettigheter til",
+            paste("Dette datasettet er offentlig tilgjengelig, og forfatteren har fraskrevet seg alle rettigheter til",
                   "datasettet. Du kan derfor kopiere, endre og distribuere datasettet, ogs\u00e5 til kommersielle",
                   "form\u00e5l, uten \u00e5 be om tillatelse. Hvis datasettet er empirisk, er forfatterne oppgitt under",
                   "'Referanser', vennligst siter de aktuelle referansene hvis det er tilfellet.")
@@ -306,7 +306,7 @@ defLic <- function(licNme = "", crrLng = "EN", licHld = "") {
                    "opphavsretten. Uten uttrykkelig samtykke fra studieforfatterne ",
                    rep(paste0("og ", licHld, " "), nzchar(licHld)), "kan dette datasettet ikke distribueres for ",
                    "kommersielle form\u00e5l, ikke redigeres og ikke brukes uten \u00e5 oppgi kilden (dvs. ",
-                   "vilk\u00e5rene i en CC BY-NC-ND-lisens).")
+                   "vilk\u00e5rene i CC BY-NC-ND-lisensen).")
         } else {
             stop(sprintf("No translation available (yet) for %s.", crrLng))
         }
@@ -326,7 +326,7 @@ defLic <- function(licNme = "", crrLng = "EN", licHld = "") {
         } else if (crrLng == "JP") {
             stop(sprintf("No translation available (yet) for %s.", crrLng))
         } else if (crrLng == "NB") {
-            paste0("Datasettet er utarbeidet av ", licHld, ", som derfor eier opphavsretten. Uten uttrykkelig ",
+            paste0("Dette datasettet er utarbeidet av ", licHld, ", som derfor eier opphavsretten. Uten uttrykkelig ",
                    "samtykke fra ", licHld, " kan dette datasettet ikke distribueres for kommersielle form\u00e5l, ",
                    "redigeres eller brukes uten \u00e5 oppgi kilden (dvs. vilk\u00e5rene i CC BY-NC-ND-lisens).")
         } else {
@@ -337,12 +337,12 @@ defLic <- function(licNme = "", crrLng = "EN", licHld = "") {
                     rep("GNU General Public License 3.0",        licNme == "RP_GPL3"),
                     rep("GNU Affero General Public License 3.0", licNme == "RP_AGPL3"),
                     rep("GNU Lesser General Public License 3.0", licNme == "RP_LGPL3"))
-        if        (licHld == "")
+        if (!nzchar(licHld))
             stop("When using this license, the R-package where the data are originating from needs to be defined.")
         if        (crrLng == "DE") {
             paste0("Dieser Datensatz ist Teil des R-Pakets '", licHld, ", das unter den Bedingungen der ", licFlN, " ",
                    "ver\u00f6ffentlicht wurde. Sie k\u00f6nnen die Daten sowohl privat als auch kommerziell nutzen, ",
-                   "verbreiten oder ver\u00e4ndern. Bei der Verwendung des Datensatzes m\u00fcssen Sie die  Quelle ",
+                   "verbreiten oder ver\u00e4ndern. Bei der Verwendung des Datensatzes m\u00fcssen Sie die Quelle ",
                    "angeben und alle \u00e4nderungen, die Sie vornehmen, unter derselben Lizenz ",
                    "ver\u00f6ffentlichen. Wenn der Datensatz auf empirischer Forschung basiert, sind die Autoren im ",
                    "Abschnitt 'Referenzen' angegeben. Zitieren Sie in diesem Fall die Studie, wenn Sie den Datensatz ",
@@ -352,7 +352,7 @@ defLic <- function(licNme = "", crrLng = "EN", licHld = "") {
                    "the terms of the ", licFlN, ". You may use the data both privately and commercially, distribute ",
                    "or modify them. When using the data set, you need to disclose the source, and publish any ",
                    "modifications you may make under the same license. If the data set is based on empirical data, ",
-                   "the authors are given in the 'References'-section. In such case, please  cite them when using ",
+                   "the authors are given in the 'References'-section. In such case, please cite them when using ",
                    "the dataset.")
         } else if (crrLng == "JP") {
             stop(sprintf("No translation available (yet) for %s.", crrLng))

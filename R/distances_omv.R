@@ -224,8 +224,8 @@ distances_omv <- function(dtaInp = NULL, fleOut = "", varDst = NULL, clmDst = TR
     dstFrm <- as.data.frame(dstMtx)
     if (mtxSps || mtxTrL) dstFrm <- mtxF2S(dstFrm, rmvTrU = mtxTrL, rmvDgn = !mtxDgn, mtxSps = mtxSps)
 
-    # rtnDta in globals.R (unified function to either write the data frame, open it in a new jamovi session or return it)
-    rtnDta(dtaFrm = dstFrm, fleOut = fleOut, dtaTtl = jmvTtl("_dist"), ...)
+    # rtnDta in globals.R (unified function to either write the data frame or return it)
+    rtnDta(dtaFrm = dstFrm, fleOut = fleOut, ...)
 }
 
 # helper and calculation functions ================================================================

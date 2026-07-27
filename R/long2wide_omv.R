@@ -157,8 +157,8 @@ long2wide_omv <- function(dtaInp = NULL, fleOut = "", varTgt = NULL, varExc = NU
     # if varID is unique, set it's measureType to ID
     if (!anyDuplicated(dtaFrm[[varID]])) attr(dtaFrm[[varID]], "jmv-id") <- TRUE
 
-    # rtnDta in globals.R (unified function to either write the data frame, open it in a new jamovi session or return it)
-    rtnDta(dtaFrm = dtaFrm, fleOut = fleOut, dtaTtl = jmvTtl("_wide"), ...)
+    # rtnDta in globals.R (unified function to either write the data frame or return it)
+    rtnDta(dtaFrm = dtaFrm, fleOut = fleOut, ...)
 }
 
 aggDta <- function(dtaFrm = NULL, varAgg = "", varID = NULL, varTme = NULL, varExc = NULL, varTgt = NULL) {

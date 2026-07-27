@@ -114,10 +114,11 @@ test_that("label_vars_omv works", {
     unlink(nmeOut)
     expect_warning(label_vars_omv(dtaInp = jmvReadWrite::AlbumSales, fleOut = nmeOut,
                                   varLbl = c("Include participant?", "Sales", "Adverts", "Airplay", "Image"), psvAnl = TRUE),
-                   "^psvAnl is only possible if dtaInp is a file name \\(analyses are not stored in data frames, only in the jamovi files\\)\\.")
-    expect_warning(label_vars_omv(dtaInp = jmvReadWrite::AlbumSales,
-                                  varLbl = c("Include participant?", "Sales", "Adverts", "Airplay", "Image"), psvAnl = TRUE),
-                   "^psvAnl is only possible if fleOut is a file name \\(analyses are not stored in data frames, only in the jamovi files\\)\\.")
+                   paste("^psvAnl is only possible if dtaInp is a file name \\(analyses are not stored in data frames,",
+                         "only in the jamovi files\\)\\."))
+    expect_warning(label_vars_omv(dtaInp = file.path("..", "ToothGrowth.omv"), varLbl = LETTERS[seq(16)], psvAnl = TRUE),
+                   paste("^psvAnl is only possible if fleOut is a file name \\(analyses are not stored in data frames,",
+                         "only in the jamovi files\\)\\."))
     unlink(nmeOut)
     # do not unlink nmeInp, this isn't a generated file, but a link
 })

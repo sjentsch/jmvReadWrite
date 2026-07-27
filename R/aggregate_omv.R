@@ -194,9 +194,8 @@ aggregate_omv <- function(dtaInp = NULL, fleOut = "", varAgg = NULL, grpAgg = NU
 
     for (crrCol in names(dscOut)) attr(frmOut[, crrCol], "description") <- dscOut[[crrCol]]
 
-    # rtnDta in globals.R (unified function to either write the data frame, open it in a new jamovi
-    # session or return it)
-    rtnDta(dtaFrm = frmOut, fleOut = fleOut, dtaTtl = jmvTtl("_agg"), ...)
+    # rtnDta in globals.R (unified function to either write the data frame or return it)
+    rtnDta(dtaFrm = frmOut, fleOut = fleOut, ...)
 }
 
 getFnc <- function(crrClc = "", drpNA = TRUE) {

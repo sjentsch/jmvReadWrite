@@ -93,6 +93,6 @@ combine_cols_omv <- function(dtaInp = NULL, fleOut = "", varPrs = list(), mdeCmb
         dtaFrm <- dtaFrm[, setdiff(names(dtaFrm), crrPrs[2])]
     }
 
-    # rtnDta in globals.R (unified function to either write the data frame, open it in a new jamovi session or return it)
-    rtnDta(dtaFrm = dtaFrm, fleOut = fleOut, dtaTtl = jmvTtl("_cmb_cols"), psvAnl = psvAnl, dtaInp = dtaInp, ...)
+    # rtnDta in globals.R (unified function to either write the data frame or return it)
+    rtnDta(dtaFrm = dtaFrm, fleOut = fleOut, psvAnl = psvAnl, dtaInp = dtaInp, ...)
 }

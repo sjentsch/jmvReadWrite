@@ -105,6 +105,6 @@ transform_vars_omv <- function(dtaInp = NULL, fleOut = "", varXfm = NULL, psvAnl
         }
     }
 
-    # rtnDta in globals.R (unified function to either write the data frame, open it in a new jamovi session or return it)
-    rtnDta(dtaFrm = dtaFrm, fleOut = fleOut, dtaTtl = jmvTtl("_transform_vars"), psvAnl = psvAnl, dtaInp = dtaInp, ...)
+    # rtnDta in globals.R (unified function to either write the data frame or return it)
+    rtnDta(dtaFrm = dtaFrm, fleOut = fleOut, psvAnl = psvAnl, dtaInp = dtaInp, ...)
 }

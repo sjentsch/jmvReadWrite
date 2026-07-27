@@ -85,8 +85,8 @@ replace_omv <- function(dtaInp = NULL, fleOut = "", rplLst = list(), whlTrm = TR
         }
     }
 
-    # rtnDta in globals.R (unified function to either write the data frame, open it in a new jamovi session or return it)
-    rtnDta(dtaFrm = dtaFrm, fleOut = fleOut, dtaTtl = jmvTtl("_rplc"), psvAnl = psvAnl, dtaInp = dtaInp, ...)
+    # rtnDta in globals.R (unified function to either write the data frame or return it)
+    rtnDta(dtaFrm = dtaFrm, fleOut = fleOut, psvAnl = psvAnl, dtaInp = dtaInp, ...)
 }
 
 chkInE <- function(dtaFrm = NULL, varInc = NULL, varExc = NULL, incNum = TRUE, incOrd = TRUE, incNom = TRUE,

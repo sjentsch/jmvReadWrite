@@ -79,7 +79,7 @@ test_that("sort_omv works", {
     expect_warning(sort_omv(dtaInp = jmvReadWrite::AlbumSales, fleOut = nmeOut, varSrt = "Sales", psvAnl = TRUE),
                    "^psvAnl is only possible if dtaInp is a file name \\(analyses are not stored in data frames, only in the jamovi files\\)\\.")
     unlink(nmeOut)
-    expect_warning(sort_omv(dtaInp = jmvReadWrite::AlbumSales, varSrt = "Sales", psvAnl = TRUE),
+    expect_warning(sort_omv(dtaInp = file.path("..", "ToothGrowth.omv"), varSrt = "len", psvAnl = TRUE),
                    "^psvAnl is only possible if fleOut is a file name \\(analyses are not stored in data frames, only in the jamovi files\\)\\.")
     unlink(nmeOut)
 })

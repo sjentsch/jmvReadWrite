@@ -222,8 +222,8 @@ wide2long_omv <- function(dtaInp = NULL, fleOut = "", varLst = NULL, varExc = NU
     # in analyses, e.g. as random-effects-variable, and this wouldn't be possible if it were still marked as "ID")
     dtaFrm <- rmvID(dtaFrm, varID, hasID)
 
-    # rtnDta in globals.R (unified function to either write the data frame, open it in a new jamovi session or return it)
-    rtnDta(dtaFrm = dtaFrm, fleOut = fleOut, dtaTtl = jmvTtl("_long"), ...)
+    # rtnDta in globals.R (unified function to either write the data frame or return it)
+    rtnDta(dtaFrm = dtaFrm, fleOut = fleOut, ...)
 }
 
 crtVry <- function(crrNmV = NULL, crrTms = NULL, varSpl = NULL, vldPos = NA, crrPos = NA, varSep = "_") {

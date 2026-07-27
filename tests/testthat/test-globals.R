@@ -151,16 +151,22 @@ test_that("globals work", {
                        "case, they are automatically removed\\)\\."))
 
     Sys.setenv(JAMOVI_R_VERSION = paste0(R.version$major, ".", R.version$minor))
-    expect_warning(expect_error(rtnDta(fleOut = "", psvAnl = TRUE),
-      regexp = "The position of the jamovi executable could not be determined or it was not found at the determined position\\. Determined position:"),
-      regexp = "psvAnl is only possible if fleOut is a file name \\(analyses are not stored in data frames, only in the jamovi files\\)\\.")
+    expect_error(jmvOpn(),
+                 paste("The position of the jamovi executable could not be determined or it was not found at the",
+                       "determined position\\. Determined position:"))
     Sys.unsetenv("JAMOVI_R_VERSION")
     expect_null(jmvPth(inpPth = R.home(), strTgt = "not_in_path", bfrTgt = TRUE))
 
-    Sys.setenv(JAMOVI_R_VERSION = paste0(R.version$major, ".", R.version$minor))
-    expect_identical(jmvTtl("_arr_col"), "Dataset_arr_col")
-    Sys.unsetenv("JAMOVI_R_VERSION")
-    expect_identical(jmvTtl("_arr_col"), "")
+    expect_warning(rtnDta(dtaFrm = jmvReadWrite::AlbumSales, fleOut = nmeOMV, psvAnl = TRUE),
+                   paste("psvAnl is only possible if dtaInp is a file name \\(analyses are not stored in data frames,",
+                         "only in the jamovi files\\)\\."))
+    unlink(nmeOMV)
+    expect_warning(rtnDta(dtaFrm = jmvReadWrite::AlbumSales, dtaInp = jmvReadWrite::AlbumSales, fleOut = nmeOMV, psvAnl = TRUE),
+                   paste("psvAnl is only possible if dtaInp is a file name \\(analyses are not stored in data frames,",
+                         "only in the jamovi files\\)\\."))
+    expect_warning(rtnDta(dtaInp = file.path("..", "ToothGrowth.omv"), fleOut = "", psvAnl = TRUE),
+                   paste("psvAnl is only possible if fleOut is a file name \\(analyses are not stored in data frames,",
+                         "only in the jamovi files\\)\\."))
 
     set.seed(1)
     tmpDF <- as.data.frame(cor(matrix(rnorm(1000), nrow = 100)))

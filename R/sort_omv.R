@@ -63,8 +63,8 @@ sort_omv <- function(dtaInp = NULL, fleOut = "", varSrt = NULL, psvAnl = FALSE, 
     # sort data set
     dtaFrm <- srtFrm(dtaFrm, varSrt)
 
-    # rtnDta in globals.R (unified function to either write the data frame, open it in a new jamovi session or return it)
-    rtnDta(dtaFrm = dtaFrm, fleOut = fleOut, dtaTtl = jmvTtl("_sort"), psvAnl = psvAnl, dtaInp = dtaInp, ...)
+    # rtnDta in globals.R (unified function to either write the data frame or return it)
+    rtnDta(dtaFrm = dtaFrm, fleOut = fleOut, psvAnl = psvAnl, dtaInp = dtaInp, ...)
 }
 
 srtFrm <- function(dtaFrm = NULL, varSrt = NULL) {

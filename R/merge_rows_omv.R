@@ -110,7 +110,8 @@ merge_rows_omv <- function(dtaInp = NULL, fleOut = "", typMrg = c("all", "common
         # is prioritized, but yet, it is still impossible to preserve the whole
         # order - i.e., variables missing in one data set may end up at the end)
         varNme <- unlist(lapply(dtaFrm[order(-vapply(dtaFrm, function(x) dim(x)[2], integer(1)))], names))
-        varTyp <- unlist(lapply(dtaFrm[order(-vapply(dtaFrm, function(x) dim(x)[2], integer(1)))], function(D) vapply(D, function(C) class(C)[1], character(1))))
+        varTyp <- unlist(lapply(dtaFrm[order(-vapply(dtaFrm, function(x) dim(x)[2], integer(1)))],
+                                function(D) vapply(D, function(C) class(C)[1], character(1))))
         varNme <- varNme[!duplicated(varNme)]
         for (crrNme in varNme) {
             if (sum(names(varTyp) == crrNme) <= 1) next
@@ -155,8 +156,8 @@ merge_rows_omv <- function(dtaInp = NULL, fleOut = "", typMrg = c("all", "common
     # sort data frame (if varSrt not empty)
     dtaFrm <- srtFrm(dtaFrm, varSrt)
 
-    # rtnDta in globals.R (unified function to either write the data frame, open it in a new jamovi session or return it)
-    rtnDta(dtaFrm = dtaFrm, fleOut = fleOut, dtaTtl = jmvTtl("_mrg_rows"), ...)
+    # rtnDta in globals.R (unified function to either write the data frame or return it)
+    rtnDta(dtaFrm = dtaFrm, fleOut = fleOut, ...)
 }
 
 addCol <- function(dtaFrm = NULL, varNme = NULL, varTyp = NULL) {

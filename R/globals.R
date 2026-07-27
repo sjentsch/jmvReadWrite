@@ -471,24 +471,21 @@ inp2DF <- function(dtaInp = NULL, minDF = 1, maxDF = 1, rmvEmp = FALSE, usePkg =
 #   - return the data frame (in R in any case, or in jamovi if fleOut is NULL)
 #   NB: this makes opening the data frame in a new session the default, if in jamovi
 rtnDta <- function(dtaFrm = NULL, fleOut = "", dtaTtl = "", wrtPtB = FALSE, psvAnl = FALSE, dtaInp = NULL, ...) {
-    if (!is.null(fleOut) && nzchar(fleOut[1])) {
+    if        (psvAnl && (!is.character(dtaInp) || !nzchar(dtaInp[1]))) {
+        warning("psvAnl is only possible if dtaInp is a file name (analyses are not stored in data frames, ",
+                "only in the jamovi files).")
+    } else if (psvAnl && (!is.character(fleOut) || !nzchar(fleOut[1]))) {
+        warning("psvAnl is only possible if fleOut is a file name (analyses are not stored in data frames, ",
+                "only in the jamovi files).")
+    }
+
+    if (is.character(fleOut) && nzchar(fleOut[1])) {
         fleOut <- fmtFlO(fleOut[1])
         write_omv(dtaFrm = dtaFrm, fleOut = fleOut, wrtPtB = wrtPtB, ...)
         # transfer analyses from input to output file
-        if (psvAnl) {
-            if (is.character(dtaInp)) {
-                xfrAnl(dtaInp[1], fleOut)
-            } else {
-                warning("psvAnl is only possible if dtaInp is a file name (analyses are not stored in data frames, only in the jamovi files).")
-            }
-        }
-        invisible(NULL)
-    } else if (isJmv() && is.character(fleOut)) {
-        if (psvAnl) warning("psvAnl is only possible if fleOut is a file name (analyses are not stored in data frames, only in the jamovi files).")
-        jmvOpn(dtaFrm, dtaTtl = dtaTtl)
+        if (psvAnl && is.character(dtaInp) && nzchar(dtaInp[1])) xfrAnl(dtaInp[1], fleOut)
         invisible(NULL)
     } else {
-        if (psvAnl) warning("psvAnl is only possible if fleOut is a file name (analyses are not stored in data frames, only in the jamovi files).")
         dtaFrm
     }
 }
@@ -557,10 +554,6 @@ getOS <- function() {
     }
 }
 
-isJmv <- function() {
-    nzchar(Sys.getenv("JAMOVI_R_VERSION"))
-}
-
 jmvOpn <- function(dtaFrm = NULL, dtaTtl = "", rtnOut = TRUE) {
     # on both Windows and Linux, jamovi is in the path, and, hence,
     # Sys.which should give the full location
@@ -587,7 +580,8 @@ jmvOpn <- function(dtaFrm = NULL, dtaTtl = "", rtnOut = TRUE) {
         jmvReadWrite::write_omv(dtaFrm, fleOut = tmpOut)
         system2(jmvEXE, args = paste0(" --temp --title=\"", dtaTtl, "\" ", tmpOut), stderr = rtnOut, stdout = rtnOut)
     } else {
-        stop(sprintf("The position of the jamovi executable could not be determined or it was not found at the determined position. Determined position: %s", jmvEXE))
+        stop("The position of the jamovi executable could not be determined or it was not found at the determined position. ",
+             sprintf("Determined position: %s", jmvEXE))
     }
 }
 
@@ -598,11 +592,4 @@ jmvPth <- function(inpPth = "", strTgt = "", bfrTgt = TRUE) {
     } else {
         return()
     }
-}
-
-jmvTtl <- function(sfxTtl = "") {
-    # return empty string when not inside jamove (then the title is irrelevant)
-    if (!isJmv()) return("")
-# TO-DO: replace Dataset with the name of the current data set (once this is implemented)
-    return(paste0("Dataset", sfxTtl))
 }

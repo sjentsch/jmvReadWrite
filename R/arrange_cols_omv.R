@@ -70,8 +70,8 @@ arrange_cols_omv <- function(dtaInp = NULL, fleOut = "", varOrd = NULL, varMve =
     dtaFrm <- dtaFrm[, varOrd]
     dtaFrm <- rstAtt(dtaFrm, attLst)
 
-    # rtnDta in globals.R (unified function to either write the data frame, open it in a new jamovi session or return it)
-    rtnDta(dtaFrm = dtaFrm, fleOut = fleOut, dtaTtl = jmvTtl("_arr_cols"), psvAnl = psvAnl, dtaInp = dtaInp, ...)
+    # rtnDta in globals.R (unified function to either write the data frame or return it)
+    rtnDta(dtaFrm = dtaFrm, fleOut = fleOut, psvAnl = psvAnl, dtaInp = dtaInp, ...)
 }
 
 chkOnM <- function(varOrd = NULL, varMve = list()) {

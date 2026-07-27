@@ -453,10 +453,10 @@ getHdl <- function(fleOMV = "", crrFle = "", crrMde = "r") {
         )
 }
 
-getSAS   <- function(fleInp = "", usePkg = "", varArg = list()) {
+getSAS   <- function(fleInp, usePkg, varArg = list()) {
     # SAS data (haven)
     if (hasExt(fleInp, c("sas7bdat", "sd2", "sd7"))) {
-        if        (usePkg == "haven" && hasPkg("haven")) {
+        if        (any(usePkg == "haven") && hasPkg("haven")) {
             tmpHvn <- tryCatch(do.call(haven::read_sas, adjArg("haven::read_sas", list(data_file = fleInp), varArg, "data_file")),
                                error   = function(errMsg) tryErr(fleInp, errMsg),
                                warning = function(wrnMsg) tryErr(fleInp, wrnMsg))
@@ -468,12 +468,12 @@ getSAS   <- function(fleInp = "", usePkg = "", varArg = list()) {
         }
     # SAS-transport-files (haven / foreign)
     } else if (hasExt(fleInp, c("xpt", "stx", "stc"))) {
-        if ((length(usePkg) > 1 || !nzchar(usePkg) || usePkg == "haven") && hasPkg("haven")) {
+        if ((length(usePkg) > 1 || !nzchar(usePkg) || any(usePkg == "haven")) && hasPkg("haven")) {
             tmpHvn <- tryCatch(do.call(haven::read_xpt, adjArg("haven::read_xpt", list(file = fleInp), varArg, "file")),
                                error   = function(errMsg) tryErr(fleInp, errMsg),
                                warning = function(wrnMsg) tryErr(fleInp, wrnMsg))
             clnTbb(tmpHvn, c("format.sas", "display_width"), jmvLbl = TRUE)
-        } else if (usePkg == "foreign" && hasPkg("foreign")) {
+        } else if (any(usePkg == "foreign") && hasPkg("foreign")) {
             fgnTmp <- tryCatch(do.call(foreign::read.xport, adjArg("foreign::read.xport", list(file = fleInp), varArg, "file")),
                                error   = function(errMsg) tryErr(fleInp, errMsg))
             clnFgn(fgnTmp)
@@ -484,13 +484,13 @@ getSAS   <- function(fleInp = "", usePkg = "", varArg = list()) {
     }
 }
 
-getSPSS  <- function(fleInp = "", usePkg = "", varArg = list()) {
-    if ((length(usePkg) > 1 || !nzchar(usePkg) || usePkg == "haven") && hasPkg("haven")) {
+getSPSS  <- function(fleInp, usePkg, varArg = list()) {
+    if ((length(usePkg) > 1 || !nzchar(usePkg) || any(usePkg == "haven")) && hasPkg("haven")) {
         tmpHvn <- tryCatch(do.call(haven::read_sav, adjArg("haven::read_sav", list(file = fleInp), varArg, "file")),
                            error   = function(errMsg) tryErr(fleInp, errMsg),
                            warning = function(wrnMsg) tryErr(fleInp, wrnMsg))
         clnTbb(tmpHvn, c("format.spss", "display_width"), jmvLbl = TRUE)
-    } else if (usePkg == "foreign" && hasPkg("foreign")) {
+    } else if (any(usePkg == "foreign") && hasPkg("foreign")) {
         fgnTmp <- tryCatch(suppressWarnings(do.call(foreign::read.spss,
                              adjArg("foreign::read.spss", list(file = fleInp, to.data.frame = TRUE, trim_values = TRUE, trim.factor.names = TRUE),
                                varArg, c("file", "to.data.frame", "trim_values", "trim.factor.names")))),
@@ -502,15 +502,15 @@ getSPSS  <- function(fleInp = "", usePkg = "", varArg = list()) {
     }
 }
 
-getStata  <- function(fleInp = "", usePkg = "", varArg = list()) {
+getStata  <- function(fleInp, usePkg, varArg = list()) {
     # NB: more recent versions of the Stata-format require "haven" and can't be read with foreign
     usePkg <- ifelse(grepl("^<stata_dta><header>", readBin(fleInp, character(), n = 1)), "haven", usePkg)
-    if ((length(usePkg) > 1 || !nzchar(usePkg) || usePkg == "haven") && hasPkg("haven")) {
+    if ((length(usePkg) > 1 || !nzchar(usePkg) || any(usePkg == "haven")) && hasPkg("haven")) {
         tmpHvn <- tryCatch(do.call(haven::read_dta, adjArg("haven::read_dta", list(file = fleInp), varArg, "file")),
                            error   = function(errMsg) tryErr(fleInp, errMsg),
                            warning = function(wrnMsg) tryErr(fleInp, wrnMsg))
         clnTbb(tmpHvn, c("format.stata", "display_width"), jmvLbl = TRUE)
-    } else if (usePkg == "foreign" && hasPkg("foreign")) {
+    } else if (any(usePkg == "foreign") && hasPkg("foreign")) {
         tmpFgn <- tryCatch(do.call(foreign::read.dta, adjArg("foreign::read.dta", list(file = fleInp), varArg, "file")),
                            error = function(errMsg) tryErr(fleInp, errMsg))
         clnFgn(tmpFgn)

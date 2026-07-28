@@ -169,26 +169,26 @@ aggregate_omv <- function(dtaInp = NULL, fleOut = "", varAgg = NULL, grpAgg = NU
     if (!any(clcSel))
         stop("At least one aggregation calculation (clc...) needs to be set to TRUE.")
 
-    frmOut <- NULL
-    dscOut <- list()
+    # convert columns to numeric if / where required
     for (crrVar in varAgg) {
-        crrDsc <- c(attr(frmInp[, crrVar], "description"), attr(frmInp[, crrVar], "jmv-desc"), crrVar)
-
         if (!is.numeric(frmInp[, crrVar]))
             frmInp[, crrVar] <- cnvCol(frmInp[, crrVar], "numeric")
+    }
 
-        for (i in which(clcSel)) {
-            crrNme <- sprintf("%s_%s", crrVar, clcStr[i])
-            crrRes <- do.call(stats::aggregate,
-                              c(list(x = frmInp[!grpNA, crrVar], by = frmInp[!grpNA, grpAgg, drop = FALSE], FUN = getFnc(clcStr[i], drpNA)),
-                                rep(list(na.rm = drpNA), !(clcStr[i] %in% c("N", "Mss", "Mde", "Rng", "IQR")))))
-            names(crrRes)[ncol(crrRes)] <- crrNme
-            dscOut[crrNme] <- sprintf("%s (%s)", crrDsc[nzchar(crrDsc)][1], clcDsc[i])
-            if (is.null(frmOut)) {
-                frmOut <- crrRes
-            } else {
-                frmOut <- merge(frmOut, crrRes, by = grpAgg, all = TRUE)
-            }
+    frmOut <- NULL
+    dscVar <- vapply(varAgg, getDsc, character(1), frmInp)
+    dscOut <- list()
+    for (i in which(clcSel)) {
+        crrNme <- sprintf("%s_%s", varAgg, clcStr[i])
+        crrRes <- do.call(stats::aggregate,
+                          c(list(x = frmInp[!grpNA, varAgg], by = frmInp[!grpNA, grpAgg, drop = FALSE], FUN = getFnc(clcStr[i], drpNA)),
+                            rep(list(na.rm = drpNA), !(clcStr[i] %in% c("N", "Mss", "Mde", "Rng", "IQR")))))
+        names(crrRes)[-1] <- crrNme
+        dscOut[crrNme] <- sprintf("%s (%s)", dscVar, clcDsc[i])
+        if (is.null(frmOut)) {
+            frmOut <- crrRes
+        } else {
+            frmOut <- merge(frmOut, crrRes, by = grpAgg, all = TRUE, sort = FALSE)
         }
     }
 
@@ -196,6 +196,11 @@ aggregate_omv <- function(dtaInp = NULL, fleOut = "", varAgg = NULL, grpAgg = NU
 
     # rtnDta in globals.R (unified function to either write the data frame or return it)
     rtnDta(dtaFrm = frmOut, fleOut = fleOut, ...)
+}
+
+getDsc <- function(crrVar, frmInp) {
+    crrDsc <- c(attr(frmInp[, crrVar], "description"), attr(frmInp[, crrVar], "jmv-desc"), crrVar)
+    crrDsc[nzchar(crrDsc)][1]
 }
 
 getFnc <- function(crrClc = "", drpNA = TRUE) {

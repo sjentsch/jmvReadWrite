@@ -50,6 +50,25 @@ test_that("aggregate_omv works", {
                  sprintf("Variable %s (%s)", rep(c("V1", "V2"), each = 12), rep(clcDsc, 2)))
     unlink(nmeOut)
 
+    # using a grouping variable (ID) and not keeping variables together (varAdj == FALSE)
+    expect_null(aggregate_omv(dtaInp = nmeInp, fleOut = nmeOut, varAgg = c("V1", "V2"), grpAgg = "ID",
+                              clcN = TRUE, clcMss = TRUE, clcMn = TRUE, clcMdn = TRUE, clcMde = TRUE, clcSum = TRUE,
+                              clcSD = TRUE, clcVar = TRUE, clcRng = TRUE, clcMin = TRUE, clcMax = TRUE, clcIQR = TRUE,
+                              varAdj = FALSE))
+    df4Chk <- read_omv(nmeOut)
+    expect_s3_class(df4Chk, "data.frame")
+    expect_identical(dim(df4Chk), c(100L, 25L))
+    expect_identical(vapply(df4Chk, typeof, character(1), USE.NAMES = FALSE),
+                     c("character", rep("integer", 4), rep("double", 5), "integer", "double", "integer",
+                       rep("double", 5), rep(c("integer", "double"), 3), "double"))
+    expect_named(df4Chk, c("ID", paste0(rep(c("V1_", "V2_"), 12), rep(clcStr, each = 2))))
+    expect_identical(unname(colMeans(df4Chk[-1])),
+                     c(10, 10, 0, 0, 50.7273, 2.9940, 50.3691, 2.9800, 8.9539, 2.9700, 507.2735, 29.9400, 28.7392,
+                       0.6790, 848.0571, 0.4862, 82.6450, 2.0500, 8.9539, 1.9700, 91.5989, 4.0200, 41.2718,  0.5900),
+                     tolerance = 1e-4)
+    expect_identical(vapply(df4Chk[-1], attr, character(1), "jmv-desc", USE.NAMES = FALSE),
+                 sprintf("Variable %s (%s)", rep(c("V1", "V2"), 12), rep(clcDsc, each = 2)))
+    unlink(nmeOut)
 
     # simple data set with two continuous variables ===================================================================
     set.seed(1)
@@ -93,6 +112,25 @@ test_that("aggregate_omv works", {
                  tolerance = 1e-4)
     expect_identical(vapply(df4Chk, attr, character(1), "jmv-desc", USE.NAMES = FALSE),
                  sprintf("Variable %s (%s)", rep(c("V1", "V2"), each = 12), rep(clcDsc, 2)))
+    unlink(nmeOut)
+
+    expect_null(aggregate_omv(dtaInp = nmeInp, fleOut = nmeOut, varAgg = c("V1", "V2"),
+                              clcN = TRUE, clcMss = TRUE, clcMn = TRUE, clcMdn = TRUE, clcMde = TRUE, clcSum = TRUE,
+                              clcSD = TRUE, clcVar = TRUE, clcRng = TRUE, clcMin = TRUE, clcMax = TRUE, clcIQR = TRUE,
+                              varAdj = FALSE))
+    df4Chk <- read_omv(nmeOut)
+    expect_s3_class(df4Chk, "data.frame")
+    expect_identical(dim(df4Chk), c(1L, 24L))
+    expect_identical(vapply(df4Chk, typeof, character(1), USE.NAMES = FALSE),
+                     c(rep("integer", 4), rep("double", 3), rep(c("integer", "double"), 3), rep("double", 4),
+                       rep(c("integer", "double"), 3), "integer"))
+    expect_named(df4Chk, paste0(rep(c("V1_", "V2_"), 12), rep(clcStr, each = 2)))
+    expect_identical(as.numeric(unname(df4Chk)),
+                     c(1000, 1000, 0, 0, 49.9692, 99.631, 48.326, 99, 0.1315, 96, 49969.1673, 99631, 28.8387, 15.5205,
+                       831.6708, 240.8857, 99.8616, 104, 0.1315, 51, 99.9931, 155, 48.8804, 22),
+                     tolerance = 1e-4)
+    expect_identical(vapply(df4Chk, attr, character(1), "jmv-desc", USE.NAMES = FALSE),
+                 sprintf("Variable %s (%s)", rep(c("V1", "V2"), 12), rep(clcDsc, each = 2)))
     unlink(nmeOut)
 
     # simple data set with NAs ========================================================================================

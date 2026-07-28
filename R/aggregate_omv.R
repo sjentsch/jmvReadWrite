@@ -37,6 +37,9 @@
 #' @param drpNA  If TRUE (default: TRUE), NA values are removed before the aggregation, and the aggregation is
 #'               calculated using the valid values. If FALSE, the result would be NA for any step / combination of
 #'               values in the grouping variable that contains a NA value.
+#' @param varAdj If TRUE (default: TRUE), all calculations for one variable are kept next to each other (e.g., "V1_N",
+#'               "V1_Mss", etc.), otherwise the same calculations are kept next to each other (e.g., "V1_N", "V2_N",
+#'               etc.).
 #' @param usePkg Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata, and SAS files;
 #'               "foreign" is the default (it is included in base R), but "haven" is newer and more comprehensive; you
 #'               may have to install using `install.packages("haven", dep = TRUE)`.
@@ -143,7 +146,7 @@ aggregate_omv <- function(dtaInp = NULL, fleOut = "", varAgg = NULL, grpAgg = NU
                           clcMss = FALSE, clcMn = FALSE, clcMdn = FALSE, clcMde = FALSE,
                           clcSum = FALSE, clcSD = FALSE, clcVar = FALSE, clcRng = FALSE,
                           clcMin = FALSE, clcMax = FALSE, clcIQR = FALSE, drpNA = TRUE,
-                          usePkg = c("foreign", "haven"), selSet = "", ...) {
+                          varAdj = TRUE, usePkg = c("foreign", "haven"), selSet = "", ...) {
 
     # check and import input data set (either as data frame or from a file)
     if (!is.null(list(...)[["fleInp"]])) stop("Please use the argument dtaInp instead of fleInp.")
@@ -183,7 +186,7 @@ aggregate_omv <- function(dtaInp = NULL, fleOut = "", varAgg = NULL, grpAgg = NU
         crrRes <- do.call(stats::aggregate,
                           c(list(x = frmInp[!grpNA, varAgg], by = frmInp[!grpNA, grpAgg, drop = FALSE], FUN = getFnc(clcStr[i], drpNA)),
                             rep(list(na.rm = drpNA), !(clcStr[i] %in% c("N", "Mss", "Mde", "Rng", "IQR")))))
-        names(crrRes)[-1] <- crrNme
+        names(crrRes)[seq_along(varAgg) + as.integer(!is.null(grpAgg))] <- crrNme
         dscOut[crrNme] <- sprintf("%s (%s)", dscVar, clcDsc[i])
         if (is.null(frmOut)) {
             frmOut <- crrRes
@@ -193,6 +196,10 @@ aggregate_omv <- function(dtaInp = NULL, fleOut = "", varAgg = NULL, grpAgg = NU
     }
 
     for (crrCol in names(dscOut)) attr(frmOut[, crrCol], "description") <- dscOut[[crrCol]]
+    
+    # if varAdj, variables are kept together (i.e., all calculations for one variable appear after one another)
+    if (varAdj)
+        frmOut <- frmOut[, c(grpAgg, sprintf("%s_%s", rep(varAgg, each = sum(clcSel)), clcStr[clcSel]))]
 
     # rtnDta in globals.R (unified function to either write the data frame or return it)
     rtnDta(dtaFrm = frmOut, fleOut = fleOut, ...)

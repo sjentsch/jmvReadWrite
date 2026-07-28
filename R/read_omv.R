@@ -238,7 +238,7 @@ valLbl <- function(crrCol = NULL, mtaCol = NULL, xtdDta = NULL) {
     if (any(crrNme == names(xtdDta))) {
         if        (chkFld(mtaCol, "columnType", "Filter") || chkFld(mtaCol, "name", "^Filter [0-9]+$")) {
             crrCol <- as.logical(crrCol)
-        } else if (chkFld(mtaCol, "columnType", "Data|Recoded")) {
+        } else if (chkFld(mtaCol, "columnType", "Data|Computed|Recoded")) {
             crrCol <- factor(crrCol, levels = unlist(lapply(xtdDta[[crrNme]]$labels, function(m) m[1])),
                                      labels = unlist(lapply(xtdDta[[crrNme]]$labels, function(m) m[2])),
                                      ordered = chkFld(mtaCol, "measureType", "Ordinal"))

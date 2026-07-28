@@ -242,10 +242,10 @@ jamovi-files, <code><a href="https://rdrr.io/r/utils/read.table.html" class="ext
 <span class="r-in"><span><span class="co"># SD, IQR, etc.) to be calculated</span></span></span>
 <span class="r-in"><span><span class="co"># check whether the file was created and its size</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/basename.html" class="external-link">dirname</a></span><span class="op">(</span><span class="va">nmeOut</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/basename.html" class="external-link">basename</a></span><span class="op">(</span><span class="va">nmeOut</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> file27815724478f.omv</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> file27ef4f51b7ab.omv</span>
 <span class="r-in"><span><span class="co"># -&gt; "file[...].omv" ([...] contains a random combination of numbers / characters</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.info.html" class="external-link">file.info</a></span><span class="op">(</span><span class="va">nmeOut</span><span class="op">)</span><span class="op">$</span><span class="va">size</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4337</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4331</span>
 <span class="r-in"><span><span class="co"># -&gt; 4898 (approximate size; size may differ in every run [in dependence of</span></span></span>
 <span class="r-in"><span><span class="co">#          how well the generated random data can be compressed])</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="fu">jmvReadWrite</span><span class="fu">::</span><span class="fu"><a href="read_omv.html">read_omv</a></span><span class="op">(</span><span class="va">nmeOut</span>, sveAtt <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
@@ -256,17 +256,17 @@ jamovi-files, <code><a href="https://rdrr.io/r/utils/read.table.html" class="ext
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ V1_N : int  10 10 10 10 10 10 10 10 10 10 ...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "jmv-desc")= chr "V1 (N)"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "missingValues")= list()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ V1_Mn: num  44.4 53.5 58.2 58.4 63.3 ...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "jmv-desc")= chr "V1 (Mean)"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "missingValues")= list()</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ V1_SD: num  29.8 32.2 29.8 20.6 29.1 ...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "jmv-desc")= chr "V1 (SD)"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "missingValues")= list()</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ V2_N : int  10 10 10 10 10 10 10 10 10 10 ...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "jmv-desc")= chr "V2 (N)"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "missingValues")= list()</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ V1_Mn: num  44.4 53.5 58.2 58.4 63.3 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "jmv-desc")= chr "V1 (Mean)"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "missingValues")= list()</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ V2_Mn: num  104 97.3 94.2 100.9 89.7 ...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "jmv-desc")= chr "V2 (Mean)"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "missingValues")= list()</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ V1_SD: num  29.8 32.2 29.8 20.6 29.1 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "jmv-desc")= chr "V1 (SD)"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "missingValues")= list()</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ V2_SD: num  11.3 13.8 16.2 14.1 16.5 ...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   ..- attr(*, "jmv-desc")= chr "V2 (SD)"</span>

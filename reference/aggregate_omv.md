@@ -264,10 +264,10 @@ jmvReadWrite::aggregate_omv(dtaInp = nmeInp, fleOut = nmeOut, varAgg = c("V1", "
 # SD, IQR, etc.) to be calculated
 # check whether the file was created and its size
 cat(list.files(dirname(nmeOut), basename(nmeOut)))
-#> file27815724478f.omv
+#> file27ef4f51b7ab.omv
 # -> "file[...].omv" ([...] contains a random combination of numbers / characters
 cat(file.info(nmeOut)$size)
-#> 4337
+#> 4331
 # -> 4898 (approximate size; size may differ in every run [in dependence of
 #          how well the generated random data can be compressed])
 cat(str(jmvReadWrite::read_omv(nmeOut, sveAtt = FALSE)))
@@ -278,17 +278,17 @@ cat(str(jmvReadWrite::read_omv(nmeOut, sveAtt = FALSE)))
 #>  $ V1_N : int  10 10 10 10 10 10 10 10 10 10 ...
 #>   ..- attr(*, "jmv-desc")= chr "V1 (N)"
 #>   ..- attr(*, "missingValues")= list()
-#>  $ V1_Mn: num  44.4 53.5 58.2 58.4 63.3 ...
-#>   ..- attr(*, "jmv-desc")= chr "V1 (Mean)"
-#>   ..- attr(*, "missingValues")= list()
-#>  $ V1_SD: num  29.8 32.2 29.8 20.6 29.1 ...
-#>   ..- attr(*, "jmv-desc")= chr "V1 (SD)"
-#>   ..- attr(*, "missingValues")= list()
 #>  $ V2_N : int  10 10 10 10 10 10 10 10 10 10 ...
 #>   ..- attr(*, "jmv-desc")= chr "V2 (N)"
 #>   ..- attr(*, "missingValues")= list()
+#>  $ V1_Mn: num  44.4 53.5 58.2 58.4 63.3 ...
+#>   ..- attr(*, "jmv-desc")= chr "V1 (Mean)"
+#>   ..- attr(*, "missingValues")= list()
 #>  $ V2_Mn: num  104 97.3 94.2 100.9 89.7 ...
 #>   ..- attr(*, "jmv-desc")= chr "V2 (Mean)"
+#>   ..- attr(*, "missingValues")= list()
+#>  $ V1_SD: num  29.8 32.2 29.8 20.6 29.1 ...
+#>   ..- attr(*, "jmv-desc")= chr "V1 (SD)"
 #>   ..- attr(*, "missingValues")= list()
 #>  $ V2_SD: num  11.3 13.8 16.2 14.1 16.5 ...
 #>   ..- attr(*, "jmv-desc")= chr "V2 (SD)"

@@ -186,7 +186,7 @@ jmvReadWrite::long2wide_omv(dtaInp = nmeInp, fleOut = nmeOut, varTgt = "X", varI
 # it is required to give at least the arguments dtaInp, varID and varTme
 # check whether the file was created and its size
 cat(list.files(dirname(nmeOut), basename(nmeOut)))
-#> file2771646b0924.omv
+#> file270922bf2223.omv
 # -> "file[...].omv" ([...] contains a random combination of numbers / characters
 cat(file.info(nmeOut)$size)
 #> 6524

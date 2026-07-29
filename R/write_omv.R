@@ -358,14 +358,14 @@ unqID <- function(mtaFld = NULL) {
     mtaFld
 }
 
-fleExs <- function(fleOut = NULL, frcWrt = FALSE) {
-    if (file.exists(fleOut)) {
-        if (frcWrt) {
-            unlink(fleOut)
-        } else {
-            stop(sprintf("The output file %s already exists. Either remove the file or set the parameter frcWrt to TRUE.", basename(fleOut)))
-        }
-    }
+fleExs <- function(fleOut = "", frcWrt = FALSE) {
+    if (!file.exists(fleOut)) return(invisible(NULL))
+
+    if (!frcWrt)
+        stop(sprintf("The output file %s already exists. Either remove the file or set the parameter frcWrt to TRUE.", basename(fleOut)))
+
+    unlink(fleOut)
+    invisible(NULL)
 }
 
 isID <- function(crrCol = NULL, i = NA, crrNme = "") {

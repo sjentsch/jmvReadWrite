@@ -577,7 +577,7 @@ jmvOpn <- function(dtaFrm = NULL, dtaTtl = "", rtnOut = TRUE) {
     }
     if (nzchar(jmvEXE) && file.exists(jmvEXE)) {
         tmpOut <- tempfile(fileext = ".omv")
-        jmvReadWrite::write_omv(dtaFrm, fleOut = tmpOut)
+        write_omv(dtaFrm = dtaFrm, fleOut = tmpOut)
         system2(jmvEXE, args = paste0(" --temp --title=\"", dtaTtl, "\" ", tmpOut), stderr = rtnOut, stdout = rtnOut)
     } else {
         stop("The position of the jamovi executable could not be determined or it was not found at the determined position. ",

@@ -1,10 +1,11 @@
 # CRAN Notes - jmvReadWrite
 
 ## Current version
-0.4.14
+0.4.15
 
-* implementing suggestions made by the `goodpractice` R-package
-* `describe_omv`: added creating a license string based upon keywords of standard licenses (e.g., `"RP_GPL2"`)
+* `transform_vars_omv`: ensure that only positive OR negative transformations are applied to one variable (both
+  transformations have the same suffix and would be overwritten; variables are either positively OR negatively skewed,
+  hence there is no requirement for applying both types of transformations)
 * fixing typos and small bugs, and improving unit tests (e.g., limit line length)
 
 ## Test environments

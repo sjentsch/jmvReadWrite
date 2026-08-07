@@ -203,4 +203,10 @@ test_that("transform_vars_omv works", {
                  paste("^All columns / variables given in the parameter varXfm need to be contained in the input data",
                        "frame \\(dtaInp\\), but variable\\(s\\)"))
     expect_false(file.exists(nmeOut))
+    expect_error(transform_vars_omv(dtaInp = dtaInp, fleOut = nmeOut, varXfm = list(posSqr = "MP", negSqr = c("MP", "MN"))),
+                 paste("^For any column / variable given in the parameter varXfm, only a positive OR a negative",
+                       "transformation can be carried out. For the variable\\(s\\) .* both a positive and a negative",
+                       "transformation is requested. Determine which type of skewness \\(positive or negative\\) the",
+                       "variable has and then decide the correct transformation."))
+    expect_false(file.exists(nmeOut))
 })

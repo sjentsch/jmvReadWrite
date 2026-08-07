@@ -21,7 +21,10 @@
 #'   used (`pos...`) or whether the original value is subtracted from the maximum value of that variable (`neg...`; a
 #'   constant of 1 is added to the maximum value for `...Log` and `...Inv` transformations). For the degree and kind of
 #'   skewness, the following names are valid: `mdrPos`, `strPos`, `svrPos`, `mdrNeg`, `strNeg`, `svrNeg` (degree:
-#'   moderate, strong, severe; kind: positive or negative).
+#'   moderate, strong, severe; kind: positive or negative). Since variables either are positively or negatively skewed
+#'   they can only appear once within those entries requesting transformations for positively skewed variables (i.e.,
+#'   posSqr, posLog, or posInv) OR those entries requesting transformations for negatively skewed variables (i.e.,
+#'   negSqr, negLog, or negInv). If a variable appears, e.g., under posSqr AND negSqr an error message is shown.
 #' * The ellipsis-parameter (`...`) can be used to submit arguments / parameters to the functions that are used for
 #'   reading the data. By clicking on the respective function under “See also”, you can get a more detailed overview
 #'   over which parameters each of those functions take.
@@ -81,6 +84,17 @@ transform_vars_omv <- function(dtaInp = NULL, fleOut = "", varXfm = NULL, psvAnl
              "(dtaInp), but variable(s) ",
              paste(setdiff(unique(unlist(varXfm, use.names = FALSE)), names(dtaInp)), collapse = ", "),
              " are missing.")
+    }
+
+    # check whether not any variable name appears under both positive and negative skewness - there is only one
+    # suffix (e.g., _SQR) for both positive and negative transformations, and transformations may be overwritten
+    varPnN <- intersect(unique(unlist(varXfm[vapply(names(varXfm), startsWith, logical(1), "pos")])),
+                        unique(unlist(varXfm[vapply(names(varXfm), startsWith, logical(1), "neg")])))
+    if (length(varPnN) > 0) {
+        stop("For any column / variable given in the parameter varXfm, only a positive OR a negative transformation ",
+             "can be carried out. For the variable(s) ", paste(varPnN, collapse = ", "), " both a positive and a ",
+             "negative transformation is requested. Determine which type of skewness (positive or negative) the ",
+             "variable has and then decide the correct transformation.")
     }
 
     # TO-DO: replace the functionality underneath with compute_omv once implemented

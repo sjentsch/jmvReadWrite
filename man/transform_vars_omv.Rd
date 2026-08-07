@@ -56,7 +56,10 @@ inversion, i.e., 1 / original value), and where the first part of the name indic
 used (\code{pos...}) or whether the original value is subtracted from the maximum value of that variable (\code{neg...}; a
 constant of 1 is added to the maximum value for \code{...Log} and \code{...Inv} transformations). For the degree and kind of
 skewness, the following names are valid: \code{mdrPos}, \code{strPos}, \code{svrPos}, \code{mdrNeg}, \code{strNeg}, \code{svrNeg} (degree:
-moderate, strong, severe; kind: positive or negative).
+moderate, strong, severe; kind: positive or negative). Since variables either are positively or negatively skewed
+they can only appear once within those entries requesting transformations for positively skewed variables (i.e.,
+posSqr, posLog, or posInv) OR those entries requesting transformations for negatively skewed variables (i.e.,
+negSqr, negLog, or negInv). If a variable appears, e.g., under posSqr AND negSqr an error message is shown.
 \item The ellipsis-parameter (\code{...}) can be used to submit arguments / parameters to the functions that are used for
 reading the data. By clicking on the respective function under “See also”, you can get a more detailed overview
 over which parameters each of those functions take.

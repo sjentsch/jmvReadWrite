@@ -23,6 +23,7 @@ aggregate_omv(
   clcMax = FALSE,
   clcIQR = FALSE,
   drpNA = TRUE,
+  varAdj = TRUE,
   usePkg = c("foreign", "haven"),
   selSet = "",
   ...
@@ -81,6 +82,10 @@ suffix \code{"_Max"} is appended to each variable in the resulting data set.}
 \item{drpNA}{If TRUE (default: TRUE), NA values are removed before the aggregation, and the aggregation is
 calculated using the valid values. If FALSE, the result would be NA for any step / combination of
 values in the grouping variable that contains a NA value.}
+
+\item{varAdj}{If TRUE (default: TRUE), all calculations for one variable are kept next to each other (e.g., "V1_N",
+"V1_Mss", etc.), otherwise the same calculations are kept next to each other (e.g., "V1_N", "V2_N",
+etc.).}
 
 \item{usePkg}{Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata, and SAS files;
 "foreign" is the default (it is included in base R), but "haven" is newer and more comprehensive; you

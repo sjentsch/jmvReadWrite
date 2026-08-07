@@ -478,7 +478,7 @@ getSAS   <- function(fleInp, usePkg, varArg = list()) {
                                error   = function(errMsg) tryErr(fleInp, errMsg))
             clnFgn(fgnTmp)
         } else {
-            stop("In order to read the SAS-transport-file \"", basename(fleInp), 
+            stop("In order to read the SAS-transport-file \"", basename(fleInp),
                  "\" either of the R-packages \"haven\" or \"foreign\" needs to be installed.")
         }
     }

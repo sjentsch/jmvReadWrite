@@ -9,6 +9,13 @@ if (getRversion() >= "2.15.1") {
 }
 
 # =================================================================================================
+# functions for checking parameters (file and directory existence, correct file extension, correct
+# dimensions and existence of data frames) and normalizing the file name
+
+#            jamovi        CSV    TSV    Rdata           RDS    SPSS           Stata  SAS
+vldExt <- c("omv", "omt", "csv", "tsv", "rdata", "rda", "rds", "sav", "zsav", "dta", "sas7bdat", "sd2", "sd7", "xpt", "stx", "stc")
+
+# =================================================================================================
 # the next lines store the currently supported versions (stored in meta / MANIFEST.MF)
 # and the string that precedes the version number
 lstMnf <- list(mnfVer = c("Manifest-Version",        "1.0"),
@@ -27,12 +34,11 @@ mtaFld <- list(name = "", id = NA, columnType = "Data", dataType = "Integer", me
 grpMta <- paste0("^", paste(c(names(mtaGlb), names(mtaFld)), collapse = "$|^"), "$")
 
 # =================================================================================================
-# functions for checking parameters (file and directory existence, correct file extension, correct
-# dimensions and existence of data frames) and normalizing the file name
+# definition of the possible calculations
+aggStr <- c("N",  "Mss",   "Mn",   "Mdn",    "Mde",  "Sum",  "SD",  "Var",      "Rng",   "Min",  "Max",  "IQR")
+aggDsc <- c("N",  "Miss.", "Mean", "Median", "Mode", "Sum",  "SD",  "Variance", "Range", "Min.", "Max.", "IQR")
 
-#            jamovi        CSV    TSV    Rdata           RDS    SPSS           Stata  SAS
-vldExt <- c("omv", "omt", "csv", "tsv", "rdata", "rda", "rds", "sav", "zsav", "dta", "sas7bdat", "sd2", "sd7", "xpt", "stx", "stc")
-
+# =================================================================================================
 # REMEMBER: requires the full file name, NOT the directory
 chkDir <- function(fleNme = "", wrtPrm = TRUE) {
     if (! utils::file_test("-d", dirname(fleNme))) {
@@ -51,7 +57,8 @@ chkDtF <- function(dtaFrm = NULL, minSze = c(0, 1)) {
         stop("Input data are either not a data frame or have incorrect (only one or more than two) dimensions.")
     } else if (any(dim(dtaFrm) < minSze)) {
         stop(sprintf("The %s dimension of the input data frame has not the required size (%d < %d).",
-                     ifelse(which(dim(dtaFrm) < minSze)[1] == 1, "first", "second"), dim(dtaFrm)[dim(dtaFrm) < minSze][1], minSze[dim(dtaFrm) < minSze][1]))
+                     ifelse(which(dim(dtaFrm) < minSze)[1] == 1, "first", "second"),
+                     dim(dtaFrm)[dim(dtaFrm) < minSze][1], minSze[dim(dtaFrm) < minSze][1]))
     }
 
     TRUE

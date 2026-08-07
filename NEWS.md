@@ -1,3 +1,13 @@
+# jmvReadWrite 0.4.15
+
+## Enhancements:
+* `transform_vars_omv`: ensure that only positive OR negative transformations are applied to one variable (both
+  transformations have the same suffix and would be overwritten; variables are either positively OR negatively skewed,
+  hence there is no requirement for applying both types of transformations)
+* fixing typos and small bugs, and improving unit tests (e.g., limit line length)
+
+---
+
 # jmvReadWrite 0.4.14
 
 ## Enhancements:

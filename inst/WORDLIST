@@ -46,8 +46,12 @@ lintr
 MAgojam
 measureType
 MinGW
+Mss
 mtaDta
 NC
+negInv
+negLog
+negSqr
 OBS
 Ochiai
 OMV
@@ -59,6 +63,9 @@ Patreon
 pkgcheck
 pkgdown
 pos
+posInv
+posLog
+posSqr
 rda
 RData
 rds

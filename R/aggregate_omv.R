@@ -166,10 +166,9 @@ aggregate_omv <- function(dtaInp = NULL, fleOut = "", varAgg = NULL, grpAgg = NU
         grpNA <- rep(FALSE, nrow(frmInp))
     }
 
-    clcSel <- c(clcN, clcMss,  clcMn,  clcMdn,   clcMde, clcSum, clcSD, clcVar,     clcRng,  clcMin, clcMax, clcIQR)
-    clcStr <- c("N",  "Mss",   "Mn",   "Mdn",    "Mde",  "Sum",  "SD",  "Var",      "Rng",   "Min",  "Max",  "IQR")
-    clcDsc <- c("N",  "Miss.", "Mean", "Median", "Mode", "Sum",  "SD",  "Variance", "Range", "Min.", "Max.", "IQR")
-    if (!any(clcSel))
+    # aggStr and aggDsc are defined in globals.R to enable shared use with jTransform
+    aggSel <- c(clcN, clcMss, clcMn, clcMdn, clcMde, clcSum, clcSD, clcVar, clcRng, clcMin, clcMax, clcIQR)
+    if (!any(aggSel))
         stop("At least one aggregation calculation (clc...) needs to be set to TRUE.")
 
     # convert columns to numeric if / where required
@@ -181,13 +180,13 @@ aggregate_omv <- function(dtaInp = NULL, fleOut = "", varAgg = NULL, grpAgg = NU
     frmOut <- NULL
     dscVar <- vapply(varAgg, getDsc, character(1), frmInp)
     dscOut <- list()
-    for (i in which(clcSel)) {
-        crrNme <- sprintf("%s_%s", varAgg, clcStr[i])
+    for (i in which(aggSel)) {
+        crrNme <- sprintf("%s_%s", varAgg, aggStr[i])
         crrRes <- do.call(stats::aggregate,
-                          c(list(x = frmInp[!grpNA, varAgg], by = frmInp[!grpNA, grpAgg, drop = FALSE], FUN = getFnc(clcStr[i], drpNA)),
-                            rep(list(na.rm = drpNA), !(clcStr[i] %in% c("N", "Mss", "Mde", "Rng", "IQR")))))
+                          c(list(x = frmInp[!grpNA, varAgg], by = frmInp[!grpNA, grpAgg, drop = FALSE], FUN = getFnc(aggStr[i], drpNA)),
+                            rep(list(na.rm = drpNA), !(aggStr[i] %in% c("N", "Mss", "Mde", "Rng", "IQR")))))
         names(crrRes)[seq(ncol(crrRes) - length(varAgg) + 1, ncol(crrRes))] <- crrNme
-        dscOut[crrNme] <- sprintf("%s (%s)", dscVar, clcDsc[i])
+        dscOut[crrNme] <- sprintf("%s (%s)", dscVar, aggDsc[i])
         if (is.null(frmOut)) {
             frmOut <- crrRes
         } else {
@@ -196,10 +195,10 @@ aggregate_omv <- function(dtaInp = NULL, fleOut = "", varAgg = NULL, grpAgg = NU
     }
 
     for (crrCol in names(dscOut)) attr(frmOut[, crrCol], "description") <- dscOut[[crrCol]]
-    
+
     # if varAdj, variables are kept together (i.e., all calculations for one variable appear after one another)
     if (varAdj)
-        frmOut <- frmOut[, c(grpAgg, sprintf("%s_%s", rep(varAgg, each = sum(clcSel)), clcStr[clcSel]))]
+        frmOut <- frmOut[, c(grpAgg, sprintf("%s_%s", rep(varAgg, each = sum(aggSel)), aggStr[aggSel]))]
 
     # rtnDta in globals.R (unified function to either write the data frame or return it)
     rtnDta(dtaFrm = frmOut, fleOut = fleOut, ...)

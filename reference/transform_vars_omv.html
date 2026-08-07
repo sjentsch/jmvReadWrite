@@ -9,7 +9,7 @@ spreadsheet 'jamovi' (https://www.jamovi.org)"><meta property="og:image" content
 
     <a class="navbar-brand me-2" href="../index.html">jmvReadWrite</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.14</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.15</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -109,7 +109,10 @@ inversion, i.e., 1 / original value), and where the first part of the name indic
 used (<code>pos...</code>) or whether the original value is subtracted from the maximum value of that variable (<code>neg...</code>; a
 constant of 1 is added to the maximum value for <code>...Log</code> and <code>...Inv</code> transformations). For the degree and kind of
 skewness, the following names are valid: <code>mdrPos</code>, <code>strPos</code>, <code>svrPos</code>, <code>mdrNeg</code>, <code>strNeg</code>, <code>svrNeg</code> (degree:
-moderate, strong, severe; kind: positive or negative).</p></li>
+moderate, strong, severe; kind: positive or negative). Since variables either are positively or negatively skewed
+they can only appear once within those entries requesting transformations for positively skewed variables (i.e.,
+posSqr, posLog, or posInv) OR those entries requesting transformations for negatively skewed variables (i.e.,
+negSqr, negLog, or negInv). If a variable appears, e.g., under posSqr AND negSqr an error message is shown.</p></li>
 <li><p>The ellipsis-parameter (<code>...</code>) can be used to submit arguments / parameters to the functions that are used for
 reading the data. By clicking on the respective function under “See also”, you can get a more detailed overview
 over which parameters each of those functions take.</p></li>

@@ -122,10 +122,10 @@ nmeOut <- tempfile(fileext = ".omv")
 saveRDS(jmvReadWrite::ToothGrowth, nmeInp)
 jmvReadWrite::convert_to_omv(fleInp = nmeInp, fleOut = nmeOut)
 cat(list.files(dirname(nmeOut), basename(nmeOut)))
-#> file27091b77273.omv
+#> file28b26a6c87ce.omv
 # -> "file[...].omv" ([...] contains a random combination of numbers / characters
 cat(file.info(nmeOut)$size)
-#> 2521
+#> 2522
 # -> 2448 (size may differ on different OSes)
 cat(str(jmvReadWrite::read_omv(nmeOut, sveAtt = FALSE)))
 #> 'data.frame':    60 obs. of  7 variables:
@@ -159,9 +159,9 @@ nmeOut <- tempfile(fileext = ".omv")
 write.csv(jmvReadWrite::ToothGrowth, nmeInp)
 jmvReadWrite::convert_to_omv(fleInp = nmeInp, fleOut = nmeOut)
 cat(list.files(dirname(nmeOut), basename(nmeOut)))
-#> file27095935df0f.omv
+#> file28b22b72daf1.omv
 cat(file.info(nmeOut)$size)
-#> 2193
+#> 2194
 # -> 2104 (size may differ acc. to OS; the size is smaller than for the RDS-file
 # because CSV can store fewer attributes, e.g., labels)
 cat(str(jmvReadWrite::read_omv(nmeOut, sveAtt = FALSE)))

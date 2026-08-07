@@ -9,7 +9,7 @@ statistical spreadsheet 'jamovi' (https://www.jamovi.org)"><meta property="og:im
 
     <a class="navbar-brand me-2" href="../index.html">jmvReadWrite</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.14</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.15</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -60,6 +60,7 @@ statistical spreadsheet 'jamovi' (<a href="https://www.jamovi.org" class="extern
 <span>  clcMax <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  clcIQR <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  drpNA <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  varAdj <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  usePkg <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"foreign"</span>, <span class="st">"haven"</span><span class="op">)</span>,</span>
 <span>  selSet <span class="op">=</span> <span class="st">""</span>,</span>
 <span>  <span class="va">...</span></span>
@@ -157,6 +158,12 @@ calculated using the valid values. If FALSE, the result would be NA for any step
 values in the grouping variable that contains a NA value.</p></dd>
 
 
+<dt id="arg-varadj">varAdj<a class="anchor" aria-label="anchor" href="#arg-varadj"></a></dt>
+<dd><p>If TRUE (default: TRUE), all calculations for one variable are kept next to each other (e.g., "V1_N",
+"V1_Mss", etc.), otherwise the same calculations are kept next to each other (e.g., "V1_N", "V2_N",
+etc.).</p></dd>
+
+
 <dt id="arg-usepkg">usePkg<a class="anchor" aria-label="anchor" href="#arg-usepkg"></a></dt>
 <dd><p>Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata, and SAS files;
 "foreign" is the default (it is included in base R), but "haven" is newer and more comprehensive; you
@@ -242,10 +249,10 @@ jamovi-files, <code><a href="https://rdrr.io/r/utils/read.table.html" class="ext
 <span class="r-in"><span><span class="co"># SD, IQR, etc.) to be calculated</span></span></span>
 <span class="r-in"><span><span class="co"># check whether the file was created and its size</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/basename.html" class="external-link">dirname</a></span><span class="op">(</span><span class="va">nmeOut</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/basename.html" class="external-link">basename</a></span><span class="op">(</span><span class="va">nmeOut</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> file270997c006a.omv</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> file28b26f675100.omv</span>
 <span class="r-in"><span><span class="co"># -&gt; "file[...].omv" ([...] contains a random combination of numbers / characters</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.info.html" class="external-link">file.info</a></span><span class="op">(</span><span class="va">nmeOut</span><span class="op">)</span><span class="op">$</span><span class="va">size</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4337</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4338</span>
 <span class="r-in"><span><span class="co"># -&gt; 4898 (approximate size; size may differ in every run [in dependence of</span></span></span>
 <span class="r-in"><span><span class="co">#          how well the generated random data can be compressed])</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="fu">jmvReadWrite</span><span class="fu">::</span><span class="fu"><a href="read_omv.html">read_omv</a></span><span class="op">(</span><span class="va">nmeOut</span>, sveAtt <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>

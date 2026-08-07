@@ -82,7 +82,12 @@ variables / columns of the input data set is re-arranged
   transformations). For the degree and kind of skewness, the following
   names are valid: `mdrPos`, `strPos`, `svrPos`, `mdrNeg`, `strNeg`,
   `svrNeg` (degree: moderate, strong, severe; kind: positive or
-  negative).
+  negative). Since variables either are positively or negatively skewed
+  they can only appear once within those entries requesting
+  transformations for positively skewed variables (i.e., posSqr, posLog,
+  or posInv) OR those entries requesting transformations for negatively
+  skewed variables (i.e., negSqr, negLog, or negInv). If a variable
+  appears, e.g., under posSqr AND negSqr an error message is shown.
 
 - The ellipsis-parameter (`...`) can be used to submit arguments /
   parameters to the functions that are used for reading the data. By

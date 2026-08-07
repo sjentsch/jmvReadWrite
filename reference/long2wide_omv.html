@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">jmvReadWrite</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.14</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.15</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -182,10 +182,10 @@ detailed overview over which parameters each of those functions take.</p></li>
 <span class="r-in"><span><span class="co"># it is required to give at least the arguments dtaInp, varID and varTme</span></span></span>
 <span class="r-in"><span><span class="co"># check whether the file was created and its size</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/basename.html" class="external-link">dirname</a></span><span class="op">(</span><span class="va">nmeOut</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/basename.html" class="external-link">basename</a></span><span class="op">(</span><span class="va">nmeOut</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> file270922bf2223.omv</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> file28b2222f5191.omv</span>
 <span class="r-in"><span><span class="co"># -&gt; "file[...].omv" ([...] contains a random combination of numbers / characters</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.info.html" class="external-link">file.info</a></span><span class="op">(</span><span class="va">nmeOut</span><span class="op">)</span><span class="op">$</span><span class="va">size</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6524</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6525</span>
 <span class="r-in"><span><span class="co"># -&gt; 6851 (approximate size; size may differ in every run [in dependence of</span></span></span>
 <span class="r-in"><span><span class="co">#          how well the generated random data can be compressed])</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="fu">jmvReadWrite</span><span class="fu">::</span><span class="fu"><a href="read_omv.html">read_omv</a></span><span class="op">(</span><span class="va">nmeOut</span>, sveAtt <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>

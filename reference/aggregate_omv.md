@@ -25,6 +25,7 @@ aggregate_omv(
   clcMax = FALSE,
   clcIQR = FALSE,
   drpNA = TRUE,
+  varAdj = TRUE,
   usePkg = c("foreign", "haven"),
   selSet = "",
   ...
@@ -136,6 +137,12 @@ aggregate_omv(
   and the aggregation is calculated using the valid values. If FALSE,
   the result would be NA for any step / combination of values in the
   grouping variable that contains a NA value.
+
+- varAdj:
+
+  If TRUE (default: TRUE), all calculations for one variable are kept
+  next to each other (e.g., "V1_N", "V1_Mss", etc.), otherwise the same
+  calculations are kept next to each other (e.g., "V1_N", "V2_N", etc.).
 
 - usePkg:
 
@@ -264,10 +271,10 @@ jmvReadWrite::aggregate_omv(dtaInp = nmeInp, fleOut = nmeOut, varAgg = c("V1", "
 # SD, IQR, etc.) to be calculated
 # check whether the file was created and its size
 cat(list.files(dirname(nmeOut), basename(nmeOut)))
-#> file270997c006a.omv
+#> file28b26f675100.omv
 # -> "file[...].omv" ([...] contains a random combination of numbers / characters
 cat(file.info(nmeOut)$size)
-#> 4337
+#> 4338
 # -> 4898 (approximate size; size may differ in every run [in dependence of
 #          how well the generated random data can be compressed])
 cat(str(jmvReadWrite::read_omv(nmeOut, sveAtt = FALSE)))

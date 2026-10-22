@@ -393,6 +393,7 @@ clnTbb <- function(dtaFrm = NULL, rmvAtt = NULL, jmvLbl = FALSE) {
 
     # convert tibble to data.frame (remove tbl_df, tbl from class)
     class(dtaFrm) <- setdiff(class(dtaFrm), c("tbl_df", "tbl", rmvAtt))
+    attr(dtaFrm, "haven_meta") <- NULL
     chkDtF(dtaFrm)
 
     for (crrNme in names(dtaFrm)) {
@@ -413,7 +414,7 @@ clnTbb <- function(dtaFrm = NULL, rmvAtt = NULL, jmvLbl = FALSE) {
             }
         }
         # remove attributes given in rmvAtt
-        for (crrAtt in rmvAtt) {
+        for (crrAtt in c(rmvAtt, "haven_meta")) {
             if (! is.null(attr(dtaFrm[[crrNme]], crrAtt))) {
                 attr(dtaFrm[[crrNme]], crrAtt) <- NULL
             }

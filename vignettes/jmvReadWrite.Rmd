@@ -34,6 +34,11 @@ from within `jamovi` by becoming part of the `Rj` module (where you can use it
 by writing R commands, documented below), and via the `jTransform` module that
 provides a graphical user interface for most helper functions.
 
+If you find the package useful, please cite it as:
+<div style = "background-color:rgb(245, 245, 245); padding: 20px 20px 1px; border-radius:5px;">
+`r format(citation("pwrss"), style = "html")`
+</div></br>
+
 ## Installation
 
 In R, you can either install a stable version of `jmvReadWrite` which is

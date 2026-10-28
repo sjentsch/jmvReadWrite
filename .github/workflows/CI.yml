@@ -9,6 +9,7 @@ on:
     branches: [main, master]
 
 env:
+  NO_CHKDIR: "true"
   USE_BSPM: "true"
   _R_CHECK_FORCE_SUGGESTS_: "false"
 
@@ -17,6 +18,7 @@ jobs:
     strategy:
       matrix:
         include:
+          - { name: r-devel,   os: ubuntu-latest, container: rocker/drd }
           - { name: macos,     os: macos-latest }
           - { name: ubuntu,    os: ubuntu-latest }
 

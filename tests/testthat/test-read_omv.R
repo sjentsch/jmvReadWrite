@@ -322,7 +322,7 @@ test_that("read_all works", {
     expect_s3_class(clnTbb(dtaTmp)[, "value"], "factor")
     expect_identical(attributes(clnTbb(dtaTmp)), list(names = "value", row.names = seq(200), class = "data.frame"))
     expect_identical(attributes(clnTbb(dtaTmp)[, "value"]), list(levels = sprintf("Level %d", seq(3)), class = "factor", format.sas = "LEVELS"))
-    expect_identical(attributes(clnTbb(dtaTmp, rmvAtt = "format.sas")[, "value"]), list(levels = sprintf("Level %d", seq(3)), class = "factor"))
+    expect_identical(attributes(clnTbb(dtaTmp, att2Rm = "format.sas")[, "value"]), list(levels = sprintf("Level %d", seq(3)), class = "factor"))
     expect_identical(as.integer(table(clnTbb(dtaTmp)[, "value"])), c(71L, 69L, 60L))
     expect_named(table(clnTbb(dtaTmp)[, "value"]), sprintf("Level %d", seq(3)))
 
@@ -333,7 +333,7 @@ test_that("read_all works", {
     expect_type(clnTbb(dtaTmp)[, "value"], "integer")
     expect_identical(attributes(clnTbb(dtaTmp)), list(names = "value", row.names = seq(200), class = "data.frame"))
     expect_identical(attributes(clnTbb(dtaTmp)[, "value"]), list(format.sas = "LEVELS"))
-    expect_null(attributes(clnTbb(dtaTmp, rmvAtt = "format.sas")[, "value"]))
+    expect_null(attributes(clnTbb(dtaTmp, att2Rm = "format.sas")[, "value"]))
     expect_identical(as.integer(clnTbb(dtaTmp)[, "value"])[1:10], c(4L, 4L, 2L, 2L, 4L, 2L, 4L, 1L, 2L, 4L))
     expect_identical(as.integer(table(clnTbb(dtaTmp)[, "value"])), c(66L, 67L, 67L))
     expect_named(table(clnTbb(dtaTmp)[, "value"]), sprintf("%d", c(1, 2, 4)))
@@ -345,7 +345,7 @@ test_that("read_all works", {
     expect_type(clnTbb(dtaTmp)[, "value"], "integer")
     expect_identical(attributes(clnTbb(dtaTmp)), list(names = "value", row.names = seq(200), class = "data.frame"))
     expect_identical(attributes(clnTbb(dtaTmp)[, "value"]), list(format.sas = "LEVELS"))
-    expect_null(attributes(clnTbb(dtaTmp, rmvAtt = "format.sas")[, "value"]))
+    expect_null(attributes(clnTbb(dtaTmp, att2Rm = "format.sas")[, "value"]))
     expect_identical(as.integer(clnTbb(dtaTmp)[, "value"])[1:10], c(1L, 1L, 2L, 1L, 1L, 4L, 1L, 2L, 1L, 1L))
     expect_identical(as.integer(table(clnTbb(dtaTmp)[, "value"])), c(70L, 72L, 58L))
     expect_named(table(clnTbb(dtaTmp)[, "value"]), sprintf("%d", c(1, 2, 4)))
@@ -359,7 +359,7 @@ test_that("read_all works", {
     expect_identical(attributes(clnTbb(dtaTmp)), list(names = "value", row.names = seq(200), class = "data.frame"))
     expect_identical(attributes(clnTbb(dtaTmp)[, "value"]),
                      list(levels = c("Smallest", "2", "3", "Largest"), class = "factor", format.sas = "LEVELS"))
-    expect_identical(attributes(clnTbb(dtaTmp, rmvAtt = "format.sas")[, "value"]),
+    expect_identical(attributes(clnTbb(dtaTmp, att2Rm = "format.sas")[, "value"]),
                      list(levels = c("Smallest", "2", "3", "Largest"), class = "factor"))
     expect_identical(as.integer(clnTbb(dtaTmp)[, "value"])[1:10], c(4L, 2L, 1L, 3L, 2L, 1L, 3L, 3L, 2L, 2L))
     expect_identical(as.integer(table(clnTbb(dtaTmp)[, "value"])), c(52L, 47L, 46L, 55L))

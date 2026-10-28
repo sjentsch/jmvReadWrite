@@ -42,6 +42,20 @@ becoming part of the `Rj` module (where you can use it by writing R
 commands, documented below), and via the `jTransform` module that
 provides a graphical user interface for most helper functions.
 
+If you find the package useful, please cite it as:
+
+<div style="background-color:rgb(245, 245, 245); padding: 20px 20px 1px; border-radius:5px;">
+
+<p>
+Bulus M, Jentschke S (2026). <em>pwrss: Statistical Power, Sample Size,
+and Detectable Effect Calculations</em>. R package version 1.3.3,
+<a href="https://doi.org/10.32614/CRAN.package.pwrss">https://doi.org/10.32614/CRAN.package.pwrss</a>.
+</p>
+
+</div>
+
+</br>
+
 ## Installation
 
 In R, you can either install a stable version of `jmvReadWrite` which is
@@ -100,38 +114,36 @@ if (nzchar(system.file(package = "jmv"))) {
         homo = TRUE,
         norm = TRUE)
     }
-#> 
-#>  ANOVA
-#> 
-#>  ANOVA - len                                                                                      
-#>  ──────────────────────────────────────────────────────────────────────────────────────────────── 
-#>                     Sum of Squares    df    Mean Square    F            p             ω²          
-#>  ──────────────────────────────────────────────────────────────────────────────────────────────── 
-#>    Overall model         2740.1033     5      548.02067    41.557178    < .0000001                
-#>    supp                   205.3500     1      205.35000    15.571979     0.0002312    0.0554519   
-#>    dose                  2426.4343     2     1213.21717    91.999965    < .0000001    0.6925788   
-#>    supp:dose              108.3190     2       54.15950     4.106991     0.0218603    0.0236466   
-#>    Residuals              712.1060    54       13.18715                                           
-#>  ──────────────────────────────────────────────────────────────────────────────────────────────── 
-#> 
-#> 
-#>  ASSUMPTION CHECKS
-#> 
-#>  Homogeneity of Variances Test (Levene's) 
-#>  ──────────────────────────────────────── 
-#>    F           df1    df2    p           
-#>  ──────────────────────────────────────── 
-#>    1.940130      5     54    0.1027298   
-#>  ──────────────────────────────────────── 
-#> 
-#> 
-#>  Normality Test (Shapiro-Wilk) 
-#>  ───────────────────────────── 
-#>    Statistic    p           
-#>  ───────────────────────────── 
-#>    0.9849884    0.6694242   
-#>  ─────────────────────────────
 ```
+
+<div class="jmv-results">
+<style>
+.jmv-results {
+    font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol";
+    color: #333333;
+    font-size: 12px;
+}
+.jmv-results h1, .jmv-results h2, .jmv-results h3,
+.jmv-results h4, .jmv-results h5, .jmv-results h6 {
+    font-family: inherit; font-weight: bold; border: none; padding: 0;
+    margin-top: 16px; margin-bottom: 12px; font-size: 110%; color: inherit;
+}
+.jmv-results h1 { font-size: 160%; color: #3E6DA9; margin-top: 24px; }
+.jmv-results h2 { font-size: 130%; color: #3E6DA9; margin-top: 24px; }
+.jmv-results table { width: auto; margin: 0; }
+.jmv-results th { font-weight: normal; }
+.jmv-results img { max-width: 100%; height: auto; }
+.jmv-results a { color: #3E6DA9; }
+</style>
+<h1>ANOVA</h1>
+<table data-quarto-disable-processing="true" style="border-collapse: collapse;"><thead><tr><th colspan="7" style="padding: 4px 8px 4px 0px; position: relative; text-align: left; border-bottom: 1px solid #333333;">ANOVA - len</th></tr><tr><th style="padding: 4px 8px 4px 8px; position: relative; text-align: center; vertical-align: bottom; border-bottom: 1px solid #333333;"></th><th style="padding: 4px 8px 4px 8px; position: relative; text-align: center; vertical-align: bottom; border-bottom: 1px solid #333333;">Sum of Squares</th><th style="padding: 4px 8px 4px 8px; position: relative; text-align: center; vertical-align: bottom; border-bottom: 1px solid #333333;">df</th><th style="padding: 4px 8px 4px 8px; position: relative; text-align: center; vertical-align: bottom; border-bottom: 1px solid #333333;">Mean Square</th><th style="padding: 4px 8px 4px 8px; position: relative; text-align: center; vertical-align: bottom; border-bottom: 1px solid #333333;">F</th><th style="padding: 4px 8px 4px 8px; position: relative; text-align: center; vertical-align: bottom; border-bottom: 1px solid #333333;">p</th><th style="padding: 4px 8px 4px 8px; position: relative; text-align: center; vertical-align: bottom; border-bottom: 1px solid #333333;">ω²</th></tr></thead><tbody><tr><td style="padding: 8px 8px 8px 8px; position: relative; text-align: left;">Overall model</td><td style="padding: 8px 20px 8px 8px; position: relative; text-align: right;">2740.1</td><td style="padding: 8px 20px 8px 8px; position: relative; text-align: right;">5</td><td style="padding: 8px 20px 8px 8px; position: relative; text-align: right;">548.02</td><td style="padding: 8px 20px 8px 8px; position: relative; text-align: right;">41.557</td><td style="padding: 8px 20px 8px 8px; position: relative; text-align: right;">&lt; .001</td><td style="padding: 4px 8px 4px 8px; position: relative;"></td></tr><tr><td style="padding: 8px 8px 4px 8px; position: relative; text-align: left;">supp</td><td style="padding: 8px 20px 4px 8px; position: relative; text-align: right;">205.4</td><td style="padding: 8px 20px 4px 8px; position: relative; text-align: right;">1</td><td style="padding: 8px 20px 4px 8px; position: relative; text-align: right;">205.35</td><td style="padding: 8px 20px 4px 8px; position: relative; text-align: right;">15.572</td><td style="padding: 8px 20px 4px 8px; position: relative; text-align: right;">&lt; .001</td><td style="padding: 8px 20px 4px 8px; position: relative; text-align: right;">0.0555</td></tr><tr><td style="padding: 4px 8px 4px 8px; position: relative; text-align: left;">dose</td><td style="padding: 4px 20px 4px 8px; position: relative; text-align: right;">2426.4</td><td style="padding: 4px 20px 4px 8px; position: relative; text-align: right;">2</td><td style="padding: 4px 20px 4px 8px; position: relative; text-align: right;">1213.22</td><td style="padding: 4px 20px 4px 8px; position: relative; text-align: right;">92.000</td><td style="padding: 4px 20px 4px 8px; position: relative; text-align: right;">&lt; .001</td><td style="padding: 4px 20px 4px 8px; position: relative; text-align: right;">0.6926</td></tr><tr><td style="padding: 4px 8px 8px 8px; position: relative; text-align: left;">supp:dose</td><td style="padding: 4px 20px 8px 8px; position: relative; text-align: right;">108.3</td><td style="padding: 4px 20px 8px 8px; position: relative; text-align: right;">2</td><td style="padding: 4px 20px 8px 8px; position: relative; text-align: right;">54.16</td><td style="padding: 4px 20px 8px 8px; position: relative; text-align: right;">4.107</td><td style="padding: 4px 20px 8px 8px; position: relative; text-align: right;">.022</td><td style="padding: 4px 20px 8px 8px; position: relative; text-align: right;">0.0236</td></tr><tr><td style="padding: 8px 8px 8px 8px; position: relative; text-align: left; border-bottom: 2px solid #333333;">Residuals</td><td style="padding: 8px 20px 8px 8px; position: relative; text-align: right; border-bottom: 2px solid #333333;">712.1</td><td style="padding: 8px 20px 8px 8px; position: relative; text-align: right; border-bottom: 2px solid #333333;">54</td><td style="padding: 8px 20px 8px 8px; position: relative; text-align: right; border-bottom: 2px solid #333333;">13.19</td><td style="padding: 4px 8px 4px 8px; position: relative; border-bottom: 2px solid #333333;"></td><td style="padding: 4px 8px 4px 8px; position: relative; border-bottom: 2px solid #333333;"></td><td style="padding: 4px 8px 4px 8px; position: relative; border-bottom: 2px solid #333333;"></td></tr></tbody></table>
+<p></p>
+<h2>Assumption Checks</h2>
+<table data-quarto-disable-processing="true" style="border-collapse: collapse;"><thead><tr><th colspan="4" style="padding: 4px 8px 4px 0px; position: relative; text-align: left; border-bottom: 1px solid #333333;">Homogeneity of Variances Test (Levene's)</th></tr><tr><th style="padding: 4px 8px 4px 8px; position: relative; text-align: center; vertical-align: bottom; border-bottom: 1px solid #333333;">F</th><th style="padding: 4px 8px 4px 8px; position: relative; text-align: center; vertical-align: bottom; border-bottom: 1px solid #333333;">df1</th><th style="padding: 4px 8px 4px 8px; position: relative; text-align: center; vertical-align: bottom; border-bottom: 1px solid #333333;">df2</th><th style="padding: 4px 8px 4px 8px; position: relative; text-align: center; vertical-align: bottom; border-bottom: 1px solid #333333;">p</th></tr></thead><tbody><tr><td style="padding: 4px 20px 4px 8px; position: relative; text-align: right; border-bottom: 2px solid #333333;">1.940</td><td style="padding: 4px 20px 4px 8px; position: relative; text-align: right; border-bottom: 2px solid #333333;">5</td><td style="padding: 4px 20px 4px 8px; position: relative; text-align: right; border-bottom: 2px solid #333333;">54</td><td style="padding: 4px 20px 4px 8px; position: relative; text-align: right; border-bottom: 2px solid #333333;">.103</td></tr></tbody></table>
+<p></p>
+<table data-quarto-disable-processing="true" style="border-collapse: collapse;"><thead><tr><th colspan="2" style="padding: 4px 8px 4px 0px; position: relative; text-align: left; border-bottom: 1px solid #333333;">Normality Test (Shapiro-Wilk)</th></tr><tr><th style="padding: 4px 8px 4px 8px; position: relative; text-align: center; vertical-align: bottom; border-bottom: 1px solid #333333;">Statistic</th><th style="padding: 4px 8px 4px 8px; position: relative; text-align: center; vertical-align: bottom; border-bottom: 1px solid #333333;">p</th></tr></thead><tbody><tr><td style="padding: 4px 20px 4px 8px; position: relative; text-align: right; border-bottom: 2px solid #333333;">0.9850</td><td style="padding: 4px 20px 4px 8px; position: relative; text-align: right; border-bottom: 2px solid #333333;">.669</td></tr></tbody></table>
+<p></p>
+</div>
 
 Since version 0.2.0,
 [`read_omv`](https://sjentsch.github.io/jmvReadWrite/reference/read_omv.html)

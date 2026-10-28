@@ -1,43 +1,63 @@
 url: https://sjentsch.github.io/jmvReadWrite/
+
 repo:
   url:
     home: https://github.com/sjentsch/jmvReadWrite/
     source: https://github.com/sjentsch/jmvReadWrite/blob/main/
     issue: https://github.com/sjentsch/jmvReadWrite/issues/
   branch: main
+
 template:
   bootstrap: 5
+
 reference:
-- title: Functions
-  desc: |
-    Functions for reading and writing jamovi's omv-files
-- contents:
-  - read_omv
-  - write_omv
-- title: Helper functions
-  desc: |
-    Functions for carrying out often required data management tasks for jamovi's omv-files
-- contents:
-  - aggregate_omv
-  - arrange_cols_omv
-  - combine_cols_omv
-  - convert_to_omv
-  - describe_omv
-  - distances_omv
-  - label_vars_omv
-  - long2wide_omv
-  - wide2long_omv
-  - merge_cols_omv
-  - merge_rows_omv
-  - replace_omv
-  - search_omv
-  - sort_omv
-  - transform_vars_omv
-  - transpose_omv
-- title: Example datasets
-- contents:
-  - AlbumSales
-  - ToothGrowth
-  - bfi_sample
-  - bfi_sample2
-  - bfi_sample3
+  - title: "Read, Write and Convert"
+    desc: "Functions to read, write, and batch-convert jamovi (.omv) data files"
+    contents:
+      - read_omv
+      - write_omv
+      - convert_to_omv
+
+  - title: "Search and Replace"
+    desc: "Search for or replace values in jamovi datasets"
+    contents:
+      - replace_omv
+      - search_omv
+
+  - title: "Data Reshaping and Transformation"
+    desc: "Functions for altering the structure, shape, and layout of your datasets"
+    contents:
+      - long2wide_omv
+      - wide2long_omv
+      - transpose_omv
+
+  - title: "Dataset Combination and Arrangement"
+    desc: "Functions to combine datasets, adjust column positioning, merge two columns into one or sort data"
+    contents:
+      - arrange_cols_omv
+      - combine_cols_omv
+      - merge_cols_omv
+      - merge_rows_omv
+      - sort_omv
+
+  - title: "Adding Metadata"
+    desc: "Functions to add descriptions at the top of jamovi files or labels to the variables"
+    contents:
+      - describe_omv
+      - label_vars_omv
+
+  - title: "Transform or aggregate variables"
+    desc: "Transform (skewed) variables (to achieve a normal distribution), aggregating data (e.g. per group) or calculate distances"
+    contents:
+      - aggregate_omv
+      - distances_omv
+      - transform_vars_omv
+
+  - title: "Example datasets"
+    desc: "Built-in datasets included for examples and testing."
+    contents:
+      - AlbumSales
+      - ToothGrowth
+      - bfi_sample
+      - bfi_sample2
+      - bfi_sample3

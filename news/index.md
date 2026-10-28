@@ -9,6 +9,8 @@
   the same suffix and would be overwritten; variables are either
   positively OR negatively skewed, hence there is no requirement for
   applying both types of transformations)
+- account for a change in `haven` (R-package; additional attribute:
+  `haven_meta`)
 - fixing typos and small bugs, and improving unit tests (e.g., limit
   line length)
 

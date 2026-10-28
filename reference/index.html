@@ -32,9 +32,9 @@
     </div>
 
     <div class="section level2">
-      <h2 id="functions">Functions<a class="anchor" aria-label="anchor" href="#functions"></a></h2>
+      <h2 id="read-write-and-convert">Read, Write and Convert<a class="anchor" aria-label="anchor" href="#read-write-and-convert"></a></h2>
 
-      <div class="section-desc"><p>Functions for reading and writing jamovi’s omv-files</p></div>
+      <div class="section-desc"><p>Functions to read, write, and batch-convert jamovi (.omv) data files</p></div>
 
       <dl></dl></div><div class="section level2">
 
@@ -54,10 +54,17 @@
 
         </dt>
         <dd>Write files to be used with the statistical spreadsheet 'jamovi' (<a href="https://www.jamovi.org" class="external-link">https://www.jamovi.org</a>)</dd>
-      </dl></div><div class="section level2">
-      <h2 id="helper-functions">Helper functions<a class="anchor" aria-label="anchor" href="#helper-functions"></a></h2>
 
-      <div class="section-desc"><p>Functions for carrying out often required data management tasks for jamovi’s omv-files</p></div>
+        <dt>
+
+          <code><a href="convert_to_omv.html">convert_to_omv()</a></code>
+
+        </dt>
+        <dd>Convert data files (CSV, R, other statistics packages) into .omv-files for the statistical spreadsheet 'jamovi' (<a href="https://www.jamovi.org" class="external-link">https://www.jamovi.org</a>)</dd>
+      </dl></div><div class="section level2">
+      <h2 id="search-and-replace">Search and Replace<a class="anchor" aria-label="anchor" href="#search-and-replace"></a></h2>
+
+      <div class="section-desc"><p>Search for or replace values in jamovi datasets</p></div>
 
       <dl></dl></div><div class="section level2">
 
@@ -66,54 +73,28 @@
 
       <dl><dt>
 
-          <code><a href="aggregate_omv.html">aggregate_omv()</a></code>
+          <code><a href="replace_omv.html">replace_omv()</a></code>
 
         </dt>
-        <dd>Aggregates data from a data set / frame (in long format) and returns them as a .omv-file for the statistical spreadsheet 'jamovi' (<a href="https://www.jamovi.org" class="external-link">https://www.jamovi.org</a>)</dd>
+        <dd>Search values in .omv-files for the statistical spreadsheet 'jamovi' (<a href="https://www.jamovi.org" class="external-link">https://www.jamovi.org</a>)</dd>
 
         <dt>
 
-          <code><a href="arrange_cols_omv.html">arrange_cols_omv()</a></code>
+          <code><a href="search_omv.html">search_omv()</a></code>
 
         </dt>
-        <dd>Re-arrange columns / variables in .omv-files for the statistical spreadsheet 'jamovi' (<a href="https://www.jamovi.org" class="external-link">https://www.jamovi.org</a>)</dd>
+        <dd>Search values in .omv-files for the statistical spreadsheet 'jamovi' (<a href="https://www.jamovi.org" class="external-link">https://www.jamovi.org</a>)</dd>
+      </dl></div><div class="section level2">
+      <h2 id="data-reshaping-and-transformation">Data Reshaping and Transformation<a class="anchor" aria-label="anchor" href="#data-reshaping-and-transformation"></a></h2>
 
-        <dt>
+      <div class="section-desc"><p>Functions for altering the structure, shape, and layout of your datasets</p></div>
 
-          <code><a href="combine_cols_omv.html">combine_cols_omv()</a></code>
+      <dl></dl></div><div class="section level2">
 
-        </dt>
-        <dd>Combines pairs of columns from a raw data matrix in .omv-files for the statistical spreadsheet 'jamovi' (<a href="https://www.jamovi.org" class="external-link">https://www.jamovi.org</a>)</dd>
 
-        <dt>
 
-          <code><a href="convert_to_omv.html">convert_to_omv()</a></code>
 
-        </dt>
-        <dd>Convert data files (CSV, R, other statistics packages) into .omv-files for the statistical spreadsheet 'jamovi' (<a href="https://www.jamovi.org" class="external-link">https://www.jamovi.org</a>)</dd>
-
-        <dt>
-
-          <code><a href="describe_omv.html">describe_omv()</a></code>
-
-        </dt>
-        <dd>Adds a title and a description for a data set stored as .omv-file for the statistical spreadsheet 'jamovi' (<a href="https://www.jamovi.org" class="external-link">https://www.jamovi.org</a>)</dd>
-
-        <dt>
-
-          <code><a href="distances_omv.html">distances_omv()</a></code>
-
-        </dt>
-        <dd>Calculates distances (returning a symmetric matrix) from a raw data matrix in .omv-files for the statistical spreadsheet 'jamovi' (<a href="https://www.jamovi.org" class="external-link">https://www.jamovi.org</a>)</dd>
-
-        <dt>
-
-          <code><a href="label_vars_omv.html">label_vars_omv()</a></code>
-
-        </dt>
-        <dd>Label columns / variables in .omv-files for the statistical spreadsheet 'jamovi' (<a href="https://www.jamovi.org" class="external-link">https://www.jamovi.org</a>)</dd>
-
-        <dt>
+      <dl><dt>
 
           <code><a href="long2wide_omv.html">long2wide_omv()</a></code>
 
@@ -126,6 +107,36 @@
 
         </dt>
         <dd>Converts .omv-files for the statistical spreadsheet 'jamovi' (<a href="https://www.jamovi.org" class="external-link">https://www.jamovi.org</a>) from wide to long format</dd>
+
+        <dt>
+
+          <code><a href="transpose_omv.html">transpose_omv()</a></code>
+
+        </dt>
+        <dd>Transpose .omv-files for the statistical spreadsheet 'jamovi' (<a href="https://www.jamovi.org" class="external-link">https://www.jamovi.org</a>)</dd>
+      </dl></div><div class="section level2">
+      <h2 id="dataset-combination-and-arrangement">Dataset Combination and Arrangement<a class="anchor" aria-label="anchor" href="#dataset-combination-and-arrangement"></a></h2>
+
+      <div class="section-desc"><p>Functions to combine datasets, adjust column positioning, merge two columns into one or sort data</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="arrange_cols_omv.html">arrange_cols_omv()</a></code>
+
+        </dt>
+        <dd>Re-arrange columns / variables in .omv-files for the statistical spreadsheet 'jamovi' (<a href="https://www.jamovi.org" class="external-link">https://www.jamovi.org</a>)</dd>
+
+        <dt>
+
+          <code><a href="combine_cols_omv.html">combine_cols_omv()</a></code>
+
+        </dt>
+        <dd>Combines pairs of columns from a raw data matrix in .omv-files for the statistical spreadsheet 'jamovi' (<a href="https://www.jamovi.org" class="external-link">https://www.jamovi.org</a>)</dd>
 
         <dt>
 
@@ -143,24 +154,56 @@
 
         <dt>
 
-          <code><a href="replace_omv.html">replace_omv()</a></code>
-
-        </dt>
-        <dd>Search values in .omv-files for the statistical spreadsheet 'jamovi' (<a href="https://www.jamovi.org" class="external-link">https://www.jamovi.org</a>)</dd>
-
-        <dt>
-
-          <code><a href="search_omv.html">search_omv()</a></code>
-
-        </dt>
-        <dd>Search values in .omv-files for the statistical spreadsheet 'jamovi' (<a href="https://www.jamovi.org" class="external-link">https://www.jamovi.org</a>)</dd>
-
-        <dt>
-
           <code><a href="sort_omv.html">sort_omv()</a></code>
 
         </dt>
         <dd>Sort data (using one or more variables) in .omv-files for the statistical spreadsheet 'jamovi' (<a href="https://www.jamovi.org" class="external-link">https://www.jamovi.org</a>)</dd>
+      </dl></div><div class="section level2">
+      <h2 id="adding-metadata">Adding Metadata<a class="anchor" aria-label="anchor" href="#adding-metadata"></a></h2>
+
+      <div class="section-desc"><p>Functions to add descriptions at the top of jamovi files or labels to the variables</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="describe_omv.html">describe_omv()</a></code>
+
+        </dt>
+        <dd>Adds a title and a description for a data set stored as .omv-file for the statistical spreadsheet 'jamovi' (<a href="https://www.jamovi.org" class="external-link">https://www.jamovi.org</a>)</dd>
+
+        <dt>
+
+          <code><a href="label_vars_omv.html">label_vars_omv()</a></code>
+
+        </dt>
+        <dd>Label columns / variables in .omv-files for the statistical spreadsheet 'jamovi' (<a href="https://www.jamovi.org" class="external-link">https://www.jamovi.org</a>)</dd>
+      </dl></div><div class="section level2">
+      <h2 id="transform-or-aggregate-variables">Transform or aggregate variables<a class="anchor" aria-label="anchor" href="#transform-or-aggregate-variables"></a></h2>
+
+      <div class="section-desc"><p>Transform (skewed) variables (to achieve a normal distribution), aggregating data (e.g. per group) or calculate distances</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="aggregate_omv.html">aggregate_omv()</a></code>
+
+        </dt>
+        <dd>Aggregates data from a data set / frame (in long format) and returns them as a .omv-file for the statistical spreadsheet 'jamovi' (<a href="https://www.jamovi.org" class="external-link">https://www.jamovi.org</a>)</dd>
+
+        <dt>
+
+          <code><a href="distances_omv.html">distances_omv()</a></code>
+
+        </dt>
+        <dd>Calculates distances (returning a symmetric matrix) from a raw data matrix in .omv-files for the statistical spreadsheet 'jamovi' (<a href="https://www.jamovi.org" class="external-link">https://www.jamovi.org</a>)</dd>
 
         <dt>
 
@@ -168,17 +211,10 @@
 
         </dt>
         <dd>Transform skewed variables (aiming at they conform to a normal distribution) in .omv-files for the statistical spreadsheet 'jamovi' (<a href="https://www.jamovi.org" class="external-link">https://www.jamovi.org</a>)</dd>
-
-        <dt>
-
-          <code><a href="transpose_omv.html">transpose_omv()</a></code>
-
-        </dt>
-        <dd>Transpose .omv-files for the statistical spreadsheet 'jamovi' (<a href="https://www.jamovi.org" class="external-link">https://www.jamovi.org</a>)</dd>
       </dl></div><div class="section level2">
       <h2 id="example-datasets">Example datasets<a class="anchor" aria-label="anchor" href="#example-datasets"></a></h2>
 
-
+      <div class="section-desc"><p>Built-in datasets included for examples and testing.</p></div>
 
       <dl></dl></div><div class="section level2">
 

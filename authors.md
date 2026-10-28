@@ -15,7 +15,7 @@ package version 0.4.15,
 <https://CRAN.R-project.org/package=jmvReadWrite>.
 
     @Manual{jmvReadWrite,
-      title = {jmvReadWrite: Read and Write jamovi Files},
+      title = {{jmvReadWrite}: Read and Write jamovi Files},
       author = {Sebastian Jentschke},
       year = {2026},
       note = {R package version 0.4.15},

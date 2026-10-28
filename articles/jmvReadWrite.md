@@ -11,7 +11,13 @@ becoming part of the `Rj` module (where you can use it by writing R
 commands, documented below), and via the `jTransform` module that
 provides a graphical user interface for most helper functions.
 
-## Installation
+If you find the package useful, please cite it as:
+
+Jentschke S (2026). *jmvReadWrite: Read and Write jamovi Files*. R
+package version 0.4.15,
+<https://CRAN.R-project.org/package=jmvReadWrite>.
+
+### Installation
 
 In R, you can either install a stable version of `jmvReadWrite` which is
 available on [CRAN](https://cran.r-project.org/package=jmvReadWrite)
@@ -31,7 +37,7 @@ if (!require(devtools)) install.packages("devtools")
 devtools::install_github("sjentsch/jmvReadWrite")
 ```
 
-## How to use the package?
+### How to use the package?
 
 [**read_omv**](https://sjentsch.github.io/jmvReadWrite/reference/read_omv.html)
 
@@ -72,38 +78,30 @@ if (nzchar(system.file(package = "jmv"))) {
         homo = TRUE,
         norm = TRUE)
     }
-#> 
-#>  ANOVA
-#> 
-#>  ANOVA - len                                                                                      
-#>  ──────────────────────────────────────────────────────────────────────────────────────────────── 
-#>                     Sum of Squares    df    Mean Square    F            p             ω²          
-#>  ──────────────────────────────────────────────────────────────────────────────────────────────── 
-#>    Overall model         2740.1033     5      548.02067    41.557178    < .0000001                
-#>    supp                   205.3500     1      205.35000    15.571979     0.0002312    0.0554519   
-#>    dose                  2426.4343     2     1213.21717    91.999965    < .0000001    0.6925788   
-#>    supp:dose              108.3190     2       54.15950     4.106991     0.0218603    0.0236466   
-#>    Residuals              712.1060    54       13.18715                                           
-#>  ──────────────────────────────────────────────────────────────────────────────────────────────── 
-#> 
-#> 
-#>  ASSUMPTION CHECKS
-#> 
-#>  Homogeneity of Variances Test (Levene's) 
-#>  ──────────────────────────────────────── 
-#>    F           df1    df2    p           
-#>  ──────────────────────────────────────── 
-#>    1.940130      5     54    0.1027298   
-#>  ──────────────────────────────────────── 
-#> 
-#> 
-#>  Normality Test (Shapiro-Wilk) 
-#>  ───────────────────────────── 
-#>    Statistic    p           
-#>  ───────────────────────────── 
-#>    0.9849884    0.6694242   
-#>  ─────────────────────────────
 ```
+
+## ANOVA
+
+| ANOVA - len   |                |     |             |        |         |        |
+|:--------------|---------------:|----:|------------:|-------:|--------:|--------|
+|               | Sum of Squares |  df | Mean Square |      F |       p | ω²     |
+| Overall model |         2740.1 |   5 |      548.02 | 41.557 | \< .001 |        |
+| supp          |          205.4 |   1 |      205.35 | 15.572 | \< .001 | 0.0555 |
+| dose          |         2426.4 |   2 |     1213.22 | 92.000 | \< .001 | 0.6926 |
+| supp:dose     |          108.3 |   2 |       54.16 |  4.107 |    .022 | 0.0236 |
+| Residuals     |          712.1 |  54 |       13.19 |        |         |        |
+
+### Assumption Checks
+
+| Homogeneity of Variances Test (Levene's) |     |     |      |
+|-----------------------------------------:|----:|----:|-----:|
+|                                        F | df1 | df2 |    p |
+|                                    1.940 |   5 |  54 | .103 |
+
+| Normality Test (Shapiro-Wilk) |      |
+|------------------------------:|-----:|
+|                     Statistic |    p |
+|                        0.9850 | .669 |
 
 Since version 0.2.0,
 [`read_omv`](https://sjentsch.github.io/jmvReadWrite/reference/read_omv.html)

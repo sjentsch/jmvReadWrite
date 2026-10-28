@@ -21,7 +21,7 @@ Language: en-GB
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 VignetteBuilder: knitr
-URL: https://sjentsch.github.io/jmvReadWrite/
+URL: https://sjentsch.github.io/jmvReadWrite/, https://github.com/sjentsch/jmvReadWrite
 BugReports: https://github.com/sjentsch/jmvReadWrite/issues
 Depends: R (>= 3.5.0)
 Imports: jsonlite,
@@ -37,4 +37,4 @@ Suggests: jmv,
           testthat (>= 3.0.0)
 Config/testthat/edition: 3
 NeedsCompilation: no
-Config/roxygen2/version: 8.1.0
+Config/roxygen2/version: 8.1.1

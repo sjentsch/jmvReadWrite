@@ -68,9 +68,13 @@ jobs:
           http-user-agent: ${{ matrix.config.http-user-agent }}
           use-public-rspm: true
 
-      - name: Install protobuf headers
-        if: runner.os == 'Linux'
+      - name: Install protobuf headers (Linux, except from noLD)
+        if: ${{ runner.os == 'Linux' && matrix.config.r != 'nold' }}
         run: sudo apt update -y && sudo apt install -y protobuf-compiler libprotobuf-dev libprotoc-dev
+
+      - name: Install protobuf headers (Linux, noLD only)
+        if: ${{ runner.os == 'Linux' && matrix.config.r == 'nold' }}
+        run: sudo apt update -y && sudo apt install -y protobuf-compiler libprotobuf-dev libprotoc-d
 
       - name: Install dependencies (all except from noLD)
         if: ${{ matrix.config.r != 'nold' }}

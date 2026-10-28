@@ -387,6 +387,7 @@ setAtt <- function(attLst = NULL, inpObj = NULL, outObj = NULL) {
     outObj
 }
 
+# rmvAtt is used in the unit tests, and in several places in jTransform
 rmvAtt <- function(attObj = NULL, att2Rm = NULL) {
     if (is.null(att2Rm))
         att2Rm <- setdiff(names(attributes(attObj)),
@@ -561,6 +562,7 @@ getOS <- function() {
     }
 }
 
+# jmvOpn is used by jTransform and Rj
 jmvOpn <- function(dtaFrm = NULL, dtaTtl = "", rtnOut = TRUE) {
     # on both Windows and Linux, jamovi is in the path, and, hence,
     # Sys.which should give the full location

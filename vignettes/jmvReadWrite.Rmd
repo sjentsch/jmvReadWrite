@@ -36,7 +36,7 @@ provides a graphical user interface for most helper functions.
 
 If you find the package useful, please cite it as:
 <div style = "background-color:rgb(245, 245, 245); padding: 20px 20px 1px; border-radius:5px;">
-`r format(citation("pwrss"), style = "html")`
+`r format(citation("jmvReadWrite"), style = "html")`
 </div></br>
 
 ## Installation

@@ -4,6 +4,7 @@
   "identifier": "jmvReadWrite",
   "description": "The free and open a statistical spreadsheet 'jamovi' (<https://www.jamovi.org>) aims to make statistical analyses easy and intuitive. 'jamovi' produces syntax that can directly be used in R (in connection with the R-package 'jmv'). Having import / export routines for the data files 'jamovi' produces ('.omv') permits an easy transfer of data and analyses between 'jamovi' and R.",
   "name": "jmvReadWrite: Read and Write 'jamovi' Files ('.omv')",
+  "relatedLink": ["https://sjentsch.github.io/jmvReadWrite/", "https://CRAN.R-project.org/package=jmvReadWrite"],
   "codeRepository": "https://github.com/sjentsch/jmvReadWrite",
   "issueTracker": "https://github.com/sjentsch/jmvReadWrite/issues",
   "license": "https://spdx.org/licenses/AGPL-3.0",
@@ -185,7 +186,7 @@
     },
     "SystemRequirements": null
   },
-  "fileSize": "3726.233KB",
+  "fileSize": "1061.199KB",
   "citation": [
     {
       "@type": "SoftwareSourceCode",
@@ -194,16 +195,14 @@
         {
           "@type": "Person",
           "givenName": "Sebastian",
-          "familyName": "Jentschke",
-          "email": "sebastian.jentschke@uib.no"
+          "familyName": "Jentschke"
         }
       ],
-      "name": "jmvReadWrite: Read and Write jamovi Files",
+      "name": "{jmvReadWrite}: Read and Write jamovi Files",
       "url": "https://CRAN.R-project.org/package=jmvReadWrite",
       "description": "R package version 0.4.15"
     }
   ],
-  "relatedLink": ["https://sjentsch.github.io/jmvReadWrite/", "https://CRAN.R-project.org/package=jmvReadWrite"],
   "releaseNotes": "https://github.com/sjentsch/jmvReadWrite/blob/main/NEWS.md",
   "readme": "https://github.com/sjentsch/jmvReadWrite/blob/main/README.md",
   "contIntegration": ["https://github.com/sjentsch/jmvReadWrite/actions/workflows/rhub.yaml", "https://github.com/sjentsch/jmvReadWrite/actions/workflows/R-CMD-check.yaml", "https://github.com/sjentsch/jmvReadWrite/actions/workflows/CI.yml", "https://github.com/sjentsch/jmvReadWrite/actions?query=workflow%3Apkgcheck", "https://app.codecov.io/gh/sjentsch/jmvReadWrite?branch=main"],

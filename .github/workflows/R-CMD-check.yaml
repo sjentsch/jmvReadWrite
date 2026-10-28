@@ -12,7 +12,7 @@ jobs:
   R-CMD-check:
     runs-on: ${{ matrix.config.os }}
 
-    name: ${{ matrix.config.os }} (${{ matrix.config.r }})
+    name: ${{ matrix.config.os }} (${{ matrix.config.r }})${{ matrix.config.mkl && ' + MKL' || '' }}
 
     strategy:
       fail-fast: false
@@ -21,19 +21,48 @@ jobs:
           - {os: macos-latest,    r: 'release'}
           - {os: windows-latest,  r: 'release'}
           - {os: ubuntu-latest,   r: 'devel', http-user-agent: 'release'}
+          - {os: ubuntu-latest,    r: 'devel', http-user-agent: 'release', mkl: true}
           - {os: ubuntu-latest,   r: 'release'}
-#         - {os: ubuntu-latest,   r: 'oldrel-1'}
+          - {os: ubuntu-latest,    r: 'oldrel-1'}
+          - {os: ubuntu-latest,    r: 'nold',  container: 'ghcr.io/r-hub/containers/nold:latest'}
+          - {os: ubuntu-26.04-arm, r: 'release'}
+          - {os: ubuntu-26.04-arm, r: 'devel', http-user-agent: 'release'}
+
+    # Dynamically apply the R-hub container only for the noLD target
+    container:
+      image: ${{ matrix.config.container || '' }}
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
+      MKL_THREADING_LAYER: GNU      # avoid conflicts between MKL and GNU OpenMP (ignored by non-MKL jobs)
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Check out package
+        uses: actions/checkout@v3
 
-      - uses: r-lib/actions/setup-pandoc@v2
+      - name: Install Intel MKL     # this step only executes if mkl is set to true in the matrix configuration
+        if: ${{ matrix.config.mkl == true }}
+        run: |
+          sudo apt-get update
+          curl -s https://githubusercontent.com | sudo bash
 
-      - uses: r-lib/actions/setup-r@v2
+      - name: Set up pandoc (all except from noLD)
+        if: ${{ matrix.config.r != 'nold' }}
+        uses: r-lib/actions/setup-pandoc@v2
+
+      - name: Set up pandoc (noLD only)
+        if: ${{ matrix.config.r == 'nold' }}
+        run: |
+          apt-get update && apt-get install -y wget
+          wget https://github.com/jgm/pandoc/releases/download/3.12.1/pandoc-3.12.1-1-amd64.deb
+          dpkg -i pandoc-3.12.1-1-amd64.deb
+          rm pandoc-3.12.1-1-amd64.deb
+        shell: bash
+
+      - name: Set up R
+        if: ${{ matrix.config.r != 'nold' }}
+        uses: r-lib/actions/setup-r@v2
         with:
           r-version: ${{ matrix.config.r }}
           http-user-agent: ${{ matrix.config.http-user-agent }}
@@ -43,15 +72,34 @@ jobs:
         if: runner.os == 'Linux'
         run: sudo apt update -y && sudo apt install -y protobuf-compiler libprotobuf-dev libprotoc-dev
 
-      - uses: r-lib/actions/setup-r-dependencies@v2
+      - name: Install dependencies (all except from noLD)
+        if: ${{ matrix.config.r != 'nold' }}
+        uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: any::rcmdcheck, any::XML, any::roxygen2, github::jamovi/jamovi/jmvcore
           needs: check
+
+      - name: Install dependencies (noLD only)
+        if: ${{ matrix.config.r == 'nold' }}
+        run: |
+          install.packages('pak', repos = 'https://r-lib.github.io/p3m/dev')
+          pak::local_install_dev_deps(upgrade = TRUE)
+          pak::pkg_install(c('rcmdcheck', 'XML', 'roxygen2'))
+        shell: Rscript {0}
 
       - name: Document
         run: roxygen2::roxygenise(roclets = "rd")
         shell: Rscript {0}
 
-      - uses: r-lib/actions/check-r-package@v2
+      - name: Run R check (all except from noLD)
+        if: ${{ matrix.config.r != 'nold' }}
+        uses: r-lib/actions/check-r-package@v2
         with:
           upload-snapshots: true
+
+      - name: Run R check (noLD only)
+        if: ${{ matrix.config.r == 'nold' }}
+        run: |
+          R CMD build .
+          R CMD check --as-cran --no-manual *.tar.gz
+        shell: bash

@@ -22,10 +22,12 @@
 .Rproj.user/
 *.Rproj
 
-# produced vignettes, manual, and pkgdown site
+# produced vignettes, manual, figures in README, and pkgdown site
 vignettes/*.html
 vignettes/*.pdf
+vignettes/*.R
 docs/
+man/figures/README*
 pkgdown/
 
 # OAuth2 token, see https://github.com/hadley/httr/releases/tag/v0.3
@@ -63,3 +65,4 @@ TrialOther
 Meta/
 /Meta/
 /doc/
+.prepare4CRAN

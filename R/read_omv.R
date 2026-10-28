@@ -7,8 +7,8 @@
 #' @param getSyn Extract syntax from the analyses in the 'jamovi'-file and store it in the attribute "syntax" (default: FALSE)?
 #' @param getHTM Store index.html in the attribute "HTML" (default: FALSE)?
 #'
-#' @return data frame (can be directly used with functions included in the R-package `jmv` and syntax from 'jamovi'; also compatible with the format of the
-#'         R-package `foreign`)
+#' @return data frame (can be directly used with functions included in the R-package `jmv` and syntax from 'jamovi';
+#'         also compatible with the format of the R-package `foreign`)
 #'
 #' @examples
 #' nmeInp <- system.file("extdata", "ToothGrowth.omv", package = "jmvReadWrite")
@@ -299,14 +299,14 @@ read_all <- function(fleInp = "", usePkg = c("foreign", "haven"), selSet = "", .
                            error   = function(errMsg) tryErr(fleInp, errMsg),
                            warning = function(wrnMsg) tryWrn(fleInp, wrnMsg))
         if (methods::is(dtaFrm, "tbl_df") || any(vapply(dtaFrm, methods::is, logical(1), "haven_labelled")))
-            dtaFrm <- clnTbb(dtaFrm, c("format.sas", "format.spss", "format.stata", "display_width"), jmvLbl = TRUE)
+            dtaFrm <- clnTbb(dtaFrm, c("format.sas", "format.spss", "format.stata", "display_width", "haven_meta"), jmvLbl = TRUE)
     # RDS
     } else if (hasExt(fleInp, "rds")) {
         dtaFrm <- tryCatch(do.call(readRDS, adjArg("readRDS", list(file = fleInp), varArg, "file")),
                            error   = function(errMsg) tryErr(fleInp, errMsg),
                            warning = function(wrnMsg) tryWrn(fleInp, wrnMsg))
         if (methods::is(dtaFrm, "tbl_df") || any(vapply(dtaFrm, methods::is, logical(1), "haven_labelled")))
-            dtaFrm <- clnTbb(dtaFrm, c("format.sas", "format.spss", "format.stata", "display_width"), jmvLbl = TRUE)
+            dtaFrm <- clnTbb(dtaFrm, c("format.sas", "format.spss", "format.stata", "display_width", "haven_meta"), jmvLbl = TRUE)
     # SPSS (haven / foreign)
     } else if (hasExt(fleInp, c("sav", "zsav"))) {
         dtaFrm <-  getSPSS(fleInp, usePkg, varArg)
@@ -388,11 +388,12 @@ clnFgn <- function(dtaFrm = NULL) {
     dtaFrm
 }
 
-clnTbb <- function(dtaFrm = NULL, rmvAtt = NULL, jmvLbl = FALSE) {
+clnTbb <- function(dtaFrm = NULL, att2Rm = NULL, jmvLbl = FALSE) {
     if (is.null(dtaFrm)) return(dtaFrm)
 
-    # convert tibble to data.frame (remove tbl_df, tbl from class)
-    class(dtaFrm) <- setdiff(class(dtaFrm), c("tbl_df", "tbl", rmvAtt))
+    # convert tibble to data.frame and remove classes or attributes given in the parameter `att2Rm` and (plus "tbl_df", "tbl")
+    class(dtaFrm) <- setdiff(class(dtaFrm), c("tbl_df", "tbl", att2Rm))
+    for (crrAtt in att2Rm) if (!is.null(attr(dtaFrm, crrAtt))) attr(dtaFrm, crrAtt) <- NULL
     chkDtF(dtaFrm)
 
     for (crrNme in names(dtaFrm)) {
@@ -412,8 +413,8 @@ clnTbb <- function(dtaFrm = NULL, rmvAtt = NULL, jmvLbl = FALSE) {
                 dtaFrm[[crrNme]] <- cnvCol(dtaFrm[[crrNme]], "factor")
             }
         }
-        # remove attributes given in rmvAtt
-        for (crrAtt in rmvAtt) {
+        # remove attributes given via the parameter `att2Rm`
+        for (crrAtt in att2Rm) {
             if (! is.null(attr(dtaFrm[[crrNme]], crrAtt))) {
                 attr(dtaFrm[[crrNme]], crrAtt) <- NULL
             }
@@ -461,7 +462,7 @@ getSAS   <- function(fleInp, usePkg, varArg = list()) {
                                error   = function(errMsg) tryErr(fleInp, errMsg),
                                warning = function(wrnMsg) tryErr(fleInp, wrnMsg))
             if (is.null(tmpHvn)) return(tmpHvn)
-            clnTbb(tmpHvn, c("format.sas", "display_width"), jmvLbl = TRUE)
+            clnTbb(tmpHvn, c("format.sas", "display_width", "haven_meta"), jmvLbl = TRUE)
         } else {
             stop("In order to read the SAS-file \"", basename(fleInp),
                  "\" the R-packages \"haven\" needs to be installed.")
@@ -472,7 +473,7 @@ getSAS   <- function(fleInp, usePkg, varArg = list()) {
             tmpHvn <- tryCatch(do.call(haven::read_xpt, adjArg("haven::read_xpt", list(file = fleInp), varArg, "file")),
                                error   = function(errMsg) tryErr(fleInp, errMsg),
                                warning = function(wrnMsg) tryErr(fleInp, wrnMsg))
-            clnTbb(tmpHvn, c("format.sas", "display_width"), jmvLbl = TRUE)
+            clnTbb(tmpHvn, c("format.sas", "display_width", "haven_meta"), jmvLbl = TRUE)
         } else if (any(usePkg == "foreign") && hasPkg("foreign")) {
             fgnTmp <- tryCatch(do.call(foreign::read.xport, adjArg("foreign::read.xport", list(file = fleInp), varArg, "file")),
                                error   = function(errMsg) tryErr(fleInp, errMsg))
@@ -489,7 +490,7 @@ getSPSS  <- function(fleInp, usePkg, varArg = list()) {
         tmpHvn <- tryCatch(do.call(haven::read_sav, adjArg("haven::read_sav", list(file = fleInp), varArg, "file")),
                            error   = function(errMsg) tryErr(fleInp, errMsg),
                            warning = function(wrnMsg) tryErr(fleInp, wrnMsg))
-        clnTbb(tmpHvn, c("format.spss", "display_width"), jmvLbl = TRUE)
+        clnTbb(tmpHvn, c("format.spss", "display_width", "haven_meta"), jmvLbl = TRUE)
     } else if (any(usePkg == "foreign") && hasPkg("foreign")) {
         fgnTmp <- tryCatch(suppressWarnings(do.call(foreign::read.spss,
                              adjArg("foreign::read.spss", list(file = fleInp, to.data.frame = TRUE, trim_values = TRUE, trim.factor.names = TRUE),
@@ -509,7 +510,7 @@ getStata  <- function(fleInp, usePkg, varArg = list()) {
         tmpHvn <- tryCatch(do.call(haven::read_dta, adjArg("haven::read_dta", list(file = fleInp), varArg, "file")),
                            error   = function(errMsg) tryErr(fleInp, errMsg),
                            warning = function(wrnMsg) tryErr(fleInp, wrnMsg))
-        clnTbb(tmpHvn, c("format.stata", "display_width"), jmvLbl = TRUE)
+        clnTbb(tmpHvn, c("format.stata", "display_width", "haven_meta"), jmvLbl = TRUE)
     } else if (any(usePkg == "foreign") && hasPkg("foreign")) {
         tmpFgn <- tryCatch(do.call(foreign::read.dta, adjArg("foreign::read.dta", list(file = fleInp), varArg, "file")),
                            error = function(errMsg) tryErr(fleInp, errMsg))

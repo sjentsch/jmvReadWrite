@@ -1,55 +1,60 @@
 #' Converts .omv-files for the statistical spreadsheet 'jamovi' (<https://www.jamovi.org>) from wide to long format
 #'
-#' @param dtaInp Either a data frame or the name of a data file to be read (including the path, if required; "FILENAME.ext"; default: NULL); files can be of
-#'               any supported file type, see Details below
-#' @param fleOut Name of the data file to be written (including the path, if required; "FILE_OUT.omv"; default: ""); if empty, the resulting data frame is
-#'               returned instead
-#' @param varLst List / set of variables that are to be transformed into single (time-varying) variables in long format (default: c())
-#' @param varExc Name of the variable(s) should be excluded from the transformation, typically this will be between-subject-variable(s) (default: c())
-#' @param varID  Name(s) of one or more variables that (is created to) identify the same group / individual (if empty, "ID" is added with row numbers
-#'               identifying cases; default: NULL)
-#' @param varTme Name of the variable (or vector with variable names) that (is created to) differentiate multiple records from the same group / individual #'               (default: "cond"; if required, a counter is added for each time-varying part)
-#' @param varSep Character that separates the variables in varLst into a time-varying part and a part that forms the variable name in long format ("_" in
-#'               "VAR_1", "VAR_2", default: "_")
-#' @param varOrd Whether to arrange the variables before the transformation, so that they are in accordance with the different split levels (default: TRUE)
-#' @param varSrt Variable(s) that are used to sort the data frame (see Details; if empty, the order returned from reshape is kept; default: c())
-#' @param excLvl Integer (or vector of integers) determining which parts of the variable names in varLst shall not be transformed (default: NULL), see Details
-#'               below
-#' @param usePkg Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata and SAS files; "foreign" is the default (it comes with
-#'               base R), but "haven" is newer and more comprehensive
-#' @param selSet Name of the data set that is to be selected from the workspace (only applies when reading .RData-files)
+#' @inheritParams aggregate_omv dtaInp fleOut usePkg selSet
+#' @param varLst List / set of variables that are to be transformed into single (time-varying) variables in long format
+#'               (default: NULL)
+#' @param varExc Name of the variable(s) should be excluded from the transformation, typically this will be
+#'               between-subject-variable(s) (default: NULL)
+#' @param varID  Name(s) of one or more variables that (is created to) identify the same group / individual (if empty,
+#'               "ID" is added with row numbers identifying cases; default: NULL)
+#' @param varTme Name of the variable (or vector with variable names) that (is created to) differentiate multiple
+#'               records from the same group / individual (default: "cond"; if required, a counter is added for each
+#'               time-varying part)
+#' @param varSep Character that separates the variables in varLst into a time-varying part and a part that forms the
+#'               variable name in long format ("_" in "VAR_1", "VAR_2", default: "_")
+#' @param varOrd Whether to arrange the variables before the transformation, so that they are in accordance with the
+#'               different split levels (default: TRUE)
+#' @param varSrt Variable(s) that are used to sort the data frame (see Details; if empty, the order returned from
+#'               reshape is kept; default: NULL)
+#' @param excLvl Integer (or vector of integers) determining which parts of the variable names in varLst shall not be
+#'               transformed (default: NULL), see Details below
 #' @param ...    Additional arguments passed on to methods; see Details below
 #'
-#' @return a data frame (only returned if `fleOut` is empty) where the input data set is converted from wide to long format
+#' @return a data frame (only returned if `fleOut` is empty) where the input data set is converted from wide to long
+#'         format
 #'
 #' @details
-#' * If `varLst` is empty, it is tried to generate it using all variables in the data frame except those defined by `varExc` and `varID`. The variable(s) in
-#'   `varID` need to be unique identifiers (in the original dataset), those in `varExc` don't have this requirement. It is recommended that the variable names
-#'   in `varExc` and `varID` should not contain the variable separator (defined in `varSep`; default: "_").
-#' * `varOrd` determines whether the variables are rearranged to match the order of split levels. Consider the `varLst` X_1, Y_1, X_2, Y_2. If `varOrd` were
-#'   set to FALSE, the original order would be preserved and the second part of the variable name (1, 2, ...) would become condition 1, and the first part
-#'   condition 2. In most cases, leaving `varOrd` set to TRUE is recommended.
-#' * `varSrt` can be either a character or a character vector (with one or more variables respectively). The sorting order for a particular variable can be
-#'   inverted with preceding the variable name with "-". Please note that this doesn't make sense and hence throws a warning for certain variable types (e.g.,
-#'   factors).
-#' * `exclLvl` points to a part of the variable names in `varLst` to be excluded. For example, if the variable name is `PART1_PART2_PART3` (split at _), then
-#'   `excLvl` = 1 would exclude PART1 from the transformation. Quite often, one has more that one variable of a particular type (e.g., responses, reaction
-#'   times, etc.). Those would typically be the first part of each variable name in `varLst` (the conditions then being PART2, PART3, and so on). `excLvl` = 1
-#'   would exclude those variable types / categories from being transformed into long (i.e., they would be kept as separate columns).
-#' * The ellipsis-parameter (`...`) can be used to submit arguments / parameters to the functions that are used for transforming or reading the data. By
-#'   clicking on the respective function under “See also”, you can get a more detailed overview over which parameters each of those functions take.
-#' * The transformation from long to wide uses `reshape`: `varID` matches (~) `idvar` in `reshape`, `varTme` ~ `timevar`, `varLst` ~ `varying`, and `varSep` ~
-#'   `sep`. The help for `reshape` is very explanatory, click on the link under “See also” to access it, particularly what is explained under “Details”.
-#' * The functions for reading and writing the data are: `read_omv` and `write_omv` (for jamovi-files), `read.table` (for CSV / TSV files; using similar
-#'   defaults as `read.csv` for CSV and `read.delim` for TSV which both are based upon `read.table`), `load` (for .RData-files), `readRDS` (for .rds-files),
-#'   `read_sav` (needs R-package `haven`) or `read.spss` (needs R-package `foreign`) for SPSS-files, `read_dta` (`haven`) / `read.dta` (`foreign`) for
-#'   Stata-files, `read_sas` (`haven`) for SAS-data-files, and `read_xpt` (`haven`) / `read.xport` (`foreign`) for SAS-transport-files. If you would like to
-#'   use `haven`, you may need to install it using `install.packages("haven", dep = TRUE)`.
+#' * If `varLst` is empty, it is tried to generate it using all variables in the data frame except those defined by
+#'   `varExc` and `varID`. The variable(s) in `varID` need to be unique identifiers (in the original dataset), those in
+#'   `varExc` don't have this requirement. It is recommended that the variable names in `varExc` and `varID` should not
+#'   contain the variable separator (defined in `varSep`; default: "_").
+#' * `varOrd` determines whether the variables are rearranged to match the order of split levels. Consider the `varLst`
+#'   X_1, Y_1, X_2, Y_2. If `varOrd` were set to FALSE, the original order would be preserved and the second part of
+#'   the variable name (1, 2, ...) would become condition 1, and the first part condition 2. In most cases, leaving
+#'   `varOrd` set to TRUE is recommended.
+#' * `varSrt` can be either a character or a character vector (with one or more variables respectively). The sorting
+#'   order for a particular variable can be inverted with preceding the variable name with "-". Please note that this
+#'   doesn't make sense and hence throws a warning for certain variable types (e.g., factors).
+#' * `exclLvl` points to a part of the variable names in `varLst` to be excluded. For example, if the variable name is
+#'   `PART1_PART2_PART3` (split at _), then `excLvl` = 1 would exclude PART1 from the transformation. Quite often, one
+#'   has more that one variable of a particular type (e.g., responses, reaction times, etc.). Those would typically be
+#'   the first part of each variable name in `varLst` (the conditions then being PART2, PART3, and so on). `excLvl` = 1
+#'   would exclude those variable types / categories from being transformed into long (i.e., they would be kept as
+#'   separate columns).
+#' * The transformation from long to wide uses `reshape`: `varID` matches (~) `idvar` in `reshape`, `varTme` ~
+#'   `timevar`, `varLst` ~ `varying`, and `varSep` ~ `sep`. The help for `reshape` is very explanatory, click on the
+#'   link under “See also” to access it, particularly what is explained under “Details”.
+#' * The ellipsis-parameter (`...`) can be used to submit arguments / parameters to the functions that are used for
+#'   reading or transforming the data. By clicking on the respective function under “See also”, you can get a more
+#'   detailed overview over which parameters each of those functions take.
 #'
-#' @seealso `long2wide_omv` internally uses the following functions: The transformation from long to wide uses [stats::reshape()]. For reading and writing data
-#'   files in different formats: [jmvReadWrite::read_omv()] and [jmvReadWrite::write_omv()] for jamovi-files, [utils::read.table()] for CSV / TSV files,
-#'   [load()] for reading .RData-files, [readRDS()] for .rds-files, [haven::read_sav()] or [foreign::read.spss()] for SPSS-files, [haven::read_dta()] or
-#'   [foreign::read.dta()] for Stata-files, [haven::read_sas()] for SAS-data-files, and [haven::read_xpt()] or [foreign::read.xport()] for SAS-transport-files.
+#' @seealso
+#' `long2wide_omv` internally uses the following functions: The transformation from long to wide uses
+#' [stats::reshape()]. For reading and writing data files in different formats: [jmvReadWrite::read_omv()] and
+#' [jmvReadWrite::write_omv()] for jamovi-files, [utils::read.table()] for CSV / TSV files, [load()] for reading
+#' .RData-files, [readRDS()] for .rds-files, [haven::read_sav()] or [foreign::read.spss()] for SPSS-files,
+#' [haven::read_dta()] or [foreign::read.dta()] for Stata-files, [haven::read_sas()] for SAS-data-files, and
+#' [haven::read_xpt()] or [foreign::read.xport()] for SAS-transport-files.
 #'
 #' @examples
 #' \dontrun{
@@ -108,8 +113,9 @@
 #'
 #' @export wide2long_omv
 #'
-wide2long_omv <- function(dtaInp = NULL, fleOut = "", varLst = c(), varExc = c(), varID = NULL, varTme = "cond", varSep = "_", varOrd = TRUE, varSrt = c(),
-                          excLvl = NULL, usePkg = c("foreign", "haven"), selSet = "", ...) {
+wide2long_omv <- function(dtaInp = NULL, fleOut = "", varLst = NULL, varExc = NULL, varID = NULL,
+                          varTme = "cond", varSep = "_", varOrd = TRUE, varSrt = NULL, excLvl = NULL,
+                          usePkg = c("foreign", "haven"), selSet = "", ...) {
 
     # check and import input data set (either as data frame or from a file)
     if (!is.null(list(...)[["fleInp"]])) stop("Please use the argument dtaInp instead of fleInp.")
@@ -131,9 +137,9 @@ wide2long_omv <- function(dtaInp = NULL, fleOut = "", varLst = c(), varExc = c()
     }
     # check whether they all contain the separator
     if (nzchar(varSep) && !all(grepl(varSep, varLst, fixed = TRUE))) {
-        stop(sprintf(paste("\n\nThe variable separator (varSep, \"%s\") must be contained in all variables",
-                           "in the variable list (varLst).\nDeviating variables: %s\n"),
-                     varSep, paste(varLst[!grepl(varSep, varLst, fixed = TRUE)], collapse = ", ")))
+        stop("\n\nThe variable separator (varSep, \"", varSep, "\") must be contained in all variables in the ",
+             "variable list (varLst).\nDeviating variables: ",
+             paste(varLst[!grepl(varSep, varLst, fixed = TRUE)], collapse = ", "), "\n")
     }
     # re-arrange the variable in the variable list so that they are in accordance with the order
     # of the splits in the variable names
@@ -143,9 +149,8 @@ wide2long_omv <- function(dtaInp = NULL, fleOut = "", varLst = c(), varExc = c()
         varSpl <- strsplit(varLst, gsub("\\.", "\\\\.", varSep))
         lngSpl <- unique(vapply(varSpl, length, integer(1)))
         if (length(lngSpl) != 1) {
-            stop(sprintf(paste("The variable names in varLst need to have the same structure, i.e., the",
-                               "same number of separators within all variable names:\n%s\n\n"),
-                         paste0(varLst, collapse = ", ")))
+            stop("The variable names in varLst need to have the same structure, i.e., the same number of separators ",
+                 "within all variable names:\n", paste(varLst, collapse = ", "), "\n\n")
         }
     } else {
         varSpl <- as.list(varLst)
@@ -179,23 +184,11 @@ wide2long_omv <- function(dtaInp = NULL, fleOut = "", varLst = c(), varExc = c()
         crrPos <- which(dffSpl == min(dffSpl, na.rm = TRUE))
         # crrTms is used as parameter in crrArg and the if-condition below
         crrTms <- unique(vapply(varSpl, "[[", character(1), crrPos))
-        # assemble the list for varying, if crrTms are the only elements of left in varLst, an output
-        # variable “measure” is used as target, otherwise crrVry is assembled as named list with the
-        # target as name and all former variables for that step of the hierarchy as entries
-        if (all(crrNmV %in% crrTms)) {
-            crrVry <- list(measure = crrNmV)
-        } else {
-            vldPos <- which(!is.na(dffSpl))
-            crrVry <- list()
-            for (i in seq_along(varSpl)) {
-                tmpTgt <- paste0(varSpl[[i]][setdiff(vldPos, crrPos)], collapse = varSep)
-                crrVry[[tmpTgt]] <- unique(c(crrVry[[tmpTgt]], paste0(varSpl[[i]][vldPos], collapse = varSep)))
-            }
-        }
-        # assemble the arguments to call reshape (limiting the variable arguments - ... - to those permitted)
-        # rmvTms also corrects labels (if available) and variable names
-        crrArg <- list(data = dtaFrm, direction = "long", idvar = varID, sep = varSep, varying = crrVry, v.names = names(crrVry),
-                       timevar = paste0(pfxTme, rep(sum(is.finite(dffSpl)), numSpl)), times = crrTms)
+        # assemble the list for varying
+        crrVry <- crtVry(crrNmV = crrNmV, crrTms = crrTms, varSpl = varSpl, vldPos = which(!is.na(dffSpl)), crrPos = crrPos, varSep = varSep)
+        crrArg <- list(data = dtaFrm, direction = "long", idvar = varID, sep = varSep, varying = crrVry,
+                       v.names = names(crrVry), timevar = paste0(pfxTme, rep(sum(is.finite(dffSpl)), numSpl)),
+                       times = crrTms)
         dtaFrm <- rmvTms(do.call(stats::reshape, adjArg("stats::reshape", crrArg, ...,
                                                         c("data", "direction", "idvar", "sep", "varying", "times", "timevar", "v.names"))), crrTms)
         dtaFrm[[crrArg$timevar]] <- as.factor(dtaFrm[[crrArg$timevar]])
@@ -243,19 +236,39 @@ wide2long_omv <- function(dtaInp = NULL, fleOut = "", varLst = c(), varExc = c()
     rtnDta(dtaFrm = dtaFrm, fleOut = fleOut, dtaTtl = jmvTtl("_long"), ...)
 }
 
-ordCol <- function(varNme = c(), dtaNmV = c(), varID = c(), varLst = c()) {
+crtVry <- function(crrNmV = NULL, crrTms = NULL, varSpl = NULL, vldPos = NA, crrPos = NA, varSep = "_") {
+    # assemble the list for varying, if crrTms are the only elements of left in varLst, an output
+    # variable “measure” is used as target, otherwise crrVry is assembled as named list with the
+    # target as name and all former variables for that step of the hierarchy as entries
+    # assemble the arguments to call reshape (limiting the variable arguments - ... - to those permitted)
+    # rmvTms also corrects labels (if available) and variable names
+
+    if (all(crrNmV %in% crrTms)) {
+        list(measure = crrNmV)
+    } else {
+        crrVry <- list()
+        for (i in seq_along(varSpl)) {
+            tmpTgt <- paste(varSpl[[i]][setdiff(vldPos, crrPos)], collapse = varSep)
+            crrVry[[tmpTgt]] <- unique(c(crrVry[[tmpTgt]], paste(varSpl[[i]][vldPos], collapse = varSep)))
+        }
+        crrVry
+    }
+}
+
+ordCol <- function(varNme = NULL, dtaNmV = NULL, varID = NULL, varLst = NULL) {
     posVrL <- range(which(dtaNmV %in% varLst))
     varOrd <- c(varID[1], setdiff(dtaNmV[rep(seq(1, posVrL[1] - 1), posVrL[1] > 1)], varID), sort(varID[-1]),
                 setdiff(varNme, c(varID, setdiff(dtaNmV, varLst))),
                 setdiff(dtaNmV[rep(seq(posVrL[2] + 1, length(dtaNmV)), posVrL[2] < length(dtaNmV))], varID))
     if (length(c(setdiff(varNme, varOrd), setdiff(varOrd, varNme))) != 0) {
-        stop(paste0("Mismatch between old and new variable order - old: ", paste0(varNme, collapse = ", "), "; new: ", paste0(varOrd, collapse = ", "), "."))
+        stop("Mismatch between old and new variable order - old: (", paste(varNme, collapse = ", "), "); new: (",
+             paste(varOrd, collapse = ", "), ").")
     }
 
     varOrd
 }
 
-rmvID <- function(dtaFrm = NULL, varID = c(), hasID = TRUE) {
+rmvID <- function(dtaFrm = NULL, varID = NULL, hasID = TRUE) {
     if ("jmv-id" %in% names(attributes(dtaFrm[, varID[1]]))) attr(dtaFrm[, varID[1]], "jmv-id") <- NULL
     if (!hasID || ("measureType" %in% names(attributes(dtaFrm[, varID[1]])) && attr(dtaFrm[, varID[1]], "measureType") == "ID")) {
         dtaFrm[, varID[1]] <- as.factor(dtaFrm[, varID[1]])
@@ -266,7 +279,7 @@ rmvID <- function(dtaFrm = NULL, varID = c(), hasID = TRUE) {
     dtaFrm
 }
 
-rmvTms <- function(dtaFrm = NULL, crrTms = c()) {
+rmvTms <- function(dtaFrm = NULL, crrTms = NULL) {
     varNme <- attr(dtaFrm, "reshapeLong")$v.names
     for (crrNme in varNme) {
         attr(dtaFrm[[crrNme]], "name") <- crrNme
@@ -274,8 +287,8 @@ rmvTms <- function(dtaFrm = NULL, crrTms = c()) {
         if (is.null(crrDsc) || !nzchar(crrDsc)) next
         splDsc <- trimws(strsplit(crrDsc, "\\(|\\)")[[1]])
         if (length(splDsc) == 2) {
-            rplDsc <- paste0(trimws(strsplit(splDsc[2], ",")[[1]])[!grepl(paste(paste0("\\w+: ", crrTms, "$"), collapse = "|"),
-                             trimws(strsplit(splDsc[2], ",")[[1]]))], collapse = ", ")
+            rplDsc <- paste(trimws(strsplit(splDsc[2], ",")[[1]])[!grepl(paste(paste0("\\w+: ", crrTms, "$"), collapse = "|"),
+                            trimws(strsplit(splDsc[2], ",")[[1]]))], collapse = ", ")
             attr(dtaFrm[[crrNme]], "jmv-desc")    <- ifelse(nzchar(rplDsc), paste0(splDsc[1], " (", rplDsc, ")"), splDsc[1])
             attr(dtaFrm[[crrNme]], "description") <- ifelse(nzchar(rplDsc), paste0(splDsc[1], " (", rplDsc, ")"), splDsc[1])
         }

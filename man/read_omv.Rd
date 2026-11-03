@@ -27,8 +27,8 @@ read_omv(
 \item{getHTM}{Store index.html in the attribute "HTML" (default: FALSE)?}
 }
 \value{
-data frame (can be directly used with functions included in the R-package \code{jmv} and syntax from 'jamovi'; also compatible with the format of the
-R-package \code{foreign})
+data frame (can be directly used with functions included in the R-package \code{jmv} and syntax from 'jamovi';
+also compatible with the format of the R-package \code{foreign})
 }
 \description{
 Read files created of the statistical spreadsheet 'jamovi' (\url{https://www.jamovi.org})
@@ -59,6 +59,7 @@ str(data)
 #   ..- attr(*, "active")= logi FALSE
 # ... (continued)
 
+# getSyn requires jmvcore and RProtoBuf, and is thus not run here
 \dontrun{
 data <- jmvReadWrite::read_omv(fleInp = nmeInp, getSyn = TRUE)
 }

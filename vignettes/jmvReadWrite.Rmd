@@ -34,6 +34,11 @@ from within `jamovi` by becoming part of the `Rj` module (where you can use it
 by writing R commands, documented below), and via the `jTransform` module that
 provides a graphical user interface for most helper functions.
 
+If you find the package useful, please cite it as:
+<div style = "background-color:rgb(245, 245, 245); padding: 20px 20px 1px; border-radius:5px;">
+`r format(citation("jmvReadWrite"), style = "html")`
+</div></br>
+
 ## Installation
 
 In R, you can either install a stable version of `jmvReadWrite` which is
@@ -82,11 +87,11 @@ from there.
 fleOMV <- system.file("extdata", "ToothGrowth.omv", package = "jmvReadWrite")
 data <- jmvReadWrite::read_omv(fleOMV)
 # if the "jmv"-package is installed, we can run a test analysis with the data
-if ("jmv" %in% rownames(installed.packages())) {
+if (nzchar(system.file(package = "jmv"))) {
     jmv::ANOVA(
         formula = len ~ supp + dose + supp:dose,
         data = data,
-        effectSize = c("omega"),
+        effectSize = "omega",
         modelTest = TRUE,
         homo = TRUE,
         norm = TRUE)
@@ -114,7 +119,7 @@ data <- jmvReadWrite::read_omv(fleOMV, getSyn = TRUE)
 if (length(attr(data, "syntax")) >= 2) {
     attr(data, "syntax")
     # if the "jmv"-package is installed, we can run the analyses in "syntax"
-    if ("jmv" %in% rownames(installed.packages())) {
+    if (nzchar(system.file(package = "jmv"))) {
         eval(parse(text = attr(data, "syntax")[[1]]))
         eval(parse(text = paste0("result = ", attr(data, "syntax")[[2]])))
         names(result)
@@ -190,6 +195,10 @@ other columns.
 `jmvReadWrite` contains a number of helper functions that assist you with data
 management tasks that are frequently required:
 
+* [`aggregate_omv`](https://sjentsch.github.io/jmvReadWrite/reference/aggregate_omv.html):
+  Aggregates data (calculating, e.g., mean, median, etc.) from data sets in long
+  format.
+
 * [`arrange_cols_omv`](https://sjentsch.github.io/jmvReadWrite/reference/arrange_cols_omv.html):
   Re-arranges the columns of your data file in a requested order.
 
@@ -218,6 +227,11 @@ management tasks that are frequently required:
   If can be determined, whether the calculation of the distances should be carried out
   between columns / variables or between rows / units of observation. The original data can
   be standardized before the distances are calculated.
+
+* [`label_vars_omv`](https://sjentsch.github.io/jmvReadWrite/reference/label_vars_omv.html):
+  Labels columns / variables in jamovi data files, using either a CSV file, a data frame (each
+  containing two columns, one with the variable names, the other with the variable labels), or
+  a character vector with the variable labels.
 
 * [`long2wide_omv`](https://sjentsch.github.io/jmvReadWrite/reference/long2wide_omv.html):
   Converts a data set from long to wide format: Time points for repeated

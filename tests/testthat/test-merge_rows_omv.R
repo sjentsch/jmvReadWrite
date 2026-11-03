@@ -18,49 +18,52 @@ test_that("merge_rows_omv works", {
     # try out different setting for the arguments and their consequence for size, etc.
     dtaFrm <- merge_rows_omv(dtaInp = nmeInp)
     expect_s3_class(dtaFrm, "data.frame")
-    expect_equal(dim(dtaFrm), c(758, 33))
-    expect_equal(names(attributes(dtaFrm)), c("names", "row.names", "class"))
-    expect_equal(names(attributes(dtaFrm[[2]])), "jmv-desc")
-    expect_equal(names(attributes(dtaFrm[[30]])), c("levels", "class"))
+    expect_identical(dim(dtaFrm), c(758L, 33L))
+    expect_named(attributes(dtaFrm), c("names", "row.names", "class"))
+    expect_named(attributes(dtaFrm[[2]]), "jmv-desc")
+    expect_named(attributes(dtaFrm[[30]]), c("levels", "class"))
 
     dtaFrm <- merge_rows_omv(dtaInp = nmeInp, typMrg = "common")
     expect_s3_class(dtaFrm, "data.frame")
-    expect_equal(dim(dtaFrm), c(758, 29))
+    expect_identical(dim(dtaFrm), c(758L, 29L))
 
     dtaFrm <- merge_rows_omv(dtaInp = nmeInp, colInd = TRUE)
     expect_s3_class(dtaFrm, "data.frame")
-    expect_equal(dim(dtaFrm), c(758, 34))
-    expect_true(all(unname(table(dtaFrm$fleInd)) == vapply(tmpInp, dim, integer(2))[1, ]))
+    expect_identical(dim(dtaFrm), c(758L, 34L))
+    expect_identical(as.integer(table(dtaFrm$fleInd)), vapply(tmpInp, dim, integer(2))[1, ])
 
     dtaFrm <- merge_rows_omv(dtaInp = nmeInp, rstRwN = TRUE)
     expect_s3_class(dtaFrm, "data.frame")
-    expect_equal(dim(dtaFrm), c(758, 33))
-    expect_true(all(rownames(dtaFrm) == as.character(seq_len(dim(dtaFrm)[1]))))
+    expect_identical(dim(dtaFrm), c(758L, 33L))
+    expect_identical(rownames(dtaFrm), as.character(seq_len(nrow(dtaFrm))))
 
     dtaFrm <- merge_rows_omv(dtaInp = nmeInp, colInd = TRUE, rmvDpl = TRUE)
     expect_s3_class(dtaFrm, "data.frame")
-    expect_equal(dim(dtaFrm), c(504, 34))
-    expect_true(all(table(dtaFrm$fleInd) == c(bfi_sample = 254, bfi_sample2 = 250)))
+    expect_identical(dim(dtaFrm), c(504L, 34L))
+    expect_identical(as.integer(table(dtaFrm$fleInd)), c(254L, 250L))
 
     tmpDF <- tmpInp[[1]]
     attr(tmpDF, "fleInp") <- nmeInp[2]
     dtaFrm <- merge_rows_omv(dtaInp = tmpDF, colInd = TRUE)
     expect_s3_class(dtaFrm, "data.frame")
-    expect_equal(dim(dtaFrm), c(504, 34))
-    expect_true(all(table(dtaFrm$fleInd) == setNames(254, "input data frame") | table(dtaFrm$fleInd) == setNames(250, nmeInp[2])))
+    expect_identical(dim(dtaFrm), c(504L, 34L))
+    expect_named(table(dtaFrm$fleInd), c(gsub(".rds$", "", basename(nmeInp[2])), "input data frame"))
+    expect_identical(as.vector(table(dtaFrm$fleInd)), c(250L, 254L))
 
     tmpDF$age <- as.numeric(tmpDF$age)
     expect_error(merge_rows_omv(dtaInp = tmpDF, colInd = TRUE), regexp = "^Variable age has different types:\\s+input data frame: numeric")
     unlink(nmeInp)
 
-    # test cases for code coverage ============================================================================================================================
+    # test cases for code coverage ====================================================================================
     nmeInp <- paste0(tempfile(), "_", 1:4, ".rds")
     for (i in seq_along(nmeInp)) saveRDS(stats::setNames(data.frame(runif(n = 100)), LETTERS[i]), nmeInp[i])
-    expect_error(dtaFrm <- merge_rows_omv(fleInp = nmeInp, typMrg = "common"), regexp = "^Please use the argument dtaInp instead of fleInp\\.")
-    expect_error(dtaFrm <- merge_rows_omv(dtaInp = nmeInp, typMrg = "common"), regexp = "^The data sets in the files that were given as dtaInp-argument do not contain variables that are overlapping")
+    expect_error(dtaFrm <- merge_rows_omv(fleInp = nmeInp, typMrg = "common"),
+                 "^Please use the argument dtaInp instead of fleInp\\.")
+    expect_error(dtaFrm <- merge_rows_omv(dtaInp = nmeInp, typMrg = "common"),
+                 "^The data sets in the files that were given as dtaInp-argument do not contain variables that are overlapping")
     unlink(nmeInp)
 
-    expect_equal(addIdx(jmvReadWrite::bfi_sample, "bfi_sample.omv")[[1]], rep("bfi_sample", 254))
-    expect_equal(addIdx(jmvReadWrite::bfi_sample, ""), jmvReadWrite::bfi_sample)
-    expect_equal(addIdx(jmvReadWrite::bfi_sample), jmvReadWrite::bfi_sample)
+    expect_identical(addIdx(jmvReadWrite::bfi_sample, "bfi_sample.omv")[[1]], rep("bfi_sample", 254))
+    expect_identical(addIdx(jmvReadWrite::bfi_sample, ""), jmvReadWrite::bfi_sample)
+    expect_identical(addIdx(jmvReadWrite::bfi_sample), jmvReadWrite::bfi_sample)
 })

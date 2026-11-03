@@ -1,3 +1,46 @@
+# jmvReadWrite 0.4.15
+
+## Enhancements:
+* `transform_vars_omv`: ensure that only positive OR negative transformations are applied to one variable (both
+  transformations have the same suffix and would be overwritten; variables are either positively OR negatively skewed,
+  hence there is no requirement for applying both types of transformations)
+* account for a change in `haven` (R-package; additional attribute: `haven_meta`)
+* fixing typos and small bugs, and improving unit tests (e.g., limit line length)
+
+---
+
+# jmvReadWrite 0.4.14
+
+## Enhancements:
+* implementing suggestions made by the `goodpractice` R-package
+* `describe_omv`: added creating a license string based upon keywords of standard licenses (e.g., `"RP_GPL2"`)
+* fixing typos and small bugs, and improving unit tests (e.g., limit line length)
+
+---
+
+# jmvReadWrite 0.4.13
+
+## Enhancements:
+* corrected unit tests (for `read_omv`) for dealing with a change in how data frame attributes are arranged (changed with R 4.6)
+* `aggregate_omv`: permit to aggregate over the whole data set (without a grouping variable)
+* added converting Nominal / Ordinal into Numeric using the value labels (if numeric)
+* `describe_omv`: added option for creating descriptions in other languages than English, and added helper function
+  defining standard licenses for dtaDsc
+* fixing typos and small bugs, and improving unit tests (e.g., limit line length)
+
+---
+
+# jmvReadWrite 0.4.12
+
+## Enhancements:
+* added `aggregate_omv`
+* parameter `varTme` for `wide2long_omv` can now be a vector with variable names
+  (previously it could only be a prefix)
+* changes suggested by pkgcheck (remove `dontrun` from examples, etc.)
+* reducing cyclomatic complexity for `wide2long_omv`
+
+---
+
 # jmvReadWrite 0.4.11
 
 ## Enhancements:

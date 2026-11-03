@@ -1,94 +1,135 @@
 #' Adds a title and a description for a data set stored as .omv-file for the statistical spreadsheet 'jamovi' (<https://www.jamovi.org>)
 #'
-#' @param dtaInp Either a data frame or the name of a data file to be read (including the path, if required; "FILENAME.ext"; default: NULL); files can be of
-#'               any supported file type, see Details below
-#' @param fleOut Name of the data file to be written (including the path, if required; "FILE_OUT.omv"; default: ""); if empty, the resulting data frame is
-#'               returned instead
+#' @inheritParams aggregate_omv dtaInp fleOut usePkg selSet
 #' @param dtaTtl Character vector with a title to be added to the data set (see Details; default: "")
-#' @param dtaDsc Description of the data set, either as character vector (HTML-formatted) or as named list with the entries "description", "variables",
-#'               "references", and "license" (see Details; default: "")
-#' @param usePkg Name of the package: "foreign" or "haven" that shall be used to read SPSS, Stata and SAS files; "foreign" is the default (it comes with
-#'               base R), but "haven" is newer and more comprehensive
-#' @param selSet Name of the data set that is to be selected from the workspace (only applies when reading .RData-files)
+#' @param dtaDsc Description of the data set, either as character vector (HTML-formatted) or as named list with the
+#'               entries "description", "variables", "references", and "license" (see Details; default: "")
+#' @param lngDsc Language of the description (localizes the description components: "Description", "Variables",
+#'               "References", and "License"; default: "EN")
 #' @param ...    Additional arguments passed on to methods; see Details below
 #'
 #' @return a data frame (only returned if `fleOut` is empty) where a description and a title are added to the input data
 #'
 #' @details
-#' * The aim of this function is to add a title and a data set description to jamovi data files. Two typical use cases would be (1) to help creating data sets
-#'   to be used in teaching (i.e., either creating or using data sets in R, and afterwards adding a description to those), and (2) to provide ”properly
-#'   described“ data when publishing in a repository such as the OSF).
-#' * NB: The data set should not contain any existing analyses. These will be overwritten (a  warning is issued informing you about that).
-#' * `dtaTtl` is a title for the dataset (at the top of the results output, i.e., that title which initially is “Results” when you create a new data set in
-#'   jamovi).
-#' * `dtaDsc` can either be a character vector (with length = 1) containing HTML-formatted text that describes the data set (see `chrDsc` in the examples for
-#'   HTML tags that are currently implemented; putting “unformatted” text is not a problem, but then the result is just plain text without formatting).
-#'   Alternatively, `dtaDcs` can be a named list with the entries `description`, `variables`, `references`, `license`. All entries except from `variables`
-#'   contain character vectors (length = 1); `variables` shall be a named list with the variable name as name and a description what the variable contains as
-#'   entry. `description` and `variables` must be given, `references` and `license` can be left blank (""; but the names must be present in the list). An
-#'   example for both a named list with a description (`lstDsc`), as well as a character vector with all HTML tags that are implemented (`chrDsc`) can be found
-#'   in the examples below.
-#' * The ellipsis-parameter (`...`) can be used to submit arguments / parameters to the functions that are used for reading and writing the data. By clicking
-#'   on the respective function under “See also”, you can get a more detailed overview over which parameters each of those functions take. The functions are:
-#'   `read_omv` and `write_omv` (for jamovi-files), `read.table` (for CSV / TSV files; using similar defaults as `read.csv` for CSV and `read.delim` for TSV
-#'   which both are based upon `read.table`), `load` (for .RData-files), `readRDS` (for .rds-files), `read_sav` (needs the R-package `haven`) or `read.spss`
-#'   (needs the R-package `foreign`) for SPSS-files, `read_dta` (`haven`) / `read.dta` (`foreign`) for Stata-files, `read_sas` (`haven`) for SAS-data-files,
-#'   and `read_xpt` (`haven`) / `read.xport` (`foreign`) for SAS-transport-files. If you would like to use `haven`, you may need to install it using
-#'   `install.packages("haven", dep = TRUE)`.
+#' * The aim of this function is to add a title and a data set description to jamovi data files. Two typical use cases
+#'   would be (1) to help creating data sets to be used in teaching (i.e., either creating or using data sets in R, and
+#'   afterwards adding a description to those), and (2) to provide "properly described" data when publishing in a
+#'   repository, e.g., the OSF).
+#' * NB: The data set should not contain any existing analyses. These will be overwritten (a  warning is issued
+#'   informing you about that).
+#' * `dtaTtl` is a title for the dataset (at the top of the results output, i.e., that title which initially is
+#'   "Results" when you create a new data set in jamovi).
+#' * `dtaDsc` can either be a character vector (with length = 1) containing HTML-formatted text that describes the data
+#'   set (see `chrDsc` in the examples for HTML tags that are currently implemented; putting "unformatted" text is not
+#'   a problem, but then the result is just plain text without formatting). Alternatively, `dtaDcs` can be a named list
+#'   with the entries `description`, `variables`, `references`, `license`. All entries except from `variables` contain
+#'   character vectors (typically with the length = 1); `variables` shall be a named list with the variable name as
+#'   name and a description what the variable contains as entry. `description` and `variables` must be given,
+#'   `references` and `license` can be left blank (""; but the names must be present in the list). `license` can also
+#'   a character vector containing one of the following keywords, producing a license text fitting the respective
+#'   license: "CC0" (Creative Commons, CC0), "DT_CC4-BY-NC-ND" and "FC_CC4-BY-NC-ND" (Creative Commons, CC BY-NC-ND
+#'   4.0, for data from scientific studies "DT_" or generated / simulated data sets "FC_"; both need the license holder
+#'   to be given as the second element of the character vector for the list entry `license`, e.g., `list(..., list =
+#'   c("DT_CC4-BY-NC-ND", "John Doe"))`, "RP_GPL2", "RP_GPL3", "RP_AGPL3", and "RP_LGPL3" are for data sets that were
+#'   originally part of R-packages under different versions of the GNU General Public License (respectively, GNU
+#'   General Public License 2.x, GNU General Public License 3.0, GNU Affero General Public License 3.0, and GNU Lesser
+#'   General Public License 3.0; these need the name of the R-package to be given as the second element of the
+#'   character vector for the list entry `license`, e.g., `list(..., list = c("RP_GPL2", "jmv")`. Examples for both
+#'   named lists with a description (`lstDsc`), as well as a character vector with all HTML tags that are implemented
+#'   (`chrDsc`) can be found in the examples below.
+#' * The ellipsis-parameter (`...`) can be used to submit arguments / parameters to the functions that are used for
+#'   reading the data. By clicking on the respective function under “See also”, you can get a more detailed overview
+#'   over which parameters each of those functions take.
 #'
-#' @seealso `describe_omv` internally uses the following functions for reading and writing data files in different formats: [jmvReadWrite::read_omv()] and
-#'   [jmvReadWrite::write_omv()] for jamovi-files, [utils::read.table()] for CSV / TSV files, [load()] for reading .RData-files, [readRDS()] for .rds-files,
-#'   [haven::read_sav()] or [foreign::read.spss()] for SPSS-files, [haven::read_dta()] or [foreign::read.dta()] for Stata-files, [haven::read_sas()] for
-#'   SAS-data-files, and [haven::read_xpt()] or [foreign::read.xport()] for SAS-transport-files.
+#' @seealso
+#' `describe_omv` internally uses the following functions for reading and writing data files in different formats:
+#' [jmvReadWrite::read_omv()] and [jmvReadWrite::write_omv()] for jamovi-files, [utils::read.table()] for CSV / TSV
+#' files, [load()] for reading .RData-files, [readRDS()] for .rds-files, [haven::read_sav()] or [foreign::read.spss()]
+#' for SPSS-files, [haven::read_dta()] or [foreign::read.dta()] for Stata-files, [haven::read_sas()] for
+#' SAS-data-files, and [haven::read_xpt()] or [foreign::read.xport()] for SAS-transport-files.
 #'
 #' @examples
-#' dtaFrm <- jmvReadWrite::ToothGrowth[, c("len", "supp", "dose")]
 #' nmeOut <- tempfile(fileext = ".omv")
 #'
 #' # the paste's underneath are only for readability (without them, the vignettes are misformatted)
-#' lstDsc <- list(description = paste("The response is the length of odontoblasts (cells responsible",
-#'                                    "for tooth growth) in 60 guinea pigs. Each animal received one",
-#'                                    "of three dose levels of vitamin C (0.5, 1, and 2 mg / day) by",
-#'                                    "one of two delivery methods, orange juice or ascorbic acid (a",
-#'                                    "form of vitamin C and coded as VC)."),
+#' # example for a data set without a license
+#' dtaFrm <- jmvReadWrite::ToothGrowth[, c("len", "supp", "dose")]
+#' lstDsc <- list(description = paste("The response is the length of odontoblasts (cells",
+#'                                    "responsible for tooth growth) in 60 guinea pigs. Each",
+#'                                    "animal received one of three dose levels of vitamin C",
+#'                                    "(0.5, 1, and 2 mg / day) by one of two delivery methods,",
+#'                                    "orange juice or ascorbic acid (a form of vitamin C and",
+#'                                    "coded as VC)."),
 #'                variables = list(len  = "Tooth length",
 #'                                 supp = "Supplement type (VC or OJ)",
-#'                                 dose = "Dose (in milligrams / day"),
-#'                references = paste("Crampton, E. W. (1947). The growth of the odontoblast of the",
-#'                                   "incisor teeth as a criterion of vitamin C intake of the guinea",
-#'                                   "pig. <em>The Journal of Nutrition, 33</em>(5), 491-504.",
-#'                                   "https://doi.org/10.1093/jn/33.5.491"),
+#'                                 dose = "Dose (in milligrams / day)"),
+#'                references = paste("Crampton, E. W. (1947). The growth of the odontoblast of",
+#'                                   "the incisor teeth as a criterion of vitamin C intake of",
+#'                                   "the guinea pig. <em>The Journal of Nutrition, 33</em>(5),",
+#'                                   "491-504. https://doi.org/10.1093/jn/33.5.491"),
 #'                license = "")
 #' jmvReadWrite::describe_omv(dtaInp = dtaFrm, fleOut = nmeOut, dtaTtl = "ToothGrowth",
-#'   dtaDsc = lstDsc)
+#'                            dtaDsc = lstDsc)
+#' # don't include the unlink, if you copy the code and want to look at the resulting output file
+#' unlink(nmeOut)
+#'
+#' # example for a data set which is part of the R-package `datasets` under the GPL2
+#' dtaFrm <- datasets::penguins
+#' lstDsc <- list(description = paste("Data on adult penguins covering three species found on",
+#'                                    "three islands in the Palmer Archipelago, Antarctica,",
+#'                                    "including their size (flipper length, body mass, bill",
+#'                                    "dimensions), and sex."),
+#'                variables = list(species     = "Species (Adelie, Chinstrap, and Gentoo)",
+#'                                 island      = "Island (Biscoe, Dream, and Torgersen)",
+#'                                 bill_len    = "Bill length (in mm)",
+#'                                 bill_dep    = "Bill depth (in mm)",
+#'                                 flipper_len = "Flipper length (in mm)",
+#'                                 body_mass   = "Body mass (in g)",
+#'                                 sex         = "Sex (female and male)",
+#'                                 year        = "Study year: 2007, 2008, or 2009"),
+#'                references = paste("Gorman, K. B., Williams, T. D., & Fraser, W. R. (2014).",
+#'                                   "Ecological sexual dimorphism and environmental variability",
+#'                                   "within a community of antarctic penguins (Genus pygoscelis).",
+#'                                   "<em>PLoS ONE, 9</em>(3), e90081.",
+#'                                   "https://doi.org/10.1371/journal.pone.0090081"),
+#'                license = c("RP_GPL2", "datasets"))
+#' jmvReadWrite::describe_omv(dtaInp = dtaFrm, fleOut = nmeOut, dtaTtl = "Penguins",
+#'                            dtaDsc = lstDsc)
 #' # don't include the unlink, if you copy the code and want to look at the resulting output file
 #' unlink(nmeOut)
 #'
 #' # the code underneath should cover all formatting options jamovi is able to use (paste0 is only
 #' # for readability)
-#' chrDsc <- paste0("<p><strong>Trial – all formattings:</strong><br/><strong>bold</strong><br/>",
-#'                  "<strong><em>bold, italics</em></strong><br/><em>italics</em><br/><u>underlined",
-#'                  "</u><br/>link:<a href=\"https://jamovi.org﻿﻿﻿\" target=\"_blank\">https://",
-#'                  "jamovi.org﻿﻿﻿</a><br/><s>strikethrough</s><br/>C<sub>2</sub>H<sub>5</sub>",
-#'                  "OH<br/>R<sup>2</sup><br/><span style=\"background-color:#e60000\">background ",
-#'                  "colour: red</span><br/><span style=\"color:#e60000\">foreground color: red",
-#'                  "</span></p><p class=\"ql-align-center\">centered</p><p class=\"ql-align-right\">",
-#'                  "right</p><p class=\"ql-align-justify\">justify justify justify justify justify ",
-#'                  "justify justify justify justify justify justify justify justify justify justify ",
-#'                  "justify justify justify justify justify justify justify justify justify justify",
-#'                  "</p><p><br/></p><ol><li>numbered list</li><li>numbered list</li></ol><p><br/>",
-#'                  "</p><ul><li>bullet point</li><li>bullet point</li></ul><p class=\"ql-indent-1\">",
-#'                  "indented once</p><p class=\"ql-indent-2\">indented twice</p><p ",
-#'                  "class=\"ql-indent-1\">indented once</p><p>Formula: <span class=\"ql-formula\">",
-#'                  "e=mc^2</span></p><pre>Preformatted</pre><p>normal again</p><h2>Heading</h2>")
+#' dtaFrm <- jmvReadWrite::ToothGrowth[, c("len", "supp", "dose")]
+#' chrDsc <- paste0("<p><strong>Trial - all formattings:</strong><br/>",
+#'                  "<strong>bold</strong><br/><strong><em>bold, italics</em></strong><br/>",
+#'                  "<em>italics</em><br/><u>underlined</u><br/><s>strikethrough</s><br/>",
+#'                  "C<sub>2</sub>H<sub>5</sub>OH<br/>R<sup>2</sup><br/>",
+#'                  "<span style=\"background-color:#e60000\">background colour: red</span><br/>",
+#'                  "<span style=\"color:#e60000\">foreground color: red</span></p>",
+#'                  "<p class=\"ql-align-center\">centered</p>",
+#'                  "<p class=\"ql-align-right\">right</p>",
+#'                  "<p class=\"ql-align-justify\">justify justify justify justify justify ",
+#'                  "justify justify justify justify justify justify justify justify justify ",
+#'                  "justify justify justify justify justify justify justify justify justify ",
+#'                  "justify justify</p><p><br/></p>",
+#'                  "<ol><li>numbered list</li><li>numbered list</li></ol><p><br/></p>",
+#'                  "<ul><li>bullet point</li><li>bullet point</li></ul>",
+#'                  "<p class=\"ql-indent-1\">indented once</p>",
+#'                  "<p class=\"ql-indent-2\">indented twice</p>",
+#'                  "<p class=\"ql-indent-1\">indented once</p>",
+#'                  "<p>Formula: <span class=\"ql-formula\">e=mc^2</span></p>",
+#'                  "<pre>Preformatted</pre><p>normal again</p><h2>Heading</h2>")
 #' jmvReadWrite::describe_omv(dtaInp = dtaFrm, fleOut = nmeOut, dtaTtl = "ToothGrowth",
-#'   dtaDsc = chrDsc)
+#'                            dtaDsc = chrDsc)
+#' # don't include the unlink, if you copy the code and want to look at the resulting output file
 #' unlink(nmeOut)
 #'
 #'
 #' @export describe_omv
 #'
-describe_omv <- function(dtaInp = NULL, fleOut = "", dtaTtl = c(), dtaDsc = c(), usePkg = c("foreign", "haven"), selSet = "", ...) {
+describe_omv <- function(dtaInp = NULL, fleOut = "", dtaTtl = NULL, dtaDsc = NULL, lngDsc = "EN",
+                         usePkg = c("foreign", "haven"), selSet = "", ...) {
 
     # check the input parameters: either dtaTtl or dtaDsc need to be given (and in the correct format)
     dscPrm(dtaTtl, dtaDsc)
@@ -101,11 +142,22 @@ describe_omv <- function(dtaInp = NULL, fleOut = "", dtaTtl = c(), dtaDsc = c(),
         warning("jmvcore version 2.4.3 (or higher) is required for using describe_omv.\n\n")
         return(invisible(NULL))
     }
-    if (!jmvPtB()) stop("The R-packages RProtoBuf and jmvcore must be installed for using describe_omv (see warnings() for further details).")
+    if (!jmvPtB())
+        stop("The R-packages RProtoBuf and jmvcore must be installed for using describe_omv (see warnings() for further details).")
 
-    # check whether dtaDsc is a list, and if so, convert it to a HTML desription
+    # check whether dtaDsc is a list, and if so, convert it to a HTML desription;
+    # in addition: add a description if there doesn't exist one already
     if (is.list(dtaDsc)) {
-        dtaDsc <- crtHTM(dtaDsc)
+        if (length(setdiff(names(dtaDsc[["variables"]]), names(dtaFrm))) != 0 ||
+            length(setdiff(names(dtaFrm), names(dtaDsc[["variables"]]))) != 0)
+            stop("The variable description (in dtaDsc) should contain all variables in the data set and no variables not contained in it.")
+        for (crrClm in names(dtaDsc[["variables"]])) {
+            if (!any(c("jmv-desc", "description") %in% names(attributes(dtaFrm[, crrClm])))) {
+                attr(dtaFrm[, crrClm], "jmv-desc")    <- dtaDsc[["variables"]][[crrClm]]
+                attr(dtaFrm[, crrClm], "description") <- dtaDsc[["variables"]][[crrClm]]
+            }
+        }
+        dtaDsc <- crtHTM(dtaDsc, lngDsc)
     }
 
     # check whether the data set contains analyses and, if so warn that they will be overwritten
@@ -129,8 +181,8 @@ describe_omv <- function(dtaInp = NULL, fleOut = "", dtaTtl = c(), dtaDsc = c(),
         results = RProtoBuf::new(jamovi.coms.ResultsElement, title = "Results", status = 3, group = RProtoBuf::new(jamovi.coms.ResultsGroup)),
         status = 3, index = 1, title = "Results", hasTitle = TRUE)
 
-    # rtnDta in globals.R (unified function to either write the data frame, open it in a new jamovi session or return it)
-    rtnDta(dtaFrm = dtaFrm, fleOut = fleOut, dtaTtl = jmvTtl("_desc"), wrtPtB = TRUE, ...)
+    # rtnDta in globals.R (unified function to either write the data frame or return it)
+    rtnDta(dtaFrm = dtaFrm, fleOut = fleOut, wrtPtB = TRUE, ...)
 }
 
 # =================================================================================================
@@ -138,13 +190,13 @@ describe_omv <- function(dtaInp = NULL, fleOut = "", dtaTtl = c(), dtaDsc = c(),
 # =================================================================================================
 
 # add / replace HTML for title and description within index.html
-addHTM <- function(crrHTM = "", dtaTtl = c(), dtaDsc = c()) {
+addHTM <- function(crrHTM = "", dtaTtl = NULL, dtaDsc = NULL) {
     vldHTM <- which(!grepl("^\\s*$", crrHTM))
     fndTtl <- grep("<h1.*?>", crrHTM[vldHTM])[1]
     if (length(dtaTtl) > 0 && nzchar(dtaTtl)) {
         splLne <- splHTM(crrHTM[vldHTM[fndTtl + 0]])
         splLne[grep("<h1.*?>", splLne) + 1] <- dtaTtl
-        crrHTM[vldHTM[fndTtl + 0]] <- paste0(splLne, collapse = "")
+        crrHTM[vldHTM[fndTtl + 0]] <- paste(splLne, collapse = "")
     }
     if (length(dtaDsc) > 0 && nzchar(dtaDsc)) {
         # issue warning if the target line hasn't the expected format
@@ -155,42 +207,172 @@ addHTM <- function(crrHTM = "", dtaTtl = c(), dtaDsc = c()) {
         crrHTM[vldHTM[fndTtl + 1]] <- paste0("<div class=\"note\">", clnHTM(dtaDsc, toHTM = TRUE), "</div>")
     }
 
-    return(crrHTM)
+    crrHTM
 }
 
 # ensure that the input line is concatened (if required) and remove leading and trailing <p> / </p> tags,
 # then split the input (into HTML tags and content) and replace characters that have a HTML-function (e.g., "/")
 # in the content
-clnHTM <- function(inpLne = c(), toHTM = FALSE) {
+clnHTM <- function(inpLne = NULL, toHTM = FALSE) {
     inpLne <- vapply(inpLne, function(x) paste0(ifelse(grepl("^\\s*<p.*?>|^\\s*<li.*?>", x), "", "<p>"), x, ifelse(grepl("</p.*?>\\s*$|</li.*?>\\s*$", x), "", "</p>")),
                 character(1), USE.NAMES = FALSE)
-    splLne <- splHTM(paste0(inpLne, collapse = ""))
+    splLne <- splHTM(paste(inpLne, collapse = ""))
     selCnt <- !grepl("<.*?>", splLne)
     splLne[selCnt] <- rplHTM(splLne[selCnt], toHTM)
-    return(paste0(splLne, collapse = ""))
+
+    paste(splLne, collapse = "")
 }
 
 # create HTML from the list-version of dtaDsc
-crtHTM <- function(inpDsc = NULL) {
-    outDsc <- c()
-    outDsc <- paste0(outDsc, "<p><strong>Description:</strong></p>", clnHTM(inpDsc[["description"]]))
-    outDsc <- paste0(outDsc, "<p><br/><strong>Variables:</strong></p><ul>")
+crtHTM <- function(inpDsc = NULL, lngDsc = "EN") {
+    nmeHdr <- defHdr(lngDsc)
+    outDsc <- NULL
+    outDsc <- paste0(outDsc,      "<p><strong>", nmeHdr["description"], ":</strong></p>", clnHTM(inpDsc[["description"]]))
+    outDsc <- paste0(outDsc, "<p><br/><strong>", nmeHdr["variables"],   ":</strong></p><ul>")
     for (varNme in names(inpDsc[["variables"]])) {
          outDsc <- paste0(outDsc, clnHTM(paste0("<li><strong><em>", varNme, ":</em></strong> ", inpDsc[["variables"]][[varNme]], "</li>")))
     }
     outDsc <- paste0(outDsc, "</ul>")
     if (length(inpDsc[["references"]]) > 0 && all(nzchar(inpDsc[["references"]]))) {
-        outDsc <- paste0(outDsc, "<p><br/><strong>References:</strong></p>", clnHTM(inpDsc[["references"]]))
+        outDsc <- paste0(outDsc, "<p><br/><strong>", nmeHdr["references"], ":</strong></p>", clnHTM(inpDsc[["references"]]))
     }
     if (length(inpDsc[["license"]]) > 0    && all(nzchar(inpDsc[["license"]]))) {
-        outDsc <- paste0(outDsc, "<p><br/>", clnHTM(paste0("<em>", inpDsc[["license"]], "</em>")))
+        if (grepl("^CC0|^DT_CC4-BY-NC-ND|^FC_CC4-BY-NC-ND|^RP_GPL2|^RP_GPL3|^RP_AGPL3|^RP_LGPL3", inpDsc[["license"]][1])) {
+            licDsc <- defLic(inpDsc[["license"]][1], lngDsc, ifelse(length(inpDsc[["license"]]) > 1, inpDsc[["license"]][2], ""))
+            outDsc <- paste0(outDsc, "<p><br/>", clnHTM(paste0("<em>", licDsc,                 "</em>")))
+        } else {
+            outDsc <- paste0(outDsc, "<p><br/>", clnHTM(paste0("<em>", inpDsc[["license"]][1], "</em>")))
+        }
     }
 
-    return(outDsc)
+    outDsc
+}
+
+# define headers for crtHTM (in different languages)
+defHdr <- function(crrLng = "EN") {
+    if        (crrLng == "DE") {
+        c(description = "Beschreibung", variables = "Variablen", references = "Referenzen")
+    } else if (crrLng == "JP") {
+#       NB: UTF-characters must be converted using stringi::stri_escape_unicode()
+        c(description = "\u8aac\u660e", variables = "\u5909\u6570", references = "\u5f15\u7528\u6587\u732e")
+    } else if (crrLng == "NB") {
+        c(description = "Beskrivelse", variables = "Variabler", references = "Referanser")
+    } else {  # defaults to English
+        c(description = "Description", variables = "Variables", references = "References")
+    }
+}
+
+# define some common licenses and make them translateable
+defLic <- function(licNme = "", crrLng = "EN", licHld = "") {
+    if        (licNme == "CC0") {
+        if        (crrLng == "DE") {
+            paste("Dieser Datensatz ist uneingeschr\u00e4nkt zug\u00e4nglich, und der Autor hat auf alle seine Rechte an dem",
+                  "Werk verzichtet. Sie k\u00f6nnen den Datensatz daher ohne vorherige Genehmigung kopieren, ver\u00e4ndern,",
+                  "und verbreiten, auch f\u00fcr kommerzielle Zwecke. Wenn der Datensatz auf empirischen Daten basiert,",
+                  "sind die Autoren im Abschnitt 'Referenzen' des Datensatzes angegeben. Zitieren Sie in diesem Fall",
+                  "bitte die entsprechenden Referenzen, wenn Sie den Datensatz verwenden.")
+        } else if (crrLng == "EN") {
+            paste("This data set is in the public domain, and the author has waived all of his or her rights to the",
+                  "work. You can therefore copy, modify and distribute the data set, even for commercial purposes,",
+                  "all without asking permission. If the data set is based upon empirical work, the authors are",
+                  "given in the 'References'-section of the data set. In such case, please cite the respective",
+                  "reference(s) when using the dataset.")
+        } else if (crrLng == "JP") {
+            stop(sprintf("No translation available (yet) for %s.", crrLng))
+        } else if (crrLng == "NB") {
+            paste("Dette datasettet er offentlig tilgjengelig, og forfatteren har fraskrevet seg alle rettigheter til",
+                  "datasettet. Du kan derfor kopiere, endre og distribuere datasettet, ogs\u00e5 til kommersielle",
+                  "form\u00e5l, uten \u00e5 be om tillatelse. Hvis datasettet er empirisk, er forfatterne oppgitt under",
+                  "'Referanser', vennligst siter de aktuelle referansene hvis det er tilfellet.")
+        } else {
+            stop(sprintf("No translation available (yet) for %s.", crrLng))
+        }
+    } else if (licNme == "DT_CC4-BY-NC-ND") {
+        if        (crrLng == "DE") {
+            paste0("Dieser Datensatz enth\u00e4lt Daten einer wissenschaftlichen Studie, deren Urheberrecht bei den ",
+                   "Autoren der Studie liegt. Ohne die ausdr\u00fcckliche Zustimmung der Autoren ",
+                   rep(paste0("und von ", licHld, " "), nzchar(licHld)), "darf dieser Datensatz nicht zu ",
+                   "kommerziellen Zwecken verbreitet, bearbeitet oder verwendet werden ohne die Quelle anzugeben ",
+                   "(d. h. der Datensatz unterliegt den Bedingungen der CC BY-NC-ND-Lizenz).")
+        } else if (crrLng == "EN") {
+            paste0("This data set contains data of a scientific study and the study authors therefore own the ",
+                  "copyright. Without the study authors` ", rep(paste0("and ", licHld, "`s "), nzchar(licHld)),
+                  "explicit consent, this data set may not be distributed for commercial purposes, not be edited, ",
+                  "and not be used without acknowledging its source (i.e., the terms of a CC BY-NC-ND license).")
+        } else if (crrLng == "JP") {
+            stop(sprintf("No translation available (yet) for %s.", crrLng))
+        } else if (crrLng == "NB") {
+            paste0("Dette datasettet inneholder data fra en vitenskapelig studie, og studieforfatterne eier derfor ",
+                   "opphavsretten. Uten uttrykkelig samtykke fra studieforfatterne ",
+                   rep(paste0("og ", licHld, " "), nzchar(licHld)), "kan dette datasettet ikke distribueres for ",
+                   "kommersielle form\u00e5l, ikke redigeres og ikke brukes uten \u00e5 oppgi kilden (dvs. ",
+                   "vilk\u00e5rene i CC BY-NC-ND-lisensen).")
+        } else {
+            stop(sprintf("No translation available (yet) for %s.", crrLng))
+        }
+    } else if (licNme == "FC_CC4-BY-NC-ND") {
+        if        (licHld == "")
+            stop("When using this license, a license holder needs to be defined.")
+        if        (crrLng == "DE") {
+            paste0("Dieser Datensatz wurde von ", licHld, " erstellt, der somit das Urheberrecht daran besitzt. ",
+                   "Ohne die ausdr\u00fcckliche Zustimmung von ", licHld, " darf dieser Datensatz nicht f\u00fcr ",
+                   "kommerzielle Zwecke verbreitet, nicht bearbeitet und nicht ohne Angabe der Quelle verwendet ",
+                   "werden (d. h. der Datensatz unterliegt den Bedingungen der CC BY-NC-ND-Lizenz).")
+        } else if (crrLng == "EN") {
+            paste0("This data set was constructed by ", licHld, ", who therefore owns the copyright. Without the ",
+                   "explicit consent of ", licHld, ", this data set may not be distributed for commercial purposes, ",
+                   "not be edited, and not be used without acknowledging its source (i.e., the terms of the CC ",
+                   "BY-NC-ND license).")
+        } else if (crrLng == "JP") {
+            stop(sprintf("No translation available (yet) for %s.", crrLng))
+        } else if (crrLng == "NB") {
+            paste0("Dette datasettet er utarbeidet av ", licHld, ", som derfor eier opphavsretten. Uten uttrykkelig ",
+                   "samtykke fra ", licHld, " kan dette datasettet ikke distribueres for kommersielle form\u00e5l, ",
+                   "redigeres eller brukes uten \u00e5 oppgi kilden (dvs. vilk\u00e5rene i CC BY-NC-ND-lisens).")
+        } else {
+            stop(sprintf("No translation available (yet) for %s.", crrLng))
+        }
+    } else if (licNme %in% c("RP_GPL2", "RP_GPL3", "RP_AGPL3", "RP_LGPL3")) {
+        licFlN <- c(rep("GNU General Public License 2.x",        licNme == "RP_GPL2"),
+                    rep("GNU General Public License 3.0",        licNme == "RP_GPL3"),
+                    rep("GNU Affero General Public License 3.0", licNme == "RP_AGPL3"),
+                    rep("GNU Lesser General Public License 3.0", licNme == "RP_LGPL3"))
+        if (!nzchar(licHld))
+            stop("When using this license, the R-package where the data are originating from needs to be defined.")
+        if        (crrLng == "DE") {
+            paste0("Dieser Datensatz ist Teil des R-Pakets '", licHld, ", das unter den Bedingungen der ", licFlN, " ",
+                   "ver\u00f6ffentlicht wurde. Sie k\u00f6nnen die Daten sowohl privat als auch kommerziell nutzen, ",
+                   "verbreiten oder ver\u00e4ndern. Bei der Verwendung des Datensatzes m\u00fcssen Sie die Quelle ",
+                   "angeben und alle \u00e4nderungen, die Sie vornehmen, unter derselben Lizenz ",
+                   "ver\u00f6ffentlichen. Wenn der Datensatz auf empirischer Forschung basiert, sind die Autoren im ",
+                   "Abschnitt 'Referenzen' angegeben. Zitieren Sie in diesem Fall die Studie, wenn Sie den Datensatz ",
+                   "verwenden.")
+        } else if (crrLng == "EN") {
+            paste0("This data set was provided as part of the R-package '", licHld, "', which is published under ",
+                   "the terms of the ", licFlN, ". You may use the data both privately and commercially, distribute ",
+                   "or modify them. When using the data set, you need to disclose the source, and publish any ",
+                   "modifications you may make under the same license. If the data set is based on empirical data, ",
+                   "the authors are given in the 'References'-section. In such case, please cite them when using ",
+                   "the dataset.")
+        } else if (crrLng == "JP") {
+            stop(sprintf("No translation available (yet) for %s.", crrLng))
+        } else if (crrLng == "NB") {
+            paste0("Dette datasettet er en del av R-pakken '", licHld, "', som er publisert under vilk\u00e5rene i ",
+                   licFlN, ". Du kan bruke dataene b\u00e5de privat og kommersielt, distribuere eller endre dem. ",
+                   "N\u00e5r du bruker datasettet, m\u00e5 du oppgi kilden og publisere eventuelle endringer du ",
+                   "gj\u00f8r under samme lisens. Hvis datasettet er basert p\u00e5 empiriske data, er forfatterne ",
+                   "oppgitt under 'Referanser'. Vennligst oppgi referansene i slike tilfeller n\u00e5r du bruker ",
+                   "datasettet.")
+        } else {
+            stop(sprintf("No translation available (yet) for %s.", crrLng))
+        }
+    } else {
+        NULL
+    }
 }
 
 # check input parameters
-dscPrm <- function(dtaTtl = c(), dtaDsc = NULL) {
+dscPrm <- function(dtaTtl = NULL, dtaDsc = NULL) {
     if ((!is.character(dtaTtl) || length(dtaTtl) != 1 || !nzchar(dtaTtl)) &&
         (((!is.character(dtaDsc) || length(dtaDsc) != 1 || !nzchar(dtaDsc)) &&
           (!is.list(dtaDsc) || !all(c("description", "variables", "references", "license") %in% names(dtaDsc)))))) {
@@ -199,46 +381,46 @@ dscPrm <- function(dtaTtl = c(), dtaDsc = NULL) {
 }
 
 # transform HTML tags into attributes (bold, italic, heading, etc.)
-getAtt <- function(vecChr = c(), vecPos = NA, lstAtt = list()) {
+getAtt <- function(vecChr = NULL, vecPos = NA, lstAtt = list()) {
     if (grepl("<p>|</p>", vecChr[vecPos])) return(lstAtt)
     prvAtt <- lstAtt
 
     # bold
-    if (grepl("<strong>|<b>",       vecChr[vecPos])) lstAtt[["bold"]] <- TRUE
-    if (grepl("</strong>|</b>",     vecChr[vecPos])) lstAtt[["bold"]] <- NULL
+    if (grepl("<strong>|<b>",       vecChr[vecPos]))               lstAtt[["bold"]] <- TRUE
+    if (grepl("</strong>|</b>",     vecChr[vecPos]))               lstAtt[["bold"]] <- NULL
     # italic
-    if (grepl("<em>|<i>",           vecChr[vecPos])) lstAtt[["italic"]] <- TRUE
-    if (grepl("</em>|</i>",         vecChr[vecPos])) lstAtt[["italic"]] <- NULL
+    if (grepl("<em>|<i>",           vecChr[vecPos]))               lstAtt[["italic"]] <- TRUE
+    if (grepl("</em>|</i>",         vecChr[vecPos]))               lstAtt[["italic"]] <- NULL
     # underline
-    if (grepl("<u>",                vecChr[vecPos])) lstAtt[["underline"]] <- TRUE
-    if (grepl("</u>",               vecChr[vecPos])) lstAtt[["underline"]] <- NULL
+    if (grepl("<u>",                vecChr[vecPos], fixed = TRUE)) lstAtt[["underline"]] <- TRUE
+    if (grepl("</u>",               vecChr[vecPos], fixed = TRUE)) lstAtt[["underline"]] <- NULL
     # strikethrough
-    if (grepl("<s>",                vecChr[vecPos])) lstAtt[["strike"]] <- TRUE
-    if (grepl("</s>",               vecChr[vecPos])) lstAtt[["strike"]] <- NULL
+    if (grepl("<s>",                vecChr[vecPos], fixed = TRUE)) lstAtt[["strike"]] <- TRUE
+    if (grepl("</s>",               vecChr[vecPos], fixed = TRUE)) lstAtt[["strike"]] <- NULL
     # preformatted / code-block
-    if (grepl("<pre.*?>|<code.*?>", vecChr[vecPos])) lstAtt[["code-block"]] <- TRUE
-    if (grepl("</pre>|</code>",     vecChr[vecPos])) lstAtt[["code-block"]] <- NULL
+    if (grepl("<pre.*?>|<code.*?>", vecChr[vecPos]))               lstAtt[["code-block"]] <- TRUE
+    if (grepl("</pre>|</code>",     vecChr[vecPos]))               lstAtt[["code-block"]] <- NULL
     # superscript
-    if (grepl("<sup>",              vecChr[vecPos])) lstAtt[["script"]] <- "super"
-    if (grepl("</sup>",             vecChr[vecPos])) lstAtt[["script"]] <- NULL
+    if (grepl("<sup>",              vecChr[vecPos], fixed = TRUE)) lstAtt[["script"]] <- "super"
+    if (grepl("</sup>",             vecChr[vecPos], fixed = TRUE)) lstAtt[["script"]] <- NULL
     # subscript
-    if (grepl("<sub>",              vecChr[vecPos])) lstAtt[["script"]] <- "sub"
-    if (grepl("</sub>",             vecChr[vecPos])) lstAtt[["script"]] <- NULL
+    if (grepl("<sub>",              vecChr[vecPos], fixed = TRUE)) lstAtt[["script"]] <- "sub"
+    if (grepl("</sub>",             vecChr[vecPos], fixed = TRUE)) lstAtt[["script"]] <- NULL
     # heading
-    if (grepl("<h\\d.*?>",          vecChr[vecPos])) lstAtt[["header"]] <- as.integer(gsub("<h(\\d).*?>", "\\1", vecChr[vecPos]))
-    if (grepl("</h\\d>",            vecChr[vecPos])) lstAtt[["header"]] <- NULL
+    if (grepl("<h\\d.*?>",          vecChr[vecPos]))               lstAtt[["header"]] <- as.integer(gsub("<h(\\d).*?>", "\\1", vecChr[vecPos]))
+    if (grepl("</h\\d>",            vecChr[vecPos]))               lstAtt[["header"]] <- NULL
     # links
-    if (grepl("<a href=.*?>",       vecChr[vecPos])) lstAtt[["link"]] <- gsub("<a href=\"(.*)\"\\s+.*?>", "\\1", vecChr[vecPos])
-    if (grepl("</a>",               vecChr[vecPos])) lstAtt[["link"]] <- NULL
+    if (grepl("<a href=.*?>",       vecChr[vecPos]))               lstAtt[["link"]] <- gsub("<a href=\"(.*)\"\\s+.*?>", "\\1", vecChr[vecPos])
+    if (grepl("</a>",               vecChr[vecPos], fixed = TRUE)) lstAtt[["link"]] <- NULL
     # ordered list
-    if (grepl("<ol>",               vecChr[vecPos])) lstAtt[["list"]] <- "ordered"
-    if (grepl("</ol>",              vecChr[vecPos])) lstAtt[["list"]] <- NULL
+    if (grepl("<ol>",               vecChr[vecPos], fixed = TRUE)) lstAtt[["list"]] <- "ordered"
+    if (grepl("</ol>",              vecChr[vecPos], fixed = TRUE)) lstAtt[["list"]] <- NULL
     # bullet list
-    if (grepl("<ul>",               vecChr[vecPos])) lstAtt[["list"]] <- "bullet"
-    if (grepl("</ul>",              vecChr[vecPos])) lstAtt[["list"]] <- NULL
+    if (grepl("<ul>",               vecChr[vecPos], fixed = TRUE)) lstAtt[["list"]] <- "bullet"
+    if (grepl("</ul>",              vecChr[vecPos], fixed = TRUE)) lstAtt[["list"]] <- NULL
     # list entries
-    if (grepl("<li>",               vecChr[vecPos])) attr(lstAtt[["list"]], "lstEnt") <- TRUE
-    if (grepl("</li>",              vecChr[vecPos])) attr(lstAtt[["list"]], "lstEnt") <- FALSE
+    if (grepl("<li>",               vecChr[vecPos], fixed = TRUE)) attr(lstAtt[["list"]], "lstEnt") <- TRUE
+    if (grepl("</li>",              vecChr[vecPos], fixed = TRUE)) attr(lstAtt[["list"]], "lstEnt") <- FALSE
     # alignment
     if (grepl("class=\".*?ql-align-\\w+|style=\".*?text-align:\\s*\\w+", vecChr[vecPos])) {
         lstAtt[["align"]] <- gsub(".*?ql-align-(\\w+).*", "\\1", gsub(".*?text-align:\\s*(\\w+).*", "\\1", vecChr[vecPos]))
@@ -278,17 +460,17 @@ getAtt <- function(vecChr = c(), vecPos = NA, lstAtt = list()) {
         warning(sprintf("The HTML tag \"%s\" isn't implemented, and hence the jamovi formatting attributes remain unchanged.\n", vecChr[vecPos]))
     }
 
-    return(lstAtt)
+    lstAtt
 }
 
 # find the next HTML tag of a particular type
-nxtAtt <- function(vecChr = c(), vecPos = NA, addTrm = c()) {
+nxtAtt <- function(vecChr = NULL, vecPos = NA, addTrm = NULL) {
     grep(paste(c(paste0(c("</", "<"), gsub("<(\\w+)\\s+.*", "\\1", vecChr[vecPos])), addTrm), collapse = "|"),
       vecChr[seq(vecPos + 1, length(vecChr))])[1] + vecPos
 }
 
 # store title and description as protobuffer
-optPtB <- function(dtaTtl = "", dtaDsc = c()) {
+optPtB <- function(dtaTtl = "", dtaDsc = NULL) {
     # create protobuffer for the title
     if (length(dtaTtl) > 0 && nzchar(dtaTtl)) {
         ttlPtB <- var2PB(dtaTtl)
@@ -298,12 +480,13 @@ optPtB <- function(dtaTtl = "", dtaDsc = c()) {
     # create protobuffer for the description
     if (length(dtaDsc) > 0 && nzchar(dtaDsc)) {
         # gsub("^\\s*<p.*?>|</p>\\s*$", "",
-        splDsc <- splHTM(gsub("(</h\\d>|</p>|</pre>|</code>)", "\n\\1", gsub("</li>", "</li>\n", gsub("<br\\s*/>|<br>", "\n", rplHTM(dtaDsc)))))
+        splDsc <- splHTM(gsub("(</h\\d>|</p>|</pre>|</code>)", "\n\\1", gsub("</li>", "</li>\n",
+                           gsub("<br\\s*/>|<br>", "\n", rplHTM(dtaDsc)), fixed = TRUE)))
         tgtDsc <- !grepl("<.*?>", splDsc)
         attDsc <- htmPtB <- list()
         for (i in seq_along(splDsc)) {
             if (tgtDsc[i]) {
-                if (is.null(attDsc[["formula"]]) || attDsc[["formula"]] == FALSE) crrIns <- splDsc[i] else crrIns <- list(formula = splDsc[i])
+                if (is.null(attDsc[["formula"]]) || !attDsc[["formula"]]) crrIns <- splDsc[i] else crrIns <- list(formula = splDsc[i])
                 htmPtB[[sum(tgtDsc[seq(i)])]] <- var2PB(c(prpAtt(attDsc), list(insert = crrIns)))
             } else {
                 attDsc <- getAtt(splDsc, i, attDsc)
@@ -334,27 +517,27 @@ prpAtt <- function(lstAtt = NULL) {
     if (length(crrAtt) > 0) return(list(attributes = crrAtt)) else return(invisible(NULL))
 }
 
-rplHTM <- function(inpVec = c(), toHTM = FALSE) {
+rplHTM <- function(inpVec = NULL, toHTM = FALSE) {
     if (toHTM) {
-        return(gsub("\\/", "&#x2F;", inpVec))
+        gsub("/", "&#x2F;", inpVec, fixed = TRUE)
     } else {
-        return(gsub("&nbsp;", " ", gsub("&#x2F;", "/",   inpVec)))
+        gsub("&nbsp;", " ", gsub("&#x2F;", "/",   inpVec, fixed = TRUE), fixed = TRUE)
     }
 }
 
 # split HTML into constituents (i.e., tags and content)
 splHTM <- function(vecChr = "") {
         splChr <- gsub("^\\s+\\n|\\n\\s+$", "\n", strsplit(vecChr, "(?=[<>])", perl = TRUE)[[1]])
-        rplDsc <- grep("<", splChr)
+        rplDsc <- grep("<", splChr, fixed = TRUE)
         # has HTML tags
         if (length(rplDsc) > 0) {
             if (!all(splChr[rplDsc + 2] == ">")) {
-                stop(paste("Error when decoding HTML. Please check whether the HTML-string the you used for the description is valid (i.e., no typos, etc.).",
-                           "If it is valid, send it to sebastian.jentschke@uib.no"))
+                stop("Error when decoding HTML. Please check whether the HTML-string the you used for the description ",
+                     "is valid (i.e., no typos, etc.). If it is valid, send it to sebastian.jentschke@uib.no")
             }
             splChr[rplDsc + 1] <- paste0("<", splChr[rplDsc + 1], ">")
-            return(splChr[-c(rplDsc, rplDsc + 2)])
+            splChr[-c(rplDsc, rplDsc + 2)]
         } else {
-            return(splChr)
+            splChr
         }
 }

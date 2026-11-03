@@ -20,11 +20,13 @@ dtaDsc
 dtaInp
 delim
 dissimiliarity
+DT
 dta
 dtaFrm
 ed
 etc
 extdata
+FC
 fleInp
 fleOut
 frcWrt
@@ -44,6 +46,7 @@ lintr
 MAgojam
 measureType
 MinGW
+Mss
 mtaDta
 NC
 OBS

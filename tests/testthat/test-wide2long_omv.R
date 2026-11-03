@@ -12,27 +12,29 @@ test_that("wide2long_omv works", {
                               varID = "Year", varTme = "Month", varSep = "."))
     df4Chk <- read_omv(nmeOut)
     expect_s3_class(df4Chk, "data.frame")
-    expect_equal(dim(df4Chk), c(121 * 12, 3))
-    expect_equal(vapply(df4Chk, typeof, character(1), USE.NAMES = FALSE), c("integer", "integer", "double"))
-    expect_equal(names(df4Chk), c("Year", "Month", "X"))
-    expect_equal(names(attributes(df4Chk)), c("names", "row.names", "class", "removedRows", "addedRows", "transforms"))
-    expect_equal(names(attributes(df4Chk[[3]])), c("jmv-desc", "name", "id", "columnType", "dataType", "measureType", "formula", "formulaMessage",
-                                                   "parentId", "width", "type", "importName", "description", "transform", "edits", "missingValues"))
-    expect_equal(attr(df4Chk[[3]], "jmv-desc"), "Test variable")
-    expect_equal(c(mean(df4Chk[[3]]), sd(df4Chk[[3]])), c(49.33121, 28.93480), tolerance = 1e-4)
+    expect_identical(dim(df4Chk), c(121L * 12L, 3L))
+    expect_identical(vapply(df4Chk, typeof, character(1), USE.NAMES = FALSE), c("integer", "integer", "double"))
+    expect_named(df4Chk, c("Year", "Month", "X"))
+    expect_named(attributes(df4Chk), c("names", "row.names", "class", "removedRows", "addedRows", "transforms"))
+    expect_named(attributes(df4Chk[[3]]),
+                 c("jmv-desc", "name", "id", "columnType", "dataType", "measureType", "formula", "formulaMessage",
+                   "parentId", "width", "type", "importName", "description", "transform", "edits", "missingValues"))
+    expect_identical(attr(df4Chk[[3]], "jmv-desc"), "Test variable")
+    expect_identical(c(mean(df4Chk[[3]]), sd(df4Chk[[3]])), c(49.33121, 28.93480), tolerance = 1e-4)
     unlink(nmeOut)
 
     expect_null(wide2long_omv(dtaInp = nmeInp, fleOut = nmeOut, varLst = setdiff(names(dtaTmp), "Year"), varID = "Year", varSep = "."))
     df4Chk <- read_omv(nmeOut)
     expect_s3_class(df4Chk, "data.frame")
-    expect_equal(dim(df4Chk), c(121 * 12, 3))
-    expect_equal(vapply(df4Chk, typeof, character(1), USE.NAMES = FALSE), c("integer", "integer", "double"))
-    expect_equal(names(df4Chk), c("Year", "cond", "X"))
-    expect_equal(names(attributes(df4Chk)), c("names", "row.names", "class", "removedRows", "addedRows", "transforms"))
-    expect_equal(names(attributes(df4Chk[[3]])), c("jmv-desc", "name", "id", "columnType", "dataType", "measureType", "formula", "formulaMessage",
-                                                   "parentId", "width", "type", "importName", "description", "transform", "edits", "missingValues"))
-    expect_equal(attr(df4Chk[[3]], "jmv-desc"), "Test variable")
-    expect_equal(c(mean(df4Chk[[3]]), sd(df4Chk[[3]])), c(49.33121, 28.93480), tolerance = 1e-4)
+    expect_identical(dim(df4Chk), c(121L * 12L, 3L))
+    expect_identical(vapply(df4Chk, typeof, character(1), USE.NAMES = FALSE), c("integer", "integer", "double"))
+    expect_named(df4Chk, c("Year", "cond", "X"))
+    expect_named(attributes(df4Chk), c("names", "row.names", "class", "removedRows", "addedRows", "transforms"))
+    expect_named(attributes(df4Chk[[3]]),
+                 c("jmv-desc", "name", "id", "columnType", "dataType", "measureType", "formula", "formulaMessage",
+                   "parentId", "width", "type", "importName", "description", "transform", "edits", "missingValues"))
+    expect_identical(attr(df4Chk[[3]], "jmv-desc"), "Test variable")
+    expect_identical(c(mean(df4Chk[[3]]), sd(df4Chk[[3]])), c(49.33121, 28.93480), tolerance = 1e-4)
     unlink(nmeOut)
 
     unlink(nmeInp)
@@ -50,34 +52,36 @@ test_that("wide2long_omv works", {
                               varID = "Year", varTme = "Month", varSep = "_"))
     df4Chk <- read_omv(nmeOut)
     expect_s3_class(df4Chk, "data.frame")
-    expect_equal(dim(df4Chk), c(121 * 12, 3))
-    expect_equal(vapply(df4Chk, typeof, character(1), USE.NAMES = FALSE), c("integer", "integer", "double"))
-    expect_equal(names(df4Chk), c("Year", "Month", "X"))
-    expect_equal(names(attributes(df4Chk)), c("names", "row.names", "class", "removedRows", "addedRows", "transforms"))
-    expect_equal(names(attributes(df4Chk[[3]])), c("jmv-desc", "name", "id", "columnType", "dataType", "measureType", "formula", "formulaMessage",
-                                                   "parentId", "width", "type", "importName", "description", "transform", "edits", "missingValues"))
-    expect_equal(attr(df4Chk[[3]], "jmv-desc"), "Test variable")
-    expect_equal(c(mean(df4Chk[[3]]), sd(df4Chk[[3]])), c(49.33121, 28.93480), tolerance = 1e-4)
+    expect_identical(dim(df4Chk), c(121L * 12L, 3L))
+    expect_identical(vapply(df4Chk, typeof, character(1), USE.NAMES = FALSE), c("integer", "integer", "double"))
+    expect_named(df4Chk, c("Year", "Month", "X"))
+    expect_named(attributes(df4Chk), c("names", "row.names", "class", "removedRows", "addedRows", "transforms"))
+    expect_named(attributes(df4Chk[[3]]),
+                 c("jmv-desc", "name", "id", "columnType", "dataType", "measureType", "formula", "formulaMessage",
+                   "parentId", "width", "type", "importName", "description", "transform", "edits", "missingValues"))
+    expect_identical(attr(df4Chk[[3]], "jmv-desc"), "Test variable")
+    expect_identical(c(mean(df4Chk[[3]]), sd(df4Chk[[3]])), c(49.33121, 28.93480), tolerance = 1e-4)
     unlink(nmeOut)
 
     expect_null(wide2long_omv(dtaInp = nmeInp, fleOut = nmeOut, varLst = setdiff(names(dtaTmp), "Year"), varID = "Year"))
     df4Chk <- read_omv(nmeOut)
     expect_s3_class(df4Chk, "data.frame")
-    expect_equal(dim(df4Chk), c(121 * 12, 3))
-    expect_equal(vapply(df4Chk, typeof, character(1), USE.NAMES = FALSE), c("integer", "integer", "double"))
-    expect_equal(names(df4Chk), c("Year", "cond", "X"))
-    expect_equal(names(attributes(df4Chk)), c("names", "row.names", "class", "removedRows", "addedRows", "transforms"))
-    expect_equal(names(attributes(df4Chk[[3]])), c("jmv-desc", "name", "id", "columnType", "dataType", "measureType", "formula", "formulaMessage",
-                                                   "parentId", "width", "type", "importName", "description", "transform", "edits", "missingValues"))
-    expect_equal(attr(df4Chk[[3]], "jmv-desc"), "Test variable")
-    expect_equal(c(mean(df4Chk[[3]]), sd(df4Chk[[3]])), c(49.33121, 28.93480), tolerance = 1e-4)
+    expect_identical(dim(df4Chk), c(121L * 12L, 3L))
+    expect_identical(vapply(df4Chk, typeof, character(1), USE.NAMES = FALSE), c("integer", "integer", "double"))
+    expect_named(df4Chk, c("Year", "cond", "X"))
+    expect_named(attributes(df4Chk), c("names", "row.names", "class", "removedRows", "addedRows", "transforms"))
+    expect_named(attributes(df4Chk[[3]]),
+                 c("jmv-desc", "name", "id", "columnType", "dataType", "measureType", "formula", "formulaMessage",
+                   "parentId", "width", "type", "importName", "description", "transform", "edits", "missingValues"))
+    expect_identical(attr(df4Chk[[3]], "jmv-desc"), "Test variable")
+    expect_identical(c(mean(df4Chk[[3]]), sd(df4Chk[[3]])), c(49.33121, 28.93480), tolerance = 1e-4)
     unlink(nmeOut)
 
     expect_null(wide2long_omv(dtaInp = nmeInp, fleOut = nmeOut, varLst = setdiff(names(dtaTmp), "Year"),
                               varID = "Year", varTme = "Month", varSrt = c("Year", "Month")))
     df4Chk <- read_omv(nmeOut)
     expect_s3_class(df4Chk, "data.frame")
-    expect_equal(dim(df4Chk), c(121 * 12, 3))
+    expect_identical(dim(df4Chk), c(121L * 12L, 3L))
     expect_false(is.unsorted(df4Chk[["Year"]]))
     expect_true(all(df4Chk[["Month"]] == rep(sort(month.abb), length(unique(df4Chk[["Year"]])))))
     unlink(nmeOut)
@@ -85,7 +89,7 @@ test_that("wide2long_omv works", {
     df4Chk <- wide2long_omv(dtaInp = nmeInp, varLst = setdiff(names(dtaTmp), "Year"), varID = "Year",
                             varTme = "Month", varSrt = c("Year", "Month"))
     expect_s3_class(df4Chk, "data.frame")
-    expect_equal(dim(df4Chk), c(121 * 12, 3))
+    expect_identical(dim(df4Chk), c(121L * 12L, 3L))
     expect_false(is.unsorted(df4Chk[["Year"]]))
     expect_true(all(df4Chk[["Month"]] == rep(sort(month.abb), length(unique(df4Chk[["Year"]])))))
 
@@ -119,10 +123,10 @@ test_that("wide2long_omv works", {
                   "Variable list \\(varLst\\) was generated using all variables in the data frame except those defined in varExc or varID \\(ID\\).")
     df4Chk <- read_omv(nmeOut)
     expect_s3_class(df4Chk, "data.frame")
-    expect_equal(dim(df4Chk), c(363, 3))
-    expect_equal(names(df4Chk), c("ID", "cond", "measure"))
-    expect_equal(vapply(df4Chk, class, character(1), USE.NAMES = FALSE), c("factor", "factor", "numeric"))
-    expect_equal(table(df4Chk$cond), table(c(rep("A", 121), rep("B", 121), rep("C", 121))))
+    expect_identical(dim(df4Chk), c(363L, 3L))
+    expect_named(df4Chk, c("ID", "cond", "measure"))
+    expect_identical(vapply(df4Chk, class, character(1), USE.NAMES = FALSE), c("factor", "factor", "numeric"))
+    expect_identical(table(df4Chk$cond), table(c(rep("A", 121), rep("B", 121), rep("C", 121))))
 
     unlink(nmeInp)
 
@@ -138,24 +142,28 @@ test_that("wide2long_omv works", {
 
     df4Chk <- wide2long_omv(dtaInp = dtaTmp, fleOut = "", varLst = names(dtaTmp)[c(-1, -2)], varExc = "sex", varID = "ID", varTme = "cond", excLvl = 1)
     expect_s3_class(df4Chk, "data.frame")
-    expect_equal(dim(df4Chk), c(2400, 7))
-    expect_equal(vapply(df4Chk, typeof, character(1), USE.NAMES = FALSE), c(rep("integer", 6), "double"))
-    expect_equal(names(df4Chk), c("ID", "sex", sprintf("cond%d", 1:3), "rspCrr", "rspTme"))
-    expect_equal(df4Chk[, "cond1"], as.factor(rep(rep(c("cong", "incong", "neutral"), each = 8), times = 100)))
-    expect_equal(df4Chk[, "cond2"], as.factor(rep(rep(c("BLUE", "GREEN", "RED", "YELLOW"), each = 2), times = 300)))
-    expect_equal(df4Chk[, "cond3"], as.factor(rep(c("1", "2"), times = 1200)))
-    expect_equal(unname(colMeans(dtaTmp[3:50])), as.vector(unlist(aggregate(x = df4Chk[, c("rspCrr", "rspTme")], by = df4Chk[, c("cond3", "cond2", "cond1")], FUN = mean)[4:5])))
+    expect_identical(dim(df4Chk), c(2400L, 7L))
+    expect_identical(vapply(df4Chk, typeof, character(1), USE.NAMES = FALSE), c(rep("integer", 6), "double"))
+    expect_named(df4Chk, c("ID", "sex", sprintf("cond%d", 1:3), "rspCrr", "rspTme"))
+    expect_identical(df4Chk[, "cond1"], as.factor(rep(rep(c("cong", "incong", "neutral"), each = 8), times = 100)))
+    expect_identical(df4Chk[, "cond2"], as.factor(rep(rep(c("BLUE", "GREEN", "RED", "YELLOW"), each = 2), times = 300)))
+    expect_identical(df4Chk[, "cond3"], as.factor(rep(c("1", "2"), times = 1200)))
+    expect_identical(unname(colMeans(dtaTmp[3:50])),
+                     as.vector(unlist(aggregate(x = df4Chk[, c("rspCrr", "rspTme")], by = df4Chk[, c("cond3", "cond2", "cond1")], FUN = mean)[4:5])),
+                     tolerance = 1e-6)
 
     df4Chk <- wide2long_omv(dtaInp = dtaTmp, fleOut = "", varLst = names(dtaTmp)[c(-1, -2)], varExc = "sex", varID = "ID", varTme = "cond")
     expect_s3_class(df4Chk, "data.frame")
-    expect_equal(dim(df4Chk), c(4800, 7))
-    expect_equal(vapply(df4Chk, typeof, character(1), USE.NAMES = FALSE), c(rep("integer", 6), "double"))
-    expect_equal(names(df4Chk), c("ID", "sex", sprintf("cond%d", 1:4), "measure"))
-    expect_equal(df4Chk[, "cond1"], as.factor(rep(rep(c("rspCrr", "rspTme"), each = 24), times = 100)))
-    expect_equal(df4Chk[, "cond2"], as.factor(rep(rep(c("cong", "incong", "neutral"), each = 8), times = 200)))
-    expect_equal(df4Chk[, "cond3"], as.factor(rep(rep(c("BLUE", "GREEN", "RED", "YELLOW"), each = 2), times = 600)))
-    expect_equal(df4Chk[, "cond4"], as.factor(rep(c("1", "2"), times = 2400)))
-    expect_equal(unname(colMeans(dtaTmp[3:50])), aggregate(x = df4Chk[, "measure", drop = FALSE], by = df4Chk[, c("cond4", "cond3", "cond2", "cond1")], FUN = mean)[, 5])
+    expect_identical(dim(df4Chk), c(4800L, 7L))
+    expect_identical(vapply(df4Chk, typeof, character(1), USE.NAMES = FALSE), c(rep("integer", 6), "double"))
+    expect_named(df4Chk, c("ID", "sex", sprintf("cond%d", 1:4), "measure"))
+    expect_identical(df4Chk[, "cond1"], as.factor(rep(rep(c("rspCrr", "rspTme"), each = 24), times = 100)))
+    expect_identical(df4Chk[, "cond2"], as.factor(rep(rep(c("cong", "incong", "neutral"), each = 8), times = 200)))
+    expect_identical(df4Chk[, "cond3"], as.factor(rep(rep(c("BLUE", "GREEN", "RED", "YELLOW"), each = 2), times = 600)))
+    expect_identical(df4Chk[, "cond4"], as.factor(rep(c("1", "2"), times = 2400)))
+    expect_identical(unname(colMeans(dtaTmp[3:50])),
+                     aggregate(x = df4Chk[, "measure", drop = FALSE], by = df4Chk[, c("cond4", "cond3", "cond2", "cond1")], FUN = mean)[, 5],
+                     tolerance = 1e-6)
     unlink(nmeOut)
 
     # more complex data set, varTme as a vector =======================================================================
@@ -171,27 +179,29 @@ test_that("wide2long_omv works", {
                               varTme = c("Month", "Test"), varSep = "_"))
     df4Chk <- read_omv(nmeOut)
     expect_s3_class(df4Chk, "data.frame")
-    expect_equal(dim(df4Chk), c(121 * 24, 4))
-    expect_equal(vapply(df4Chk, typeof, character(1), USE.NAMES = FALSE), c(rep("integer", 3), "double"))
-    expect_equal(names(df4Chk), c("Year", "Month", "Test", "X"))
-    expect_equal(names(attributes(df4Chk)), c("names", "row.names", "class", "removedRows", "addedRows", "transforms"))
-    expect_equal(names(attributes(df4Chk[[4]])), c("jmv-desc", "name", "id", "columnType", "dataType", "measureType", "formula", "formulaMessage",
-                                                   "parentId", "width", "type", "importName", "description", "transform", "edits", "missingValues"))
-    expect_equal(attr(df4Chk[[4]], "jmv-desc"), "Test variable")
-    expect_equal(c(mean(df4Chk[[4]]), sd(df4Chk[[4]])), c(49.30143, 29.22032), tolerance = 1e-4)
+    expect_identical(dim(df4Chk), c(121L * 24L, 4L))
+    expect_identical(vapply(df4Chk, typeof, character(1), USE.NAMES = FALSE), c(rep("integer", 3), "double"))
+    expect_named(df4Chk, c("Year", "Month", "Test", "X"))
+    expect_named(attributes(df4Chk), c("names", "row.names", "class", "removedRows", "addedRows", "transforms"))
+    expect_named(attributes(df4Chk[[4]]),
+                 c("jmv-desc", "name", "id", "columnType", "dataType", "measureType", "formula", "formulaMessage",
+                   "parentId", "width", "type", "importName", "description", "transform", "edits", "missingValues"))
+    expect_identical(attr(df4Chk[[4]], "jmv-desc"), "Test variable")
+    expect_identical(c(mean(df4Chk[[4]]), sd(df4Chk[[4]])), c(49.30143, 29.22032), tolerance = 1e-4)
     unlink(nmeOut)
 
     expect_null(wide2long_omv(dtaInp = nmeInp, fleOut = nmeOut, varLst = setdiff(names(dtaTmp), "Year"), varID = "Year", varSep = "_"))
     df4Chk <- read_omv(nmeOut)
     expect_s3_class(df4Chk, "data.frame")
-    expect_equal(dim(df4Chk), c(121 * 24, 4))
-    expect_equal(vapply(df4Chk, typeof, character(1), USE.NAMES = FALSE), c(rep("integer", 3), "double"))
-    expect_equal(names(df4Chk), c("Year", "cond1", "cond2", "X"))
-    expect_equal(names(attributes(df4Chk)), c("names", "row.names", "class", "removedRows", "addedRows", "transforms"))
-    expect_equal(names(attributes(df4Chk[[4]])), c("jmv-desc", "name", "id", "columnType", "dataType", "measureType", "formula", "formulaMessage",
-                                                   "parentId", "width", "type", "importName", "description", "transform", "edits", "missingValues"))
-    expect_equal(attr(df4Chk[[4]], "jmv-desc"), "Test variable")
-    expect_equal(c(mean(df4Chk[[4]]), sd(df4Chk[[4]])), c(49.30143, 29.22032), tolerance = 1e-4)
+    expect_identical(dim(df4Chk), c(121L * 24L, 4L))
+    expect_identical(vapply(df4Chk, typeof, character(1), USE.NAMES = FALSE), c(rep("integer", 3), "double"))
+    expect_named(df4Chk, c("Year", "cond1", "cond2", "X"))
+    expect_named(attributes(df4Chk), c("names", "row.names", "class", "removedRows", "addedRows", "transforms"))
+    expect_named(attributes(df4Chk[[4]]),
+                 c("jmv-desc", "name", "id", "columnType", "dataType", "measureType", "formula", "formulaMessage",
+                   "parentId", "width", "type", "importName", "description", "transform", "edits", "missingValues"))
+    expect_identical(attr(df4Chk[[4]], "jmv-desc"), "Test variable")
+    expect_identical(c(mean(df4Chk[[4]]), sd(df4Chk[[4]])), c(49.30143, 29.22032), tolerance = 1e-4)
     unlink(nmeOut)
 
     expect_warning(wide2long_omv(dtaInp = nmeInp, fleOut = nmeOut, varLst = setdiff(names(dtaTmp), "Year"),
@@ -199,21 +209,22 @@ test_that("wide2long_omv works", {
                    regexp = "The number of splits \\(defined by the variables in varLst and varSep\\) is not matching the length of varTme\\.")
     df4Chk <- read_omv(nmeOut)
     expect_s3_class(df4Chk, "data.frame")
-    expect_equal(dim(df4Chk), c(121 * 24, 4))
-    expect_equal(vapply(df4Chk, typeof, character(1), USE.NAMES = FALSE), c(rep("integer", 3), "double"))
-    expect_equal(names(df4Chk), c("Year", "cond1", "cond2", "X"))
-    expect_equal(names(attributes(df4Chk)), c("names", "row.names", "class", "removedRows", "addedRows", "transforms"))
-    expect_equal(names(attributes(df4Chk[[4]])), c("jmv-desc", "name", "id", "columnType", "dataType", "measureType", "formula", "formulaMessage",
-                                                   "parentId", "width", "type", "importName", "description", "transform", "edits", "missingValues"))
-    expect_equal(attr(df4Chk[[4]], "jmv-desc"), "Test variable")
-    expect_equal(c(mean(df4Chk[[4]]), sd(df4Chk[[4]])), c(49.30143, 29.22032), tolerance = 1e-4)
+    expect_identical(dim(df4Chk), c(121L * 24L, 4L))
+    expect_identical(vapply(df4Chk, typeof, character(1), USE.NAMES = FALSE), c(rep("integer", 3), "double"))
+    expect_named(df4Chk, c("Year", "cond1", "cond2", "X"))
+    expect_named(attributes(df4Chk), c("names", "row.names", "class", "removedRows", "addedRows", "transforms"))
+    expect_named(attributes(df4Chk[[4]]),
+                 c("jmv-desc", "name", "id", "columnType", "dataType", "measureType", "formula", "formulaMessage",
+                   "parentId", "width", "type", "importName", "description", "transform", "edits", "missingValues"))
+    expect_identical(attr(df4Chk[[4]], "jmv-desc"), "Test variable")
+    expect_identical(c(mean(df4Chk[[4]]), sd(df4Chk[[4]])), c(49.30143, 29.22032), tolerance = 1e-4)
     unlink(nmeOut)
 
     expect_null(wide2long_omv(dtaInp = nmeInp, fleOut = nmeOut, varLst = setdiff(names(dtaTmp), "Year"), varID = "Year",
                               varTme = c("Month", "Test"), varSrt = c("Year", "Month")))
     df4Chk <- read_omv(nmeOut)
     expect_s3_class(df4Chk, "data.frame")
-    expect_equal(dim(df4Chk), c(121 * 24, 4))
+    expect_identical(dim(df4Chk), c(121L * 24L, 4L))
     expect_false(is.unsorted(df4Chk[["Year"]]))
     expect_true(all(df4Chk[["Month"]] == rep(rep(sort(month.abb), each = 2), length(unique(df4Chk[["Year"]])))))
     unlink(nmeOut)
@@ -221,7 +232,7 @@ test_that("wide2long_omv works", {
     df4Chk <- wide2long_omv(dtaInp = nmeInp, varLst = setdiff(names(dtaTmp), "Year"), varID = "Year",
                             varTme = c("Month", "Test"), varSrt = c("Year", "Month"))
     expect_s3_class(df4Chk, "data.frame")
-    expect_equal(dim(df4Chk), c(121 * 24, 4))
+    expect_identical(dim(df4Chk), c(121L * 24L, 4L))
     expect_false(is.unsorted(df4Chk[["Year"]]))
     expect_true(all(df4Chk[["Month"]] == rep(rep(sort(month.abb), each = 2), length(unique(df4Chk[["Year"]])))))
 
@@ -229,7 +240,7 @@ test_that("wide2long_omv works", {
                               varTme = c("Month", "Test"), varSrt = c("Year", "Test", "Month")))
     df4Chk <- read_omv(nmeOut)
     expect_s3_class(df4Chk, "data.frame")
-    expect_equal(dim(df4Chk), c(121 * 24, 4))
+    expect_identical(dim(df4Chk), c(121L * 24L, 4L))
     expect_false(is.unsorted(df4Chk[["Year"]]))
     expect_true(all(df4Chk[["Month"]] == rep(sort(month.abb), length(unique(df4Chk[["Year"]])) * 2)))
     unlink(nmeOut)

@@ -6,7 +6,7 @@ concurrency:
   cancel-in-progress: true
 
 on:
-  # Manually trigger the Action under Actions/pkgcheck
+  # Trigger the Action under Actions/pkgcheck
   workflow_dispatch:
   # Run on every push to main
   push:
@@ -19,6 +19,7 @@ env:
 
 jobs:
   pkgcheck:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     permissions:
       issues: write

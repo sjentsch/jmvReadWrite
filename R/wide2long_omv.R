@@ -232,8 +232,8 @@ wide2long_omv <- function(dtaInp = NULL, fleOut = "", varLst = NULL, varExc = NU
         }
     }
 
-    # rtnDta in globals.R (unified function to either write the data frame, open it in a new jamovi session or return it)
-    rtnDta(dtaFrm = dtaFrm, fleOut = fleOut, dtaTtl = jmvTtl("_long"), ...)
+    # rtnDta in globals.R (unified function to either write the data frame or return it)
+    rtnDta(dtaFrm = dtaFrm, fleOut = fleOut, ...)
 }
 
 crtVry <- function(crrNmV = NULL, crrTms = NULL, varSpl = NULL, vldPos = NA, crrPos = NA, varSep = "_") {

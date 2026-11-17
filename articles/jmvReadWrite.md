@@ -14,7 +14,7 @@ provides a graphical user interface for most helper functions.
 If you find the package useful, please cite it as:
 
 Jentschke S (2026). *jmvReadWrite: Read and Write jamovi Files*. R
-package version 0.4.15,
+package version 0.4.15.9000,
 <https://CRAN.R-project.org/package=jmvReadWrite>.
 
 ### Installation
@@ -170,7 +170,7 @@ list.files(".", "Trial.omv")
 #> [1] "Trial.omv"
 file.info("Trial.omv")[, c("size", "isdir", "mode")]
 #>           size isdir mode
-#> Trial.omv 2522 FALSE  644
+#> Trial.omv 2525 FALSE  644
 unlink("Trial.omv")
 ```
 

@@ -11,13 +11,13 @@ Source:
 [`inst/CITATION`](https://github.com/sjentsch/jmvReadWrite/blob/main/inst/CITATION)
 
 Jentschke S (2026). *jmvReadWrite: Read and Write jamovi Files*. R
-package version 0.4.15,
+package version 0.4.15.9000,
 <https://CRAN.R-project.org/package=jmvReadWrite>.
 
     @Manual{jmvReadWrite,
       title = {{jmvReadWrite}: Read and Write jamovi Files},
       author = {Sebastian Jentschke},
       year = {2026},
-      note = {R package version 0.4.15},
+      note = {R package version 0.4.15.9000},
       url = {https://CRAN.R-project.org/package=jmvReadWrite},
     }

@@ -2,6 +2,8 @@
 
 ## jmvReadWrite 0.4.15
 
+CRAN release: 2026-11-04
+
 ### Enhancements:
 
 - `transform_vars_omv`: ensure that only positive OR negative
